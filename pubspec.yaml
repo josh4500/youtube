@@ -5,7 +5,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.3.0-35.0.dev <4.0.0'
+  sdk: '>=3.2.0 <4.0.0'
 dependencies:
   flutter:
     sdk: flutter
@@ -13,12 +13,15 @@ dependencies:
   camera: ^0.10.5+5
   cupertino_icons: ^1.0.2
   extended_image: ^8.2.0
-  flutter_riverpod: ^2.4.6
+  flutter_riverpod: ^2.4.8
   get_it: ^7.6.4
   go_router: ^12.1.1
   google_sign_in: ^6.1.6
   grpc: ^3.2.4
+  hive: ^4.0.0-dev.2
   image: ^4.1.3
+  intl_utils: ^2.8.3
+  isar_flutter_libs: ^4.0.0-dev.13
   media_kit: ^1.1.10+1
   palette_generator: ^0.3.3+3
   path_provider: ^2.1.1
@@ -26,12 +29,18 @@ dependencies:
   protobuf: ^3.1.0
   retry: ^3.1.2
   sign_in_with_apple: ^5.0.0
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 flutter:
+  generate: true
   uses-material-design: true
+
+flutter_intl:
+  enabled: true
