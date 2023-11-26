@@ -3,37 +3,48 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:youtube_clone/core/extensions.dart';
 
-typedef HiveBox = Box;
+import '../core/utils.dart';
 
 class Preferences extends Notifier<PreferenceState> {
+  /// Preference HiveBox
   final _prefBox = Hive.box(name: 'preferences');
 
+  late final ReadWriteValue<ThemeMode> _themeMode;
+  late final ReadWriteValue<Locale> _locale;
+
   set themeMode(ThemeMode themeMode) {
-    _getThemeMode.val = themeMode;
+    _themeMode.value = themeMode;
     state = state.copyWith(themeMode: themeMode);
   }
 
-  ReadWriteValue<ThemeMode> get _getThemeMode => ReadWriteValue<ThemeMode>(
-        'themeMode',
-        ThemeMode.system,
-        _prefBox,
-        (mode) => mode.name,
-        (name) => ThemeMode.values.firstWhereOrNull(
-          (element) => element.name == name,
-        ),
-      );
-
-  ReadWriteValue<Locale> get _getLocale => ReadWriteValue(
-        'locale',
-        const Locale('en'),
-        _prefBox,
-      );
+  set locale(Locale locale) {
+    _locale.value = locale;
+    state = state.copyWith(locale: locale);
+  }
 
   @override
   PreferenceState build() {
+    // Set ReadWriteValue for _themeMode
+    _themeMode = ReadWriteValue<ThemeMode>(
+      'themeMode',
+      ThemeMode.system,
+      _prefBox,
+      (mode) => mode.name,
+      (name) => ThemeMode.values.firstWhereOrNull(
+        (element) => element.name == name,
+      ),
+    );
+
+    // Set ReadWriteValue for _locale
+    _locale = ReadWriteValue(
+      'locale',
+      const Locale('en'),
+      _prefBox,
+    );
+
     return PreferenceState(
-      themeMode: _getThemeMode.val,
-      locale: _getLocale.val,
+      themeMode: _themeMode.value,
+      locale: _locale.value,
     );
   }
 }
@@ -55,33 +66,10 @@ class PreferenceState {
   }
 }
 
-class ReadWriteValue<T> {
-  final String key;
-  final T defaultValue;
-  final HiveBox? getBox;
-  final String Function(T input)? encoder;
-  final T? Function(String input)? decoder;
-
-  ReadWriteValue(
-    this.key,
-    this.defaultValue, [
-    this.getBox,
-    this.encoder,
-    this.decoder,
-  ]);
-
-  Box _getRealBox() => getBox ?? Hive.box();
-
-  T get val {
-    final value = _getRealBox().get(key);
-    if (value != null && decoder != null) {
-      return decoder!(value as String)!;
-    }
-    return value ?? defaultValue;
-  }
-
-  set val(T newVal) => _getRealBox().put(
-        key,
-        encoder != null ? encoder!(newVal) : newVal,
-      );
+extension IsDarkExtension on ThemeMode {
+  bool get isDark => this == ThemeMode.dark;
 }
+
+final preferencesProvider = NotifierProvider<Preferences, PreferenceState>(
+  () => Preferences(),
+);
