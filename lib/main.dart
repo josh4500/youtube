@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'core/environment.dart';
 import 'generated/l10n.dart';
+import 'infrastructure/services/internet_connectivity/internet_connectivity.dart';
 import 'presentation/app.dart';
 
 Future<void> main() async {
@@ -21,6 +22,8 @@ Future<void> setup() async {
 
   // Load default locale
   await S.load(const Locale('en'));
+
+  InternetConnectivity.instance.initialize();
 
   // Initialize services and repository depending on the environment
   switch (environment) {

@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
 
   camera: ^0.10.5+5
+  connectivity_plus: ^5.0.2
   cupertino_icons: ^1.0.2
   extended_image: ^8.2.0
   flutter_riverpod: ^2.4.8
@@ -28,6 +29,7 @@ dependencies:
   photo_manager: ^2.8.1
   protobuf: ^3.1.0
   retry: ^3.1.2
+  rxdart: ^0.27.7
   sign_in_with_apple: ^5.0.0
   flutter_localizations:
     sdk: flutter
