@@ -6,7 +6,9 @@ import 'package:youtube_clone/presentation/theme/app_theme.dart';
 
 import '../generated/l10n.dart';
 import 'preferences.dart';
+import 'router/app_router.dart';
 import 'screens/homepage.dart';
+import 'widgets/error_overlay.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -16,7 +18,7 @@ class App extends StatelessWidget {
     return ProviderScope(child: Consumer(
       builder: (context, ref, _) {
         final preferences = ref.watch(preferencesProvider);
-        return MaterialApp(
+        return MaterialApp.router(
           title: 'Flutter Demo',
           debugShowCheckedModeBanner: environment.isDev,
           localizationsDelegates: const [
@@ -29,7 +31,12 @@ class App extends StatelessWidget {
           supportedLocales: S.delegate.supportedLocales,
           themeMode: preferences.themeMode,
           theme: preferences.themeMode.isDark ? AppTheme.dark : AppTheme.light,
-          home: const HomePage(),
+          builder: (context, child) {
+            return ErrorOverlay(
+              child: child!,
+            );
+          },
+          routerConfig: AppRouter.routerConfig,
         );
       },
     ));

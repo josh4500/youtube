@@ -14,6 +14,7 @@ Future<void> main() async {
 
 Future<void> setup() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   final dir = await getApplicationDocumentsDirectory();
   final appPath = dir.path;
 
