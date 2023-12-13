@@ -4,11 +4,21 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 
+import 'connectivity_state.dart';
+
 /// The duration (in milliseconds) for the timeout when attempting to ping a server.
 const int kPingTimeoutDuration = 5000;
 
 /// The interval (in milliseconds) between consecutive attempts to ping a server.
 const int kPingableInterval = 7000;
+
+/// Represents a server that can be pinged to check internet connectivity.
+class _Pingable {
+  final String host;
+  final int port;
+
+  _Pingable({required this.host, required this.port});
+}
 
 /// Singleton class that manages internet connectivity and emits state changes.
 class InternetConnectivity {
@@ -22,10 +32,12 @@ class InternetConnectivity {
   }
 
   final _connectivity = Connectivity();
-  late StreamSubscription<ConnectivityResult> subscription;
+  late StreamSubscription<ConnectivityResult> _subscription;
   ConnectivityState _state = ConnectivityState.initializing();
   ConnectivityState get state => _state;
+  ConnectivityType _connectivityType = ConnectivityType.none;
 
+  late Timer _connectionTimer;
   final _stateController = StreamController<ConnectivityState>.broadcast();
   Stream<ConnectivityState> get onStateChange => _stateController.stream;
 
@@ -35,11 +47,18 @@ class InternetConnectivity {
   /// Initializes the InternetConnectivity by setting up connectivity change
   /// listeners and periodic ping attempts.
   void initialize() {
-    Future.delayed(const Duration(milliseconds: kPingableInterval), () {
-      subscription = _connectivity.onConnectivityChanged.listen(
+    Future.delayed(const Duration(milliseconds: kPingableInterval), () async {
+      final cResult = await _connectivity.checkConnectivity();
+
+      // Set the connectivity type
+      _connectivityType = cResult.toConnectivityType();
+
+      // Set subscription to change in connectivity result
+      _subscription = _connectivity.onConnectivityChanged.listen(
         _onConnectivityResultChange,
       );
-      Timer.periodic(
+
+      _connectionTimer = Timer.periodic(
         const Duration(milliseconds: kPingableInterval),
         _onTryConnection,
       );
@@ -48,11 +67,18 @@ class InternetConnectivity {
 
   /// Updates connectivity state
   void _updateConnectivityState(ConnectivityState newState) {
-    _stateController.sink.add(_state = newState);
+    _stateController.sink.add(
+      _state = newState.copyWith(
+        type: _connectivityType,
+      ),
+    );
   }
 
   /// Handles the change in connectivity status and updates the state accordingly.
   Future<void> _onConnectivityResultChange(ConnectivityResult result) async {
+    // Update the connectivity type
+    _connectivityType = result.toConnectivityType();
+
     if (result == ConnectivityResult.none) {
       _lastConnectionTest = false;
       _updateConnectivityState(ConnectivityState.disconnected());
@@ -108,42 +134,10 @@ class InternetConnectivity {
     }
     return false;
   }
-}
 
-/// Represents the state of internet connectivity.
-class ConnectivityState {
-  final bool isConnected;
-  final bool initializing;
-
-  const ConnectivityState({
-    required this.isConnected,
-    this.initializing = false,
-  });
-
-  /// Factory method to create a connected state.
-  factory ConnectivityState.connected() {
-    return const ConnectivityState(isConnected: true);
+  /// Cancels listeners and subscription
+  void destroy() {
+    _connectionTimer.cancel();
+    _subscription.cancel();
   }
-
-  /// Factory method to create a disconnected state.
-  factory ConnectivityState.disconnected() {
-    return const ConnectivityState(isConnected: false);
-  }
-
-  factory ConnectivityState.initializing() {
-    return const ConnectivityState(isConnected: false, initializing: true);
-  }
-
-  @override
-  String toString() {
-    return 'ConnectivityState: isConnected $isConnected initializing $initializing';
-  }
-}
-
-/// Represents a server that can be pinged to check internet connectivity.
-class _Pingable {
-  final String host;
-  final int port;
-
-  _Pingable({required this.host, required this.port});
 }
