@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/theme/app_style.dart';
 
 import 'app_color.dart';
 
@@ -18,13 +19,31 @@ class AppTheme {
     background: Colors.white,
   );
 
+  static final _lightAppStyles = AppStylesExtension(
+    appBarTextStyle: AppStyle.appBar.light,
+  );
+
   //
   // Dark theme
   //
 
-  static final ThemeData dark = ThemeData.dark().copyWith(
+  static final ThemeData dark = ThemeData(
+    colorScheme: const ColorScheme.dark(
+      background: Colors.black,
+    ),
+    scrollbarTheme: const ScrollbarThemeData(
+      interactive: false,
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.black,
+      iconTheme: const IconThemeData(weight: 100),
+      elevation: 0,
+      titleTextStyle: AppStyle.appBar.dark,
+    ),
+  ).copyWith(
     extensions: [
       _darkAppColors,
+      _darkAppStyles,
     ],
   );
 
@@ -32,12 +51,18 @@ class AppTheme {
     primary: Colors.white,
     background: Colors.black,
   );
+
+  static final _darkAppStyles = AppStylesExtension(
+    appBarTextStyle: AppStyle.appBar.dark,
+  );
 }
 
 extension AppThemeExtension on ThemeData {
   /// Usage example: Theme.of(context).appColors;
   AppColorsExtension get appColors =>
       extension<AppColorsExtension>() ?? AppTheme._lightAppColors;
+  AppStylesExtension get appStyles =>
+      extension<AppStylesExtension>() ?? AppTheme._lightAppStyles;
 }
 
 extension ThemeGetter on BuildContext {

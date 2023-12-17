@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
-class AppColor {}
+class AppPalette {
+  // WHITE
+  static const Color white = Color(0xFFFFFFFF);
+  static const Color white1 = Color(0xFFF1F1F1);
+}
 
 class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   AppColorsExtension({
