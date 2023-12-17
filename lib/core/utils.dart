@@ -12,11 +12,11 @@ class ReadWriteValue<T> {
 
   ReadWriteValue(
     this.key,
-    this.defaultValue, [
-    this.getBox,
+    this.defaultValue,
+    this.getBox, {
     this.encoder,
     this.decoder,
-  ]);
+  });
 
   Box _getRealBox() => getBox ?? Hive.box();
 
@@ -36,4 +36,23 @@ class ReadWriteValue<T> {
       encoder != null ? encoder!(newVal) : newVal,
     );
   }
+}
+
+class ReadWriteEnum<T extends Enum> extends ReadWriteValue<T> {
+  final String key;
+  final T defaultValue;
+  final HiveBox? getBox;
+  final List<T> enumValues;
+
+  ReadWriteEnum(this.key, this.defaultValue, this.getBox, this.enumValues)
+      : super(
+          key,
+          defaultValue,
+          getBox,
+          encoder: (enumValue) => enumValue.name,
+          decoder: (name) => enumValues.firstWhere(
+            (element) => element.name == name,
+            orElse: () => defaultValue,
+          ),
+        );
 }
