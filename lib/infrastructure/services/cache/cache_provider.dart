@@ -1,16 +1,16 @@
-abstract class Cache<V> {
+abstract class CacheProvider<E> {
   /// Checks whether a store contains the key.
   bool containsKey(String key);
-  V? read(String key);
+  E? read(String key);
 
   /// Write
-  void write(String key, V? value);
+  void write(String key, E? value);
 
   /// Get all values from a given store
-  Iterable<V> get values;
+  Iterable<E> get values;
 
   /// Watch changes for a given [key]
-  Stream<V?> watchKey(String key);
+  Stream<E?> watchKey(String key);
 
   /// Delete key value
   void delete(String key);
