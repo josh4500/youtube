@@ -20,3 +20,9 @@ extension FirstWhereOrNullExtension<T> on Iterable<T> {
     }
   }
 }
+
+extension RemoveFirstExtension<T> on List<T> {
+  T removeFirst() {
+    return removeAt(0);
+  }
+}
