@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:youtube_clone/core/enums/settings_enums.dart';
+import 'package:youtube_clone/infrastructure/services/cache/hive_cache_provider.dart';
 
-import '../core/utils.dart';
+import '../infrastructure/services/cache/read_write_value.dart';
 
 class Preferences extends Notifier<PreferenceState> {
-  /// Preference HiveBox
-  final _prefBox = Hive.box(name: 'preferences');
+  /// Dynamic Preference [HiveCacheProvider]
+  final _prefBox = HiveCacheProvider('preferences');
 
   late final _themeMode = ReadWriteEnum<ThemeMode>(
     'themeMode',
