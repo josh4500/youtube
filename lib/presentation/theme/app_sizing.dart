@@ -1,22 +1,18 @@
-import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/theme/relative_size.dart';
 
-class AppSizing {}
+import 'size_triad.dart';
+import 'orientation_pair.dart';
 
-class AppSizingExtension extends ThemeExtension<AppSizingExtension> {
-  @override
-  ThemeExtension<AppSizingExtension> copyWith() {
-    return AppSizingExtension();
-  }
+class AppSizing {
+  static final testProperty = SizeTriad<OrientationPair<double>>.double(
+    const OrientationPair<double>(landscape: 120, portrait: 120),
+    const OrientationPair<double>(landscape: 120, portrait: 120),
+  );
 
-  @override
-  ThemeExtension<AppSizingExtension> lerp(
-    covariant ThemeExtension<AppSizingExtension>? other,
-    double t,
-  ) {
-    if (other is! AppSizingExtension) {
-      return this;
-    }
-
-    return AppSizingExtension();
-  }
+  static final settingsTileSize = SizeTriad.single(
+    const OrientationPair<RelativeSizing>(
+      landscape: RelativeSizing(wRatio: 0.41),
+      portrait: RelativeSizing(wRatio: 1),
+    ),
+  );
 }

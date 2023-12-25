@@ -1,3 +1,7 @@
+import 'package:youtube_clone/presentation/theme/device_theme.dart';
+
+import 'enum.dart';
+
 /// A generic class representing a triad of sizes for different platforms.
 ///
 /// This class is designed to hold size values for Android phones, iOS phones,
@@ -62,4 +66,31 @@ class SizeTriad<T> {
       ipad: tablet,
     );
   }
+
+  T resolveWithDeviceType(DeviceType type) {
+    switch (type) {
+      case DeviceType.android:
+        return android;
+      case DeviceType.ios:
+        return ios;
+      case DeviceType.tablet:
+        return androidTablet;
+      case DeviceType.ipad:
+        return ipad;
+    }
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SizeTriad &&
+          runtimeType == other.runtimeType &&
+          android == other.android &&
+          ios == other.ios &&
+          androidTablet == other.androidTablet &&
+          ipad == other.ipad;
+
+  @override
+  int get hashCode =>
+      android.hashCode ^ ios.hashCode ^ androidTablet.hashCode ^ ipad.hashCode;
 }
