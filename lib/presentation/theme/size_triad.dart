@@ -1,5 +1,3 @@
-import 'package:youtube_clone/presentation/theme/device_theme.dart';
-
 import 'enum.dart';
 
 /// A generic class representing a triad of sizes for different platforms.
