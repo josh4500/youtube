@@ -9,6 +9,7 @@ enum ConnectivityType {
   bool get isWifi => this == wifi;
   bool get isMobile => this == mobile;
   bool get isOther => this == other;
+  bool get isNone => this == none;
 }
 
 /// Represents the state of internet connectivity.
@@ -16,6 +17,8 @@ class ConnectivityState {
   final bool isConnected;
   final bool initializing;
   final ConnectivityType type;
+
+  bool get isNotConnected => !isConnected;
 
   const ConnectivityState({
     required this.isConnected,

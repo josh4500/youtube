@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,8 +23,8 @@ class App extends StatelessWidget {
           return DeviceTheme.fromView(
             view: View.of(context),
             child: MaterialApp.router(
-              title: 'Flutter Demo',
-              debugShowCheckedModeBanner: environment.isDev,
+              title: 'Youtube',
+              debugShowCheckedModeBanner: false,
               localizationsDelegates: const [
                 S.delegate,
                 GlobalMaterialLocalizations.delegate,
@@ -32,9 +33,10 @@ class App extends StatelessWidget {
               ],
               locale: preferences.locale,
               supportedLocales: S.delegate.supportedLocales,
+              theme: AppTheme.light,
+              darkTheme: AppTheme.dark,
               themeMode: preferences.themeMode,
-              theme:
-                  preferences.themeMode.isDark ? AppTheme.dark : AppTheme.light,
+              themeAnimationCurve: Curves.easeIn,
               builder: (context, child) {
                 return ErrorOverlay(
                   child: child!,

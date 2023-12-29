@@ -26,16 +26,20 @@ class Preferences extends Notifier<PreferenceState> {
     decoder: (languageCode) => Locale(languageCode),
   );
 
-  late final _remindForBreak = ReadWriteValue<bool>(
+  late final _remindForBreak = ReadWriteValue<RemindForBreak>(
     'remindForBreak',
-    false,
+    RemindForBreak.defaultPref,
     _prefBox,
+    encoder: (value) => value.toJson(),
+    decoder: (value) => RemindForBreak.fromJson(value),
   );
 
-  late final _remindForBedtime = ReadWriteValue<bool>(
+  late final _remindForBedtime = ReadWriteValue<RemindForBedtime>(
     'remindForBedtime',
-    false,
+    RemindForBedtime.defaultPref,
     _prefBox,
+    encoder: (value) => value.toJson(),
+    decoder: (value) => RemindForBedtime.fromJson(value),
   );
 
   late final _playbackInFeeds = ReadWriteEnum<PlaybackInFeeds>(
@@ -45,9 +49,9 @@ class Preferences extends Notifier<PreferenceState> {
     PlaybackInFeeds.values,
   );
 
-  late final _doubleTapToSeek = ReadWriteValue<int>(
+  late final _doubleTapSeek = ReadWriteValue<int>(
     'doubleTapToSeek',
-    0,
+    10,
     _prefBox,
   );
 
@@ -124,6 +128,37 @@ class Preferences extends Notifier<PreferenceState> {
     decoder: (prefJson) => AccessibilityPreferences.fromJson(prefJson),
   );
 
+  set playbackInFeeds(PlaybackInFeeds playbackInFeeds) {
+    _playbackInFeeds.value = playbackInFeeds;
+    state = state.copyWith(playbackInFeeds: playbackInFeeds);
+  }
+
+  set enableStatsForNerds(bool enableStatsForNerds) {
+    _enableStatForNerds.value = enableStatsForNerds;
+    state = state.copyWith(enableStatsForNerds: enableStatsForNerds);
+  }
+
+  set restrictedMode(bool restrictedMode) {
+    _restrictedMode.value = restrictedMode;
+    state = state.copyWith(restrictedMode: restrictedMode);
+  }
+
+  set uploadNetwork(UploadNetwork uploadNetwork) {
+    _uploadNetwork.value = uploadNetwork;
+    state = state.copyWith(uploadNetwork: uploadNetwork);
+  }
+
+  set zoomFillScreen(bool zoomFillScreen) {
+    _zoomFillScreen.value = zoomFillScreen;
+    state = state.copyWith(zoomFillScreen: zoomFillScreen);
+  }
+
+  set doubleTapSeek(int doubleTapSeek) {
+    _doubleTapSeek.value = doubleTapSeek;
+
+    state = state.copyWith(doubleTapSeek: doubleTapSeek);
+  }
+
   set themeMode(ThemeMode themeMode) {
     _themeMode.value = themeMode;
     state = state.copyWith(themeMode: themeMode);
@@ -134,11 +169,61 @@ class Preferences extends Notifier<PreferenceState> {
     state = state.copyWith(locale: locale);
   }
 
+  void changeRemindForBreak({Duration? frequency, bool? enabled}) {
+    if (frequency == null && enabled == null) return;
+
+    // Set enabled to false if duration chosen is Duration.zero
+    enabled = frequency != null && frequency.inSeconds == 0 ? false : enabled;
+    // Set frequency to null if duration chosen is Duration.zero
+    frequency =
+        frequency != null && frequency.inSeconds == 0 ? null : frequency;
+
+    _remindForBreak.value = _remindForBreak.value.copyWith(
+      frequency: frequency,
+      enabled: enabled,
+    );
+
+    state = state.copyWith(remindForBreak: _remindForBreak.value);
+  }
+
+  void changeRemindForBedTime({
+    bool? onDeviceBedtime,
+    DateTime? customStartSchedule,
+    DateTime? customStopSchedule,
+    bool? waitTillFinishVideo,
+    bool? enable,
+  }) {
+    if (onDeviceBedtime == null &&
+        customStartSchedule == null &&
+        customStopSchedule == null &&
+        waitTillFinishVideo == null &&
+        enable == null) {
+      return;
+    }
+
+    _remindForBedtime.value = _remindForBedtime.value.copyWith(
+      onDeviceBedtime: onDeviceBedtime,
+      customStartSchedule: customStartSchedule,
+      customStopSchedule: customStopSchedule,
+      waitTillFinishVideo: waitTillFinishVideo,
+      enabled: enable,
+    );
+    state = state.copyWith(remindForBedtime: _remindForBedtime.value);
+  }
+
   @override
   PreferenceState build() {
     return PreferenceState(
       themeMode: _themeMode.value,
       locale: _locale.value,
+      remindForBreak: _remindForBreak.value,
+      remindForBedtime: _remindForBedtime.value,
+      playbackInFeeds: _playbackInFeeds.value,
+      doubleTapSeek: _doubleTapSeek.value,
+      zoomFillScreen: _zoomFillScreen.value,
+      uploadNetwork: _uploadNetwork.value,
+      restrictedMode: _restrictedMode.value,
+      enableStatsForNerds: _enableStatForNerds.value,
     );
   }
 }
@@ -146,16 +231,151 @@ class Preferences extends Notifier<PreferenceState> {
 class PreferenceState {
   final ThemeMode themeMode;
   final Locale locale;
+  final RemindForBreak remindForBreak;
+  final RemindForBedtime remindForBedtime;
 
-  const PreferenceState({required this.themeMode, required this.locale});
+  final PlaybackInFeeds playbackInFeeds;
+  final int doubleTapSeek;
+  final bool zoomFillScreen;
+  final UploadNetwork uploadNetwork;
+  final bool restrictedMode;
+
+  final bool enableStatsForNerds;
+
+  PreferenceState({
+    required this.themeMode,
+    required this.locale,
+    required this.remindForBreak,
+    required this.remindForBedtime,
+    required this.playbackInFeeds,
+    required this.doubleTapSeek,
+    required this.zoomFillScreen,
+    required this.uploadNetwork,
+    required this.restrictedMode,
+    required this.enableStatsForNerds,
+  });
 
   PreferenceState copyWith({
     ThemeMode? themeMode,
     Locale? locale,
+    RemindForBreak? remindForBreak,
+    RemindForBedtime? remindForBedtime,
+    PlaybackInFeeds? playbackInFeeds,
+    int? doubleTapSeek,
+    bool? zoomFillScreen,
+    UploadNetwork? uploadNetwork,
+    bool? restrictedMode,
+    bool? enableStatsForNerds,
   }) {
     return PreferenceState(
       themeMode: themeMode ?? this.themeMode,
       locale: locale ?? this.locale,
+      remindForBreak: remindForBreak ?? this.remindForBreak,
+      remindForBedtime: remindForBedtime ?? this.remindForBedtime,
+      playbackInFeeds: playbackInFeeds ?? this.playbackInFeeds,
+      doubleTapSeek: doubleTapSeek ?? this.doubleTapSeek,
+      zoomFillScreen: zoomFillScreen ?? this.zoomFillScreen,
+      uploadNetwork: uploadNetwork ?? this.uploadNetwork,
+      restrictedMode: restrictedMode ?? this.restrictedMode,
+      enableStatsForNerds: enableStatsForNerds ?? this.enableStatsForNerds,
+    );
+  }
+}
+
+class RemindForBreak {
+  final Duration frequency;
+  final bool enabled;
+
+  const RemindForBreak({required this.frequency, required this.enabled});
+
+  static const defaultPref = RemindForBreak(
+    frequency: Duration(hours: 1, minutes: 15),
+    enabled: false,
+  );
+
+  String toJson() {
+    return jsonEncode({
+      'frequency': frequency.inMilliseconds,
+      'enabled': enabled,
+    });
+  }
+
+  factory RemindForBreak.fromJson(String source) {
+    final Map<String, dynamic> map = jsonDecode(source);
+    return RemindForBreak(
+      frequency: Duration(milliseconds: map['frequency'] as int),
+      enabled: map['enabled'] as bool,
+    );
+  }
+
+  RemindForBreak copyWith({
+    Duration? frequency,
+    bool? enabled,
+  }) {
+    return RemindForBreak(
+      frequency: frequency ?? this.frequency,
+      enabled: enabled ?? this.enabled,
+    );
+  }
+}
+
+class RemindForBedtime {
+  final bool onDeviceBedtime;
+  final DateTime customStartSchedule;
+  final DateTime customStopSchedule;
+  final bool waitTillFinishVideo;
+  final bool enabled;
+
+  static final defaultPref = RemindForBedtime(
+    onDeviceBedtime: false,
+    customStartSchedule: DateTime.now().copyWith(hour: 23),
+    customStopSchedule: DateTime.now().copyWith(hour: 5),
+    waitTillFinishVideo: true,
+    enabled: false,
+  );
+
+  const RemindForBedtime({
+    required this.onDeviceBedtime,
+    required this.customStartSchedule,
+    required this.customStopSchedule,
+    required this.waitTillFinishVideo,
+    required this.enabled,
+  });
+
+  String toJson() {
+    return jsonEncode({
+      'onDeviceBedtime': onDeviceBedtime,
+      'customStartSchedule': customStartSchedule.toIso8601String(),
+      'customStopSchedule': customStopSchedule.toIso8601String(),
+      'waitTillFinishVideo': waitTillFinishVideo,
+      'enabled': enabled,
+    });
+  }
+
+  factory RemindForBedtime.fromJson(String source) {
+    final Map<String, dynamic> map = jsonDecode(source);
+    return RemindForBedtime(
+      onDeviceBedtime: map['onDeviceBedtime'] as bool,
+      customStartSchedule: DateTime.parse(map['customStartSchedule']),
+      customStopSchedule: DateTime.parse(map['customStopSchedule']),
+      waitTillFinishVideo: map['waitTillFinishVideo'] as bool,
+      enabled: map['enabled'] as bool,
+    );
+  }
+
+  RemindForBedtime copyWith({
+    bool? onDeviceBedtime,
+    DateTime? customStartSchedule,
+    DateTime? customStopSchedule,
+    bool? waitTillFinishVideo,
+    bool? enabled,
+  }) {
+    return RemindForBedtime(
+      onDeviceBedtime: onDeviceBedtime ?? this.onDeviceBedtime,
+      customStartSchedule: customStartSchedule ?? this.customStartSchedule,
+      customStopSchedule: customStopSchedule ?? this.customStopSchedule,
+      waitTillFinishVideo: waitTillFinishVideo ?? this.waitTillFinishVideo,
+      enabled: enabled ?? this.enabled,
     );
   }
 }
@@ -202,7 +422,7 @@ class DataSavingPreferences {
   }
 
   factory DataSavingPreferences.fromJson(String source) {
-    final Map<String, Object> map = jsonDecode(source);
+    final Map<String, dynamic> map = jsonDecode(source);
     return DataSavingPreferences(
       reduceVideoQuality: map['reduceVideoQuality'] as bool,
       reduceDownloadQuality: map['reduceDownloadQuality'] as bool,
@@ -237,7 +457,7 @@ class VideoQualityPreferences {
   }
 
   factory VideoQualityPreferences.fromJson(String source) {
-    final Map<String, Object> map = jsonDecode(source);
+    final Map<String, dynamic> map = jsonDecode(source);
     return VideoQualityPreferences(
       mobile: map['mobile'] as VideoQuality,
       wifi: map['wifi'] as VideoQuality,
@@ -296,7 +516,7 @@ class DownloadPreferences {
   }
 
   factory DownloadPreferences.fromJson(String source) {
-    final Map<String, Object> map = jsonDecode(source);
+    final Map<String, dynamic> map = jsonDecode(source);
     return DownloadPreferences(
       quality: map['quality'] as int,
       wifiOnly: map['wifiOnly'] as bool,
@@ -347,7 +567,7 @@ class AccessibilityPreferences {
   }
 
   factory AccessibilityPreferences.fromJson(String source) {
-    final Map<String, Object> map = jsonDecode(source);
+    final Map<String, dynamic> map = jsonDecode(source);
     return AccessibilityPreferences(
       enabled: map['enabled'] as bool,
       hideDuration: map['hideDuration'] as int,
@@ -360,6 +580,7 @@ class Country {}
 
 extension IsDarkExtension on ThemeMode {
   bool get isDark => this == ThemeMode.dark;
+  bool get isSystem => this == ThemeMode.system;
 }
 
 final preferencesProvider = NotifierProvider<Preferences, PreferenceState>(

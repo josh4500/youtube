@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:youtube_clone/core/constants/constants.dart';
 
 import 'core/environment.dart';
 import 'generated/l10n.dart';
@@ -22,9 +25,16 @@ Future<void> setup() async {
   Hive.defaultDirectory = appPath;
 
   // Load default locale
-  await S.load(const Locale('en'));
+  final locale = S.delegate.supportedLocales.firstWhere(
+    (locale) {
+      return locale.languageCode.split('_').first == Platform.localeName ||
+          locale.languageCode == Platform.localeName;
+    },
+    orElse: () => defaultLocale,
+  );
+  await S.load(locale);
 
-  InternetConnectivity.instance.initialize();
+  await InternetConnectivity.instance.initialize();
 
   // Initialize services and repository depending on the environment
   switch (environment) {

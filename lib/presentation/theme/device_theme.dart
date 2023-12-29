@@ -216,4 +216,10 @@ class _DeviceThemeFromViewState extends State<_DeviceThemeFromView>
 extension DeviceThemeGetter on BuildContext {
   // Usage example: `context.deviceTheme`
   DeviceThemeData get deviceTheme => DeviceTheme.of(this);
+  Orientation get orientation => DeviceTheme.orientationOf(this);
+}
+
+extension OrientationExtension on Orientation {
+  bool get isLandscape => this == Orientation.landscape;
+  bool get isPortrait => this == Orientation.portrait;
 }

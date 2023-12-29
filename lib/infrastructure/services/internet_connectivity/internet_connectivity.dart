@@ -21,7 +21,7 @@ class _Pingable {
 }
 
 /// Singleton class that manages internet connectivity and emits state changes.
-class InternetConnectivity {
+final class InternetConnectivity {
   InternetConnectivity._();
 
   static final InternetConnectivity _instance = InternetConnectivity._();
@@ -46,18 +46,23 @@ class InternetConnectivity {
 
   /// Initializes the InternetConnectivity by setting up connectivity change
   /// listeners and periodic ping attempts.
-  void initialize() {
-    Future.delayed(const Duration(milliseconds: kPingableInterval), () async {
-      final cResult = await _connectivity.checkConnectivity();
+  Future<void> initialize() async {
+    final cResult = await _connectivity.checkConnectivity();
 
-      // Set the connectivity type
-      _connectivityType = cResult.toConnectivityType();
+    // Set the connectivity type
+    _connectivityType = cResult.toConnectivityType();
 
-      // Set subscription to change in connectivity result
-      _subscription = _connectivity.onConnectivityChanged.listen(
-        _onConnectivityResultChange,
+    if (!_connectivityType.isNone) {
+      _updateConnectivityState(
+        ConnectivityState.connected().copyWith(type: _connectivityType),
       );
+    }
+    // Set subscription to change in connectivity result
+    _subscription = _connectivity.onConnectivityChanged.listen(
+      _onConnectivityResultChange,
+    );
 
+    Future.delayed(const Duration(milliseconds: kPingableInterval), () async {
       _connectionTimer = Timer.periodic(
         const Duration(milliseconds: kPingableInterval),
         _onTryConnection,
