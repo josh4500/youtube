@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:youtube_clone/presentation/screens/home/home_screen.dart';
 import 'package:youtube_clone/presentation/screens/settings/settings_screen.dart';
 
-import '../screens/homepage.dart';
 import 'app_routes.dart';
 
 class AppRouter {

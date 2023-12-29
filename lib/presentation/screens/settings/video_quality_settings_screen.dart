@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/screens/settings/view_models/pref_option.dart';
-import 'package:youtube_clone/presentation/theme/app_color.dart';
 
 import 'widgets/settings_list_view.dart';
 import 'widgets/settings_tile.dart';

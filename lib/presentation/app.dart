@@ -1,8 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/core/environment.dart';
 import 'package:youtube_clone/presentation/theme/app_theme.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
 
