@@ -73,23 +73,21 @@ class _DateRangePickerState extends State<DateRangePicker> {
         return SettingsPopupContainer(
           title: '${start ? 'Start' : 'Stop'} time',
           showAffirmButton: true,
+          alignment: Alignment.center,
           density: VisualDensity.compact,
           capitalizeDismissButtons: true,
           child: Container(
             height: 150,
             margin: const EdgeInsets.all(32),
-            child: Align(
-              alignment: Alignment.center,
-              child: RouletteScroll<String>(
-                items: List.generate(
-                  24 * 4,
-                  (index) {
-                    return Duration(minutes: index * 15).hoursMinutes;
-                  },
-                ),
-                controller: start ? startController : stopController,
-                onPageChange: (hourValue) {},
+            child: RouletteScroll<String>(
+              items: List.generate(
+                24 * 4,
+                (index) {
+                  return Duration(minutes: index * 15).hoursMinutes;
+                },
               ),
+              controller: start ? startController : stopController,
+              onPageChange: (hourValue) {},
             ),
           ),
         );

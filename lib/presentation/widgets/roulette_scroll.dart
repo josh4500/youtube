@@ -134,23 +134,24 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
                     currentPageIndex.value = pageIndex - addedExtra;
                     widget.controller.jumpToPage(pageIndex - addedExtra);
                     print('Generated B');
-                  } else if (currentItem == lastItem && switcher && a) {
-                    effectiveItems.removeRange(
-                      (effectiveItems.length - addedExtra) + 1,
-                      effectiveItems.length,
-                    );
-
-                    effectiveItems.insertAll(
-                      0,
-                      List.generate(addedExtra, (index) => widget.items[index]),
-                    );
-                    switcher = !switcher;
-
-                    setState(() {});
-                    currentPageIndex.value = widget.items.length - 1;
-                    widget.controller.jumpToPage(widget.items.length - 1);
-                    print('Generated C');
                   }
+                  // else if (currentItem == lastItem && switcher && a) {
+                  //   effectiveItems.removeRange(
+                  //     (effectiveItems.length - addedExtra) + 1,
+                  //     effectiveItems.length,
+                  //   );
+                  //
+                  //   effectiveItems.insertAll(
+                  //     0,
+                  //     List.generate(addedExtra, (index) => widget.items[index]),
+                  //   );
+                  //   switcher = !switcher;
+                  //
+                  //   setState(() {});
+                  //   currentPageIndex.value = widget.items.length - 1;
+                  //   widget.controller.jumpToPage(widget.items.length - 1);
+                  //   print('Generated C');
+                  // }
                   // else if (currentItem == middleItem && switcher) {
                   //   effectiveItems.removeRange(
                   //     effectiveItems.length - _extra,
