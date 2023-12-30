@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class RouletteScroll<T> extends StatefulWidget {
   final T? initialValue;
@@ -29,9 +30,13 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
   late final T beforeMiddleItem;
   late final T beforeLastItem;
 
+  late final T beforeBMiddleItem;
+  late final T beforeBLastItem;
+
   bool firstTurn = false;
 
   T get lastItem => widget.items.last;
+  T get firstItem => widget.items.first;
 
   final currentPageIndex = ValueNotifier(0);
 
@@ -43,32 +48,26 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
     final initialIndex = widget.items.indexWhere(
       (element) => element == widget.initialValue,
     );
+
     if (initialIndex >= addedExtra) {
-      effectiveItems = [
-        ...widget.items,
-        ...widget.items.getRange(0, addedExtra),
-      ];
-      middleItem = effectiveItems[addedExtra * 2];
-      beforeMiddleItem = effectiveItems[(addedExtra * 2) - 1];
-    } else {
-      middleItem = effectiveItems[addedExtra * 2];
-      beforeMiddleItem = effectiveItems[(addedExtra * 2) - 1];
+      effectiveItems.addAll(
+        List.generate(_extra, (index) => widget.items[index]),
+      );
     }
 
+    middleItem = effectiveItems[addedExtra * 2];
+    beforeMiddleItem = effectiveItems[(addedExtra * 2) - 1];
+    beforeBMiddleItem = effectiveItems[(addedExtra * 2) - 2];
+
     beforeLastItem = widget.items[widget.items.length - 2];
+    beforeBLastItem = widget.items[widget.items.length - 3];
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       firstTurn = true;
-      final newIndex = initialIndex >= 0
-          ? initialIndex >= addedExtra
-              ? initialIndex
-              : addedExtra + initialIndex
-          : addedExtra;
-      widget.controller.jumpToPage(
-        newIndex,
-        // duration: const Duration(milliseconds: 200),
-        // curve: Curves.ease,
-      );
+      final newIndex =
+          initialIndex >= 0 ? addedExtra + initialIndex : addedExtra;
+
+      widget.controller.jumpToPage(newIndex);
       Future.microtask(() => currentPageIndex.value = newIndex);
     });
   }
@@ -97,31 +96,35 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
         Positioned.fill(
           child: Center(
             child: PageView.builder(
+              physics: const BouncingScrollPhysics(),
               controller: widget.controller,
               scrollDirection: Axis.vertical,
-              clipBehavior: Clip.none,
               onPageChanged: (pageIndex) {
                 final currentItem = effectiveItems[pageIndex];
                 currentPageIndex.value = pageIndex;
 
-                final a = effectiveItems.last == lastItem;
-                final b = effectiveItems.last == middleItem;
-
                 if (firstTurn) {
-                  if (currentItem == beforeMiddleItem && switcher && a) {
+                  final dir = widget.controller.position.userScrollDirection;
+                  final f = dir == ScrollDirection.reverse;
+
+                  final a = effectiveItems.last == lastItem && f;
+                  final b = effectiveItems.last == middleItem && f;
+                  final c = effectiveItems.last == lastItem && !f;
+                  final d = effectiveItems.first == firstItem && !f;
+                  if (currentItem == beforeMiddleItem && (switcher || f) && a) {
                     effectiveItems.removeRange(0, addedExtra);
 
                     effectiveItems.addAll(
                       List.generate(_extra, (index) => widget.items[index]),
                     );
-                    switcher = !switcher;
+                    switcher = !switcher && !f;
 
                     setState(() {});
                     currentPageIndex.value = pageIndex - addedExtra;
-                    widget.controller.jumpToPage(pageIndex - addedExtra);
-
-                    print('Generated A');
-                  } else if (currentItem == beforeLastItem && !switcher && b) {
+                    _gotoPage(pageIndex - addedExtra);
+                  } else if (currentItem == beforeLastItem &&
+                      (!switcher || f) &&
+                      b) {
                     effectiveItems.removeRange(0, addedExtra);
                     effectiveItems.addAll(
                       List.generate(
@@ -129,43 +132,100 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
                         (index) => widget.items[index + _extra],
                       ),
                     );
-                    switcher = !switcher;
+                    switcher = !switcher && !f;
                     setState(() {});
                     currentPageIndex.value = pageIndex - addedExtra;
-                    widget.controller.jumpToPage(pageIndex - addedExtra);
-                    print('Generated B');
+                    _gotoPage(pageIndex - addedExtra);
+                  } else if (currentItem == lastItem && (switcher || !f) && c) {
+                    effectiveItems.removeRange(
+                      (effectiveItems.length - addedExtra) + 1,
+                      effectiveItems.length,
+                    );
+
+                    effectiveItems.insertAll(
+                      0,
+                      List.generate(addedExtra, (index) => widget.items[index]),
+                    );
+                    switcher = !switcher && !f;
+
+                    setState(() {});
+                    currentPageIndex.value = widget.items.length - 1;
+                    _gotoPage(widget.items.length - 1);
+                  } else if (currentItem == middleItem &&
+                      (!switcher || !f) &&
+                      d) {
+                    effectiveItems.removeRange(
+                      effectiveItems.length - _extra,
+                      effectiveItems.length,
+                    );
+
+                    effectiveItems.insertAll(
+                      0,
+                      List.generate(
+                        addedExtra,
+                        (index) => widget.items[index + addedExtra],
+                      ),
+                    );
+                    switcher = !switcher && !f;
+                    setState(() {});
+                    currentPageIndex.value = widget.items.length;
+                    _gotoPage(widget.items.length);
+                  } else if (currentItem == beforeBLastItem && c) {
+                    effectiveItems.removeRange(
+                      (effectiveItems.length - addedExtra) + 1,
+                      effectiveItems.length,
+                    );
+
+                    effectiveItems.insertAll(
+                      0,
+                      List.generate(addedExtra, (index) => widget.items[index]),
+                    );
+                    switcher = !switcher && !f;
+
+                    setState(() {});
+                    currentPageIndex.value = widget.items.length - 3;
+                    _gotoPage(widget.items.length - 3);
+                  } else if (currentItem == beforeBMiddleItem && b) {
+                    effectiveItems.removeRange(
+                      effectiveItems.length - _extra,
+                      effectiveItems.length,
+                    );
+
+                    effectiveItems.insertAll(
+                      0,
+                      List.generate(
+                        addedExtra,
+                        (index) => widget.items[index + addedExtra],
+                      ),
+                    );
+                    switcher = !switcher && !f;
+                    setState(() {});
+
+                    currentPageIndex.value = widget.items.length - 2;
+                    _gotoPage(widget.items.length - 2);
                   }
-                  // else if (currentItem == lastItem && switcher && a) {
-                  //   effectiveItems.removeRange(
-                  //     (effectiveItems.length - addedExtra) + 1,
-                  //     effectiveItems.length,
-                  //   );
-                  //
-                  //   effectiveItems.insertAll(
-                  //     0,
-                  //     List.generate(addedExtra, (index) => widget.items[index]),
-                  //   );
-                  //   switcher = !switcher;
-                  //
-                  //   setState(() {});
-                  //   currentPageIndex.value = widget.items.length - 1;
-                  //   widget.controller.jumpToPage(widget.items.length - 1);
-                  //   print('Generated C');
-                  // }
-                  // else if (currentItem == middleItem && switcher) {
-                  //   effectiveItems.removeRange(
-                  //     effectiveItems.length - _extra,
-                  //     effectiveItems.length,
-                  //   );
-                  //   effectiveItems.insertAll(
-                  //     0,
-                  //     List.generate(
-                  //         _extra, (index) => widget.items[index + _extra]),
-                  //   );
-                  //   switcher = !switcher;
-                  //   setState(() {});
-                  // print('Generated C');
-                  // }
+
+                  if (currentItem == middleItem &&
+                      !(a || b || c || d) &&
+                      switcher) {
+                    effectiveItems.removeRange(
+                      effectiveItems.length - _extra,
+                      effectiveItems.length,
+                    );
+
+                    effectiveItems.insertAll(
+                      0,
+                      List.generate(
+                        addedExtra,
+                        (index) => widget.items[index + addedExtra],
+                      ),
+                    );
+                    switcher = !switcher && !f;
+                    setState(() {});
+                    currentPageIndex.value = widget.items.length + addedExtra;
+                    widget.controller
+                        .jumpToPage(widget.items.length + addedExtra);
+                  }
                 } else {
                   firstTurn = true;
                 }
@@ -191,6 +251,14 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
           ),
         ),
       ],
+    );
+  }
+
+  void _gotoPage(int index) {
+    widget.controller.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 75),
+      curve: Curves.bounceIn,
     );
   }
 }
