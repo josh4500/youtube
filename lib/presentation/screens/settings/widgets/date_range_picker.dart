@@ -4,13 +4,27 @@ import 'package:youtube_clone/presentation/screens/settings/widgets/settings_pop
 import 'package:youtube_clone/presentation/widgets/roulette_scroll.dart';
 
 class DateRangePicker extends StatefulWidget {
-  const DateRangePicker({super.key});
+  final Duration? initialStart;
+  final Duration? initialStop;
+  final ValueChanged<Duration> onStartChange;
+  final ValueChanged<Duration> onStopChange;
+
+  const DateRangePicker({
+    super.key,
+    required this.onStartChange,
+    required this.onStopChange,
+    this.initialStart,
+    this.initialStop,
+  });
 
   @override
   State<DateRangePicker> createState() => _DateRangePickerState();
 }
 
 class _DateRangePickerState extends State<DateRangePicker> {
+  late Duration startDuration = widget.initialStart ?? Duration.zero;
+  late Duration stopDuration = widget.initialStop ?? Duration.zero;
+
   final startController = PageController(
     viewportFraction: 0.33,
     initialPage: 4,
@@ -18,6 +32,12 @@ class _DateRangePickerState extends State<DateRangePicker> {
   final stopController = PageController(
     viewportFraction: 0.33,
     initialPage: 4,
+  );
+  final List<String> timeList = List.generate(
+    24 * 4,
+    (index) {
+      return Duration(minutes: index * 15).hoursMinutes;
+    },
   );
 
   @override
@@ -36,13 +56,15 @@ class _DateRangePickerState extends State<DateRangePicker> {
         children: [
           InkWell(
             onTap: _showStartStop,
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Start time'),
-                  Text('23:00'),
+                  const Text('Start time'),
+                  Text(
+                    '${startDuration.hourPart.toString().padLeft(2, '0')}:${startDuration.minutesPart.toString().padLeft(2, '0')}',
+                  ),
                 ],
               ),
             ),
@@ -50,13 +72,15 @@ class _DateRangePickerState extends State<DateRangePicker> {
           const SizedBox(height: 8),
           InkWell(
             onTap: () => _showStartStop(false),
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Stop time'),
-                  Text('23:00'),
+                  const Text('Stop time'),
+                  Text(
+                    '${stopDuration.hourPart.toString().padLeft(2, '0')}:${stopDuration.minutesPart.toString().padLeft(2, '0')}',
+                  ),
                 ],
               ),
             ),
@@ -66,11 +90,15 @@ class _DateRangePickerState extends State<DateRangePicker> {
     );
   }
 
-  void _showStartStop([bool start = true]) {
-    showDialog(
+  void _showStartStop([bool start = true]) async {
+    final controller = SettingsPopupContainerController(
+      value: start ? startDuration : stopDuration,
+    );
+    final duration = await showDialog(
       context: context,
       builder: (_) {
-        return SettingsPopupContainer(
+        return SettingsPopupContainer<Duration>(
+          controller: controller,
           title: '${start ? 'Start' : 'Stop'} time',
           showAffirmButton: true,
           alignment: Alignment.center,
@@ -80,18 +108,32 @@ class _DateRangePickerState extends State<DateRangePicker> {
             height: 150,
             margin: const EdgeInsets.all(32),
             child: RouletteScroll<String>(
-              items: List.generate(
-                24 * 4,
-                (index) {
-                  return Duration(minutes: index * 15).hoursMinutes;
-                },
-              ),
+              items: timeList,
               controller: start ? startController : stopController,
-              onPageChange: (hourValue) {},
+              initialValue: start
+                  ? startDuration.hoursMinutes
+                  : stopDuration.hoursMinutes,
+              onPageChange: (hourMinute) {
+                final index = timeList.indexWhere(
+                  (element) => element == hourMinute,
+                );
+                controller.value = Duration(minutes: index * 15);
+              },
             ),
           ),
         );
       },
     );
+
+    if (duration != null) {
+      if (start) {
+        startDuration = duration!;
+        widget.onStartChange(duration!);
+      } else {
+        stopDuration = duration!;
+        widget.onStopChange(duration!);
+      }
+      setState(() {});
+    }
   }
 }

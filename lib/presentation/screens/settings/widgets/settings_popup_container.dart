@@ -4,6 +4,7 @@ import 'package:youtube_clone/presentation/theme/app_theme.dart';
 
 class SettingsPopupContainer<T> extends StatelessWidget {
   final String title;
+  final String? subtitle;
   final Widget? action;
   final bool showTitle;
   final VisualDensity? density;
@@ -19,6 +20,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
     super.key,
     this.action,
     this.density,
+    this.subtitle,
     this.controller,
     required this.title,
     this.showTitle = true,
@@ -33,6 +35,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
   factory SettingsPopupContainer.builder({
     Key? key,
     required String title,
+    String? subtitle,
     bool showTitle = true,
     bool showDismissButtons = true,
     bool showAffirmButton = false,
@@ -43,6 +46,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
     return SettingsPopupContainer(
       key: key,
       title: title,
+      subtitle: subtitle,
       showTitle: showTitle,
       showDismissButtons: showDismissButtons,
       showAffirmButton: showAffirmButton,
@@ -88,18 +92,15 @@ class SettingsPopupContainer<T> extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (showTitle)
-                    Column(
-                      crossAxisAlignment: density == VisualDensity.compact
-                          ? CrossAxisAlignment.center
-                          : CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            top: 16.0,
-                            right: 16,
-                            left: 16,
-                          ),
-                          child: Row(
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 16.0, right: 16, left: 16),
+                      child: Column(
+                        crossAxisAlignment: density == VisualDensity.compact
+                            ? CrossAxisAlignment.center
+                            : CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
@@ -109,9 +110,19 @@ class SettingsPopupContainer<T> extends StatelessWidget {
                               if (action != null) action!,
                             ],
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
+                          if (subtitle != null) ...[
+                            const SizedBox(height: 16),
+                            Text(
+                              subtitle!,
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 10),
+                        ],
+                      ),
                     ),
                   Align(
                     alignment: alignment,

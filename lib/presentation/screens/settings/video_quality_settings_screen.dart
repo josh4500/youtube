@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/core/enums/settings_enums.dart';
+import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/screens/settings/view_models/pref_option.dart';
 
 import 'widgets/settings_list_view.dart';
 import 'widgets/settings_tile.dart';
 
-class VideoQualitySettingsScreen extends StatelessWidget {
+class VideoQualitySettingsScreen extends ConsumerWidget {
   const VideoQualitySettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final preferences = ref.watch(preferencesProvider);
     return Material(
       type: MaterialType.canvas,
       child: SettingsListView(
@@ -37,23 +41,37 @@ class VideoQualitySettingsScreen extends StatelessWidget {
             title: 'Auto (recommend)',
             summary:
                 'Adjust to give you the best experience for your conditions',
-            onTap: () {},
+            prefOption: PrefOption(
+              type: PrefOptionType.radio,
+              value: VideoQuality.auto,
+              groupValue: preferences.videoQualityPreferences.mobile,
+              onToggle: () => _changeMobileVideoQuality(VideoQuality.auto, ref),
+            ),
+            onTap: () => _changeMobileVideoQuality(VideoQuality.auto, ref),
           ),
           SettingsTile(
             title: 'Higher picture quality',
             summary: 'User more data',
             prefOption: PrefOption(
-              type: PrefOptionType.toggle,
-              value: false,
+              type: PrefOptionType.radio,
+              value: VideoQuality.higher,
+              groupValue: preferences.videoQualityPreferences.mobile,
+              onToggle: () =>
+                  _changeMobileVideoQuality(VideoQuality.higher, ref),
             ),
+            onTap: () => _changeMobileVideoQuality(VideoQuality.higher, ref),
           ),
           SettingsTile(
             title: 'Data saver',
             summary: 'Lower quality picture',
             prefOption: PrefOption(
-              type: PrefOptionType.toggle,
-              value: false,
+              type: PrefOptionType.radio,
+              value: VideoQuality.saver,
+              groupValue: preferences.videoQualityPreferences.mobile,
+              onToggle: () =>
+                  _changeMobileVideoQuality(VideoQuality.saver, ref),
             ),
+            onTap: () => _changeMobileVideoQuality(VideoQuality.saver, ref),
           ),
           const Divider(),
           const Padding(
@@ -69,26 +87,46 @@ class VideoQualitySettingsScreen extends StatelessWidget {
             title: 'Auto (recommend)',
             summary:
                 'Adjust to give you the best experience for your conditions',
-            onTap: () {},
+            prefOption: PrefOption(
+              type: PrefOptionType.radio,
+              value: VideoQuality.auto,
+              groupValue: preferences.videoQualityPreferences.wifi,
+              onToggle: () => _changeWifiVideoQuality(VideoQuality.auto, ref),
+            ),
+            onTap: () => _changeWifiVideoQuality(VideoQuality.auto, ref),
           ),
           SettingsTile(
             title: 'Higher picture quality',
             summary: 'User more data',
             prefOption: PrefOption(
-              type: PrefOptionType.toggle,
-              value: false,
+              type: PrefOptionType.radio,
+              value: VideoQuality.higher,
+              groupValue: preferences.videoQualityPreferences.wifi,
+              onToggle: () => _changeWifiVideoQuality(VideoQuality.higher, ref),
             ),
+            onTap: () => _changeWifiVideoQuality(VideoQuality.higher, ref),
           ),
           SettingsTile(
             title: 'Data saver',
             summary: 'Lower quality picture',
             prefOption: PrefOption(
-              type: PrefOptionType.toggle,
-              value: false,
+              type: PrefOptionType.radio,
+              value: VideoQuality.saver,
+              groupValue: preferences.videoQualityPreferences.wifi,
+              onToggle: () => _changeWifiVideoQuality(VideoQuality.saver, ref),
             ),
+            onTap: () => _changeWifiVideoQuality(VideoQuality.saver, ref),
           ),
         ],
       ),
     );
+  }
+
+  void _changeWifiVideoQuality(VideoQuality quality, WidgetRef ref) {
+    ref.read(preferencesProvider.notifier).changeVideoQuality(wifi: quality);
+  }
+
+  void _changeMobileVideoQuality(VideoQuality quality, WidgetRef ref) {
+    ref.read(preferencesProvider.notifier).changeVideoQuality(mobile: quality);
   }
 }

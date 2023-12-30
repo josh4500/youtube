@@ -75,6 +75,12 @@ class Preferences extends Notifier<PreferenceState> {
     _prefBox,
   );
 
+  late final _autoPlay = ReadWriteValue<bool>(
+    'autoPlay',
+    false,
+    _prefBox,
+  );
+
   late final _enableStatForNerds = ReadWriteValue<bool>(
     'enableStatForNerds',
     false,
@@ -128,6 +134,11 @@ class Preferences extends Notifier<PreferenceState> {
     decoder: (prefJson) => AccessibilityPreferences.fromJson(prefJson),
   );
 
+  set autoPlay(bool autoPlay) {
+    _autoPlay.value = autoPlay;
+    state = state.copyWith(autoplay: autoPlay);
+  }
+
   set playbackInFeeds(PlaybackInFeeds playbackInFeeds) {
     _playbackInFeeds.value = playbackInFeeds;
     state = state.copyWith(playbackInFeeds: playbackInFeeds);
@@ -178,37 +189,51 @@ class Preferences extends Notifier<PreferenceState> {
     frequency =
         frequency != null && frequency.inSeconds == 0 ? null : frequency;
 
-    _remindForBreak.value = _remindForBreak.value.copyWith(
+    final newValue = _remindForBreak.value = _remindForBreak.value.copyWith(
       frequency: frequency,
       enabled: enabled,
     );
 
-    state = state.copyWith(remindForBreak: _remindForBreak.value);
+    state = state.copyWith(remindForBreak: newValue);
   }
 
   void changeRemindForBedTime({
-    bool? onDeviceBedtime,
-    DateTime? customStartSchedule,
-    DateTime? customStopSchedule,
-    bool? waitTillFinishVideo,
-    bool? enable,
+    RemindForBedtime? remindForBedtime,
+    bool? enabled,
   }) {
-    if (onDeviceBedtime == null &&
-        customStartSchedule == null &&
-        customStopSchedule == null &&
-        waitTillFinishVideo == null &&
-        enable == null) {
-      return;
+    if (remindForBedtime != null || enabled != null) {
+      final newValue = _remindForBedtime.value =
+          (remindForBedtime ?? _remindForBedtime.value)
+              .copyWith(enabled: enabled);
+      state = state.copyWith(remindForBedtime: newValue);
     }
+  }
 
-    _remindForBedtime.value = _remindForBedtime.value.copyWith(
-      onDeviceBedtime: onDeviceBedtime,
-      customStartSchedule: customStartSchedule,
-      customStopSchedule: customStopSchedule,
-      waitTillFinishVideo: waitTillFinishVideo,
-      enabled: enable,
+  void changeVideoQuality({VideoQuality? mobile, VideoQuality? wifi}) {
+    final newValue = _videoQuality.value = _videoQuality.value.copyWith(
+      mobile: mobile,
+      wifi: wifi,
     );
-    state = state.copyWith(remindForBedtime: _remindForBedtime.value);
+
+    state = state.copyWith(videoQualityPreferences: newValue);
+  }
+
+  void changeAccessibility({bool? enabled, int? hideDuration}) {
+    final newValue = _accessibility.value = _accessibility.value.copyWith(
+      enabled: enabled,
+      hideDuration: hideDuration,
+    );
+    state = state.copyWith(accessibilityPreferences: newValue);
+  }
+
+  void changeDownloadsPref({int? quality, bool? wifiOnly, bool? recommend}) {
+    final newValue = _downloads.value = _downloads.value.copyWith(
+      quality: quality,
+      wifiOnly: wifiOnly,
+      recommend: recommend,
+    );
+
+    state = state.copyWith(downloadPreferences: newValue);
   }
 
   @override
@@ -224,6 +249,10 @@ class Preferences extends Notifier<PreferenceState> {
       uploadNetwork: _uploadNetwork.value,
       restrictedMode: _restrictedMode.value,
       enableStatsForNerds: _enableStatForNerds.value,
+      videoQualityPreferences: _videoQuality.value,
+      downloadPreferences: _downloads.value,
+      accessibilityPreferences: _accessibility.value,
+      autoplay: _autoPlay.value,
     );
   }
 }
@@ -239,8 +268,11 @@ class PreferenceState {
   final bool zoomFillScreen;
   final UploadNetwork uploadNetwork;
   final bool restrictedMode;
-
   final bool enableStatsForNerds;
+  final VideoQualityPreferences videoQualityPreferences;
+  final DownloadPreferences downloadPreferences;
+  final AccessibilityPreferences accessibilityPreferences;
+  final bool autoplay;
 
   PreferenceState({
     required this.themeMode,
@@ -253,6 +285,10 @@ class PreferenceState {
     required this.uploadNetwork,
     required this.restrictedMode,
     required this.enableStatsForNerds,
+    required this.videoQualityPreferences,
+    required this.downloadPreferences,
+    required this.accessibilityPreferences,
+    required this.autoplay,
   });
 
   PreferenceState copyWith({
@@ -266,6 +302,10 @@ class PreferenceState {
     UploadNetwork? uploadNetwork,
     bool? restrictedMode,
     bool? enableStatsForNerds,
+    VideoQualityPreferences? videoQualityPreferences,
+    DownloadPreferences? downloadPreferences,
+    AccessibilityPreferences? accessibilityPreferences,
+    bool? autoplay,
   }) {
     return PreferenceState(
       themeMode: themeMode ?? this.themeMode,
@@ -278,6 +318,12 @@ class PreferenceState {
       uploadNetwork: uploadNetwork ?? this.uploadNetwork,
       restrictedMode: restrictedMode ?? this.restrictedMode,
       enableStatsForNerds: enableStatsForNerds ?? this.enableStatsForNerds,
+      videoQualityPreferences:
+          videoQualityPreferences ?? this.videoQualityPreferences,
+      downloadPreferences: downloadPreferences ?? this.downloadPreferences,
+      accessibilityPreferences:
+          accessibilityPreferences ?? this.accessibilityPreferences,
+      autoplay: autoplay ?? this.autoplay,
     );
   }
 }
@@ -321,15 +367,15 @@ class RemindForBreak {
 
 class RemindForBedtime {
   final bool onDeviceBedtime;
-  final DateTime customStartSchedule;
-  final DateTime customStopSchedule;
+  final Duration customStartSchedule;
+  final Duration customStopSchedule;
   final bool waitTillFinishVideo;
   final bool enabled;
 
-  static final defaultPref = RemindForBedtime(
+  static const defaultPref = RemindForBedtime(
     onDeviceBedtime: false,
-    customStartSchedule: DateTime.now().copyWith(hour: 23),
-    customStopSchedule: DateTime.now().copyWith(hour: 5),
+    customStartSchedule: Duration(hours: 12, minutes: 15),
+    customStopSchedule: Duration(hours: 17, minutes: 15),
     waitTillFinishVideo: true,
     enabled: false,
   );
@@ -345,8 +391,8 @@ class RemindForBedtime {
   String toJson() {
     return jsonEncode({
       'onDeviceBedtime': onDeviceBedtime,
-      'customStartSchedule': customStartSchedule.toIso8601String(),
-      'customStopSchedule': customStopSchedule.toIso8601String(),
+      'customStartSchedule': customStartSchedule.inSeconds,
+      'customStopSchedule': customStopSchedule.inSeconds,
       'waitTillFinishVideo': waitTillFinishVideo,
       'enabled': enabled,
     });
@@ -356,8 +402,8 @@ class RemindForBedtime {
     final Map<String, dynamic> map = jsonDecode(source);
     return RemindForBedtime(
       onDeviceBedtime: map['onDeviceBedtime'] as bool,
-      customStartSchedule: DateTime.parse(map['customStartSchedule']),
-      customStopSchedule: DateTime.parse(map['customStopSchedule']),
+      customStartSchedule: Duration(seconds: map['customStartSchedule']),
+      customStopSchedule: Duration(seconds: map['customStopSchedule']),
       waitTillFinishVideo: map['waitTillFinishVideo'] as bool,
       enabled: map['enabled'] as bool,
     );
@@ -365,8 +411,8 @@ class RemindForBedtime {
 
   RemindForBedtime copyWith({
     bool? onDeviceBedtime,
-    DateTime? customStartSchedule,
-    DateTime? customStopSchedule,
+    Duration? customStartSchedule,
+    Duration? customStopSchedule,
     bool? waitTillFinishVideo,
     bool? enabled,
   }) {
@@ -451,16 +497,31 @@ class VideoQualityPreferences {
 
   String toJson() {
     return jsonEncode({
-      'mobile': mobile,
-      'wifi': wifi,
+      'mobile': mobile.name,
+      'wifi': wifi.name,
     });
   }
 
   factory VideoQualityPreferences.fromJson(String source) {
     final Map<String, dynamic> map = jsonDecode(source);
     return VideoQualityPreferences(
-      mobile: map['mobile'] as VideoQuality,
-      wifi: map['wifi'] as VideoQuality,
+      mobile: VideoQuality.values.firstWhere(
+        (element) => element.name == map['mobile'],
+      ),
+      wifi: VideoQuality.values.firstWhere(
+        (element) => element.name == map['wifi'],
+        orElse: () => VideoQuality.auto,
+      ),
+    );
+  }
+
+  VideoQualityPreferences copyWith({
+    VideoQuality? mobile,
+    VideoQuality? wifi,
+  }) {
+    return VideoQualityPreferences(
+      mobile: mobile ?? this.mobile,
+      wifi: wifi ?? this.wifi,
     );
   }
 }
@@ -527,7 +588,8 @@ class DownloadPreferences {
 
 class AccessibilityPreferences {
   final bool enabled;
-  // -1 = Never; -2 = Use device settings;
+
+  /// -1 = Never; -2 = Use device settings;
   final int hideDuration;
 
   static const defaultPref = AccessibilityPreferences(

@@ -12,6 +12,7 @@ class SettingsTile extends StatelessWidget {
   final bool accountRequired;
   final bool disableOnNoNetwork;
   final bool selected;
+  final bool? enabled;
   final PrefOption? prefOption;
   final VoidCallback? onTap;
 
@@ -24,6 +25,7 @@ class SettingsTile extends StatelessWidget {
     this.accountRequired = false,
     this.disableOnNoNetwork = false,
     this.selected = false,
+    this.enabled,
     this.prefOption,
     this.onTap,
   });
@@ -36,6 +38,19 @@ class SettingsTile extends StatelessWidget {
           padding: const EdgeInsets.only(right: 8.0),
           child: Switch(
             value: prefOption!.value,
+            onChanged: (_) {
+              if ((networkRequired && isConnected) || !networkRequired) {
+                prefOption!.onToggle!();
+              }
+            },
+          ),
+        );
+      } else if (prefOption!.type == PrefOptionType.radio) {
+        return Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: Radio(
+            value: prefOption!.value,
+            groupValue: prefOption!.groupValue,
             onChanged: (_) {
               if ((networkRequired && isConnected) || !networkRequired) {
                 prefOption!.onToggle!();
@@ -86,7 +101,7 @@ class SettingsTile extends StatelessWidget {
               : null,
           trailing: _buildTrailing(state.isConnected),
           onTap: onTap,
-          enabled: disableOnNoNetwork ? state.isConnected : true,
+          enabled: enabled ?? (disableOnNoNetwork ? state.isConnected : true),
         );
       });
     });

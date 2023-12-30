@@ -15,6 +15,9 @@ extension DurationUtils on Duration {
     return '$hoursPart$minutesPart';
   }
 
+  int get hourPart => (inMinutes / 60).floor();
+  int get minutesPart => inMinutes.remainder(60);
+
   String get hoursMinutes {
     String hoursPart = (inMinutes / 60).floor().toString().padLeft(2, '0');
     String minutesPart = inMinutes.remainder(60).toString().padLeft(2, '0');

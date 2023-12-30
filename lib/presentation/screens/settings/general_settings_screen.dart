@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core/enums/settings_enums.dart';
-import 'package:youtube_clone/core/utils/date_time.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/screens/settings/view_models/pref_option.dart';
@@ -66,7 +65,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
                 } else {
                   final start = remindForBedtime.customStartSchedule;
                   final stop = remindForBedtime.customStopSchedule;
-                  return '${start.hourMinute()} - ${stop.hourMinute()}';
+                  return '${start.hoursMinutes} - ${stop.hoursMinutes}';
                 }
               } else {
                 return 'Off';
@@ -75,13 +74,14 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
             prefOption: PrefOption<bool>(
               type: PrefOptionType.toggleWithOptions,
               value: preferences.remindForBedtime.enabled,
-              onToggle: () {
+              onToggle: () async {
                 // Opens settings anyway
                 if (!preferences.remindForBedtime.enabled) {
-                  _onChangeRemindForBedtime();
+                  await _onChangeRemindForBedtime();
                 }
                 ref.read(preferencesProvider.notifier).changeRemindForBedTime(
-                    enable: !preferences.remindForBedtime.enabled);
+                      enabled: !preferences.remindForBedtime.enabled,
+                    );
               },
             ),
             onTap: _onChangeRemindForBedtime,
@@ -211,62 +211,115 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
 
   Future<void> _onChangeRemindForBedtime() async {
     final preferences = ref.read(preferencesProvider);
+    // Controller popup
     final controller = SettingsPopupContainerController<RemindForBedtime>(
       value: preferences.remindForBedtime,
     );
-    final result = await showDialog<RemindForBedtime>(
+    // State value for popup
+    RemindForBedtime remindForBedTimeState = preferences.remindForBedtime;
+    final affirmedChanges = await showDialog<RemindForBedtime>(
       context: context,
       builder: (_) {
-        return Consumer(builder: (context, ref, _) {
-          final preferences = ref.watch(preferencesProvider);
-          return SettingsPopupContainer<RemindForBedtime>(
-            title: 'Remind me when it\'s bedtime',
-            showAffirmButton: true,
-            controller: controller,
-            child: Column(
-              children: [
-                RoundCheckItem<bool>(
-                  title: 'When my phone\'s bedtime mode is on',
-                  value: preferences.remindForBedtime.onDeviceBedtime,
-                  groupValue: preferences.remindForBedtime.onDeviceBedtime,
-                  onChange: (_) {},
-                ),
-                RoundCheckItem<bool>(
-                  title: 'Use custom schedule',
-                  value: !preferences.remindForBedtime.onDeviceBedtime,
-                  groupValue: preferences.remindForBedtime.onDeviceBedtime,
-                  onChange: (_) {},
-                ),
-                const DateRangePicker(),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Divider(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    children: [
-                      Checkbox(
-                        value: controller.value!.waitTillFinishVideo,
-                        onChanged: (_) {
-                          controller.value = controller.value!.copyWith(
-                            enabled: !controller.value!.waitTillFinishVideo,
-                          );
-                        },
-                      ),
-                      const Text('Wait until I finish video to show reminder')
-                    ],
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return SettingsPopupContainer<RemindForBedtime>(
+              title: 'Remind me when it\'s bedtime',
+              showAffirmButton: true,
+              controller: controller,
+              child: Column(
+                children: [
+                  RoundCheckItem<TwoState>(
+                    title: 'When my phone\'s bedtime mode is on',
+                    value: TwoState.first,
+                    subtitle: remindForBedTimeState.onDeviceBedtime
+                        ? const Text(
+                            'Manage device settings',
+                          )
+                        : null,
+                    groupValue: remindForBedTimeState.onDeviceBedtime
+                        ? TwoState.first
+                        : TwoState.second,
+                    onChange: (value) {
+                      setState(() {
+                        remindForBedTimeState = remindForBedTimeState.copyWith(
+                          onDeviceBedtime: value == TwoState.first,
+                        );
+                        controller.value = remindForBedTimeState;
+                      });
+                    },
                   ),
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          );
-        });
+                  RoundCheckItem<TwoState>(
+                    title: 'Use custom schedule',
+                    value: TwoState.second,
+                    groupValue: remindForBedTimeState.onDeviceBedtime
+                        ? TwoState.first
+                        : TwoState.second,
+                    onChange: (value) {
+                      setState(() {
+                        remindForBedTimeState = remindForBedTimeState.copyWith(
+                          onDeviceBedtime: value == TwoState.first,
+                        );
+                        controller.value = remindForBedTimeState;
+                      });
+                    },
+                  ),
+                  if (!remindForBedTimeState.onDeviceBedtime)
+                    DateRangePicker(
+                      initialStart: remindForBedTimeState.customStartSchedule,
+                      initialStop: remindForBedTimeState.customStopSchedule,
+                      onStartChange: (duration) {
+                        setState(() {
+                          controller.value = remindForBedTimeState =
+                              remindForBedTimeState.copyWith(
+                            customStartSchedule: duration,
+                          );
+                        });
+                      },
+                      onStopChange: (duration) {
+                        setState(() {
+                          controller.value = remindForBedTimeState =
+                              remindForBedTimeState.copyWith(
+                            customStopSchedule: duration,
+                          );
+                        });
+                      },
+                    ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Divider(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      children: [
+                        Checkbox(
+                          value: remindForBedTimeState.waitTillFinishVideo,
+                          onChanged: (value) {
+                            setState(() {
+                              remindForBedTimeState = remindForBedTimeState
+                                  .copyWith(waitTillFinishVideo: value);
+                              controller.value = remindForBedTimeState;
+                            });
+                          },
+                        ),
+                        const Text('Wait until I finish video to show reminder')
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            );
+          },
+        );
       },
     );
 
-    ref.read(preferencesProvider.notifier).changeRemindForBedTime();
+    ref.read(preferencesProvider.notifier).changeRemindForBedTime(
+          remindForBedtime: affirmedChanges,
+          enabled:
+              affirmedChanges != null || preferences.remindForBreak.enabled,
+        );
   }
 
   Future<void> _onChangeAppearance() async {
@@ -450,3 +503,5 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
     ref.read(preferencesProvider.notifier).enableStatsForNerds = value;
   }
 }
+
+enum TwoState { first, second }
