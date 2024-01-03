@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/screens/settings/data_saving_settings_screen.dart';
 import 'package:youtube_clone/presentation/screens/settings/downloads_settings_screen.dart';
 import 'package:youtube_clone/presentation/screens/settings/general_settings_screen.dart';
@@ -8,10 +9,11 @@ import 'package:youtube_clone/presentation/screens/settings/video_quality_settin
 import 'package:youtube_clone/presentation/screens/settings/widgets/settings_popup_container.dart';
 import 'package:youtube_clone/presentation/screens/settings/widgets/settings_tile.dart';
 import 'package:youtube_clone/presentation/theme/app_theme.dart';
+import 'package:youtube_clone/presentation/widgets/lazy_indexed_stack.dart';
 
 import '../../../generated/l10n.dart';
 import '../../theme/device_theme.dart';
-import '../../widgets/orientation_builder.dart';
+import '../../widgets/builders/orientation_builder.dart';
 import 'about_screen.dart';
 import 'accessibility_settings_screen.dart';
 import 'auto_play_settings_screen.dart';
@@ -30,6 +32,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _currentSettingScreen = 0;
   int _mostRecentSettingScreen = 1;
   String _currentSettingsTitle = 'Settings';
+
+  final List<Widget> _settingsPages = const [
+    GeneralSettingsScreen(),
+    DataSavingSettingsScreen(),
+    AutoPlaySettingsScreen(),
+    VideoQualitySettingsScreen(),
+    DownloadsSettingsScreen(),
+    PrivacySettingsScreen(),
+    BillingAndPaymentsScreen(),
+    NotificationsSettingsScreen(),
+    LiveChatSettingsScreen(),
+    AccessibilitySettingsScreen(),
+    AboutScreen(),
+  ];
 
   Future<void> _showSettingsPrefScreen(String title) async {
     if (title == S.current.general) {
@@ -120,8 +136,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       setState(() {});
       return;
     }
-    // TODO: Make sure to check can pop
-    // context.pop();
+    context.pop();
   }
 
   bool _isSelected(int index) {
@@ -231,7 +246,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ],
     );
     return PopScope(
-      // TODO: Implement canPop
       canPop: false,
       onPopInvoked: (canPop) => _onNavigateBack(),
       child: Scaffold(
@@ -241,21 +255,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         body: CustomOrientationBuilder(
           onPortrait: (_, child) {
-            return IndexedStack(
+            return LazyIndexedStack(
               index: _currentSettingScreen,
               children: [
                 settingsList,
-                const GeneralSettingsScreen(),
-                const DataSavingSettingsScreen(),
-                const AutoPlaySettingsScreen(),
-                const VideoQualitySettingsScreen(),
-                const DownloadsSettingsScreen(),
-                const PrivacySettingsScreen(),
-                const BillingAndPaymentsScreen(),
-                const NotificationsSettingsScreen(),
-                const LiveChatSettingsScreen(),
-                const AccessibilitySettingsScreen(),
-                const AboutScreen(),
+                ..._settingsPages,
               ],
             );
           },
@@ -270,19 +274,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Expanded(
                   child: IndexedStack(
                     index: _mostRecentSettingScreen - 1,
-                    children: const [
-                      GeneralSettingsScreen(),
-                      DataSavingSettingsScreen(),
-                      AutoPlaySettingsScreen(),
-                      VideoQualitySettingsScreen(),
-                      DownloadsSettingsScreen(),
-                      PrivacySettingsScreen(),
-                      BillingAndPaymentsScreen(),
-                      NotificationsSettingsScreen(),
-                      LiveChatSettingsScreen(),
-                      AccessibilitySettingsScreen(),
-                      AboutScreen(),
-                    ],
+                    children: _settingsPages,
                   ),
                 )
               ],

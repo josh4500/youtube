@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets/account_builder.dart';
+import 'package:youtube_clone/presentation/widgets/builders/auth_state_builder.dart';
 
-import '../../../widgets/network_builder.dart';
+import '../../../widgets/builders/network_builder.dart';
 import '../view_models/pref_option.dart';
 
 class SettingsTile extends StatelessWidget {
@@ -65,7 +65,7 @@ class SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AccountBuilder(builder: (context, state) {
+    return AuthStateBuilder(builder: (context, state) {
       if (state.isNotAuthenticated && accountRequired) {
         return const SizedBox();
       }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 
 class SettingsListView extends StatefulWidget {
   final List<Widget> children;
@@ -20,11 +21,10 @@ class _SettingsListViewState extends State<SettingsListView> {
 
   @override
   Widget build(BuildContext context) {
-    return GlowingOverscrollIndicator(
-      showLeading: false,
-      showTrailing: false,
-      axisDirection: AxisDirection.up,
-      color: Colors.grey,
+    return ScrollConfiguration(
+      behavior: const OverScrollGlowBehavior(
+        color: Colors.grey,
+      ),
       child: Scrollbar(
         controller: scrollController,
         child: ListView(
