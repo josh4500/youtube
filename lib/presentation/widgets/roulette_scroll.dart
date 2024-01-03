@@ -235,15 +235,16 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
                 return Container(
                   alignment: Alignment.center,
                   child: ListenableBuilder(
-                      listenable: currentPageIndex,
-                      builder: (context, _) {
-                        return Text(
-                          effectiveItems[index].toString(),
-                          style: currentPageIndex.value != index
-                              ? const TextStyle(color: Color(0x30D3D3D3))
-                              : null,
-                        );
-                      }),
+                    listenable: currentPageIndex,
+                    builder: (context, _) {
+                      return Text(
+                        effectiveItems[index].toString(),
+                        style: currentPageIndex.value != index
+                            ? const TextStyle(color: Color(0x30D3D3D3))
+                            : null,
+                      );
+                    },
+                  ),
                 );
               },
               itemCount: effectiveItems.length,
