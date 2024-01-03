@@ -132,7 +132,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                           ),
                           child: PlayableVideoContent(
                             width: 180,
-                            height: 112,
+                            height: 104,
                           ),
                         ),
                       ),
@@ -151,7 +151,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                       padding: EdgeInsets.all(16.0),
                       child: PlayableVideoContent(
                         width: 180,
-                        height: 112,
+                        height: 104,
                       ),
                     );
                   },
@@ -340,10 +340,10 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
       },
       child: Stack(
         children: [
-          Container(
+          const SizedBox(
             width: 100,
             height: 112,
-            child: const Icon(
+            child: Icon(
               Icons.delete,
               color: Colors.black,
             ),

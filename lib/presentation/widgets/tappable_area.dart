@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class TappableArea extends StatefulWidget {
   final Widget child;
   final EdgeInsets padding;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final VoidCallback? onLongPress;
 
   const TappableArea({
     super.key,
@@ -12,7 +13,8 @@ class TappableArea extends StatefulWidget {
       horizontal: 8,
     ),
     required this.child,
-    required this.onPressed,
+    this.onPressed,
+    this.onLongPress,
   });
 
   @override
@@ -79,6 +81,7 @@ class _TappableAreaState extends State<TappableArea>
       onPointerUp: (_) async => await _controller.reverse(),
       child: GestureDetector(
         onTap: widget.onPressed,
+        onLongPress: widget.onLongPress,
         child: AnimatedBuilder(
           animation: _backgroundAnimation,
           builder: (context, backgroundChild) {

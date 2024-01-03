@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
+import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 import '../../widgets/appbar_action.dart';
+import '../../widgets/playable/playable_clip_content.dart';
+import '../../widgets/playable/playable_video_content.dart';
 
 class YourClipsScreen extends StatefulWidget {
   const YourClipsScreen({super.key});
@@ -73,6 +77,48 @@ class _YourClipsScreenState extends State<YourClipsScreen>
             },
           ),
         ],
+      ),
+      body: ScrollConfiguration(
+        behavior: const OverScrollGlowBehavior(
+          color: Colors.black12,
+        ),
+        child: CustomScrollView(
+          slivers: [
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 16,
+                ),
+                child: Text(
+                  'Your clips',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  return TappableArea(
+                    onPressed: () {},
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8.0,
+                      horizontal: 16,
+                    ),
+                    child: const PlayableClipContent(
+                      width: 180,
+                      height: 104,
+                    ),
+                  );
+                },
+                childCount: 10,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
