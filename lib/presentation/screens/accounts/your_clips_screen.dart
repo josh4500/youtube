@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/screens/accounts/widgets/popup/show_your_clips_menu.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
@@ -72,8 +73,12 @@ class _YourClipsScreenState extends State<YourClipsScreen>
           ),
           AppbarAction(
             icon: Icons.more_vert_outlined,
-            onTapDown: (details) {
+            onTapDown: (details) async {
               final position = details.globalPosition;
+              await showYourClipsMenu(
+                context,
+                RelativeRect.fromLTRB(position.dx, 0, 0, 0),
+              );
             },
           ),
         ],
@@ -83,6 +88,7 @@ class _YourClipsScreenState extends State<YourClipsScreen>
           color: Colors.black12,
         ),
         child: CustomScrollView(
+          controller: controller,
           slivers: [
             const SliverToBoxAdapter(
               child: Padding(
