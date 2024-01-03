@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../infrastructure/services/internet_connectivity/connectivity_state.dart';
-import '../../infrastructure/services/internet_connectivity/internet_connectivity.dart';
+import '../../../infrastructure/services/internet_connectivity/connectivity_state.dart';
+import '../../../infrastructure/services/internet_connectivity/internet_connectivity.dart';
 
 class NetworkBuilder extends StatelessWidget {
   final Widget Function(BuildContext context, ConnectivityState state) builder;

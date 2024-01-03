@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/core/enums/auth_state.dart';
 
-enum AuthState {
-  authenticated,
-  notAuthenticated;
-
-  bool get isNotAuthenticated => this == notAuthenticated;
-}
-
-class AccountBuilder extends StatelessWidget {
+class AuthStateBuilder extends StatelessWidget {
   final Widget Function(BuildContext context, AuthState state) builder;
 
-  const AccountBuilder({super.key, required this.builder});
+  const AuthStateBuilder({super.key, required this.builder});
 
   @override
   Widget build(BuildContext context) {

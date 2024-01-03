@@ -41,7 +41,7 @@ final class InternetConnectivity {
   final _stateController = StreamController<ConnectivityState>.broadcast();
   Stream<ConnectivityState> get onStateChange => _stateController.stream;
 
-  bool _lastConnectionTest = false;
+  bool _lastConnectionTest = true;
   int _pingableIndex = 0;
 
   /// Initializes the InternetConnectivity by setting up connectivity change
@@ -52,22 +52,15 @@ final class InternetConnectivity {
     // Set the connectivity type
     _connectivityType = cResult.toConnectivityType();
 
-    if (!_connectivityType.isNone) {
-      _updateConnectivityState(
-        ConnectivityState.connected().copyWith(type: _connectivityType),
-      );
-    }
     // Set subscription to change in connectivity result
     _subscription = _connectivity.onConnectivityChanged.listen(
       _onConnectivityResultChange,
     );
 
-    Future.delayed(const Duration(milliseconds: kPingableInterval), () async {
-      _connectionTimer = Timer.periodic(
-        const Duration(milliseconds: kPingableInterval),
-        _onTryConnection,
-      );
-    });
+    _connectionTimer = Timer.periodic(
+      const Duration(milliseconds: kPingableInterval),
+      _onTryConnection,
+    );
   }
 
   /// Updates connectivity state
@@ -123,6 +116,22 @@ final class InternetConnectivity {
 
   /// Attempts to establish a socket connection to the provided pingable server.
   Future<bool> _tryConnection(_Pingable pingable) async {
+    return (await _tryInternetAddress()) || (await _trySock(pingable));
+  }
+
+  Future<bool> _tryInternetAddress() async {
+    // Find why Device caches DNS lookup and if there's a low bandwidth method
+    // than Socket
+    // try {
+    //   final list = await InternetAddress.lookup('localhost');
+    //   if (list.isNotEmpty) return true;
+    // } catch (e) {
+    //   return false;
+    // }
+    return false;
+  }
+
+  Future<bool> _trySock(_Pingable pingable) async {
     Socket? sock;
     try {
       sock = await Socket.connect(
