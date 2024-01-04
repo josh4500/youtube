@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets/clip_thumb_clipper.dart';
 
 class PlayableVideoContent extends StatelessWidget {
   // TODO: rename width and height
@@ -20,15 +19,12 @@ class PlayableVideoContent extends StatelessWidget {
         Stack(
           alignment: Alignment.bottomRight,
           children: [
-            ClipPath(
-              clipper: ClipThumbClipper(),
-              child: Container(
-                width: width,
-                height: height,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
+            Container(
+              width: width,
+              height: height,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
             Container(
@@ -44,17 +40,12 @@ class PlayableVideoContent extends StatelessWidget {
                 color: Colors.black87,
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '6:54',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+              child: const Text(
+                '6:54',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],

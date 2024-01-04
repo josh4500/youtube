@@ -12,6 +12,7 @@ import 'package:youtube_clone/presentation/screens/homepage.dart';
 import 'package:youtube_clone/presentation/screens/playlist/playlist_screen.dart';
 import 'package:youtube_clone/presentation/screens/settings/settings_screen.dart';
 import 'package:youtube_clone/presentation/screens/shorts/shorts_screen.dart';
+import 'package:youtube_clone/presentation/screens/subscriptions/all_subscriptions_screen.dart';
 import 'package:youtube_clone/presentation/screens/subscriptions/subscriptions_screen.dart';
 import 'package:youtube_clone/presentation/screens/watch_on_tv/link_tv_screen.dart';
 import 'package:youtube_clone/presentation/screens/watch_on_tv/watch_on_tv_screen.dart';
@@ -63,7 +64,7 @@ class AppRouter {
             ],
           ),
           StatefulShellBranch(
-            routes: [
+            routes: <RouteBase>[
               GoRoute(
                 name: AppRoutes.subscriptions.name,
                 path: AppRoutes.subscriptions.path,
@@ -72,11 +73,22 @@ class AppRouter {
                     key: state.pageKey,
                   );
                 },
+                routes: <RouteBase>[
+                  GoRoute(
+                    name: AppRoutes.allSubscriptions.name,
+                    path: AppRoutes.allSubscriptions.path,
+                    pageBuilder: (BuildContext context, GoRouterState state) {
+                      return const NoTransitionPage(
+                        child: AllSubscriptionsScreen(),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
           StatefulShellBranch(
-            routes: [
+            routes: <RouteBase>[
               GoRoute(
                 name: AppRoutes.accounts.name,
                 path: AppRoutes.accounts.path,

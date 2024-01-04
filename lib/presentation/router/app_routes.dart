@@ -21,9 +21,20 @@ class AppRoutes {
     path: '/shorts',
   );
 
+  ///
+  ///
+  /// Subscriptions
+  ///
+  ///
+
   static final subscriptions = RouteInfo(
     name: 'subscriptions',
     path: '/subscriptions',
+  );
+
+  static final allSubscriptions = RouteInfo(
+    name: 'all subscriptions',
+    path: 'subscriptions/all',
   );
 
   ///
