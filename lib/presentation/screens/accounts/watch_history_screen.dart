@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../widgets/appbar_action.dart';
 import '../../widgets/over_scroll_glow_behavior.dart';
 import '../../widgets/playable/playable_video_content.dart';
+import '../../widgets/slidable.dart';
+import 'widgets/history_search_text_field.dart';
 import 'widgets/popup/show_history_menu.dart';
 import 'widgets/shorts_history.dart';
 
@@ -109,7 +111,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                         ),
                       ),
                     ),
-                    SomeSearchTextfield(
+                    HistorySearchTextField(
                       focusNode: focusNode,
                       controller: textEditingController,
                     ),
@@ -122,18 +124,16 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    return Slidable(
-                      child: InkWell(
-                        onTap: () {},
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 12,
-                            horizontal: 16,
-                          ),
-                          child: PlayableVideoContent(
-                            width: 180,
-                            height: 104,
-                          ),
+                    return InkWell(
+                      onTap: () {},
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                        child: PlayableVideoContent(
+                          width: 180,
+                          height: 104,
                         ),
                       ),
                     );
@@ -161,198 +161,6 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class SomeSearchTextfield extends StatefulWidget {
-  final TextEditingController? controller;
-  final FocusNode? focusNode;
-
-  const SomeSearchTextfield({super.key, this.controller, this.focusNode});
-
-  @override
-  State<SomeSearchTextfield> createState() => _SomeSearchTextfieldState();
-}
-
-class _SomeSearchTextfieldState extends State<SomeSearchTextfield>
-    with TickerProviderStateMixin {
-  late final TextEditingController _effectiveController;
-  late final FocusNode _effectiveFocusNode;
-  late final AnimationController _controller;
-  late final Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _effectiveController = widget.controller ?? TextEditingController();
-    _effectiveFocusNode = widget.focusNode ?? FocusNode();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 350),
-      animationBehavior: AnimationBehavior.preserve,
-    );
-
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.fastOutSlowIn,
-    );
-
-    _effectiveFocusNode.addListener(_focusNodeListener);
-  }
-
-  void _focusNodeListener() {
-    if (_effectiveFocusNode.hasFocus) {
-      _controller.forward();
-    } else if (_effectiveController.text.isEmpty) {
-      _controller.reverse();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(left: 16),
-      color: const Color(0xff2c2c2c),
-      child: Row(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Icon(Icons.search),
-          ),
-          Expanded(
-            child: TextField(
-              focusNode: _effectiveFocusNode,
-              controller: _effectiveController,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.zero,
-                border: InputBorder.none,
-                hintText: 'Search watch history',
-              ),
-            ),
-          ),
-          ListenableBuilder(
-            listenable: _effectiveController,
-            builder: (context, child) {
-              return AnimatedOpacity(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInCubic,
-                opacity: _effectiveController.text.isNotEmpty ? 1 : 0,
-                child: child!,
-              );
-            },
-            child: IconButton(
-              onPressed: () {
-                _effectiveController.clear();
-                _focusNodeListener();
-              },
-              icon: const Icon(Icons.clear),
-            ),
-          ),
-          SizeTransition(
-            sizeFactor: _animation,
-            axis: Axis.horizontal,
-            axisAlignment: 0,
-            child: ColoredBox(
-              color: Colors.white12,
-              child: TextButton(
-                onPressed: () {
-                  _effectiveFocusNode.unfocus();
-                  _effectiveController.clear();
-                },
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class Slidable extends StatefulWidget {
-  final Widget child;
-  const Slidable({super.key, required this.child});
-
-  @override
-  State<Slidable> createState() => _SlidableState();
-}
-
-class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<RelativeRect> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-      animationBehavior: AnimationBehavior.preserve,
-    );
-
-    _animation = RelativeRectTween(
-      begin: const RelativeRect.fromLTRB(0, 0, 0, 0),
-      end: const RelativeRect.fromLTRB(0, 0, 100, 0),
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.elasticInOut,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) {
-        // Slide to the left when dragging to the left
-        if (details.primaryDelta! < 0) {
-          _controller.forward();
-        }
-        // Slide to the right when dragging to the right
-        else if (details.primaryDelta! > 0) {
-          _controller.reverse();
-        }
-      },
-      onHorizontalDragEnd: (details) {
-        // You can add additional logic here if needed
-      },
-      child: Stack(
-        children: [
-          const SizedBox(
-            width: 100,
-            height: 112,
-            child: Icon(
-              Icons.delete,
-              color: Colors.black,
-            ),
-          ),
-          PositionedTransition(
-            rect: _animation,
-            child: widget.child,
-          ),
-        ],
       ),
     );
   }
