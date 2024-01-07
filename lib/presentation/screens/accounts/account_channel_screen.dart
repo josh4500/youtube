@@ -48,115 +48,109 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
           child: NestedScrollView(
             headerSliverBuilder: (context, isInScroll) {
               return <Widget>[
+                SliverToBoxAdapter(
+                  child: AccountChannelSection(moreChannel: () {}),
+                ),
                 SliverOverlapAbsorber(
                   handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
                     context,
                   ),
-                  sliver: SliverToBoxAdapter(
-                    child: AccountChannelSection(moreChannel: () {}),
+                  sliver: const SliverAppBar(
+                    pinned: true,
+                    toolbarHeight: 0,
+                    centerTitle: false,
+                    automaticallyImplyLeading: false,
+                    bottom: TabBar(
+                      isScrollable: true,
+                      tabAlignment: TabAlignment.start,
+                      dividerColor: Colors.white,
+                      indicatorColor: Colors.white,
+                      tabs: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Tab(text: 'Home'),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Tab(text: 'Playlists'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ];
             },
-            body: Builder(
-              builder: (context) {
-                return CustomScrollView(
-                  key: const PageStorageKey<String>('name'),
-                  slivers: [
-                    SliverOverlapInjector(
-                      handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                        context,
-                      ),
-                    ),
-                    SliverFillRemaining(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const TabBar(
-                            isScrollable: true,
-                            tabAlignment: TabAlignment.start,
-                            dividerColor: Colors.white,
-                            indicatorColor: Colors.white,
-                            tabs: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Tab(text: 'Home'),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Tab(text: 'Playlists'),
-                              ),
-                            ],
+            body: TabBarView(
+              children: [
+                Container(), // TODO: Home tab
+                Builder(
+                  builder: (context) {
+                    return CustomScrollView(
+                      key: const PageStorageKey<String>('name'),
+                      slivers: [
+                        SliverOverlapInjector(
+                          handle:
+                              NestedScrollView.sliverOverlapAbsorberHandleFor(
+                            context,
                           ),
-                          const Divider(height: 0),
-                          Expanded(
-                            child: TabBarView(
-                              children: [
-                                Container(),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0,
-                                        horizontal: 16.0,
-                                      ),
-                                      child: TappableArea(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 4,
-                                          horizontal: 2,
-                                        ),
-                                        onPressed: () async {
-                                          showAccountPlaylistsSortMenu(context);
-                                        },
-                                        child: const Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(Icons.sort),
-                                            SizedBox(width: 4),
-                                            Text('Sort'),
-                                            SizedBox(width: 4),
-                                            RotatedBox(
-                                              quarterTurns: 1,
-                                              child: Icon(Icons.chevron_right),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: ListView.builder(
-                                        itemBuilder: (context, index) {
-                                          return TappableArea(
-                                            onPressed: () {},
-                                            child: const Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                vertical: 4.0,
-                                                horizontal: 8.0,
-                                              ),
-                                              child: PlayableContent(
-                                                width: 180,
-                                                height: 120,
-                                                direction: Axis.horizontal,
-                                                isPlaylist: true,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        itemCount: 5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                        ),
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8.0,
+                              horizontal: 16.0,
                             ),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                );
-              },
+                            child: TappableArea(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 2,
+                              ),
+                              onPressed: () async {
+                                showAccountPlaylistsSortMenu(context);
+                              },
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.sort),
+                                  SizedBox(width: 4),
+                                  Text('Sort'),
+                                  SizedBox(width: 4),
+                                  RotatedBox(
+                                    quarterTurns: 1,
+                                    child: Icon(Icons.chevron_right),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              return TappableArea(
+                                onPressed: () {},
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 4.0,
+                                    horizontal: 8.0,
+                                  ),
+                                  child: PlayableContent(
+                                    width: 180,
+                                    height: 120,
+                                    direction: Axis.horizontal,
+                                    isPlaylist: true,
+                                  ),
+                                ),
+                              );
+                            },
+                            childCount: 5,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         ),

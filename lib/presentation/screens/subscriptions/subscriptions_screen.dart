@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/router/app_router.dart';
+import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/screens/subscriptions/widgets/subscriptions_tabs.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/dynamic_tab.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 import 'package:youtube_clone/presentation/widgets/viewable/group/viewable_group_shorts.dart';
-import 'package:youtube_clone/presentation/widgets/viewable/viewable_shorts_content.dart';
 
 import '../../widgets/appbar_action.dart';
 import '../../widgets/viewable/viewable_post_content.dart';
@@ -19,133 +20,122 @@ class SubscriptionsScreen extends StatefulWidget {
 }
 
 class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
+  final ScrollController _scrollController = ScrollController();
   final ValueNotifier<int?> _selectedChannel = ValueNotifier<int?>(null);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          AppbarAction(
-            icon: Icons.cast_outlined,
-            onTap: () {},
-          ),
-          AppbarAction(
-            icon: Icons.notifications_outlined,
-            onTap: () {},
-          ),
-          AppbarAction(
-            icon: Icons.search,
-            onTap: () {},
-          ),
-        ],
-      ),
       body: ScrollConfiguration(
         behavior: const OverScrollGlowBehavior(
           enabled: false,
         ),
         child: CustomScrollView(
+          controller: _scrollController,
           slivers: [
             SliverAppBar(
               automaticallyImplyLeading: false,
-              collapsedHeight: MediaQuery.sizeOf(context).width * 0.3 +
-                  16 +
-                  MediaQuery.sizeOf(context).height * 0.05,
+              actions: [
+                AppbarAction(
+                  icon: Icons.cast_outlined,
+                  onTap: () {},
+                ),
+                AppbarAction(
+                  icon: Icons.notifications_outlined,
+                  onTap: () {},
+                ),
+                AppbarAction(
+                  icon: Icons.search,
+                  onTap: () {},
+                ),
+              ],
               floating: true,
-              flexibleSpace: Column(
-                children: [
-                  SizedBox(
-                    height: MediaQuery.sizeOf(context).width * 0.3,
-                    child: SubscriptionsTabs(
-                      valueListenable: _selectedChannel,
-                      onChange: (value) {},
+              bottom: PreferredSize(
+                preferredSize: Size(
+                  MediaQuery.sizeOf(context).width,
+                  MediaQuery.sizeOf(context).width * 0.3 +
+                      MediaQuery.sizeOf(context).height * 0.05,
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: MediaQuery.sizeOf(context).width * 0.3,
+                      child: SubscriptionsTabs(
+                        valueListenable: _selectedChannel,
+                        onChange: (value) {},
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  ValueListenableBuilder(
-                    valueListenable: _selectedChannel,
-                    builder: (context, value, childWidget) {
-                      if (value != null) {
-                        return const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              CustomActionChip(
-                                title: 'View channel',
-                                alignment: Alignment.center,
-                                padding: EdgeInsets.all(8),
-                                backgroundColor: Colors.white12,
-                              ),
-                            ],
-                          ),
+                    const SizedBox(height: 8),
+                    ValueListenableBuilder(
+                      valueListenable: _selectedChannel,
+                      builder: (context, value, childWidget) {
+                        if (value != null) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                CustomActionChip(
+                                  title: 'View channel',
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                    horizontal: 16,
+                                  ),
+                                  backgroundColor: Colors.white12,
+                                  onTap: () {
+                                    context.goto(
+                                      AppRoutes.channel.withPrefixParent(
+                                        AppRoutes.subscriptions,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        return SizedBox(
+                          height: MediaQuery.sizeOf(context).height * 0.05,
+                          child: childWidget,
                         );
-                      }
-                      return SizedBox(
-                        height: MediaQuery.sizeOf(context).height * 0.05,
-                        child: childWidget,
-                      );
-                    },
-                    child: DynamicTab(
-                      initialIndex: 1,
-                      trailing: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TappableArea(
-                          onPressed: () {},
-                          padding: const EdgeInsets.all(4.0),
-                          child: const Text(
-                            'Settings',
-                            style: TextStyle(
-                              color: Colors.blueAccent,
+                      },
+                      child: DynamicTab(
+                        initialIndex: 1,
+                        trailing: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TappableArea(
+                            onPressed: () {},
+                            padding: const EdgeInsets.all(4.0),
+                            child: const Text(
+                              'Settings',
+                              style: TextStyle(
+                                color: Colors.blueAccent,
+                              ),
                             ),
                           ),
                         ),
+                        options: const <String>[
+                          'All',
+                          'Today',
+                          'Live',
+                          'Shorts',
+                          'Continue watching',
+                          'Unwatched',
+                          'Post'
+                        ],
                       ),
-                      options: const <String>[
-                        'All',
-                        'Today',
-                        'Live',
-                        'Shorts',
-                        'Continue watching',
-                        'Unwatched',
-                        'Post'
-                      ],
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                ],
+                    const SizedBox(height: 2),
+                  ],
+                ),
               ),
             ),
             const SliverToBoxAdapter(
               child: ViewablePostContent(),
             ),
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  const Divider(thickness: 1.5, height: 0),
-                  const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.adb_sharp,
-                          size: 36,
-                          color: Colors.red,
-                        ),
-                        SizedBox(width: 16),
-                        Text(
-                          'Shorts',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  const ViewableGroupShorts(),
-                  const SizedBox(height: 16),
-                ],
-              ),
+            const SliverToBoxAdapter(
+              child: ViewableGroupShorts(),
             ),
             ValueListenableBuilder(
               valueListenable: _selectedChannel,

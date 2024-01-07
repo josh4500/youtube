@@ -2,8 +2,25 @@ import 'package:flutter/material.dart';
 
 class OptionButton extends StatefulWidget {
   final String title;
+  final Widget? leading;
+  final double? leadingWidth;
+  final Alignment? alignment;
+  final Color? backgroundColor;
+  final BorderRadius? borderRadius;
+  final EdgeInsets? padding;
+  final TextStyle? textStyle;
 
-  const OptionButton({super.key, required this.title});
+  const OptionButton({
+    super.key,
+    required this.title,
+    this.leading,
+    this.leadingWidth,
+    this.alignment,
+    this.backgroundColor,
+    this.borderRadius,
+    this.padding,
+    this.textStyle,
+  });
 
   @override
   State<OptionButton> createState() => _OptionButtonState();
@@ -44,16 +61,26 @@ class _OptionButtonState extends State<OptionButton>
         _controller.reverse();
       },
       child: Container(
+        alignment: widget.alignment,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: Colors.white12,
+          borderRadius: widget.borderRadius ?? BorderRadius.circular(8),
+          color: widget.backgroundColor ?? Colors.white12,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (widget.leading != null) ...[
+              widget.leading!,
+              SizedBox(width: widget.leadingWidth ?? 8),
+            ],
             Padding(
-              padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
-              child: Text(widget.title),
+              padding: widget.padding ??
+                  const EdgeInsets.only(
+                    left: 12,
+                    top: 8,
+                    bottom: 8,
+                  ),
+              child: Text(widget.title, style: widget.textStyle),
             ),
             AnimatedBuilder(
               animation: _animation,

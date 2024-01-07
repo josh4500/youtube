@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../widgets/appbar_action.dart';
 import '../../widgets/over_scroll_glow_behavior.dart';
 import '../../widgets/playable/playable_video_content.dart';
-import '../../widgets/slidable.dart';
 import 'widgets/history_search_text_field.dart';
 import 'widgets/popup/show_history_menu.dart';
 import 'widgets/shorts_history.dart';

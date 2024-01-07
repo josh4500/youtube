@@ -48,12 +48,10 @@ class AccountsScreen extends StatelessWidget {
           slivers: [
             SliverToBoxAdapter(
               child: AccountSection(
-                onTapSwitchAccount: () {},
-                onTapChannelInfo: () {
-                  context.goto(AppRoutes.accountChannel);
-                },
-                onTapGoogleAccount: () {},
                 onTapIncognito: () {},
+                onTapChannelInfo: () => context.goto(AppRoutes.accountChannel),
+                onTapSwitchAccount: () {},
+                onTapGoogleAccount: () {},
               ),
             ),
             SliverList(

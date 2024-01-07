@@ -7,6 +7,8 @@ import 'package:youtube_clone/presentation/screens/accounts/watch_history_screen
 import 'package:youtube_clone/presentation/screens/accounts/your_clips_screen.dart';
 import 'package:youtube_clone/presentation/screens/accounts/your_movies_screen.dart';
 import 'package:youtube_clone/presentation/screens/accounts/your_videos_screen.dart';
+import 'package:youtube_clone/presentation/screens/channel/channel_description_screen.dart';
+import 'package:youtube_clone/presentation/screens/channel/channel_screen.dart';
 import 'package:youtube_clone/presentation/screens/home/home_screen.dart';
 import 'package:youtube_clone/presentation/screens/homepage.dart';
 import 'package:youtube_clone/presentation/screens/playlist/playlist_screen.dart';
@@ -61,6 +63,16 @@ class AppRouter {
                   );
                 },
               ),
+              GoRoute(
+                name: AppRoutes.shortsSubscription.name,
+                path: AppRoutes.shortsSubscription.path,
+                builder: (BuildContext context, GoRouterState state) {
+                  return ShortsScreen(
+                    key: state.pageKey,
+                    isSubscription: true,
+                  );
+                },
+              ),
             ],
           ),
           StatefulShellBranch(
@@ -80,6 +92,27 @@ class AppRouter {
                     pageBuilder: (BuildContext context, GoRouterState state) {
                       return const NoTransitionPage(
                         child: AllSubscriptionsScreen(),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    name: AppRoutes.channel.name,
+                    path: AppRoutes.channel
+                        .withPrefixParent(AppRoutes.subscriptions)
+                        .path,
+                    pageBuilder: (BuildContext context, GoRouterState state) {
+                      return const NoTransitionPage(
+                        child: ChannelScreen(),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: AppRoutes.channelDescription
+                        .withPrefixParent(AppRoutes.subscriptions)
+                        .path,
+                    pageBuilder: (BuildContext context, GoRouterState state) {
+                      return const NoTransitionPage(
+                        child: ChannelDescriptionScreen(),
                       );
                     },
                   ),
@@ -165,6 +198,17 @@ class AppRouter {
                     pageBuilder: (BuildContext context, GoRouterState state) {
                       return const NoTransitionPage(
                         child: DownloadsScreen(),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    name: AppRoutes.channelDescription.name,
+                    path: AppRoutes.channelDescription
+                        .withPrefixParent(AppRoutes.accounts)
+                        .path,
+                    pageBuilder: (BuildContext context, GoRouterState state) {
+                      return const NoTransitionPage(
+                        child: ChannelDescriptionScreen(),
                       );
                     },
                   ),

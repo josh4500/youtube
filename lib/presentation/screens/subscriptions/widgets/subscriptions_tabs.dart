@@ -36,7 +36,9 @@ class _SubscriptionsTabsState extends State<SubscriptionsTabs> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               itemBuilder: (context, index) {
+                final key = GlobalObjectKey(index.hashCode);
                 return ValueListenableBuilder<int?>(
+                  key: key,
                   valueListenable: _selectedChannel,
                   builder: (context, selected, childWidget) {
                     final opacity =
@@ -57,6 +59,13 @@ class _SubscriptionsTabsState extends State<SubscriptionsTabs> {
                       if (prevSelected == index) {
                         _selectedChannel.value = null;
                       } else {
+                        Scrollable.ensureVisible(
+                          key.currentContext!,
+                          alignment: 0.55,
+                          alignmentPolicy:
+                              ScrollPositionAlignmentPolicy.explicit,
+                          curve: Curves.easeInOut,
+                        );
                         _selectedChannel.value = index;
                       }
                       widget.onChange(index);

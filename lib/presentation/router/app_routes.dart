@@ -3,6 +3,13 @@ class RouteInfo {
   final String path;
 
   RouteInfo({required this.name, required this.path});
+
+  RouteInfo withPrefixParent(RouteInfo parent) {
+    return RouteInfo(
+      name: name,
+      path: '${parent.path.replaceFirst('/', '')}/$path',
+    );
+  }
 }
 
 class AppRoutes {
@@ -19,6 +26,25 @@ class AppRoutes {
   static final shorts = RouteInfo(
     name: 'shorts',
     path: '/shorts',
+  );
+  static final shortsSubscription = RouteInfo(
+    name: 'shorts subscription',
+    path: '/shorts/subscription',
+  );
+
+  ///
+  ///
+  /// Channel
+  ///
+  ///
+  static final channel = RouteInfo(
+    name: 'channel',
+    path: 'channel',
+  );
+
+  static final channelDescription = RouteInfo(
+    name: 'channel description',
+    path: 'channel/description',
   );
 
   ///

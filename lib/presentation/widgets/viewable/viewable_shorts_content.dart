@@ -1,24 +1,35 @@
 import 'package:flutter/material.dart';
 
 class ViewableShortsContent extends StatelessWidget {
-  const ViewableShortsContent({super.key});
+  final double? width;
+  final EdgeInsets? margin;
+  final BorderRadius? borderRadius;
+  final bool showTitle;
+
+  const ViewableShortsContent({
+    super.key,
+    this.width,
+    this.margin,
+    this.borderRadius,
+    this.showTitle = true,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 180,
-      margin: const EdgeInsets.all(4),
+      width: width,
+      margin: margin,
       decoration: BoxDecoration(
-        color: Colors.white38,
-        borderRadius: BorderRadius.circular(8),
+        color: Colors.white12,
+        borderRadius: borderRadius,
       ),
-      child: const Stack(
+      child: Stack(
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Align(
+              const Align(
                 alignment: Alignment.topRight,
                 child: Padding(
                   padding: EdgeInsets.symmetric(
@@ -31,23 +42,24 @@ class ViewableShortsContent extends StatelessWidget {
                   ),
                 ),
               ),
-              Spacer(),
+              const Spacer(),
               Padding(
-                padding: EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Frame Generation is Game Changing',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
+                    if (showTitle)
+                      const Text(
+                        'Frame Generation is Game Changing',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
+                    const SizedBox(height: 8),
+                    const Text(
                       '1.7k views',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

@@ -2,29 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class NotificationOption extends StatelessWidget {
-  const NotificationOption({super.key});
+  final String? title;
+  final Alignment? alignment;
+  final Color? backgroundColor;
+  final BorderRadius? borderRadius;
+  final EdgeInsets? padding;
+  final TextStyle? textStyle;
+
+  const NotificationOption({
+    super.key,
+    this.title,
+    this.alignment,
+    this.backgroundColor,
+    this.borderRadius,
+    this.padding,
+    this.textStyle,
+  });
 
   @override
   Widget build(BuildContext context) {
     return TappableArea(
       padding: EdgeInsets.zero,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: borderRadius ?? BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: 4,
-          horizontal: 8,
-        ),
+        alignment: alignment,
+        padding: padding ??
+            const EdgeInsets.symmetric(
+              vertical: 4,
+              horizontal: 8,
+            ),
         decoration: BoxDecoration(
           color: Colors.white12,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: borderRadius ?? BorderRadius.circular(16),
         ),
-        child: const Row(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.notifications_active),
-            SizedBox(width: 4),
-            RotatedBox(
+            const Icon(Icons.notifications_active),
+            if (title != null) ...[
+              const SizedBox(width: 4),
+              Text(title!, style: textStyle),
+            ],
+            const SizedBox(width: 4),
+            const RotatedBox(
               quarterTurns: 1,
-              child: Icon(Icons.chevron_right, size: 14),
+              child: Icon(Icons.chevron_right),
             ),
           ],
         ),

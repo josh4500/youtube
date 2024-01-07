@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/router/app_router.dart';
+import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
@@ -61,7 +63,13 @@ class AccountChannelSection extends StatelessWidget {
             ),
           ),
           TappableArea(
-            onPressed: () {},
+            onPressed: () {
+              context.goto(
+                AppRoutes.channelDescription.withPrefixParent(
+                  AppRoutes.accounts,
+                ),
+              );
+            },
             child: const Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: 8.0,

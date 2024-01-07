@@ -12,7 +12,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool isPlayerActive = true;
+  bool isPlayerActive = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

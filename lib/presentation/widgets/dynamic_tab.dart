@@ -7,13 +7,18 @@ class DynamicTab extends StatefulWidget {
   final int initialIndex;
   final List<String> options;
   final Widget? leading;
+  final double? leadingWidth;
   final Widget? trailing;
+  final TextStyle? textStyle;
   final ValueChanged<int>? onChanged;
+
   const DynamicTab({
     super.key,
     this.leading,
+    this.leadingWidth,
     this.trailing,
     this.onChanged,
+    this.textStyle,
     required this.initialIndex,
     required this.options,
   });
@@ -23,12 +28,19 @@ class DynamicTab extends StatefulWidget {
 }
 
 class _DynamicTabState extends State<DynamicTab> {
-  late final ValueNotifier<int> _selectedIndexNotifier =
-      ValueNotifier<int>(widget.initialIndex);
+  late final ValueNotifier<int> _selectedIndexNotifier = ValueNotifier<int>(
+    widget.initialIndex,
+  );
   int get _totalItems =>
       widget.options.length +
       (widget.leading != null ? 1 : 0) +
       (widget.trailing != null ? 1 : 0);
+
+  @override
+  void didUpdateWidget(covariant DynamicTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _selectedIndexNotifier.value = widget.initialIndex;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +51,16 @@ class _DynamicTabState extends State<DynamicTab> {
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         itemBuilder: (context, index) {
           if (widget.leading != null && index == 0) {
-            return widget.leading;
+            return Row(
+              children: [
+                widget.leading!,
+                SizedBox(width: widget.leadingWidth),
+              ],
+            );
           } else if (widget.trailing != null && index == _totalItems - 1) {
-            return widget.trailing;
+            return widget.trailing!;
           }
-
+          index -= (widget.leading != null ? 1 : 0);
           return Padding(
             padding: const EdgeInsets.all(4.0),
             child: TappableArea(
@@ -72,11 +89,17 @@ class _DynamicTabState extends State<DynamicTab> {
                       ),
                       child: Text(
                         widget.options[index],
-                        style: TextStyle(
-                          color: index == selectedIndex
-                              ? Colors.black
-                              : Colors.white,
-                        ),
+                        style: widget.textStyle?.copyWith(
+                              color: index == selectedIndex
+                                  ? Colors.black
+                                  : Colors.white,
+                            ) ??
+                            TextStyle(
+                              color: index == selectedIndex
+                                  ? Colors.black
+                                  : Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
                       ),
                     );
                   }),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/router/app_router.dart';
+import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/widgets/channel_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
@@ -9,12 +11,19 @@ class SubscriptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Stack(
+    return Stack(
       alignment: Alignment.centerRight,
       children: [
         TappableArea(
-          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-          child: Row(
+          onPressed: () {
+            context.goto(
+              AppRoutes.channel.withPrefixParent(
+                AppRoutes.subscriptions,
+              ),
+            );
+          },
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          child: const Row(
             children: [
               ChannelAvatar(),
               SizedBox(width: 16),
@@ -28,7 +37,7 @@ class SubscriptionTile extends StatelessWidget {
             ],
           ),
         ),
-        Positioned(
+        const Positioned(
           right: 8,
           child: NotificationOption(),
         )
