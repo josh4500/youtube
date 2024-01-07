@@ -108,7 +108,7 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet>
                       Container(
                         height: 4,
                         width: 50,
-                        margin: const EdgeInsets.all(4),
+                        margin: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: Colors.grey,
                           borderRadius: BorderRadius.circular(8),
@@ -213,9 +213,8 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet>
                   ),
                 ),
                 SliverFillRemaining(
-                  hasScrollBody: true,
-                  fillOverscroll: true,
                   child: Stack(
+                    fit: StackFit.expand,
                     children: [
                       Column(
                         children: [
@@ -230,56 +229,14 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet>
                             ),
                           ),
                           ValueListenableBuilder(
-                              valueListenable: widget.replyNotifier,
-                              builder: (context, value, _) {
-                                return Visibility(
-                                  visible: !value,
-                                  child: Column(
-                                    children: [
-                                      const Divider(thickness: 1.5, height: 0),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 4,
-                                          horizontal: 8.0,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(4.0),
-                                              child: CircleAvatar(
-                                                backgroundColor: Colors.grey,
-                                                maxRadius: 12,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  vertical: 8,
-                                                  horizontal: 16,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white12,
-                                                  borderRadius:
-                                                      BorderRadius.circular(4),
-                                                ),
-                                                child: const Text(
-                                                  'Add a comment...',
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 4),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }),
+                            valueListenable: widget.replyNotifier,
+                            builder: (context, value, _) {
+                              return Visibility(
+                                visible: !value,
+                                child: const ShortsTextFieldPlaceholder(),
+                              );
+                            },
+                          ),
                         ],
                       ),
                       SlideTransition(
@@ -299,45 +256,7 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet>
                                   itemCount: 20,
                                 ),
                               ),
-                              const Divider(thickness: 1.5, height: 0),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 4,
-                                  horizontal: 8.0,
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Padding(
-                                      padding: EdgeInsets.all(4.0),
-                                      child: CircleAvatar(
-                                        backgroundColor: Colors.grey,
-                                        maxRadius: 12,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 8,
-                                          horizontal: 16,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white12,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
-                                        child: const Text(
-                                          'Add a reply...',
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                  ],
-                                ),
-                              )
+                              const ShortsTextFieldPlaceholder(isReply: true),
                             ],
                           ),
                         ),
@@ -350,6 +269,60 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet>
           ),
         ),
       ),
+    );
+  }
+}
+
+class ShortsTextFieldPlaceholder extends StatelessWidget {
+  final bool isReply;
+  const ShortsTextFieldPlaceholder({super.key, this.isReply = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Divider(
+          thickness: 1.5,
+          height: 0,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 4,
+            horizontal: 8.0,
+          ),
+          child: Row(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(4.0),
+                child: CircleAvatar(
+                  backgroundColor: Colors.grey,
+                  maxRadius: 12,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white12,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Add a ${isReply ? 'reply' : 'comment'}...',
+                    style: const TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -3,8 +3,8 @@ import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 
-class SubscriptionScreenButton extends StatelessWidget {
-  const SubscriptionScreenButton({super.key});
+class ShortsSubscriptionButton extends StatelessWidget {
+  const ShortsSubscriptionButton({super.key});
 
   @override
   Widget build(BuildContext context) {

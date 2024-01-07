@@ -5,7 +5,7 @@ import 'package:youtube_clone/presentation/widgets/player/playback/playback_prog
 
 import '../../widgets/appbar_action.dart';
 import 'widgets/shorts_comments_bottom_sheet.dart';
-import 'widgets/subscription_screen_button.dart';
+import 'widgets/shorts_subscription_button.dart';
 
 class ShortsScreen extends StatefulWidget {
   final bool isSubscription;
@@ -27,9 +27,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
   bool get _isSubscriptionScreen => widget.isSubscription;
   bool get _showSubscriptionButton => _isPaused.value && !widget.isSubscription;
 
-  final ValueNotifier<bool> _replyIsOpenedNotifier = ValueNotifier<bool>(
-    true,
-  );
+  final ValueNotifier<bool> _replyIsOpenedNotifier = ValueNotifier<bool>(false);
 
   bool _commentOpened = false;
   final _commentsController = DraggableScrollableController();
@@ -169,12 +167,15 @@ class _ShortsScreenState extends State<ShortsScreen> {
                                     Expanded(
                                       child: GestureDetector(
                                         onTap: _pausePlay,
-                                        child: Image.network(
-                                          _isSubscriptionScreen
-                                              ? 'https://dummyimage.com/360x700/17b00f/fff.jpg'
-                                              : 'https://dummyimage.com/360x700/c7b01e/fff.jpg',
-                                          alignment: Alignment.center,
-                                          fit: BoxFit.fitHeight,
+                                        child: SizedBox(
+                                          width: double.infinity,
+                                          child: Image.network(
+                                            _isSubscriptionScreen
+                                                ? 'https://dummyimage.com/360x700/17b00f/fff.jpg'
+                                                : 'https://dummyimage.com/360x700/c7b01e/fff.jpg',
+                                            alignment: Alignment.center,
+                                            fit: BoxFit.fitHeight,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -204,7 +205,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
                                     }
                                     return const SizedBox();
                                   },
-                                  child: const SubscriptionScreenButton(),
+                                  child: const ShortsSubscriptionButton(),
                                 ),
                               ],
                             );
@@ -242,7 +243,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
           minChildSize: 0,
           maxChildSize: 1,
           initialChildSize: 0,
-          snapSizes: const [0, 0.55],
+          snapSizes: const [0, 0.68],
           shouldCloseOnMinExtent: false,
           controller: _commentsController,
           snapAnimationDuration: const Duration(milliseconds: 300),
