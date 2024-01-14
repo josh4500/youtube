@@ -29,15 +29,16 @@ import 'package:youtube_clone/presentation/screens/player/player_screen.dart';
 import 'package:youtube_clone/presentation/widgets/builders/auth_state_builder.dart';
 import 'package:youtube_clone/presentation/widgets/connection_snackbar.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   final StatefulNavigationShell child;
   const HomePage({super.key, required this.child});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+class _HomePageState extends ConsumerState<HomePage>
+    with TickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<Offset> _animation;
 
@@ -75,6 +76,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(playerOverlayStateProvider, (previous, next) {
+      if (next) {
+        _controller.forward();
+      }
+    });
     return Scaffold(
       body: Stack(
         children: [
