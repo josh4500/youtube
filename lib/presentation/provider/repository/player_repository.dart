@@ -20,47 +20,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import 'dart:async';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'cache_provider.dart';
+final _playerOverlayStateProvider = StateProvider<bool>((ref) => false);
 
-class InMemoryCache<E> extends CacheProvider<E> {
-  static final Map<String, Map<String, Object>> _generalStore = {};
-  Map<String, E> get _store => _generalStore[name]! as Map<String, E>;
+final playerOverlayStateProvider = Provider(
+  (ref) {
+    return ref.watch(_playerOverlayStateProvider);
+  },
+);
 
-  final String name;
-  final _controller = StreamController<(String, E)>.broadcast();
+class PlayerRepository {
+  final Ref _ref;
 
-  InMemoryCache(this.name) {
-    _generalStore[name] ??= {};
+  PlayerRepository({required Ref ref}) : _ref = ref;
+
+  void openPlayerScreen() {
+    _ref.read(_playerOverlayStateProvider.notifier).state = true;
   }
 
-  @override
-  Stream<E> watchKey(String key) {
-    return _controller.stream
-        .where((event) => event.$1 == key)
-        .map((event) => event.$2);
+  void closePlayerScreen() {
+    _ref.read(_playerOverlayStateProvider.notifier).state = false;
   }
-
-  @override
-  E? read(String key) => _store[key];
-
-  @override
-  Iterable<E> get values => _store.values;
-
-  @override
-  void write(String key, E? value) {
-    if (value != null) {
-      _store[key] = value;
-      _controller.sink.add((key, value));
-    } else {
-      _store.remove(key);
-    }
-  }
-
-  @override
-  bool containsKey(String key) => _store.containsKey(key);
-
-  @override
-  void delete(String key) => _store.remove(key);
 }
+
+class PlayerState {
+  final bool playing;
+  final bool expanded;
+  final bool fullscreen;
+  final bool minimized;
+  final bool controlsHidden;
+
+  PlayerState({
+    required this.playing,
+    required this.expanded,
+    required this.fullscreen,
+    required this.minimized,
+    required this.controlsHidden,
+  });
+}
+
+final playerRepositoryProvider = Provider((ref) => PlayerRepository(ref: ref));

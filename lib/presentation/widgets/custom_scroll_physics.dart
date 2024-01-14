@@ -20,47 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import 'dart:async';
+import 'package:flutter/widgets.dart';
 
-import 'cache_provider.dart';
+class CustomScrollableScrollPhysics extends ScrollPhysics {
+  // TODO: Use tag name and Map<String, bool> / InMemoryCache to store values
+  static bool _shouldScroll = true;
+  const CustomScrollableScrollPhysics({super.parent});
 
-class InMemoryCache<E> extends CacheProvider<E> {
-  static final Map<String, Map<String, Object>> _generalStore = {};
-  Map<String, E> get _store => _generalStore[name]! as Map<String, E>;
+  @override
+  CustomScrollableScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return CustomScrollableScrollPhysics(parent: buildParent(ancestor));
+  }
 
-  final String name;
-  final _controller = StreamController<(String, E)>.broadcast();
-
-  InMemoryCache(this.name) {
-    _generalStore[name] ??= {};
+  void canScroll(bool value) {
+    _shouldScroll = value;
   }
 
   @override
-  Stream<E> watchKey(String key) {
-    return _controller.stream
-        .where((event) => event.$1 == key)
-        .map((event) => event.$2);
-  }
+  bool get allowUserScrolling => _shouldScroll;
 
   @override
-  E? read(String key) => _store[key];
-
-  @override
-  Iterable<E> get values => _store.values;
-
-  @override
-  void write(String key, E? value) {
-    if (value != null) {
-      _store[key] = value;
-      _controller.sink.add((key, value));
-    } else {
-      _store.remove(key);
-    }
-  }
-
-  @override
-  bool containsKey(String key) => _store.containsKey(key);
-
-  @override
-  void delete(String key) => _store.remove(key);
+  bool get allowImplicitScrolling => _shouldScroll;
 }
