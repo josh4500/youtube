@@ -3,15 +3,19 @@ import 'package:youtube_clone/presentation/widgets/comment_tile.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/reply_tile.dart';
 
+import '../../../widgets/comment_textfield_placeholder.dart';
+
 class ShortsCommentsBottomSheet extends StatefulWidget {
   final ScrollController? controller;
   final ValueNotifier<bool> replyNotifier;
   final VoidCallback closeComment;
+  final DraggableScrollableController draggableController;
   const ShortsCommentsBottomSheet({
     super.key,
     this.controller,
     required this.replyNotifier,
     required this.closeComment,
+    required this.draggableController,
   });
 
   @override
@@ -121,21 +125,38 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet>
                               Flexible(
                                 child: Stack(
                                   children: [
-                                    const Row(
+                                    Row(
                                       children: [
-                                        SizedBox(width: 16),
-                                        Text(
+                                        const SizedBox(
+                                          width: 16,
+                                          height: 32,
+                                        ),
+                                        const Text(
                                           'Comments',
                                           style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        SizedBox(width: 16),
-                                        Text(
+                                        const SizedBox(width: 16),
+                                        const Text(
                                           '1k',
                                           style: TextStyle(
+                                            fontSize: 15,
                                             color: Colors.grey,
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        InkWell(
+                                          onTap: () {},
+                                          borderRadius:
+                                              BorderRadius.circular(32),
+                                          child: const Padding(
+                                            padding: EdgeInsets.all(8.0),
+                                            child: Icon(
+                                              Icons.tune_outlined,
+                                              size: 24,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -154,12 +175,13 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet>
                                         child: Material(
                                           child: Row(
                                             children: [
-                                              const SizedBox(width: 16),
+                                              const SizedBox(
+                                                width: 16,
+                                                height: 32,
+                                              ),
                                               InkWell(
                                                 borderRadius:
-                                                    BorderRadius.circular(
-                                                  32,
-                                                ),
+                                                    BorderRadius.circular(32),
                                                 onTap: _closeReply,
                                                 child: const Icon(
                                                     Icons.arrow_back),
@@ -172,22 +194,13 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet>
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
+                                              const Spacer(),
                                             ],
                                           ),
                                         ),
                                       ),
                                     ),
                                   ],
-                                ),
-                              ),
-                              const Spacer(),
-                              const InkWell(
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Icon(
-                                    Icons.tune_outlined,
-                                    size: 24,
-                                  ),
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -214,16 +227,13 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet>
                 ),
                 SliverFillRemaining(
                   child: Stack(
-                    fit: StackFit.expand,
                     children: [
                       Column(
                         children: [
                           Expanded(
                             child: ListView.builder(
                               itemBuilder: (context, index) {
-                                return CommentTile(
-                                  openReply: _openReply,
-                                );
+                                return CommentTile(openReply: _openReply);
                               },
                               itemCount: 20,
                             ),
@@ -233,7 +243,7 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet>
                             builder: (context, value, _) {
                               return Visibility(
                                 visible: !value,
-                                child: const ShortsTextFieldPlaceholder(),
+                                child: const CommentTextFieldPlaceholder(),
                               );
                             },
                           ),
@@ -256,7 +266,7 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet>
                                   itemCount: 20,
                                 ),
                               ),
-                              const ShortsTextFieldPlaceholder(isReply: true),
+                              const CommentTextFieldPlaceholder(isReply: true),
                             ],
                           ),
                         ),
@@ -269,60 +279,6 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet>
           ),
         ),
       ),
-    );
-  }
-}
-
-class ShortsTextFieldPlaceholder extends StatelessWidget {
-  final bool isReply;
-  const ShortsTextFieldPlaceholder({super.key, this.isReply = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Divider(
-          thickness: 1.5,
-          height: 0,
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 4,
-            horizontal: 8.0,
-          ),
-          child: Row(
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(4.0),
-                child: CircleAvatar(
-                  backgroundColor: Colors.grey,
-                  maxRadius: 12,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white12,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    'Add a ${isReply ? 'reply' : 'comment'}...',
-                    style: const TextStyle(
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 4),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

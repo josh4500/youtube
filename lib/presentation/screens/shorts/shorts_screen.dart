@@ -1,3 +1,25 @@
+// MIT License
+//
+// Copyright (c) 2024 Ajibola Akinmosin (https://github.com/josh4500)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/screens/shorts/widgets/shorts_info_section.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
@@ -30,7 +52,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
   final ValueNotifier<bool> _replyIsOpenedNotifier = ValueNotifier<bool>(false);
 
   bool _commentOpened = false;
-  final _commentsController = DraggableScrollableController();
+  final _draggableController = DraggableScrollableController();
 
   final ValueNotifier<double> playerBottomPadding = ValueNotifier(0);
   final ValueNotifier<ScrollPhysics> physicsNotifier = ValueNotifier(
@@ -40,8 +62,8 @@ class _ShortsScreenState extends State<ShortsScreen> {
   @override
   void initState() {
     super.initState();
-    _commentsController.addListener(_resizeCallBack);
-    _commentsController.addListener(_scrollPhysicsCallback);
+    _draggableController.addListener(_resizeCallBack);
+    _draggableController.addListener(_scrollPhysicsCallback);
   }
 
   void _onPageIndexChange(int index) {
@@ -60,7 +82,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
 
   void _openCommentSheet() {
     _commentOpened = true;
-    _commentsController.animateTo(
+    _draggableController.animateTo(
       0.68,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInCubic,
@@ -73,7 +95,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
       return;
     }
     _commentOpened = false;
-    _commentsController.animateTo(
+    _draggableController.animateTo(
       0,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOutCubic,
@@ -81,7 +103,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
   }
 
   void _scrollPhysicsCallback() {
-    final size = _commentsController.size;
+    final size = _draggableController.size;
     if (size > 0) {
       physicsNotifier.value = const NeverScrollableScrollPhysics();
     } else {
@@ -90,7 +112,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
   }
 
   void _resizeCallBack() {
-    final size = _commentsController.size;
+    final size = _draggableController.size;
     final screenHeight = MediaQuery.sizeOf(context).height - 8;
     final calc = (screenHeight * size) - (kToolbarHeight + 12);
 
@@ -103,9 +125,9 @@ class _ShortsScreenState extends State<ShortsScreen> {
   void dispose() {
     _pageController.dispose();
 
-    _commentsController.removeListener(_resizeCallBack);
-    _commentsController.removeListener(_scrollPhysicsCallback);
-    _commentsController.dispose();
+    _draggableController.removeListener(_resizeCallBack);
+    _draggableController.removeListener(_scrollPhysicsCallback);
+    _draggableController.dispose();
     super.dispose();
   }
 
@@ -243,15 +265,16 @@ class _ShortsScreenState extends State<ShortsScreen> {
           minChildSize: 0,
           maxChildSize: 1,
           initialChildSize: 0,
-          snapSizes: const [0, 0.68],
+          snapSizes: const [0.0, 0.68],
           shouldCloseOnMinExtent: false,
-          controller: _commentsController,
+          controller: _draggableController,
           snapAnimationDuration: const Duration(milliseconds: 300),
           builder: (context, controller) {
             return ShortsCommentsBottomSheet(
               controller: controller,
               replyNotifier: _replyIsOpenedNotifier,
               closeComment: _closeCommentSheet,
+              draggableController: _draggableController,
             );
           },
         ),
