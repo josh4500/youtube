@@ -21,6 +21,9 @@
 // SOFTWARE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 import 'package:youtube_clone/presentation/widgets/appbar_action.dart';
 import 'package:youtube_clone/presentation/widgets/player/playback/playback_progress.dart';
 
@@ -68,26 +71,7 @@ class PlayerOverlayControls extends StatelessWidget {
                       color: Colors.white30,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                    ),
-                    child: InkWell(
-                      onTap: () {},
-                      borderRadius: BorderRadius.circular(32),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.black12,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.play_arrow,
-                          size: 54,
-                        ),
-                      ),
-                    ),
-                  ),
+                  const _PlayPauseControl(),
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: const BoxDecoration(
@@ -127,6 +111,66 @@ class PlayerOverlayControls extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PlayPauseControl extends ConsumerStatefulWidget {
+  const _PlayPauseControl({super.key});
+
+  @override
+  ConsumerState<_PlayPauseControl> createState() => _PlayPauseControlState();
+}
+
+class _PlayPauseControlState extends ConsumerState<_PlayPauseControl>
+    with SingleTickerProviderStateMixin {
+  late AnimationController controller;
+  late Animation<double> animation;
+
+  @override
+  void initState() {
+    super.initState();
+    final isPlaying = ref.read(playerNotifierProvider).playing;
+    controller = AnimationController(
+      vsync: this,
+      value: isPlaying ? 0 : 1,
+      duration: const Duration(milliseconds: 300),
+    );
+    animation = Tween<double>(begin: 0.0, end: 1.0).animate(controller);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isPlaying = ref.watch(
+      playerNotifierProvider.select((value) => value.playing),
+    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: InkWell(
+        onTap: () {
+          if (isPlaying) {
+            controller.forward();
+            ref.read(playerRepositoryProvider).pauseVideo();
+          } else {
+            controller.reverse();
+            ref.read(playerRepositoryProvider).playVideo();
+          }
+        },
+        borderRadius: BorderRadius.circular(32),
+        child: Container(
+          padding: const EdgeInsets.all(4),
+          decoration: const BoxDecoration(
+            color: Colors.black12,
+            shape: BoxShape.circle,
+          ),
+          child: AnimatedIcon(
+            icon: AnimatedIcons.pause_play,
+            progress: animation,
+            size: 54.0,
+            semanticLabel: 'Show menu',
+          ),
+        ),
       ),
     );
   }

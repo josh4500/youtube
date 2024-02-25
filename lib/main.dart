@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
 
@@ -17,7 +18,7 @@ Future<void> main() async {
 
 Future<void> setup() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  MediaKit.ensureInitialized();
   final dir = await getApplicationDocumentsDirectory();
   final appPath = dir.path;
 
@@ -37,6 +38,7 @@ Future<void> setup() async {
   await InternetConnectivity.instance.initialize();
 
   // Initialize services and repository depending on the environment
+  // Recommended for infrastructure and Domain
   switch (environment) {
     case Environment.dev:
       break;

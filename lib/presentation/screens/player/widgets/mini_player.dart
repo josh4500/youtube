@@ -22,7 +22,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository.dart';
+import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class MiniPlayer extends StatelessWidget {
@@ -75,29 +76,14 @@ class MiniPlayer extends StatelessWidget {
                 ),
               ),
             ),
-            Expanded(
+            const Expanded(
               child: FittedBox(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    const TappableArea(
-                      padding: EdgeInsets.all(16),
-                      child: Icon(Icons.pause),
-                    ),
-                    Consumer(
-                      builder: (context, ref, _) {
-                        return TappableArea(
-                          onPressed: () {
-                            ref
-                                .read(playerRepositoryProvider)
-                                .closePlayerScreen();
-                          },
-                          padding: const EdgeInsets.all(16),
-                          child: const Icon(Icons.close),
-                        );
-                      },
-                    ),
+                    _MiniPlayerPausePlayButton(),
+                    _MiniPlayerCloseButton(),
                   ],
                 ),
               ),
@@ -105,6 +91,37 @@ class MiniPlayer extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _MiniPlayerPausePlayButton extends ConsumerWidget {
+  const _MiniPlayerPausePlayButton({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isPlaying = ref.watch(
+      playerNotifierProvider.select((value) => value.playing),
+    );
+    return TappableArea(
+      onPressed: ref.read(playerNotifierProvider.notifier).togglePlaying,
+      padding: const EdgeInsets.all(16),
+      child: Icon(
+        isPlaying ? Icons.pause : Icons.play_arrow,
+      ),
+    );
+  }
+}
+
+class _MiniPlayerCloseButton extends ConsumerWidget {
+  const _MiniPlayerCloseButton({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return TappableArea(
+      onPressed: ref.read(playerRepositoryProvider).closePlayerScreen,
+      padding: const EdgeInsets.all(16),
+      child: const Icon(Icons.close),
     );
   }
 }

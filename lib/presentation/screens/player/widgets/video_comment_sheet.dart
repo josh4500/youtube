@@ -20,10 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/core/constants/constants.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/comment_tile.dart';
 import 'package:youtube_clone/presentation/widgets/dynamic_tab.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
+import 'package:youtube_clone/presentation/widgets/persistent_header_delegate.dart';
 import 'package:youtube_clone/presentation/widgets/reply_tile.dart';
 
 import 'video_comment_guidelines.dart';
@@ -32,6 +37,7 @@ class VideoCommentsSheet extends StatefulWidget {
   final ScrollController? controller;
   final ValueNotifier<bool> replyNotifier;
   final VoidCallback closeComment;
+  final double maxHeight;
   final DraggableScrollableController draggableController;
 
   const VideoCommentsSheet({
@@ -39,6 +45,7 @@ class VideoCommentsSheet extends StatefulWidget {
     this.controller,
     required this.replyNotifier,
     required this.closeComment,
+    required this.maxHeight,
     required this.draggableController,
   });
 
@@ -50,8 +57,11 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet>
     with TickerProviderStateMixin {
   bool _replyIsOpened = false;
   final ScrollController _commentListController = ScrollController();
+  final _commentListPhysics = const CustomScrollableScrollPhysics(
+    tag: 'comment',
+  );
   late final AnimationController _repliesAnimationController;
-  late final Animation _repliesOpacityAnimation;
+  late final Animation<double> _repliesOpacityAnimation;
   late final Animation<Offset> _repliesSlideAnimation;
 
   final _commentTagsNotifier = ValueNotifier<bool>(true);
@@ -134,106 +144,131 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet>
     widget.closeComment();
   }
 
+  void _onDragInfo(PointerMoveEvent event) {
+    if (_commentListController.offset == 0) {
+      final yDist = event.delta.dy;
+      final height = MediaQuery.sizeOf(context).height;
+      final size = widget.draggableController.size;
+
+      final newSize = clampDouble(
+        size - (yDist / height),
+        0,
+        1 - widget.maxHeight,
+      );
+
+      if (newSize >= 1 - widget.maxHeight) {
+        _commentListPhysics.canScroll(true);
+      } else {
+        _commentListPhysics.canScroll(false);
+      }
+
+      widget.draggableController.jumpTo(newSize);
+    }
+  }
+
+  void _onDragInfoUp(PointerUpEvent event) {
+    _commentListPhysics.canScroll(true);
+    final size = widget.draggableController.size;
+    if (size != 0.0 || size != 1 - widget.maxHeight) {
+      widget.draggableController.animateTo(
+        size < (1 - widget.maxHeight) / 2 ? 0.0 : 1 - widget.maxHeight,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeIn,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: ClipRRect(
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      ),
+      child: Material(
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
         ),
-        child: Material(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          ),
-          child: ScrollConfiguration(
-            behavior: const NoOverScrollGlowBehavior(),
-            child: CustomScrollView(
-              controller: widget.controller,
-              slivers: [
-                ValueListenableBuilder(
-                  valueListenable: _commentTagsNotifier,
-                  builder: (context, showCommentTags, childWidget) {
-                    return SliverAppBar(
-                      automaticallyImplyLeading: false,
-                      pinned: true,
-                      leadingWidth: 0,
-                      title: childWidget,
-                      actions: [
-                        InkWell(
-                          onTap: _closeComment,
-                          borderRadius: BorderRadius.circular(32),
-                          child: const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Icon(
-                              Icons.close,
-                              size: 24,
+        child: ScrollConfiguration(
+          behavior: const NoOverScrollGlowBehavior(),
+          child: CustomScrollView(
+            controller: widget.controller,
+            slivers: [
+              ValueListenableBuilder(
+                valueListenable: _commentTagsNotifier,
+                builder: (context, showCommentTags, childWidget) {
+                  return SliverPersistentHeader(
+                    pinned: true,
+                    floating: true,
+                    delegate: PersistentHeaderDelegate(
+                      minHeight: 46,
+                      maxHeight: showCommentTags ? 100 : 56,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            height: 4,
+                            width: 45,
+                            margin: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(32),
                             ),
                           ),
-                        ),
-                      ],
-                      flexibleSpace: Align(
-                        alignment: Alignment.topCenter,
-                        child: Container(
-                          height: 4,
-                          width: 45,
-                          margin: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      bottom: PreferredSize(
-                        preferredSize: Size(
-                          double.infinity,
-                          showCommentTags ? 45.5 : 1.5,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (showCommentTags) ...[
-                              const Column(
-                                children: [
-                                  SizedBox(
-                                    height: 40,
-                                    child: DynamicTab(
-                                      initialIndex: 0,
-                                      options: ['Top', 'Timed', 'Newest'],
-                                    ),
+                          childWidget!,
+                          const SizedBox(height: 12),
+                          if (showCommentTags) ...[
+                            const Column(
+                              children: [
+                                SizedBox(
+                                  height: 40,
+                                  child: DynamicTab(
+                                    initialIndex: 0,
+                                    options: ['Top', 'Timed', 'Newest'],
                                   ),
-                                  SizedBox(height: 4),
-                                ],
-                              ),
-                            ],
-                            const Divider(thickness: 1.5, height: 0),
+                                ),
+                                SizedBox(height: 4),
+                              ],
+                            ),
                           ],
-                        ),
+                          const Divider(thickness: 1.5, height: 0),
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                  ),
                   child: Stack(
                     children: [
-                      const Text(
-                        'Comments',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        children: [
+                          const Text(
+                            'Comments',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Spacer(),
+                          const SizedBox(width: 16),
+                          InkWell(
+                            borderRadius: BorderRadius.circular(32),
+                            onTap: _closeComment,
+                            child: const Icon(Icons.close),
+                          ),
+                        ],
                       ),
-                      AnimatedBuilder(
-                        animation: _repliesOpacityAnimation,
-                        builder: (context, childWidget) {
-                          return Opacity(
-                            opacity: _repliesOpacityAnimation.value,
-                            child: childWidget,
-                          );
-                        },
+                      FadeTransition(
+                        opacity: _repliesOpacityAnimation,
                         child: SlideTransition(
                           position: _repliesSlideAnimation,
                           child: Material(
                             child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 InkWell(
                                   borderRadius: BorderRadius.circular(32),
@@ -256,18 +291,39 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet>
                     ],
                   ),
                 ),
-                SliverFillRemaining(
+              ),
+              SliverFillRemaining(
+                child: Listener(
+                  onPointerMove: _onDragInfo,
+                  onPointerUp: _onDragInfoUp,
                   child: Stack(
+                    alignment: Alignment.bottomCenter,
                     children: [
-                      ListView.builder(
-                        controller: _commentListController,
-                        itemBuilder: (context, index) {
-                          if (index == 0) {
-                            return const VideoCommentGuidelines();
-                          }
-                          return CommentTile(openReply: _openReply);
-                        },
-                        itemCount: 20,
+                      Column(
+                        children: [
+                          Expanded(
+                            child: ListView.builder(
+                              physics: _commentListPhysics,
+                              controller: _commentListController,
+                              itemBuilder: (context, index) {
+                                if (index == 0) {
+                                  return const VideoCommentGuidelines();
+                                }
+                                return CommentTile(openReply: _openReply);
+                              },
+                              itemCount: 20,
+                            ),
+                          ),
+                          ValueListenableBuilder(
+                            valueListenable: widget.replyNotifier,
+                            builder: (context, value, _) {
+                              return Visibility(
+                                visible: !value,
+                                child: const CommentTextFieldPlaceholder(),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                       SlideTransition(
                         position: _repliesSlideAnimation,
@@ -286,8 +342,8 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet>
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -24,7 +24,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository.dart';
+import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/player_screen.dart';
 import 'package:youtube_clone/presentation/widgets/builders/auth_state_builder.dart';
 import 'package:youtube_clone/presentation/widgets/connection_snackbar.dart';
@@ -64,6 +65,11 @@ class _HomePageState extends ConsumerState<HomePage>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   void didUpdateWidget(covariant HomePage oldWidget) {
     super.didUpdateWidget(oldWidget);
     final index = widget.child.currentIndex;
@@ -72,6 +78,21 @@ class _HomePageState extends ConsumerState<HomePage>
     } else {
       _controller.forward();
     }
+
+    Future(() {
+      final isPlayerActive = ref.read(playerOverlayStateProvider);
+      if (oldWidget.child.currentIndex != widget.child.currentIndex) {
+        if (isPlayerActive && _controller.value != 1) {
+          if (index == 1 && ref.read(playerNotifierProvider).playing) {
+            ref.read(playerRepositoryProvider).minimizeAndPauseVideo();
+          } else {
+            ref.read(playerRepositoryProvider).minimizeVideo();
+          }
+        }
+      }
+    });
+
+    // TODO 1: When open new viewable/playable, if
   }
 
   @override
@@ -81,53 +102,53 @@ class _HomePageState extends ConsumerState<HomePage>
         _controller.forward();
       }
     });
-    return Scaffold(
-      body: Stack(
-        children: [
-          widget.child,
-          SlideTransition(
-            position: _animation,
-            child: Consumer(
-              builder: (context, ref, childWidget) {
-                final isPlayerActive = ref.watch(playerOverlayStateProvider);
-                if (isPlayerActive) {
-                  return childWidget!;
-                }
-                return const SizedBox();
-              },
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: LayoutBuilder(builder: (context, c) {
-                  return PlayerScreen(
-                    height: c.maxHeight,
-                    width: c.maxWidth,
-                  );
-                }),
+    return SafeArea(
+      bottom: false,
+      child: Scaffold(
+        body: Stack(
+          children: [
+            widget.child,
+            SlideTransition(
+              position: _animation,
+              child: Consumer(
+                builder: (context, ref, childWidget) {
+                  final isPlayerActive = ref.watch(playerOverlayStateProvider);
+                  if (isPlayerActive) {
+                    return childWidget!;
+                  }
+                  return const SizedBox();
+                },
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: LayoutBuilder(builder: (context, c) {
+                    return PlayerScreen(
+                      height: c.maxHeight,
+                    );
+                  }),
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: Consumer(
-        builder: (context, ref, childWidget) {
-          final isPlayerActive = ref.watch(playerOverlayStateProvider);
-          return Padding(
-            padding: isPlayerActive
-                ? MediaQuery.viewInsetsOf(
-                    context,
-                  )
-                : EdgeInsets.zero,
-            child: childWidget,
-          );
-        },
-        child: CustomNavigatorBar(
-          selectedIndex: widget.child.currentIndex,
-          onChangeIndex: (index) {
-            widget.child.goBranch(
-              index,
-              initialLocation: index == widget.child.currentIndex,
+          ],
+        ),
+        bottomNavigationBar: Consumer(
+          builder: (context, ref, childWidget) {
+            final isPlayerActive = ref.watch(playerOverlayStateProvider);
+            return Padding(
+              padding: isPlayerActive
+                  ? MediaQuery.viewInsetsOf(context)
+                  : EdgeInsets.zero,
+              child: childWidget,
             );
           },
+          child: CustomNavigatorBar(
+            selectedIndex: widget.child.currentIndex,
+            onChangeIndex: (index) {
+              widget.child.goBranch(
+                index,
+                initialLocation: index == widget.child.currentIndex,
+              );
+            },
+          ),
         ),
       ),
     );
