@@ -23,13 +23,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/comment_tile.dart';
-import 'package:youtube_clone/presentation/widgets/dynamic_tab.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/persistent_header_delegate.dart';
-import 'package:youtube_clone/presentation/widgets/reply_tile.dart';
 
 import 'video_comment_guidelines.dart';
 

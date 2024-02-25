@@ -117,7 +117,7 @@ class PlayerOverlayControls extends StatelessWidget {
 }
 
 class _PlayPauseControl extends ConsumerStatefulWidget {
-  const _PlayPauseControl({super.key});
+  const _PlayPauseControl();
 
   @override
   ConsumerState<_PlayPauseControl> createState() => _PlayPauseControlState();

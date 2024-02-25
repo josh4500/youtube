@@ -96,7 +96,7 @@ class MiniPlayer extends StatelessWidget {
 }
 
 class _MiniPlayerPausePlayButton extends ConsumerWidget {
-  const _MiniPlayerPausePlayButton({super.key});
+  const _MiniPlayerPausePlayButton();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -114,7 +114,7 @@ class _MiniPlayerPausePlayButton extends ConsumerWidget {
 }
 
 class _MiniPlayerCloseButton extends ConsumerWidget {
-  const _MiniPlayerCloseButton({super.key});
+  const _MiniPlayerCloseButton();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
