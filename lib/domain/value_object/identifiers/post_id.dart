@@ -20,44 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'identifier.dart';
 
-final _playerOverlayStateProvider = StateProvider<bool>((ref) => false);
-
-final playerOverlayStateProvider = Provider(
-  (ref) {
-    return ref.watch(_playerOverlayStateProvider);
-  },
-);
-
-class PlayerRepository {
-  final Ref _ref;
-
-  PlayerRepository({required Ref ref}) : _ref = ref;
-
-  void openPlayerScreen() {
-    _ref.read(_playerOverlayStateProvider.notifier).state = true;
-  }
-
-  void closePlayerScreen() {
-    _ref.read(_playerOverlayStateProvider.notifier).state = false;
-  }
+class PostID extends Identifier<String> {
+  const PostID({required super.value});
 }
-
-class PlayerState {
-  final bool playing;
-  final bool expanded;
-  final bool fullscreen;
-  final bool minimized;
-  final bool controlsHidden;
-
-  PlayerState({
-    required this.playing,
-    required this.expanded,
-    required this.fullscreen,
-    required this.minimized,
-    required this.controlsHidden,
-  });
-}
-
-final playerRepositoryProvider = Provider((ref) => PlayerRepository(ref: ref));
