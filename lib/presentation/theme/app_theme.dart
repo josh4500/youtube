@@ -25,7 +25,7 @@ import 'package:youtube_clone/presentation/theme/app_style.dart';
 
 import 'app_color.dart';
 
-class AppTheme {
+abstract final class AppTheme {
   //
   // Light theme
   //

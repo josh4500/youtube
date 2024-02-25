@@ -30,11 +30,9 @@ class VideoCommentGuidelines extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       color: Colors.grey,
-      child: Text(
+      child: const Text(
         'Remember to keep comments respectful and to follow our Community Guidelines',
-        style: TextStyle(
-          fontSize: 11,
-        ),
+        style: TextStyle(fontSize: 11),
       ),
     );
   }

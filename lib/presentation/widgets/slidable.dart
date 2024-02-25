@@ -30,7 +30,8 @@ class Slidable extends StatefulWidget {
   State<Slidable> createState() => _SlidableState();
 }
 
-class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
+class _SlidableState extends State<Slidable>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<Offset> _animation;
 

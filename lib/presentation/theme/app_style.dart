@@ -24,7 +24,7 @@ import 'package:flutter/material.dart';
 
 import 'brightness_pair.dart';
 
-class AppStyle {
+abstract final class AppStyle {
   static const appBar = BrightnessPair<TextStyle>(
     light: TextStyle(
       fontSize: 20,

@@ -24,7 +24,7 @@ import 'package:flutter/material.dart';
 
 import 'brightness_pair.dart';
 
-class AppPalette {
+abstract final class AppPalette {
   // WHITE
   static const Color white = Color(0xFFFFFFFF);
   static const Color white1 = Color(0xFFF1F1F1);

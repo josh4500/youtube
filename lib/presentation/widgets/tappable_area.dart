@@ -52,7 +52,7 @@ class TappableArea extends StatefulWidget {
 }
 
 class _TappableAreaState extends State<TappableArea>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<Color?> _backgroundAnimation;
   late final Animation<Border?> _borderAnimation;
