@@ -124,6 +124,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                       },
                       child: DynamicTab(
                         initialIndex: 1,
+                        useTappable: true,
                         trailing: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TappableArea(

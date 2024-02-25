@@ -27,6 +27,7 @@ import 'tappable_area.dart';
 
 class DynamicTab extends StatefulWidget {
   final int initialIndex;
+  final bool useTappable;
   final List<String> options;
   final Widget? leading;
   final double? leadingWidth;
@@ -36,6 +37,7 @@ class DynamicTab extends StatefulWidget {
 
   const DynamicTab({
     super.key,
+    this.useTappable = false,
     this.leading,
     this.leadingWidth,
     this.trailing,
@@ -83,50 +85,65 @@ class _DynamicTabState extends State<DynamicTab> {
             return widget.trailing!;
           }
           index -= (widget.leading != null ? 1 : 0);
-          return Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: TappableArea(
-              onPressed: () {
-                _selectedIndexNotifier.value = index;
-                if (widget.onChanged != null) {
-                  widget.onChanged!(index);
-                }
-              },
-              padding: EdgeInsets.zero,
-              borderRadius: BorderRadius.circular(8),
-              child: ValueListenableBuilder(
-                  valueListenable: _selectedIndexNotifier,
-                  builder: (context, selectedIndex, childWidget) {
-                    return Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 12.5,
-                      ),
-                      decoration: BoxDecoration(
+          final child = ValueListenableBuilder(
+            valueListenable: _selectedIndexNotifier,
+            builder: (context, selectedIndex, childWidget) {
+              return Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 12.5,
+                ),
+                decoration: BoxDecoration(
+                  color: index == selectedIndex ? Colors.white : Colors.white12,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  widget.options[index],
+                  style: widget.textStyle?.copyWith(
                         color: index == selectedIndex
-                            ? Colors.white
-                            : Colors.white12,
-                        borderRadius: BorderRadius.circular(8),
+                            ? Colors.black
+                            : Colors.white,
+                      ) ??
+                      TextStyle(
+                        color: index == selectedIndex
+                            ? Colors.black
+                            : Colors.white,
+                        fontWeight: FontWeight.w500,
                       ),
-                      child: Text(
-                        widget.options[index],
-                        style: widget.textStyle?.copyWith(
-                              color: index == selectedIndex
-                                  ? Colors.black
-                                  : Colors.white,
-                            ) ??
-                            TextStyle(
-                              color: index == selectedIndex
-                                  ? Colors.black
-                                  : Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
-                      ),
-                    );
-                  }),
-            ),
+                ),
+              );
+            },
           );
+          if (widget.useTappable) {
+            return Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: TappableArea(
+                onPressed: () {
+                  _selectedIndexNotifier.value = index;
+                  if (widget.onChanged != null) {
+                    widget.onChanged!(index);
+                  }
+                },
+                padding: EdgeInsets.zero,
+                borderRadius: BorderRadius.circular(8),
+                child: child,
+              ),
+            );
+          } else {
+            return Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: GestureDetector(
+                onTap: () {
+                  _selectedIndexNotifier.value = index;
+                  if (widget.onChanged != null) {
+                    widget.onChanged!(index);
+                  }
+                },
+                child: child,
+              ),
+            );
+          }
         },
         itemCount: _totalItems,
       ),
