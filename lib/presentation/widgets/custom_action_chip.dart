@@ -53,7 +53,7 @@ class CustomActionChip extends StatefulWidget {
 }
 
 class _CustomActionChipState extends State<CustomActionChip>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   late AnimationController controller;
   late Animation<double> animation;
 

@@ -23,22 +23,25 @@
 import 'package:flutter/widgets.dart';
 
 class CustomScrollableScrollPhysics extends ScrollPhysics {
-  // TODO: Use tag name and Map<String, bool> / InMemoryCache to store values
-  static bool _shouldScroll = true;
-  const CustomScrollableScrollPhysics({super.parent});
+  static final Map<String, bool> _shouldScroll = {};
+  final String tag;
+  const CustomScrollableScrollPhysics({super.parent, required this.tag});
 
   @override
   CustomScrollableScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return CustomScrollableScrollPhysics(parent: buildParent(ancestor));
+    return CustomScrollableScrollPhysics(
+      parent: buildParent(ancestor),
+      tag: tag,
+    );
   }
 
   void canScroll(bool value) {
-    _shouldScroll = value;
+    _shouldScroll[tag] = value;
   }
 
   @override
-  bool get allowUserScrolling => _shouldScroll;
+  bool get allowUserScrolling => _shouldScroll[tag] ?? true;
 
   @override
-  bool get allowImplicitScrolling => _shouldScroll;
+  bool get allowImplicitScrolling => _shouldScroll[tag] ?? true;
 }

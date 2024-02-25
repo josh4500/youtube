@@ -22,26 +22,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:youtube_clone/presentation/screens/accounts/accounts_screen.dart';
-import 'package:youtube_clone/presentation/screens/accounts/account_playlists_screen.dart';
-import 'package:youtube_clone/presentation/screens/accounts/downloads_screen.dart';
-import 'package:youtube_clone/presentation/screens/accounts/watch_history_screen.dart';
-import 'package:youtube_clone/presentation/screens/accounts/your_clips_screen.dart';
-import 'package:youtube_clone/presentation/screens/accounts/your_movies_screen.dart';
-import 'package:youtube_clone/presentation/screens/accounts/your_videos_screen.dart';
-import 'package:youtube_clone/presentation/screens/channel/channel_description_screen.dart';
-import 'package:youtube_clone/presentation/screens/channel/channel_screen.dart';
-import 'package:youtube_clone/presentation/screens/home/home_screen.dart';
-import 'package:youtube_clone/presentation/screens/homepage.dart';
-import 'package:youtube_clone/presentation/screens/playlist/playlist_screen.dart';
-import 'package:youtube_clone/presentation/screens/settings/settings_screen.dart';
-import 'package:youtube_clone/presentation/screens/shorts/shorts_screen.dart';
-import 'package:youtube_clone/presentation/screens/subscriptions/all_subscriptions_screen.dart';
-import 'package:youtube_clone/presentation/screens/subscriptions/subscriptions_screen.dart';
-import 'package:youtube_clone/presentation/screens/watch_on_tv/link_tv_screen.dart';
-import 'package:youtube_clone/presentation/screens/watch_on_tv/watch_on_tv_screen.dart';
+import 'package:youtube_clone/presentation/screens.dart';
 
-import '../screens/accounts/account_channel_screen.dart';
 import 'app_routes.dart';
 
 class AppRouter {
