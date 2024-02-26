@@ -57,6 +57,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
     final isRestrictedMode = ref.watch(
       preferencesProvider.select((value) => value.restrictedMode),
     );
+    // TODO: Check for isLiveVideo
     const isLiveVideo = true;
 
     final childWidget = Column(

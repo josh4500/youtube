@@ -259,7 +259,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   /// Reverses the zoom and pan effect using an animation.
-  void _reverseZoomPan() {
+  Future<void> _reverseZoomPan() async {
     // Create a Matrix4Tween for the animation
     final tween = Matrix4Tween(
       begin: _transformationController.value,
@@ -275,7 +275,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _zoomPanAnimationController.reset();
 
     // Start the animation by moving it forward
-    _zoomPanAnimationController.forward();
+    await _zoomPanAnimationController.forward();
   }
 
   void _hideControls() {
@@ -411,7 +411,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
   }
 
-  void _onDragPlayerEnd(DragEndDetails details) {
+  Future<void> _onDragPlayerEnd(DragEndDetails details) async {
     _preventPlayerDragUp = false;
     _preventPlayerDragDown = false;
 
@@ -472,11 +472,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     // Reversing zoom due to swiping up
     final lastScaleValue = _transformationController.value.getMaxScaleOnAxis();
     if (lastScaleValue <= minPlayerScale + 0.5) {
-      _reverseZoomPan();
+      await _reverseZoomPan();
 
       if (lastScaleValue == minPlayerScale + 0.5) {
         // TODO: Toggle fullscreen
       }
+      final ended = ref.read(playerNotifierProvider).ended;
+      if (ended) _toggleControls();
     } else {
       _onTapFullScreen();
     }
