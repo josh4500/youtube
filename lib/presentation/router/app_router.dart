@@ -83,6 +83,16 @@ class AppRouter {
                   );
                 },
               ),
+              GoRoute(
+                name: AppRoutes.shortsLive.name,
+                path: AppRoutes.shortsLive.path,
+                builder: (BuildContext context, GoRouterState state) {
+                  return ShortsScreen(
+                    key: state.pageKey,
+                    isLive: true,
+                  );
+                },
+              ),
             ],
           ),
           StatefulShellBranch(

@@ -46,42 +46,66 @@ class ShortsInfoSection extends StatelessWidget {
             children: [
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(
-                    16.0,
-                  ),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      InkWell(
-                        onTap: () {},
-                        borderRadius: BorderRadius.circular(32),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(
-                              32,
+                      ...[
+                        GestureDetector(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 10,
                             ),
-                            color: Colors.black45,
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.location_on_outlined,
-                                size: 14,
-                              ),
-                              SizedBox(width: 4),
-                              Text('New york'),
-                            ],
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(2),
+                              color: Colors.black45,
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.paid_outlined, size: 14),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Includes Paid Promotions',
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                                SizedBox(width: 4),
+                                Icon(Icons.chevron_right, size: 14),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
+                      ],
+                      ...[
+                        InkWell(
+                          onTap: () {},
+                          borderRadius: BorderRadius.circular(32),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 16,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(32),
+                              color: Colors.black45,
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.location_on_outlined, size: 14),
+                                SizedBox(width: 4),
+                                Text('New york'),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       Row(
                         children: [
                           const ChannelAvatar(size: 32),
@@ -113,8 +137,11 @@ class ShortsInfoSection extends StatelessWidget {
                         children: [
                           Icon(Icons.arrow_right_sharp),
                           SizedBox(width: 4),
-                          Text(
-                            'Posted content will be found here if clicked',
+                          Expanded(
+                            child: Text(
+                              'Posted content will be found here if clicked',
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
@@ -137,6 +164,7 @@ class ShortsInfoSection extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(width: 16),
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

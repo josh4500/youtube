@@ -33,11 +33,17 @@ import 'package:youtube_clone/presentation/widgets/player/playback/playback_prog
 
 import '../../widgets/appbar_action.dart';
 import 'widgets/shorts_comments_bottom_sheet.dart';
-import 'widgets/shorts_subscription_button.dart';
+import 'widgets/shorts_category_actions.dart';
 
 class ShortsScreen extends StatefulWidget {
   final bool isSubscription;
-  const ShortsScreen({super.key, this.isSubscription = false});
+  final bool isLive;
+
+  const ShortsScreen({
+    super.key,
+    this.isSubscription = false,
+    this.isLive = false,
+  });
 
   @override
   State<ShortsScreen> createState() => _ShortsScreenState();
@@ -51,9 +57,10 @@ class _ShortsScreenState extends State<ShortsScreen> {
 
   int _currentIndex = 0;
   final _isPaused = ValueNotifier(false);
-  bool get _isMainScreen => !widget.isSubscription;
+  bool get _isMainScreen => !widget.isSubscription && !widget.isLive;
   bool get _isSubscriptionScreen => widget.isSubscription;
-  bool get _showSubscriptionButton => _isPaused.value && !widget.isSubscription;
+  bool get _isLiveScreen => widget.isLive;
+  bool get _showCategoryActions => _isPaused.value && _isMainScreen;
 
   final ValueNotifier<bool> _replyIsOpenedNotifier = ValueNotifier<bool>(false);
 
@@ -149,7 +156,11 @@ class _ShortsScreenState extends State<ShortsScreen> {
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
               title: Text(
-                _isSubscriptionScreen ? 'Subscriptions' : 'Shorts',
+                _isSubscriptionScreen
+                    ? 'Subscriptions'
+                    : _isLiveScreen
+                        ? 'Live'
+                        : 'Shorts',
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -200,7 +211,9 @@ class _ShortsScreenState extends State<ShortsScreen> {
                                           child: Image.network(
                                             _isSubscriptionScreen
                                                 ? 'https://dummyimage.com/360x700/17b00f/fff.jpg'
-                                                : 'https://dummyimage.com/360x700/c7b01e/fff.jpg',
+                                                : _isLiveScreen
+                                                    ? 'https://dummyimage.com/360x700/11101e/fff.jpg'
+                                                    : 'https://dummyimage.com/360x700/c7b01e/fff.jpg',
                                             alignment: Alignment.center,
                                             fit: BoxFit.fitHeight,
                                           ),
@@ -227,13 +240,13 @@ class _ShortsScreenState extends State<ShortsScreen> {
                                 ListenableBuilder(
                                   listenable: _isPaused,
                                   builder: (context, childWidget) {
-                                    if (_showSubscriptionButton &&
+                                    if (_showCategoryActions &&
                                         index == _currentIndex) {
                                       return childWidget!;
                                     }
                                     return const SizedBox();
                                   },
-                                  child: const ShortsSubscriptionButton(),
+                                  child: const ShortsCategoryActions(),
                                 ),
                               ],
                             );

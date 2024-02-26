@@ -59,6 +59,10 @@ class AppRoutes {
     name: 'shorts subscription',
     path: '/shorts/subscription',
   );
+  static final shortsLive = RouteInfo(
+    name: 'live subscription',
+    path: '/shorts/live',
+  );
 
   ///
   ///

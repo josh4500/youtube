@@ -31,8 +31,8 @@ import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 
-class ShortsSubscriptionButton extends StatelessWidget {
-  const ShortsSubscriptionButton({super.key});
+class ShortsCategoryActions extends StatelessWidget {
+  const ShortsCategoryActions({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +52,21 @@ class ShortsSubscriptionButton extends StatelessWidget {
                 icon: const Icon(Icons.subscriptions_outlined),
                 backgroundColor: Colors.white10,
                 title: 'Subscriptions',
+                textStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 8),
+              CustomActionChip(
+                onTap: () => context.goto(AppRoutes.shortsLive),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 6,
+                  horizontal: 16,
+                ),
+                icon: const Icon(Icons.live_tv),
+                backgroundColor: Colors.white10,
+                title: 'Live',
                 textStyle: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
