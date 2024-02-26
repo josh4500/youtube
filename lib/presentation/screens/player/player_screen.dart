@@ -191,6 +191,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   @override
   void dispose() {
+    _draggableOpacityController.dispose();
     _zoomPanAnimationController.dispose();
     _transformationController.dispose();
     _commentDraggableController.dispose();
@@ -200,6 +201,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _replyIsOpenedNotifier.dispose();
     _transcriptNotifier.dispose();
     _infoScrollController.dispose();
+    _infoOpacityController.dispose();
     super.dispose();
   }
 

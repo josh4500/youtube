@@ -28,11 +28,21 @@
 
 import 'package:flutter/material.dart';
 
+class StackedPosition {
+  final double? top;
+  final double? bottom;
+  final double? left;
+  final double? right;
+
+  StackedPosition({this.top, this.bottom, this.left, this.right});
+}
+
 class TappableArea extends StatefulWidget {
   final Widget child;
   final HitTestBehavior? behavior;
   final EdgeInsets padding;
   final Alignment stackedAlignment;
+  final StackedPosition? stackedPosition;
   final Widget? stackedChild;
   final BorderRadius? borderRadius;
   final VoidCallback? onPressed;
@@ -46,6 +56,7 @@ class TappableArea extends StatefulWidget {
     ),
     this.behavior,
     this.borderRadius,
+    this.stackedPosition,
     this.stackedAlignment = Alignment.center,
     this.stackedChild,
     required this.child,
@@ -158,7 +169,18 @@ class _TappableAreaState extends State<TappableArea>
             ),
           ),
         ),
-        if (widget.stackedChild != null)
+        if (widget.stackedChild != null && widget.stackedPosition != null)
+          Positioned.fill(
+            top: widget.stackedPosition?.top,
+            bottom: widget.stackedPosition?.bottom,
+            left: widget.stackedPosition?.left,
+            right: widget.stackedPosition?.right,
+            child: Align(
+              alignment: widget.stackedAlignment,
+              child: widget.stackedChild,
+            ),
+          ),
+        if (widget.stackedChild != null && widget.stackedPosition == null)
           Align(
             alignment: widget.stackedAlignment,
             child: widget.stackedChild,

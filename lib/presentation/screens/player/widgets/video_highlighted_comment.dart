@@ -29,22 +29,46 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets/channel_avatar.dart';
 
-class VideoHighlightedComment extends StatelessWidget {
+class VideoHighlightedComment extends StatefulWidget {
   const VideoHighlightedComment({super.key});
 
+  @override
+  State<VideoHighlightedComment> createState() =>
+      _VideoHighlightedCommentState();
+}
+
+class _VideoHighlightedCommentState extends State<VideoHighlightedComment> {
   @override
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        ChannelAvatar(size: 32),
+        ChannelAvatar(size: 24),
         SizedBox(width: 8),
         Text(
           'God bless your heart',
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 12,
-          ),
+          style: TextStyle(fontSize: 12),
+        )
+      ],
+    );
+  }
+}
+
+class VideoHighlightedLiveComment extends StatelessWidget {
+  const VideoHighlightedLiveComment({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      children: [
+        Icon(Icons.chat_bubble_outline),
+        SizedBox(width: 8),
+        Text(
+          'See what others said about this video while it was live',
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 12),
         )
       ],
     );

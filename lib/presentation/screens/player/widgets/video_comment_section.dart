@@ -33,50 +33,113 @@ import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 import 'video_highlighted_comment.dart';
 
-class VideoCommentSection extends ConsumerWidget {
+class VideoCommentSection extends ConsumerStatefulWidget {
   final VoidCallback? onTap;
   const VideoCommentSection({super.key, this.onTap});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final restrictedMode = ref.watch(
+  ConsumerState<VideoCommentSection> createState() =>
+      _VideoCommentSectionState();
+}
+
+class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
+  int currentPage = 0;
+  final _pageController = PageController(initialPage: 0);
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isRestrictedMode = ref.watch(
       preferencesProvider.select((value) => value.restrictedMode),
     );
+    const isLiveVideo = true;
+
     final childWidget = Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            const Text(
-              'Comments',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            if (!restrictedMode) ...[
-              const SizedBox(width: 8),
-              const Text('16k'),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            children: [
+              ListenableBuilder(
+                  listenable: _pageController,
+                  builder: (context, _) {
+                    return Text(
+                      currentPage == 0 ? 'Comments' : 'Live chat replay',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    );
+                  }),
+              if (!isRestrictedMode) ...[
+                const SizedBox(width: 8),
+                ListenableBuilder(
+                  listenable: _pageController,
+                  builder: (context, _) {
+                    if (currentPage != 0) return const SizedBox();
+                    return const Text('16k');
+                  },
+                ),
+              ],
+              const Spacer(),
+              if (isLiveVideo && !isRestrictedMode)
+                ListenableBuilder(
+                  listenable: _pageController,
+                  builder: (context, _) {
+                    return Row(
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: currentPage == 0
+                                ? Colors.white
+                                : Colors.white12,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: currentPage != 0
+                                ? Colors.white
+                                : Colors.white12,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                )
             ],
-          ],
+          ),
         ),
-        if (restrictedMode)
+        if (isRestrictedMode)
           const SizedBox(height: 8)
         else
-          const SizedBox(height: 12),
-        if (restrictedMode)
+          const SizedBox(height: 4),
+        if (isRestrictedMode)
           const Text(
             'Restricted Mode has hidden comments for this video.',
-            style: TextStyle(
-              fontSize: 14,
-            ),
+            style: TextStyle(fontSize: 14),
           )
         else
-          const VideoHighlightedComment(),
+          const SizedBox(height: 42),
+        const SizedBox(height: 4),
       ],
     );
 
-    if (!restrictedMode) {
+    if (!isRestrictedMode) {
       return Container(
         margin: const EdgeInsets.symmetric(
           vertical: 4,
@@ -86,11 +149,45 @@ class VideoCommentSection extends ConsumerWidget {
           color: Colors.grey.shade900,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: TappableArea(
-          onPressed: onTap,
-          padding: const EdgeInsets.all(16),
-          borderRadius: BorderRadius.circular(16),
-          child: childWidget,
+        child: LayoutBuilder(
+          builder: (context, c) {
+            return TappableArea(
+              onPressed: widget.onTap,
+              padding: EdgeInsets.zero,
+              borderRadius: BorderRadius.circular(16),
+              stackedPosition: StackedPosition(bottom: 4),
+              stackedChild: SizedBox(
+                height: 42,
+                width: c.maxWidth,
+                child: PageView(
+                  controller: _pageController,
+                  physics: isLiveVideo
+                      ? const AlwaysScrollableScrollPhysics()
+                      : const NeverScrollableScrollPhysics(),
+                  onPageChanged: (page) => currentPage = page,
+                  children: [
+                    TappableArea(
+                      onPressed: widget.onTap,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8,
+                      ),
+                      child: const VideoHighlightedComment(),
+                    ),
+                    if (isLiveVideo)
+                      const TappableArea(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8,
+                        ),
+                        child: VideoHighlightedLiveComment(),
+                      ),
+                  ],
+                ),
+              ),
+              child: childWidget,
+            );
+          },
         ),
       );
     }
