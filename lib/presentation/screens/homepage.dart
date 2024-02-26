@@ -92,7 +92,7 @@ class _HomePageState extends ConsumerState<HomePage>
           if (index == 1 && ref.read(playerNotifierProvider).playing) {
             ref.read(playerRepositoryProvider).minimizeAndPauseVideo();
           } else {
-            ref.read(playerRepositoryProvider).minimizeVideo();
+            ref.read(playerRepositoryProvider).minimize();
           }
         }
       }

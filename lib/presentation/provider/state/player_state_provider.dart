@@ -7,7 +7,7 @@ class PlayerState {
   final bool expanded;
   final bool fullscreen;
   final bool minimized;
-  final bool controlsHidden;
+  final bool ended;
   final bool ambientMode;
 
   const PlayerState({
@@ -15,7 +15,7 @@ class PlayerState {
     required this.expanded,
     required this.fullscreen,
     required this.minimized,
-    required this.controlsHidden,
+    required this.ended,
     required this.ambientMode,
   });
 
@@ -28,7 +28,7 @@ class PlayerState {
           expanded == other.expanded &&
           fullscreen == other.fullscreen &&
           minimized == other.minimized &&
-          controlsHidden == other.controlsHidden &&
+          ended == other.ended &&
           ambientMode == other.ambientMode;
 
   @override
@@ -37,7 +37,7 @@ class PlayerState {
       expanded.hashCode ^
       fullscreen.hashCode ^
       minimized.hashCode ^
-      controlsHidden.hashCode ^
+      ended.hashCode ^
       ambientMode.hashCode;
 
   PlayerState copyWith({
@@ -45,7 +45,7 @@ class PlayerState {
     bool? expanded,
     bool? fullscreen,
     bool? minimized,
-    bool? controlsHidden,
+    bool? ended,
     bool? ambientMode,
   }) {
     return PlayerState(
@@ -53,7 +53,7 @@ class PlayerState {
       expanded: expanded ?? this.expanded,
       fullscreen: fullscreen ?? this.fullscreen,
       minimized: minimized ?? this.minimized,
-      controlsHidden: controlsHidden ?? this.controlsHidden,
+      ended: ended ?? this.ended,
       ambientMode: ambientMode ?? this.ambientMode,
     );
   }
@@ -69,7 +69,7 @@ class PlayerNotifier extends _$PlayerNotifier {
       minimized: false,
       fullscreen: false,
       ambientMode: false,
-      controlsHidden: false,
+      ended: false,
     );
   }
 
@@ -101,15 +101,31 @@ class PlayerNotifier extends _$PlayerNotifier {
     state = state.copyWith(ambientMode: !state.ambientMode);
   }
 
-  void hideControls() {
-    state = state.copyWith(controlsHidden: true);
+  void end() {
+    state = state.copyWith(ended: true, playing: false);
+  }
+
+  void restart() {
+    state = state.copyWith(ended: false, playing: true);
   }
 
   void showControls() {
-    state = state.copyWith(controlsHidden: false);
+    state = state.copyWith(ended: false);
+  }
+
+  void minimize() {
+    state = state.copyWith(minimized: false);
   }
 
   void maximize() {
     state = state.copyWith(minimized: false);
+  }
+
+  void expand() {
+    state = state.copyWith(expanded: true);
+  }
+
+  void deExpand() {
+    state = state.copyWith(expanded: false);
   }
 }

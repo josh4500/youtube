@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
+import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 
 class PlayerAutoplaySwitch extends ConsumerWidget {
   const PlayerAutoplaySwitch({super.key});
@@ -42,6 +43,7 @@ class PlayerAutoplaySwitch extends ConsumerWidget {
       value: autoPlay,
       onChanged: (value) {
         ref.read(preferencesProvider.notifier).autoPlay = value;
+        ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.control);
       },
       activeColor: Colors.white,
       activeTrackColor: Colors.black12,

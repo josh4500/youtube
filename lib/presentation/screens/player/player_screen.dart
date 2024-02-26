@@ -30,8 +30,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/player_components_wrapper.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/player_notifications.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/persistent_header_delegate.dart';
 
@@ -51,9 +55,16 @@ class PlayerScreen extends ConsumerStatefulWidget {
   ConsumerState<PlayerScreen> createState() => _PlayerScreenState();
 }
 
-class _PlayerScreenState extends ConsumerState<PlayerScreen> {
+class _PlayerScreenState extends ConsumerState<PlayerScreen>
+    with TickerProviderStateMixin {
   final _infoScrollController = ScrollController();
   final _infoScrollPhysics = const CustomScrollableScrollPhysics(tag: 'info');
+
+  final _transformationController = TransformationController();
+  late final AnimationController _zoomPanAnimationController;
+
+  late final AnimationController _infoOpacityController;
+  late final Animation _infoOpacityAnimation;
 
   late final ValueNotifier<double> additionalHeightNotifier;
 
@@ -82,12 +93,31 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   @override
   void initState() {
     super.initState();
+    _zoomPanAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+
+    _infoOpacityController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+
+    _infoOpacityAnimation = CurvedAnimation(
+      parent: ReverseAnimation(_infoOpacityController),
+      curve: Curves.easeIn,
+    );
+
     additionalHeightNotifier = ValueNotifier<double>(clampDouble(
       ((screenHeight * (1 - avgVideoViewPortHeight)) -
           (screenHeight * (1 - videoViewHeight))),
       0,
       maxAdditionalHeight,
     ));
+
+    additionalHeightNotifier.addListener(() {
+      _infoOpacityController.value = additionalHeight / maxAdditionalHeight;
+    });
 
     marginNotifier = ValueNotifier<double>(0);
     heightNotifier = ValueNotifier<double>(1);
@@ -99,6 +129,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
     heightNotifier.addListener(() {
       _recomputeDraggableHeight(heightNotifier.value);
+      _infoOpacityController.value = 1 - heightNotifier.value;
+    });
+
+    _transformationController.addListener(() {
+      final scale = _transformationController.value.getMaxScaleOnAxis();
+
+      if (scale != minPlayerScale) {
+        _activeZoomPanning = true;
+      } else {
+        _activeZoomPanning = false;
+      }
     });
 
     _descDraggableController.addListener(() {
@@ -112,6 +153,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
   @override
   void dispose() {
+    _zoomPanAnimationController.dispose();
+    _transformationController.dispose();
     _commentDraggableController.dispose();
     _descDraggableController.dispose();
     _showCommentDraggable.dispose();
@@ -122,31 +165,107 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     super.dispose();
   }
 
-  bool _expanded = false;
+  /// Indicates whether the player is expanded or not.
+  bool get _expanded => ref.read(playerNotifierProvider).expanded;
 
+  /// Indicates whether the player is in fullscreen mode or not.
+  bool _fullscreen = false;
+
+  /// Indicates whether active zoom panning is in progress.
+  bool _activeZoomPanning = false;
+
+  /// Indicates the direction of player dragging. True if dragging down, otherwise null.
   bool? _isPlayerDraggingDown;
+
+  /// Prevents player from being dragged up when set to true.
   bool _preventPlayerDragUp = false;
+
+  /// Prevents player from being dragged down when set to true.
   bool _preventPlayerDragDown = false;
+
+  /// Allows or disallows dragging for info. Set to true by default.
   bool _allowInfoDrag = true;
 
+  void _onTapFullScreen() {
+    _fullscreen = !_fullscreen;
+    // TODO: Do fullscreen stuff
+    // TODO: Also use notifications to listen to controls
+  }
+
+  /// Handles zooming and panning based on a swipe gesture.
+  ///
+  /// Parameters:
+  ///   - scaleFactor: The scaling factor to be applied based on the swipe gesture.
+  void _swipeZoomPan(double scaleFactor) {
+    // Retrieve the last scale value from the transformation controller
+    final lastScaleValue = _transformationController.value.getMaxScaleOnAxis();
+
+    // Check if the last scale value is below a certain threshold
+    if (lastScaleValue <= minPlayerScale + 0.5) {
+      // Ensure a minimum scale to avoid zooming in too much
+      scaleFactor = clampDouble(
+        lastScaleValue + scaleFactor,
+        minPlayerScale,
+        minPlayerScale + 0.5,
+      );
+
+      // Create a new identity matrix and apply scaling
+      final updatedMatrix = Matrix4.identity();
+      updatedMatrix.scale(minPlayerScale * scaleFactor);
+
+      // Update the transformation controller with the new matrix
+      _transformationController.value = updatedMatrix;
+    }
+  }
+
+  /// Reverses the zoom and pan effect using an animation.
+  void _reverseZoomPan() {
+    // Create a Matrix4Tween for the animation
+    final tween = Matrix4Tween(
+      begin: _transformationController.value,
+      end: Matrix4.identity(),
+    ).animate(_zoomPanAnimationController);
+
+    // Listener to update the transformation controller during the animation
+    tween.addListener(() {
+      _transformationController.value = tween.value;
+    });
+
+    // Reset the animation controller to its initial state
+    _zoomPanAnimationController.reset();
+
+    // Start the animation by moving it forward
+    _zoomPanAnimationController.forward();
+  }
+
   void _hideControls() {
-    ref.read(playerRepositoryProvider).hideControls();
+    ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.none);
   }
 
-  void _showControls() {
-    ref.read(playerRepositoryProvider).showControls();
+  void _toggleControls() {
+    ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.user);
   }
 
+  /// Handles tap events on the player.
   Future<void> _onTapPlayer() async {
+    // If the player is fully expanded, show controls
     if (heightNotifier.value == 1) {
-      _showControls();
+      _toggleControls();
     }
 
+    // Set height and width to maximum
     heightNotifier.value = 1;
     widthNotifier.value = 1;
 
+    if (widthNotifier.value == 1) {
+      ref.read(playerRepositoryProvider).maximize();
+    }
+
+    // Adjust additional height if within limits
     if (additionalHeight < maxAdditionalHeight) {
+      // Check if video view height is not equal to height ratio
       if (videoViewHeight != heightRatio) {
+        // If comments are opened, animate to the appropriate position
         if (_commentIsOpened) {
           _commentDraggableController.animateTo(
             ((screenHeight * heightRatio) + additionalHeight) / screenHeight,
@@ -155,6 +274,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
           );
         }
 
+        // If description is opened, animate to the appropriate position
         if (_descIsOpened) {
           _descDraggableController.animateTo(
             ((screenHeight * heightRatio) + additionalHeight) / screenHeight,
@@ -163,63 +283,89 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
           );
         }
 
+        // Set additional height to its maximum value
         additionalHeightNotifier.value = maxAdditionalHeight;
       }
     }
   }
 
-  void _onDragPlayer(DragUpdateDetails details) {
-    if (_expanded) {
-      if (details.delta.dy < -1) {
-        if (marginNotifier.value > 0) {
-          _preventPlayerDragUp = true;
-          marginNotifier.value = clampDouble(
-            marginNotifier.value + details.delta.dy,
-            0,
-            (screenHeight - (screenHeight * heightRatio)),
-          );
-        } else if (!_preventPlayerDragUp) {
-          _preventPlayerDragDown = true;
-          additionalHeightNotifier.value = clampDouble(
-            additionalHeightNotifier.value + details.delta.dy,
-            maxAdditionalHeight,
-            screenHeight * (1 - heightRatio),
-          );
-        }
-      } else {
-        if (!_preventPlayerDragDown) {
-          marginNotifier.value = clampDouble(
-            marginNotifier.value + details.delta.dy,
-            0,
-            (screenHeight - (screenHeight * heightRatio)),
-          );
-        } else {
-          additionalHeightNotifier.value = clampDouble(
-            additionalHeightNotifier.value + details.delta.dy,
-            maxAdditionalHeight,
-            screenHeight * (1 - heightRatio),
-          );
-        }
+  void _onDragExpandedPlayer(DragUpdateDetails details) {
+    if (details.delta.dy < -1) {
+      if (marginNotifier.value > 0) {
+        _preventPlayerDragUp = true;
+        marginNotifier.value = clampDouble(
+          marginNotifier.value + details.delta.dy,
+          0,
+          (screenHeight - (screenHeight * heightRatio)),
+        );
+      } else if (!_preventPlayerDragUp) {
+        _preventPlayerDragDown = true;
+        additionalHeightNotifier.value = clampDouble(
+          additionalHeightNotifier.value + details.delta.dy,
+          maxAdditionalHeight,
+          screenHeight * (1 - heightRatio),
+        );
       }
     } else {
-      _isPlayerDraggingDown ??= details.delta.dy > 0;
-      if (_isPlayerDraggingDown ?? false) {
-        heightNotifier.value = clampDouble(
-          heightNotifier.value - (details.delta.dy / screenHeight),
-          minVideoViewPortHeight,
-          1,
+      if (!_preventPlayerDragDown) {
+        marginNotifier.value = clampDouble(
+          marginNotifier.value + details.delta.dy,
+          0,
+          (screenHeight - (screenHeight * heightRatio)),
         );
-
-        widthNotifier.value = clampDouble(
-          heightNotifier.value / heightRatio,
-          0.33,
-          1,
+      } else {
+        additionalHeightNotifier.value = clampDouble(
+          additionalHeightNotifier.value + details.delta.dy,
+          maxAdditionalHeight,
+          screenHeight * (1 - heightRatio),
         );
       }
+    }
+  }
 
-      if (heightNotifier.value < 1) {
-        _hideControls();
+  /// Handles drag updates for a not expanded player.
+  ///
+  /// Parameters:
+  ///   - details: The drag update details containing information about the drag.
+  void _onDragNotExpandedPlayer(DragUpdateDetails details) {
+    // Determine the drag direction (down or not)
+    _isPlayerDraggingDown ??= details.delta.dy > 0;
+
+    // If dragging down
+    if (_isPlayerDraggingDown ?? false) {
+      // Adjust height and width based on the drag delta
+      heightNotifier.value = clampDouble(
+        heightNotifier.value - (details.delta.dy / screenHeight),
+        minVideoViewPortHeight,
+        1,
+      );
+
+      widthNotifier.value = clampDouble(
+        heightNotifier.value / heightRatio,
+        0.33,
+        1,
+      );
+    } else {
+      // Start zoom panning on swipe up
+      _swipeZoomPan(-(details.delta.dy / (screenHeight * heightRatio)));
+    }
+
+    // Hide controls when the height falls below a certain threshold
+    if (heightNotifier.value < 1) {
+      _hideControls();
+    }
+  }
+
+  void _onDragPlayer(DragUpdateDetails details) {
+    if (!_activeZoomPanning) {
+      if (_expanded) {
+        _onDragExpandedPlayer(details);
+      } else {
+        _onDragNotExpandedPlayer(details);
       }
+    } else {
+      // Update zoom panning on swipe up or swipe down
+      _swipeZoomPan(-(details.delta.dy / (screenHeight * heightRatio)));
     }
   }
 
@@ -229,11 +375,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
     if (_expanded) {
       if (additionalHeight > maxAdditionalHeight) {
-        _expanded = true;
+        ref.read(playerRepositoryProvider).expand();
         additionalHeightNotifier.value =
             screenHeight - (screenHeight * heightRatio);
       } else {
-        _expanded = false;
+        ref.read(playerRepositoryProvider).deExpand();
         if (videoViewHeight <= heightRatio) {
           additionalHeightNotifier.value = 0;
         } else {
@@ -243,7 +389,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
       if (marginNotifier.value >
           (screenHeight - (screenHeight * heightRatio)) / 4) {
-        _expanded = false;
+        ref.read(playerRepositoryProvider).deExpand();
 
         if (videoViewHeight <= heightRatio) {
           additionalHeightNotifier.value = 0;
@@ -272,7 +418,21 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         _isPlayerDraggingDown = null;
       }
 
+      if (widthNotifier.value == 0.33) {
+        ref.read(playerRepositoryProvider).minimize();
+      } else {
+        ref.read(playerRepositoryProvider).maximize();
+      }
+
       _infoScrollPhysics.canScroll(true);
+    }
+
+    // Reversing zoom due to swiping up
+    final lastScaleValue = _transformationController.value.getMaxScaleOnAxis();
+    if (lastScaleValue <= minPlayerScale + 0.5) {
+      _reverseZoomPan();
+    } else {
+      _onTapFullScreen();
     }
   }
 
@@ -315,7 +475,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   void _onDragInfoUp(PointerUpEvent event) {
     if (additionalHeight > 0 && _allowInfoDrag) {
       if (additionalHeight > maxAdditionalHeight) {
-        _expanded = true;
+        ref.read(playerRepositoryProvider).expand();
         additionalHeightNotifier.value =
             screenHeight - (screenHeight * heightRatio);
       } else {
@@ -326,7 +486,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     }
 
     if (additionalHeightNotifier.value == 0) {
-      _expanded = false;
+      ref.read(playerRepositoryProvider).deExpand();
       _infoScrollPhysics.canScroll(true);
     }
 
@@ -431,6 +591,43 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final interactivePlayerView = ListenableBuilder(
+      listenable: _transformationController,
+      builder: (context, childWidget) {
+        return InteractiveViewer(
+          constrained: true,
+          minScale: minPlayerScale,
+          maxScale: maxPlayerScale,
+          alignment: Alignment.center,
+          transformationController: _transformationController,
+          child: childWidget!,
+        );
+      },
+      child: PlayerComponentsWrapper(
+        handleNotification: (notification) {
+          if (notification is MinimizePlayerNotification) {
+            _hideControls();
+            heightNotifier.value = minVideoViewPortHeight;
+            widthNotifier.value = 0.33;
+            ref.read(playerRepositoryProvider).minimize();
+          } else if (notification is ExpandPlayerNotification) {
+            additionalHeightNotifier.value = screenHeight * (1 - heightRatio);
+            ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.none);
+            ref.read(playerRepositoryProvider).expand();
+          } else if (notification is DeExpandPlayerNotification) {
+            additionalHeightNotifier.value = 0;
+            ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.none);
+            ref.read(playerRepositoryProvider).deExpand();
+          } else if (notification is FullscreenPlayerNotification) {
+            ref.read(playerRepositoryProvider).toggleFullscreen();
+          } else if (notification is SettingsPlayerNotification) {
+            // TODO: Open settings
+          }
+        },
+        child: const PlayerView(),
+      ),
+    );
+
     return ValueListenableBuilder(
       valueListenable: heightNotifier,
       builder: (context, value, childWidget) {
@@ -497,7 +694,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                                                   ),
                                             height: screenHeight * heightValue,
                                             width: screenWidth * widthValue,
-                                            child: const PlayerView(),
+                                            child: interactivePlayerView,
                                           );
                                         },
                                       ),
@@ -525,68 +722,77 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                     onPointerUp: _onDragInfoUp,
                     child: ScrollConfiguration(
                       behavior: const NoOverScrollGlowBehavior(),
-                      child: CustomScrollView(
-                        physics: _infoScrollPhysics,
-                        controller: _infoScrollController,
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: Column(
-                              children: [
-                                VideoDescriptionSection(
-                                  onTap: _openDescSheet,
-                                ),
-                                const VideoActions(),
-                                VideoCommentSection(
-                                  onTap: _openCommentSheet,
-                                ),
-                              ],
+                      child: AnimatedBuilder(
+                        animation: _infoOpacityAnimation,
+                        builder: (context, childWidget) {
+                          return Opacity(
+                            opacity: _infoOpacityAnimation.value,
+                            child: childWidget,
+                          );
+                        },
+                        child: CustomScrollView(
+                          physics: _infoScrollPhysics,
+                          controller: _infoScrollController,
+                          slivers: [
+                            SliverToBoxAdapter(
+                              child: Column(
+                                children: [
+                                  VideoDescriptionSection(
+                                    onTap: _openDescSheet,
+                                  ),
+                                  const VideoActions(),
+                                  VideoCommentSection(
+                                    onTap: _openCommentSheet,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          SliverPersistentHeader(
-                            pinned: true,
-                            floating: true,
-                            delegate: SlidingHeaderDelegate(
-                              minHeight: 0,
-                              maxHeight: 48,
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 4.0,
-                                ),
-                                child: Material(
-                                  child: DynamicTab(
-                                    initialIndex: 0,
-                                    leadingWidth: 8,
-                                    options: <String>[
-                                      'All',
-                                      'Something',
-                                      'Related',
-                                      'Recently uploaded',
-                                      'Watched',
-                                    ],
+                            SliverPersistentHeader(
+                              pinned: true,
+                              floating: true,
+                              delegate: SlidingHeaderDelegate(
+                                minHeight: 0,
+                                maxHeight: 48,
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 4.0,
+                                  ),
+                                  child: Material(
+                                    child: DynamicTab(
+                                      initialIndex: 0,
+                                      leadingWidth: 8,
+                                      options: <String>[
+                                        'All',
+                                        'Something',
+                                        'Related',
+                                        'Recently uploaded',
+                                        'Watched',
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: ViewableVideoContent(),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: ViewableVideoContent(),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: ViewableVideoContent(),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: ViewableVideoContent(),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: ViewableVideoContent(),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: ViewableVideoContent(),
-                          ),
-                        ],
+                            const SliverToBoxAdapter(
+                              child: ViewableVideoContent(),
+                            ),
+                            const SliverToBoxAdapter(
+                              child: ViewableVideoContent(),
+                            ),
+                            const SliverToBoxAdapter(
+                              child: ViewableVideoContent(),
+                            ),
+                            const SliverToBoxAdapter(
+                              child: ViewableVideoContent(),
+                            ),
+                            const SliverToBoxAdapter(
+                              child: ViewableVideoContent(),
+                            ),
+                            const SliverToBoxAdapter(
+                              child: ViewableVideoContent(),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

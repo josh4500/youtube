@@ -26,6 +26,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -39,6 +41,12 @@ final playerOverlayStateProvider = Provider(
   },
 );
 
+enum PlayerTapActor {
+  none,
+  user,
+  control;
+}
+
 class PlayerRepository {
   final Ref _ref;
 
@@ -50,6 +58,9 @@ class PlayerRepository {
   late final _shortsController = VideoController(_shortsPlayer);
   VideoController get shortsController => _shortsController;
 
+  final _playerTapController = StreamController<PlayerTapActor>.broadcast();
+  Stream<PlayerTapActor> get playerTapStream => _playerTapController.stream;
+
   PlayerRepository({required Ref ref}) : _ref = ref;
 
   void openPlayerScreen() {
@@ -60,8 +71,8 @@ class PlayerRepository {
     _ref.read(_playerOverlayStateProvider.notifier).state = false;
   }
 
-  void minimizeVideo() {
-    _ref.read(playerNotifierProvider.notifier).toggleMinimized();
+  void minimize() {
+    _ref.read(playerNotifierProvider.notifier).minimize();
   }
 
   void minimizeAndPauseVideo() {
@@ -69,9 +80,21 @@ class PlayerRepository {
     _ref.read(playerNotifierProvider.notifier).togglePlaying();
   }
 
+  void expand() {
+    _ref.read(playerNotifierProvider.notifier).expand();
+  }
+
+  void deExpand() {
+    _ref.read(playerNotifierProvider.notifier).deExpand();
+  }
+
   Future<void> pauseVideo() async {
     // await _videoPlayer.pause();
     _ref.read(playerNotifierProvider.notifier).pause();
+  }
+
+  void restartVideo() {
+    _ref.read(playerNotifierProvider.notifier).restart();
   }
 
   Future<void> playVideo() async {
@@ -79,20 +102,20 @@ class PlayerRepository {
     _ref.read(playerNotifierProvider.notifier).play();
   }
 
-  void hideControls() {
-    _ref.read(playerNotifierProvider.notifier).hideControls();
-  }
-
   void showControls() {
     _ref.read(playerNotifierProvider.notifier).showControls();
   }
 
-  void toggleControlsHidden() {
-    if (_ref.read(playerNotifierProvider).controlsHidden) {
-      _ref.read(playerNotifierProvider.notifier).showControls();
-    } else {
-      _ref.read(playerNotifierProvider.notifier).hideControls();
-    }
+  void tapPlayer(PlayerTapActor actor) {
+    _playerTapController.sink.add(actor);
+  }
+
+  void toggleFullscreen() {
+    _ref.read(playerNotifierProvider.notifier).toggleFullScreen();
+  }
+
+  void maximize() {
+    _ref.read(playerNotifierProvider.notifier).maximize();
   }
 }
 
