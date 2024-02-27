@@ -75,7 +75,7 @@ class PlayerRepository {
     _videoPlayer.stream.completed.listen((hasEnded) {
       if (hasEnded) {
         _ref.read(playerNotifierProvider.notifier).end();
-        // _positionMemory.delete('video');
+        _positionMemory.delete('video');
       }
     });
 
@@ -88,7 +88,7 @@ class PlayerRepository {
     });
 
     _videoPlayer.stream.position.listen((position) {
-      // _positionMemory.write('video', position);
+      _positionMemory.write('video', position);
     });
   }
 
