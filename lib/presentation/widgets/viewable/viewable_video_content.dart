@@ -71,7 +71,9 @@ class ViewableVideoContent extends StatelessWidget {
                             maintainSize: true,
                             maintainState: true,
                             maintainAnimation: true,
-                            child: ChannelAvatar(),
+                            child: ChannelAvatar(
+                              size: 48,
+                            ),
                           ),
                         ),
                         Flexible(
@@ -133,17 +135,17 @@ class ViewableVideoContent extends StatelessWidget {
         ),
         const Positioned(
           left: 8,
-          bottom: 16,
+          bottom: 24,
           child: Padding(
             padding: EdgeInsets.symmetric(
               vertical: 12.0,
               horizontal: 4,
             ),
-            child: ChannelAvatar(),
+            child: ChannelAvatar(size: 44),
           ),
         ),
         Positioned(
-          right: 12,
+          right: 8,
           bottom: 48,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 6.0),

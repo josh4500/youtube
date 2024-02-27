@@ -44,11 +44,13 @@ class _VideoHighlightedCommentState extends State<VideoHighlightedComment> {
       children: [
         ChannelAvatar(size: 24),
         SizedBox(width: 8),
-        Text(
-          'God bless your heart',
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontSize: 12),
+        Expanded(
+          child: Text(
+            'This movie is really interesting but it\'s not getting enough views, I would suggest you promote it more and ask your other',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 12),
+          ),
         ),
       ],
     );

@@ -193,7 +193,7 @@ class _CustomNavigatorBarState extends State<CustomNavigatorBar>
     _controller = AnimationController(
       vsync: this,
       duration: widget.duration,
-      value: 1,
+      value: 0,
       animationBehavior: AnimationBehavior.preserve,
     );
 

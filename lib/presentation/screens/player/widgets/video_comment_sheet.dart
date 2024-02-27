@@ -332,7 +332,10 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet>
                           child: ListView.builder(
                             itemBuilder: (context, index) {
                               if (index == 0) {
-                                return const CommentTile(showReplies: false);
+                                return const CommentTile(
+                                  showReplies: false,
+                                  backgroundColor: Color(0xFF272727),
+                                );
                               }
                               return const ReplyTile();
                             },

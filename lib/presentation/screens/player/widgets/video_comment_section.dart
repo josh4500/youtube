@@ -65,9 +65,9 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: Row(
             children: [
               ListenableBuilder(
@@ -76,7 +76,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
                     return Text(
                       currentPage == 0 ? 'Comments' : 'Live chat replay',
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                     );
@@ -129,7 +129,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
         if (isRestrictedMode)
           const SizedBox(height: 8)
         else
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
         if (isRestrictedMode)
           const Text(
             'Restricted Mode has hidden comments for this video.',
@@ -137,7 +137,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
           )
         else
           const SizedBox(
-            height: 42,
+            height: 45,
             child: isLiveVideo == false
                 ? Padding(
                     padding: EdgeInsets.symmetric(
@@ -155,11 +155,11 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
     if (!isRestrictedMode) {
       return Container(
         margin: const EdgeInsets.symmetric(
-          vertical: 4,
-          horizontal: 16,
+          vertical: 12,
+          horizontal: 12,
         ),
         decoration: BoxDecoration(
-          color: Colors.grey.shade900,
+          color: const Color(0xFF272727),
           borderRadius: BorderRadius.circular(12),
         ),
         child: LayoutBuilder(
@@ -168,11 +168,11 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
               onPressed: widget.onTap,
               padding: EdgeInsets.zero,
               borderRadius: BorderRadius.circular(16),
-              stackedPosition: StackedPosition(bottom: 4),
+              stackedPosition: StackedPosition(bottom: 5),
               stackedChild: showHighlighted
                   ? isLiveVideo
                       ? SizedBox(
-                          height: 42,
+                          height: 45,
                           width: c.maxWidth,
                           child: PageView(
                             controller: _pageController,
@@ -182,14 +182,14 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
                               TappableArea(
                                 onPressed: widget.onTap,
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0,
+                                  horizontal: 12.0,
                                   vertical: 8,
                                 ),
                                 child: const VideoHighlightedComment(),
                               ),
                               const TappableArea(
                                 padding: EdgeInsets.symmetric(
-                                  horizontal: 16.0,
+                                  horizontal: 12.0,
                                   vertical: 8,
                                 ),
                                 child: VideoHighlightedLiveComment(),
@@ -236,7 +236,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
         horizontal: 16,
       ),
       decoration: BoxDecoration(
-        color: Colors.grey.shade900,
+        color: const Color(0xFF272727),
         borderRadius: BorderRadius.circular(12),
       ),
       child: childWidget,

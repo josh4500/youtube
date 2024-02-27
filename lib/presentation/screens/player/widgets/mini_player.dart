@@ -69,7 +69,7 @@ class MiniPlayer extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 4),
+                    SizedBox(height: 6),
                     Text(
                       'Mrwhosetheboss',
                       maxLines: 1,

@@ -807,7 +807,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                   VideoDescriptionSection(
                                     onTap: _openDescSheet,
                                   ),
-                                  const VideoContext(),
+                                  // const VideoContext(),
                                   const VideoActions(),
                                   VideoCommentSection(
                                     onTap: _openCommentSheet,
@@ -820,23 +820,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                               floating: true,
                               delegate: SlidingHeaderDelegate(
                                 minHeight: 0,
-                                maxHeight: 48,
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 4.0,
-                                  ),
-                                  child: Material(
-                                    child: DynamicTab(
-                                      initialIndex: 0,
-                                      leadingWidth: 8,
-                                      options: <String>[
-                                        'All',
-                                        'Something',
-                                        'Related',
-                                        'Recently uploaded',
-                                        'Watched',
-                                      ],
-                                    ),
+                                maxHeight: 40,
+                                child: const Material(
+                                  child: DynamicTab(
+                                    initialIndex: 0,
+                                    leadingWidth: 8,
+                                    options: <String>[
+                                      'All',
+                                      'Something',
+                                      'Related',
+                                      'Recently uploaded',
+                                      'Watched',
+                                    ],
                                   ),
                                 ),
                               ),

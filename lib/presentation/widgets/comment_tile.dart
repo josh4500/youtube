@@ -32,119 +32,129 @@ import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 class CommentTile extends StatelessWidget {
   final bool showReplies;
   final VoidCallback? openReply;
-  const CommentTile({super.key, this.showReplies = true, this.openReply});
+  final Color? backgroundColor;
+
+  const CommentTile({
+    super.key,
+    this.showReplies = true,
+    this.openReply,
+    this.backgroundColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TappableArea(
-          onPressed: openReply,
-          padding: const EdgeInsets.all(16),
-          stackedAlignment: Alignment.topRight,
-          stackedChild: InkWell(
-            onTap: () {},
-            borderRadius: BorderRadius.circular(32),
-            child: const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Icon(
-                Icons.more_vert_sharp,
-                size: 16,
+    return ColoredBox(
+      color: backgroundColor ?? Colors.transparent,
+      child: Column(
+        children: [
+          TappableArea(
+            onPressed: openReply,
+            padding: const EdgeInsets.all(16),
+            stackedAlignment: Alignment.topRight,
+            stackedChild: InkWell(
+              onTap: () {},
+              borderRadius: BorderRadius.circular(32),
+              child: const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Icon(
+                  Icons.more_vert_sharp,
+                  size: 16,
+                ),
               ),
             ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const CircleAvatar(
-                backgroundColor: Colors.grey,
-                maxRadius: 16,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          RichText(
-                            text: const TextSpan(
-                              text: '@BussyBoyBonanza',
-                              children: [
-                                TextSpan(text: ' · '),
-                                TextSpan(text: '7mo ago'),
-                              ],
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const CircleAvatar(
+                  backgroundColor: Colors.grey,
+                  maxRadius: 16,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            RichText(
+                              text: const TextSpan(
+                                text: '@BussyBoyBonanza',
+                                children: [
+                                  TextSpan(text: ' · '),
+                                  TextSpan(text: '7mo ago'),
+                                ],
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Cutting fundig on precautions is going to cost more in the long run',
-                      ),
-                      const SizedBox(height: 16),
-                      const Row(
-                        children: [
-                          Icon(
-                            Icons.thumb_up_outlined,
-                            size: 14,
-                          ),
-                          SizedBox(width: 4),
-                          SizedBox(
-                            width: 42,
-                            child: Text(
-                              '69',
-                              style: TextStyle(fontSize: 12),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Cutting fundig on precautions is going to cost more in the long run',
+                        ),
+                        const SizedBox(height: 16),
+                        const Row(
+                          children: [
+                            Icon(
+                              Icons.thumb_up_outlined,
+                              size: 14,
                             ),
-                          ),
-                          Icon(
-                            Icons.thumb_down_outlined,
-                            size: 14,
-                          ),
-                          SizedBox(width: 48),
-                          Icon(
-                            Icons.comment_outlined,
-                            size: 14,
-                          ),
-                        ],
-                      ),
-                    ],
+                            SizedBox(width: 4),
+                            SizedBox(
+                              width: 42,
+                              child: Text(
+                                '69',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            Icon(
+                              Icons.thumb_down_outlined,
+                              size: 14,
+                            ),
+                            SizedBox(width: 48),
+                            Icon(
+                              Icons.comment_outlined,
+                              size: 14,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-            ],
+                const SizedBox(width: 16),
+              ],
+            ),
           ),
-        ),
-        if (showReplies) ...[
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const SizedBox(width: 52),
-              TappableArea(
-                onPressed: openReply,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 8,
-                ),
-                child: const Text(
-                  '107 Replies',
-                  style: TextStyle(
-                    color: Colors.blue,
+          if (showReplies) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const SizedBox(width: 52),
+                TappableArea(
+                  onPressed: openReply,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 8,
+                  ),
+                  child: const Text(
+                    '107 Replies',
+                    style: TextStyle(
+                      color: Colors.blue,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

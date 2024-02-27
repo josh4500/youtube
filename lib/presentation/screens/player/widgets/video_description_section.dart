@@ -44,14 +44,16 @@ class VideoDescriptionSection extends StatelessWidget {
           TappableArea(
             onPressed: onTap,
             padding: const EdgeInsets.symmetric(
-              vertical: 16,
-              horizontal: 16,
+              vertical: 8,
+              horizontal: 12,
             ),
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Abrahamic Religions',
+                  'The Notebook Latest Yoruba Movie 2024 Drama Ronke Odusanya|Mecry Aigbe|Lateef Adedimeji',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -78,25 +80,26 @@ class VideoDescriptionSection extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 4),
           TappableArea(
             padding: const EdgeInsets.symmetric(
-              vertical: 8,
-              horizontal: 16,
+              vertical: 4,
+              horizontal: 12,
             ),
             child: Row(
               children: [
                 const ChannelAvatar(size: 36),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 const Text(
-                  'Word in-spire',
+                  'Muy Authentic Tv',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 8),
                 const Text(
-                  '46.5K',
+                  '34.5K',
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 13,
@@ -105,8 +108,8 @@ class VideoDescriptionSection extends StatelessWidget {
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 12,
+                    vertical: 9,
+                    horizontal: 14,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -115,9 +118,9 @@ class VideoDescriptionSection extends StatelessWidget {
                   child: const Text(
                     'Subscribe',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       color: Colors.black,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 )

@@ -36,25 +36,27 @@ class VideoActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 2.5),
       child: SizedBox(
-        height: 34,
+        height: 32,
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+          ),
           scrollDirection: Axis.horizontal,
           children: <Widget>[
             Container(
               margin: const EdgeInsets.only(right: 4),
               decoration: BoxDecoration(
-                color: Colors.grey.shade900,
+                color: const Color(0xFF272727),
                 borderRadius: BorderRadius.circular(32),
               ),
               child: const Row(
                 children: [
                   CustomActionButton(
-                    title: '1.7k',
-                    leadingWidth: 8,
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    title: '9.5k',
+                    leadingWidth: 4,
+                    padding: EdgeInsets.symmetric(horizontal: 14),
                     icon: Icon(Icons.thumb_up_outlined, size: 14),
                   ),
                   Padding(
@@ -68,53 +70,53 @@ class VideoActions extends StatelessWidget {
                     ),
                   ),
                   CustomActionButton(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 14),
                     icon: Icon(Icons.thumb_down_outlined, size: 14),
                   ),
                 ],
               ),
             ),
-            CustomActionChip(
+            const CustomActionChip(
               title: 'Share',
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              backgroundColor: Colors.grey.shade900,
-              icon: const Icon(Icons.reply_outlined, size: 14),
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              margin: EdgeInsets.symmetric(horizontal: 4),
+              backgroundColor: Color(0xFF272727),
+              icon: Icon(Icons.reply_outlined, size: 14),
             ),
-            CustomActionChip(
+            const CustomActionChip(
               title: 'Remix',
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              backgroundColor: Colors.grey.shade900,
-              icon: const Icon(Icons.wifi_channel_outlined, size: 14),
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              margin: EdgeInsets.symmetric(horizontal: 4),
+              backgroundColor: Color(0xFF272727),
+              icon: Icon(Icons.wifi_channel_outlined, size: 14),
             ),
-            CustomActionChip(
+            const CustomActionChip(
               title: 'Thanks',
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              backgroundColor: Colors.grey.shade900,
-              icon: const Icon(Icons.attach_money, size: 14),
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              margin: EdgeInsets.symmetric(horizontal: 4),
+              backgroundColor: Color(0xFF272727),
+              icon: Icon(Icons.attach_money, size: 14),
             ),
-            CustomActionButton(
+            const CustomActionButton(
               title: 'Download',
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              backgroundColor: Colors.grey.shade900,
-              icon: const Icon(Icons.download, size: 14),
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              margin: EdgeInsets.symmetric(horizontal: 4),
+              backgroundColor: Color(0xFF272727),
+              icon: Icon(Icons.download, size: 14),
             ),
-            CustomActionChip(
+            const CustomActionChip(
               title: 'Clip',
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              backgroundColor: Colors.grey.shade900,
-              icon: const Icon(Icons.cut_outlined, size: 14),
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              margin: EdgeInsets.symmetric(horizontal: 4),
+              backgroundColor: Color(0xFF272727),
+              icon: Icon(Icons.cut_outlined, size: 14),
             ),
-            CustomActionChip(
+            const CustomActionChip(
               title: 'Save',
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              backgroundColor: Colors.grey.shade900,
-              icon: const Icon(Icons.add_box_outlined, size: 14),
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              margin: EdgeInsets.symmetric(horizontal: 4),
+              backgroundColor: Color(0xFF272727),
+              icon: Icon(Icons.add_box_outlined, size: 14),
             ),
           ],
         ),
