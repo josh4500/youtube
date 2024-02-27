@@ -49,7 +49,7 @@ class _VideoHighlightedCommentState extends State<VideoHighlightedComment> {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(fontSize: 12),
-        )
+        ),
       ],
     );
   }

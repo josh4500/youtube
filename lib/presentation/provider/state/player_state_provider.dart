@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'player_state_provider.g.dart';
 
 class PlayerState {
+  final bool loading;
   final bool playing;
   final bool expanded;
   final bool fullscreen;
@@ -11,6 +12,7 @@ class PlayerState {
   final bool ambientMode;
 
   const PlayerState({
+    required this.loading,
     required this.playing,
     required this.expanded,
     required this.fullscreen,
@@ -24,6 +26,7 @@ class PlayerState {
       identical(this, other) ||
       other is PlayerState &&
           runtimeType == other.runtimeType &&
+          loading == other.loading &&
           playing == other.playing &&
           expanded == other.expanded &&
           fullscreen == other.fullscreen &&
@@ -33,6 +36,7 @@ class PlayerState {
 
   @override
   int get hashCode =>
+      loading.hashCode ^
       playing.hashCode ^
       expanded.hashCode ^
       fullscreen.hashCode ^
@@ -41,6 +45,7 @@ class PlayerState {
       ambientMode.hashCode;
 
   PlayerState copyWith({
+    bool? loading,
     bool? playing,
     bool? expanded,
     bool? fullscreen,
@@ -49,6 +54,7 @@ class PlayerState {
     bool? ambientMode,
   }) {
     return PlayerState(
+      loading: loading ?? this.loading,
       playing: playing ?? this.playing,
       expanded: expanded ?? this.expanded,
       fullscreen: fullscreen ?? this.fullscreen,
@@ -64,6 +70,7 @@ class PlayerNotifier extends _$PlayerNotifier {
   @override
   PlayerState build() {
     return const PlayerState(
+      loading: true,
       playing: false,
       expanded: false,
       minimized: false,
@@ -74,11 +81,11 @@ class PlayerNotifier extends _$PlayerNotifier {
   }
 
   void pause() {
-    state = state.copyWith(playing: false);
+    state = state.copyWith(playing: false, loading: false);
   }
 
   void play() {
-    state = state.copyWith(playing: true);
+    state = state.copyWith(playing: true, loading: false);
   }
 
   void togglePlaying() {
@@ -127,5 +134,17 @@ class PlayerNotifier extends _$PlayerNotifier {
 
   void deExpand() {
     state = state.copyWith(expanded: false);
+  }
+
+  void reset() {
+    state = const PlayerState(
+      loading: true,
+      playing: false,
+      expanded: false,
+      minimized: false,
+      fullscreen: false,
+      ambientMode: false,
+      ended: false,
+    );
   }
 }

@@ -51,4 +51,11 @@ extension DurationUtils on Duration {
     String minutesPart = inMinutes.remainder(60).toString().padLeft(2, '0');
     return '$hoursPart:$minutesPart';
   }
+
+  String get hoursMinutesSeconds {
+    String hoursPart = (inMinutes / 60).floor().toString().padLeft(2, '0');
+    String minutesPart = inMinutes.remainder(60).toString().padLeft(2, '0');
+    String secondsPart = inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '${(inMinutes / 60) > 1 ? '$hoursPart:' : ''}$minutesPart:$secondsPart';
+  }
 }

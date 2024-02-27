@@ -106,14 +106,28 @@ class _MiniPlayerPausePlayButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isPlaying = ref.watch(
-      playerNotifierProvider.select((value) => value.playing),
-    );
+    final playerNotifier = ref.watch(playerNotifierProvider);
+    final isPlaying = playerNotifier.playing;
+    final isRestart = playerNotifier.ended;
     return TappableArea(
-      onPressed: ref.read(playerNotifierProvider.notifier).togglePlaying,
+      onPressed: () {
+        if (!isRestart) {
+          if (isPlaying) {
+            ref.read(playerRepositoryProvider).pauseVideo();
+          } else {
+            ref.read(playerRepositoryProvider).playVideo();
+          }
+        } else {
+          ref.read(playerRepositoryProvider).restartVideo();
+        }
+      },
       padding: const EdgeInsets.all(16),
       child: Icon(
-        isPlaying ? Icons.pause : Icons.play_arrow,
+        isRestart
+            ? Icons.restart_alt
+            : isPlaying
+                ? Icons.pause
+                : Icons.play_arrow,
       ),
     );
   }

@@ -30,6 +30,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 // import 'package:media_kit/media_kit.dart';
 // import 'package:media_kit_video/media_kit_video.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
@@ -54,15 +55,21 @@ class PlayerView extends StatelessWidget {
           maxHeight: screenHeight * avgVideoViewPortHeight,
           minHeight: screenHeight * minVideoViewPortHeight,
         ),
-        child: Image.network(
-          'http://via.placeholder.com/640x360',
-          fit: BoxFit.fitWidth,
-        ),
-        // child: Video(
-        //   controller: controller,
+        // child: Image.network(
+        //   'http://via.placeholder.com/640x360',
         //   fit: BoxFit.fitWidth,
-        //   controls: null,
         // ),
+        child: Consumer(
+          builder: (context, ref, child) {
+            final controller =
+                ref.watch(playerRepositoryProvider).videoController;
+            return Video(
+              controller: controller,
+              fit: BoxFit.fitWidth,
+              controls: null,
+            );
+          },
+        ),
       ),
     );
   }

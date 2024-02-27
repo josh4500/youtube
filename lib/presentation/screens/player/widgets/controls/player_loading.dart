@@ -28,29 +28,26 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 
-import 'player_control.dart';
-
-class PlayerPrevious extends ConsumerWidget {
-  const PlayerPrevious({super.key});
+class PlayerLoadingIndicator extends ConsumerWidget {
+  const PlayerLoadingIndicator({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return PlayerControl(
-      onTap: () {
-        ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.control);
-      },
-      enabled: false,
-      builder: (context, _) {
-        return const Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Icon(
-            Icons.skip_previous,
-            color: Colors.white30,
-          ),
-        );
-      },
+    final isLoading = ref.watch(
+      playerNotifierProvider.select((value) => value.loading),
+    );
+    if (!isLoading) {
+      return const SizedBox();
+    }
+    return const SizedBox(
+      width: 100,
+      height: 100,
+      child: CircularProgressIndicator(
+        strokeWidth: 0.7,
+        color: Colors.white,
+      ),
     );
   }
 }

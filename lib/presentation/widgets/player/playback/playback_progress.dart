@@ -28,16 +28,74 @@
 
 import 'package:flutter/material.dart';
 
+final class Progress {
+  final Duration buffer;
+  final Duration position;
+
+  const Progress({required this.buffer, required this.position});
+
+  static const Progress zero = Progress(
+    buffer: Duration.zero,
+    position: Duration.zero,
+  );
+}
+
 class PlaybackProgress extends StatelessWidget {
-  const PlaybackProgress({super.key});
+  final Color? color;
+  final Animation<Color?>? animation;
+  final Animation<Color?>? bufferAnimation;
+  final Color? backgroundColor;
+  final Stream<Progress>? progress;
+  final Progress start;
+  final Duration end;
+  final bool showBuffer;
+
+  const PlaybackProgress({
+    super.key,
+    this.color,
+    this.animation,
+    this.bufferAnimation,
+    this.progress,
+    this.start = Progress.zero,
+    this.end = Duration.zero,
+    this.showBuffer = true,
+    this.backgroundColor = Colors.white30,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const LinearProgressIndicator(
-      color: Colors.red,
-      value: 0.5,
-      minHeight: 2,
-      backgroundColor: Colors.grey,
+    return StreamBuilder<Progress>(
+      stream: progress,
+      initialData: start,
+      builder: (context, snapshot) {
+        final data = snapshot.data ?? Progress.zero;
+        final currentValue = data.position.inSeconds / end.inSeconds;
+        final bufferValue = data.buffer.inSeconds / end.inSeconds;
+
+        return Stack(
+          children: [
+            if (showBuffer)
+              LinearProgressIndicator(
+                color: Colors.white24,
+                value: bufferValue.isNaN || bufferValue.isInfinite
+                    ? 0
+                    : bufferValue,
+                minHeight: 2,
+                valueColor: bufferAnimation,
+                backgroundColor: Colors.transparent,
+              ),
+            LinearProgressIndicator(
+              color: color ?? Colors.red,
+              value: currentValue.isNaN || currentValue.isInfinite
+                  ? 0
+                  : currentValue,
+              minHeight: 2,
+              valueColor: animation,
+              backgroundColor: backgroundColor ?? Colors.transparent,
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -31,7 +31,7 @@ import 'dart:async';
 import 'cache_provider.dart';
 
 class InMemoryCache<E> extends CacheProvider<E> {
-  static final Map<String, Map<String, Object>> _generalStore = {};
+  static final Map<String, Object> _generalStore = {};
   Map<String, E> get _store => _generalStore[name]! as Map<String, E>;
 
   final String name;

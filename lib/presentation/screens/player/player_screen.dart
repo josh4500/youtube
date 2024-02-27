@@ -187,6 +187,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _infoOpacityController.value =
           clampDouble(size / (1 - heightRatio), 0, 1);
     });
+
+    Future(() {
+      ref.read(playerRepositoryProvider).openVideo();
+    });
   }
 
   @override
@@ -330,6 +334,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   void _onDragExpandedPlayer(DragUpdateDetails details) {
+    _hideControls();
     if (details.delta.dy < -1) {
       if (marginNotifier.value > 0) {
         _preventPlayerDragUp = true;
@@ -467,18 +472,27 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       }
 
       _infoScrollPhysics.canScroll(true);
+
+      final ended = ref.read(playerNotifierProvider).ended;
+      if (ended) {
+        _toggleControls();
+      }
     }
+
+    final hasEnded = ref.read(playerNotifierProvider).ended;
+    final isMinimized = ref.read(playerNotifierProvider).minimized;
 
     // Reversing zoom due to swiping up
     final lastScaleValue = _transformationController.value.getMaxScaleOnAxis();
-    if (lastScaleValue <= minPlayerScale + 0.5) {
+    if (lastScaleValue <= minPlayerScale + 0.5 && lastScaleValue > 1.0) {
+      if (lastScaleValue == minPlayerScale + 0.5) {
+        _onTapFullScreen();
+        // TODO: Return on fullscreen
+        // return;
+      }
       await _reverseZoomPan();
 
-      if (lastScaleValue == minPlayerScale + 0.5) {
-        // TODO: Toggle fullscreen
-      }
-      final ended = ref.read(playerNotifierProvider).ended;
-      if (ended) _toggleControls();
+      if (hasEnded && !isMinimized) _toggleControls();
     } else {
       _onTapFullScreen();
     }
@@ -629,44 +643,52 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   @override
   Widget build(BuildContext context) {
-    final interactivePlayerView = ListenableBuilder(
-      listenable: _transformationController,
-      builder: (context, childWidget) {
-        return InteractiveViewer(
-          constrained: true,
-          minScale: minPlayerScale,
-          maxScale: maxPlayerScale,
-          alignment: Alignment.center,
-          transformationController: _transformationController,
-          child: childWidget!,
-        );
-      },
-      child: PlayerComponentsWrapper(
-        handleNotification: (notification) {
-          if (notification is MinimizePlayerNotification) {
-            _hideControls();
-            heightNotifier.value = minVideoViewPortHeight;
-            widthNotifier.value = minVideoViewPortWidth;
-            ref.read(playerRepositoryProvider).minimize();
-          } else if (notification is ExpandPlayerNotification) {
-            additionalHeightNotifier.value = screenHeight * (1 - heightRatio);
-            ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.none);
-            ref.read(playerRepositoryProvider).expand();
-          } else if (notification is DeExpandPlayerNotification) {
-            if (expandedMode) {
-              additionalHeightNotifier.value = maxAdditionalHeight;
-            } else {
-              additionalHeightNotifier.value = 0;
-            }
-            ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.none);
-            ref.read(playerRepositoryProvider).deExpand();
-          } else if (notification is FullscreenPlayerNotification) {
-            ref.read(playerRepositoryProvider).toggleFullscreen();
-          } else if (notification is SettingsPlayerNotification) {
-            // TODO: Open settings
+    final interactivePlayerView = PlayerComponentsWrapper(
+      handleNotification: (notification) {
+        if (notification is MinimizePlayerNotification) {
+          _hideControls();
+          heightNotifier.value = minVideoViewPortHeight;
+          widthNotifier.value = minVideoViewPortWidth;
+          ref.read(playerRepositoryProvider).minimize();
+        } else if (notification is ExpandPlayerNotification) {
+          additionalHeightNotifier.value = screenHeight * (1 - heightRatio);
+          ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.none);
+          ref.read(playerRepositoryProvider).expand();
+        } else if (notification is DeExpandPlayerNotification) {
+          if (expandedMode) {
+            additionalHeightNotifier.value = maxAdditionalHeight;
+          } else {
+            additionalHeightNotifier.value = 0;
           }
+          ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.none);
+          ref.read(playerRepositoryProvider).deExpand();
+        } else if (notification is FullscreenPlayerNotification) {
+          ref.read(playerRepositoryProvider).toggleFullscreen();
+        } else if (notification is SettingsPlayerNotification) {
+          // TODO: Open settings
+        } else if (notification is SeekStartPlayerNotification) {
+          _preventPlayerDragUp = true;
+          _preventPlayerDragDown = true;
+        } else if (notification is SeekEndPlayerNotification) {
+          _preventPlayerDragUp = false;
+          _preventPlayerDragDown = false;
+        }
+      },
+      child: ListenableBuilder(
+        listenable: _transformationController,
+        builder: (context, childWidget) {
+          return InteractiveViewer(
+            constrained: true,
+            minScale: minPlayerScale,
+            maxScale: maxPlayerScale,
+            alignment: Alignment.center,
+            transformationController: _transformationController,
+            child: childWidget!,
+          );
         },
-        child: const PlayerView(),
+        child: const KeyedSubtree(
+          child: PlayerView(),
+        ),
       ),
     );
 
@@ -746,7 +768,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                         left: 0,
                                         bottom: 0,
                                         width: screenWidth,
-                                        child: const PlaybackProgress(),
+                                        child: const PlaybackProgress(
+                                          showBuffer: false,
+                                          backgroundColor: Colors.transparent,
+                                        ),
                                       ),
                                   ],
                                 );

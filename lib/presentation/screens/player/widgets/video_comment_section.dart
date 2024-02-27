@@ -59,6 +59,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
     );
     // TODO: Check for isLiveVideo
     const isLiveVideo = true;
+    const showHighlighted = true;
 
     final childWidget = Column(
       mainAxisSize: MainAxisSize.min,
@@ -135,7 +136,18 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
             style: TextStyle(fontSize: 14),
           )
         else
-          const SizedBox(height: 42),
+          const SizedBox(
+            height: 42,
+            child: isLiveVideo == false
+                ? Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8,
+                    ),
+                    child: showHighlighted ? VideoHighlightedComment() : null,
+                  )
+                : null,
+          ),
         const SizedBox(height: 4),
       ],
     );
@@ -157,35 +169,59 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
               padding: EdgeInsets.zero,
               borderRadius: BorderRadius.circular(16),
               stackedPosition: StackedPosition(bottom: 4),
-              stackedChild: SizedBox(
-                height: 42,
-                width: c.maxWidth,
-                child: PageView(
-                  controller: _pageController,
-                  physics: isLiveVideo
-                      ? const AlwaysScrollableScrollPhysics()
-                      : const NeverScrollableScrollPhysics(),
-                  onPageChanged: (page) => currentPage = page,
-                  children: [
-                    TappableArea(
-                      onPressed: widget.onTap,
+              stackedChild: showHighlighted
+                  ? isLiveVideo
+                      ? SizedBox(
+                          height: 42,
+                          width: c.maxWidth,
+                          child: PageView(
+                            controller: _pageController,
+                            physics: const NeverScrollableScrollPhysics(),
+                            onPageChanged: (page) => currentPage = page,
+                            children: [
+                              TappableArea(
+                                onPressed: widget.onTap,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                  vertical: 8,
+                                ),
+                                child: const VideoHighlightedComment(),
+                              ),
+                              const TappableArea(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                  vertical: 8,
+                                ),
+                                child: VideoHighlightedLiveComment(),
+                              ),
+                            ],
+                          ),
+                        )
+                      : null
+                  : Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16.0,
-                        vertical: 8,
+                        vertical: 12,
                       ),
-                      child: const VideoHighlightedComment(),
-                    ),
-                    if (isLiveVideo)
-                      const TappableArea(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 8,
+                      child: TappableArea(
+                        padding: EdgeInsets.zero,
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12.0,
+                            vertical: 4.0,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white12,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Text(
+                            'Add a comment...',
+                            style: TextStyle(fontSize: 12),
+                          ),
                         ),
-                        child: VideoHighlightedLiveComment(),
                       ),
-                  ],
-                ),
-              ),
+                    ),
               child: childWidget,
             );
           },
