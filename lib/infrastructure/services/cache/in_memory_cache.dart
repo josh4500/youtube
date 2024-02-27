@@ -31,8 +31,8 @@ import 'dart:async';
 import 'cache_provider.dart';
 
 class InMemoryCache<E> extends CacheProvider<E> {
-  static final Map<String, Object> _generalStore = {};
-  Map<String, E> get _store => _generalStore[name]! as Map<String, E>;
+  static final Map<String, Map<String, dynamic>> _generalStore = {};
+  Map<String, E> get _store => _generalStore[name]!.cast<String, E>();
 
   final String name;
   final _controller = StreamController<(String, E)>.broadcast();
