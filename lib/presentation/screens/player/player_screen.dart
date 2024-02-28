@@ -503,7 +503,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _infoScrollPhysics.canScroll(true);
 
       final ended = ref.read(playerNotifierProvider).ended;
-      if (ended) {
+      if (ended && heightNotifier.value == 1) {
         _toggleControls();
       }
     }
