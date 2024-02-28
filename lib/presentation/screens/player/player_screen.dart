@@ -309,11 +309,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _toggleControls();
     }
 
-    // Set height and width to maximum
-    heightNotifier.value = 1;
-    widthNotifier.value = 1;
-
-    if (widthNotifier.value == 1 && heightNotifier.value == 1) {
+    // Maximizes player
+    if (widthNotifier.value != 1 && heightNotifier.value != 1) {
+      // Set height and width to maximum
+      heightNotifier.value = 1;
+      widthNotifier.value = 1;
       ref
           .read(playerRepositoryProvider)
           .sendPlayerSignal(PlayerSignal.maximize);
