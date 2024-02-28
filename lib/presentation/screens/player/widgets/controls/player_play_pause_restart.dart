@@ -94,7 +94,9 @@ class PlayPauseRestartControlState
           ref.read(playerRepositoryProvider).restartVideo();
         }
 
-        ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.control);
+        ref.read(playerRepositoryProvider).sendPlayerSignal(
+              PlayerSignal.showControls,
+            );
       },
       builder: (context, _) {
         return isRestart

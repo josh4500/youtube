@@ -42,10 +42,9 @@ class PlayerLoadingIndicator extends ConsumerWidget {
       return const SizedBox();
     }
     return const SizedBox(
-      width: 100,
-      height: 100,
+      width: 60,
+      height: 60,
       child: CircularProgressIndicator(
-        strokeWidth: 0.7,
         color: Colors.white,
       ),
     );

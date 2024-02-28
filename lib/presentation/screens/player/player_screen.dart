@@ -209,10 +209,19 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   /// Indicates whether the player is expanded or not.
-  bool get _expanded => ref.read(playerNotifierProvider).expanded;
+  bool get _expanded {
+    return ref.read(playerRepositoryProvider).playerViewState.isExpanded;
+  }
 
   /// Indicates whether the player is in fullscreen mode or not.
-  bool _fullscreen = false;
+  bool get _fullscreen {
+    return ref.read(playerRepositoryProvider).playerViewState.isFullscreen;
+  }
+
+  /// Indicates whether the player is minimized or not.
+  bool get _isMinimized {
+    return ref.read(playerRepositoryProvider).playerViewState.isMinimized;
+  }
 
   /// Indicates whether active zoom panning is in progress.
   bool _activeZoomPanning = false;
@@ -228,12 +237,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Allows or disallows dragging for info. Set to true by default.
   bool _allowInfoDrag = true;
-
-  void _onTapFullScreen() {
-    _fullscreen = !_fullscreen;
-    // TODO: Do fullscreen stuff
-    // TODO: Also use notifications to listen to controls
-  }
 
   /// Handles zooming and panning based on a swipe gesture.
   ///
@@ -282,11 +285,21 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   void _hideControls() {
-    ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.none);
+    ref
+        .read(playerRepositoryProvider)
+        .sendPlayerSignal(PlayerSignal.hideControls);
   }
 
   void _toggleControls() {
-    ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.user);
+    if (ref.read(playerRepositoryProvider).playerViewState.showControls) {
+      ref
+          .read(playerRepositoryProvider)
+          .sendPlayerSignal(PlayerSignal.hideControls);
+    } else {
+      ref
+          .read(playerRepositoryProvider)
+          .sendPlayerSignal(PlayerSignal.showControls);
+    }
   }
 
   /// Handles tap events on the player.
@@ -301,7 +314,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     widthNotifier.value = 1;
 
     if (widthNotifier.value == 1 && heightNotifier.value == 1) {
-      ref.read(playerRepositoryProvider).maximize();
+      ref
+          .read(playerRepositoryProvider)
+          .sendPlayerSignal(PlayerSignal.maximize);
+      if (ref.read(playerNotifierProvider).ended) {
+        ref
+            .read(playerRepositoryProvider)
+            .sendPlayerSignal(PlayerSignal.showControls);
+      }
     }
 
     // Adjust additional height if within limits
@@ -421,11 +441,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     if (_expanded) {
       if (additionalHeight > maxAdditionalHeight) {
-        ref.read(playerRepositoryProvider).expand();
+        ref
+            .read(playerRepositoryProvider)
+            .sendPlayerSignal(PlayerSignal.enterExpanded);
         additionalHeightNotifier.value =
             screenHeight - (screenHeight * heightRatio);
       } else {
-        ref.read(playerRepositoryProvider).deExpand();
+        ref
+            .read(playerRepositoryProvider)
+            .sendPlayerSignal(PlayerSignal.exitExpanded);
         if (expandedMode) {
           additionalHeightNotifier.value = maxAdditionalHeight;
         } else {
@@ -435,7 +459,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
       if (marginNotifier.value >
           (screenHeight - (screenHeight * heightRatio)) / 4) {
-        ref.read(playerRepositoryProvider).deExpand();
+        ref
+            .read(playerRepositoryProvider)
+            .sendPlayerSignal(PlayerSignal.exitExpanded);
 
         if (expandedMode) {
           additionalHeightNotifier.value = maxAdditionalHeight;
@@ -465,9 +491,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       }
 
       if (widthNotifier.value == minVideoViewPortWidth) {
-        ref.read(playerRepositoryProvider).minimize();
+        ref
+            .read(playerRepositoryProvider)
+            .sendPlayerSignal(PlayerSignal.minimize);
       } else {
-        ref.read(playerRepositoryProvider).maximize();
+        ref
+            .read(playerRepositoryProvider)
+            .sendPlayerSignal(PlayerSignal.maximize);
       }
 
       _infoScrollPhysics.canScroll(true);
@@ -479,21 +509,20 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
 
     final hasEnded = ref.read(playerNotifierProvider).ended;
-    final isMinimized = ref.read(playerNotifierProvider).minimized;
 
     // Reversing zoom due to swiping up
     final lastScaleValue = _transformationController.value.getMaxScaleOnAxis();
     if (lastScaleValue <= minPlayerScale + 0.5 && lastScaleValue > 1.0) {
       if (lastScaleValue == minPlayerScale + 0.5) {
-        _onTapFullScreen();
+        ref
+            .read(playerRepositoryProvider)
+            .sendPlayerSignal(PlayerSignal.enterFullscreen);
         // TODO: Return on fullscreen
         // return;
       }
       await _reverseZoomPan();
 
-      if (hasEnded && !isMinimized) _toggleControls();
-    } else {
-      _onTapFullScreen();
+      if (hasEnded && !_isMinimized) _toggleControls();
     }
   }
 
@@ -526,7 +555,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   void _onDragInfoUp(PointerUpEvent event) {
     if (additionalHeight > 0 && _allowInfoDrag) {
       if (additionalHeight > maxAdditionalHeight) {
-        ref.read(playerRepositoryProvider).expand();
+        ref
+            .read(playerRepositoryProvider)
+            .sendPlayerSignal(PlayerSignal.enterExpanded);
         additionalHeightNotifier.value =
             screenHeight - (screenHeight * heightRatio);
       } else {
@@ -537,7 +568,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
 
     if (additionalHeightNotifier.value == 0) {
-      ref.read(playerRepositoryProvider).deExpand();
+      ref
+          .read(playerRepositoryProvider)
+          .sendPlayerSignal(PlayerSignal.exitExpanded);
       _infoScrollPhysics.canScroll(true);
     }
 
@@ -648,21 +681,29 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           _hideControls();
           heightNotifier.value = minVideoViewPortHeight;
           widthNotifier.value = minVideoViewPortWidth;
-          ref.read(playerRepositoryProvider).minimize();
+          ref
+              .read(playerRepositoryProvider)
+              .sendPlayerSignal(PlayerSignal.minimize);
         } else if (notification is ExpandPlayerNotification) {
+          _hideControls();
           additionalHeightNotifier.value = screenHeight * (1 - heightRatio);
-          ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.none);
-          ref.read(playerRepositoryProvider).expand();
+          ref
+              .read(playerRepositoryProvider)
+              .sendPlayerSignal(PlayerSignal.enterExpanded);
         } else if (notification is DeExpandPlayerNotification) {
           if (expandedMode) {
             additionalHeightNotifier.value = maxAdditionalHeight;
           } else {
             additionalHeightNotifier.value = 0;
           }
-          ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.none);
-          ref.read(playerRepositoryProvider).deExpand();
+          _hideControls();
+          ref
+              .read(playerRepositoryProvider)
+              .sendPlayerSignal(PlayerSignal.exitExpanded);
         } else if (notification is FullscreenPlayerNotification) {
-          ref.read(playerRepositoryProvider).toggleFullscreen();
+          ref
+              .read(playerRepositoryProvider)
+              .sendPlayerSignal(PlayerSignal.enterFullscreen);
         } else if (notification is SettingsPlayerNotification) {
           // TODO: Open settings
         } else if (notification is SeekStartPlayerNotification) {

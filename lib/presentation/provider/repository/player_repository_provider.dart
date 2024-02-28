@@ -44,10 +44,33 @@ final playerOverlayStateProvider = Provider(
   },
 );
 
-enum PlayerTapActor {
-  none,
-  user,
-  control;
+enum PlayerViewState {
+  expanded,
+  minimized,
+  fullscreen,
+  visibleAmbient,
+  visibleControls;
+}
+
+extension PlayerViewStateExtension on Set<PlayerViewState> {
+  bool get isExpanded => contains(PlayerViewState.expanded);
+  bool get isMinimized => contains(PlayerViewState.minimized);
+  bool get isFullscreen => contains(PlayerViewState.fullscreen);
+  bool get showAmbient => contains(PlayerViewState.visibleAmbient);
+  bool get showControls => contains(PlayerViewState.visibleControls);
+}
+
+enum PlayerSignal {
+  showControls,
+  hideControls,
+  showAmbient,
+  hideAmbient,
+  enterFullscreen,
+  exitFullscreen,
+  minimize,
+  maximize,
+  enterExpanded,
+  exitExpanded;
 }
 
 class PlayerRepository {
@@ -68,12 +91,19 @@ class PlayerRepository {
   late final _shortsController = VideoController(_shortsPlayer);
   VideoController get shortsController => _shortsController;
 
-  final _playerTapController = StreamController<PlayerTapActor>.broadcast();
-  Stream<PlayerTapActor> get playerTapStream => _playerTapController.stream;
+  final _playerSignalController = StreamController<PlayerSignal>.broadcast();
+  Stream<PlayerSignal> get playerSignalStream => _playerSignalController.stream;
+
+  final Set<PlayerViewState> _playerViewState = <PlayerViewState>{};
+  Set<PlayerViewState> get playerViewState => _playerViewState;
 
   PlayerRepository({required Ref ref}) : _ref = ref {
     _videoPlayer.stream.completed.listen((hasEnded) {
       if (hasEnded) {
+        if (!_playerViewState.isMinimized) {
+          sendPlayerSignal(PlayerSignal.showControls);
+        }
+
         _ref.read(playerNotifierProvider.notifier).end();
         _positionMemory.delete('video');
       }
@@ -117,20 +147,12 @@ class PlayerRepository {
   }
 
   void minimize() {
-    _ref.read(playerNotifierProvider.notifier).minimize();
+    sendPlayerSignal(PlayerSignal.minimize);
   }
 
   void minimizeAndPauseVideo() {
-    _ref.read(playerNotifierProvider.notifier).toggleMinimized();
-    _ref.read(playerNotifierProvider.notifier).togglePlaying();
-  }
-
-  void expand() {
-    _ref.read(playerNotifierProvider.notifier).expand();
-  }
-
-  void deExpand() {
-    _ref.read(playerNotifierProvider.notifier).deExpand();
+    sendPlayerSignal(PlayerSignal.minimize);
+    _ref.read(playerNotifierProvider.notifier).pause();
   }
 
   Future<void> pauseVideo() async {
@@ -157,20 +179,31 @@ class PlayerRepository {
     await _videoPlayer.play();
   }
 
-  void showControls() {
-    _ref.read(playerNotifierProvider.notifier).showControls();
-  }
+  void sendPlayerSignal(PlayerSignal signal) {
+    switch (signal) {
+      case PlayerSignal.minimize:
+        _playerViewState.add(PlayerViewState.minimized);
+      case PlayerSignal.maximize:
+        _playerViewState.remove(PlayerViewState.minimized);
+      case PlayerSignal.enterExpanded:
+        _playerViewState.add(PlayerViewState.expanded);
+      case PlayerSignal.exitExpanded:
+        _playerViewState.remove(PlayerViewState.expanded);
+      case PlayerSignal.enterFullscreen:
+        _playerViewState.add(PlayerViewState.fullscreen);
+      case PlayerSignal.exitFullscreen:
+        _playerViewState.remove(PlayerViewState.fullscreen);
+      case PlayerSignal.showControls:
+        _playerViewState.add(PlayerViewState.visibleControls);
+      case PlayerSignal.hideControls:
+        _playerViewState.remove(PlayerViewState.visibleControls);
+      case PlayerSignal.showAmbient:
+        _playerViewState.add(PlayerViewState.visibleAmbient);
+      case PlayerSignal.hideAmbient:
+        _playerViewState.remove(PlayerViewState.visibleAmbient);
+    }
 
-  void tapPlayer(PlayerTapActor actor) {
-    _playerTapController.sink.add(actor);
-  }
-
-  void toggleFullscreen() {
-    _ref.read(playerNotifierProvider.notifier).toggleFullScreen();
-  }
-
-  void maximize() {
-    _ref.read(playerNotifierProvider.notifier).maximize();
+    _playerSignalController.sink.add(signal);
   }
 }
 

@@ -37,7 +37,7 @@ import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
-import 'package:youtube_clone/presentation/provider/state/player_tap_provider.dart';
+import 'package:youtube_clone/presentation/provider/state/player_signal_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_next.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_previous.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/player_notifications.dart';
@@ -135,53 +135,41 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     return Consumer(
       builder: (context, ref, childWidget) {
         ref.listen(
-          playerTapProvider,
+          playerSignalProvider,
           (previous, next) async {
-            final actor = next.asData?.value;
-            if (actor != PlayerTapActor.none) {
+            final signal = next.asData?.value;
+            if (signal == PlayerSignal.showControls) {
+              _controlsHidden = false;
+              _controlsOpacityController.forward();
+              _progressController.reverse();
+
               _progressIsVisible.value = true;
-              if (_controlsHidden || actor == PlayerTapActor.control) {
-                _controlsHidden = false;
-                _controlsOpacityController.forward();
-                _progressController.reverse();
-              } else {
-                _controlsHidden = true;
-                _controlsOpacityController.reverse();
-                _progressController.forward();
+
+              // Cancel any existing timer
+              if (_timer != null && (_timer?.isActive ?? false)) {
+                _timer?.cancel();
               }
 
-              if (_controlsHidden == false) {
-                // Cancel any existing timer
-                if (_timer != null && (_timer?.isActive ?? false)) {
-                  _timer?.cancel();
-                }
-
-                // TODO: Test logic
+              // Auto hide only when video is playing
+              _timer = Timer(const Duration(seconds: 3), () async {
                 final isPlaying = ref.read(playerNotifierProvider).playing;
-                // Auto hide only when video is playing
                 if (isPlaying) {
-                  _timer = Timer(const Duration(seconds: 3), () async {
-                    _controlsHidden = true;
-                    _progressController.forward();
-                    await _controlsOpacityController.reverse();
-                    ref
-                        .read(playerRepositoryProvider)
-                        .tapPlayer(PlayerTapActor.none);
-                  });
+                  ref
+                      .read(playerRepositoryProvider)
+                      .sendPlayerSignal(PlayerSignal.hideControls);
                 }
-              }
-            } else if (!_controlsHidden) {
+              });
+            } else if (signal == PlayerSignal.hideControls) {
               _controlsHidden = true;
               _timer?.cancel();
               _progressController.forward();
               _progressIsVisible.value = false;
               await _controlsOpacityController.reverse(from: 0);
-              ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.none);
             }
           },
         );
 
-        final hideStateAsync = ref.watch(playerTapProvider);
+        final hideStateAsync = ref.watch(playerSignalProvider);
         return hideStateAsync.when(
           data: (_) => Stack(
             children: [
@@ -447,7 +435,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       final screenWidth = MediaQuery.sizeOf(context).width;
       final screenHeight = MediaQuery.sizeOf(context).height;
 
-      final isExpanded = ref.read(playerNotifierProvider).expanded;
+      final isExpanded =
+          ref.read(playerRepositoryProvider).playerViewState.isExpanded;
       final possibleVideoHeight =
           (isExpanded ? 1 : avgVideoViewPortHeight) * screenHeight;
 

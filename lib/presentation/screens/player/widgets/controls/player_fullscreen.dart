@@ -41,13 +41,10 @@ class PlayerFullscreen extends ConsumerWidget {
     // TODO: Check if Expanded or Fullscreen control mode
     const bool expandedMode = true;
 
-    final expanded = ref.watch(
-      playerNotifierProvider.select((value) => value.expanded),
-    );
     return PlayerControl(
       onTap: () {
         if (expandedMode) {
-          if (!expanded) {
+          if (!ref.watch(playerRepositoryProvider).playerViewState.isExpanded) {
             ExpandPlayerNotification().dispatch(context);
           } else {
             DeExpandPlayerNotification().dispatch(context);
@@ -55,7 +52,10 @@ class PlayerFullscreen extends ConsumerWidget {
         } else {
           FullscreenPlayerNotification().dispatch(context);
         }
-        ref.read(playerRepositoryProvider).tapPlayer(PlayerTapActor.control);
+
+        ref.read(playerRepositoryProvider).sendPlayerSignal(
+              PlayerSignal.showControls,
+            );
       },
       color: Colors.transparent,
       horizontalPadding: 0,
