@@ -213,11 +213,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     return ref.read(playerRepositoryProvider).playerViewState.isExpanded;
   }
 
-  /// Indicates whether the player is in fullscreen mode or not.
-  bool get _fullscreen {
-    return ref.read(playerRepositoryProvider).playerViewState.isFullscreen;
-  }
-
   /// Indicates whether the player is minimized or not.
   bool get _isMinimized {
     return ref.read(playerRepositoryProvider).playerViewState.isMinimized;

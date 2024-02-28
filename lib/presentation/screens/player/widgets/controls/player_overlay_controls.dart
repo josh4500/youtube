@@ -68,7 +68,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   final _showSlideFrame = ValueNotifier<bool>(false);
   late final AnimationController _slideFrameController;
-  late final Animation<Offset> _slideFrameAnimation;
 
   bool _controlsHidden = true;
 
@@ -117,17 +116,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       duration: const Duration(milliseconds: 300),
     );
 
-    _slideFrameAnimation = Tween<Offset>(
-      begin: const Offset(0, slideFrameHeight),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _slideFrameController,
-        curve: Curves.easeOutCubic,
-        reverseCurve: Curves.easeInCubic,
-      ),
-    );
-
     _progressController = AnimationController(
       vsync: this,
       value: 1,
@@ -144,11 +132,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       begin: Colors.white24,
       end: Colors.transparent,
     ).animate(_progressController);
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      // TODO: Make sure after video is loaded
-      _progressController.forward();
-    });
   }
 
   // Timer instance
@@ -162,6 +145,12 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _showDoubleTapSeekIndicator.dispose();
     _showForward2XIndicator.dispose();
     _showSlidingSeekDuration.dispose();
+    _slideFrameController.dispose();
+    _progressController.dispose();
+    _showSlidingReleaseIndicator.dispose();
+    _showDoubleTapSeekIndicator.dispose();
+    _slidingSeekDuration.dispose();
+
     super.dispose();
   }
 
