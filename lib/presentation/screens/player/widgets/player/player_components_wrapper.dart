@@ -27,10 +27,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/player_notifications.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
 
-import 'controls/player_loading.dart';
-import 'controls/player_overlay_controls.dart';
+import '../controls/player_loading.dart';
+import '../controls/player_overlay_controls.dart';
 
 class PlayerComponentsWrapper extends StatelessWidget {
   final Widget child;

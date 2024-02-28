@@ -31,7 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_control.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/player_notifications.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
 
 class PlayerMinimize extends ConsumerWidget {
   const PlayerMinimize({super.key});

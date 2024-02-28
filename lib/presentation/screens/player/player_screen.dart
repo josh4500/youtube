@@ -33,13 +33,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/player_components_wrapper.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/player_notifications.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/player/player_components_wrapper.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/persistent_header_delegate.dart';
 
-import 'widgets/mini_player.dart';
-import 'widgets/player.dart';
+import 'widgets/player/mini_player.dart';
+import 'widgets/player/player.dart';
 import 'widgets/video_actions.dart';
 import 'widgets/video_comment_section.dart';
 import 'widgets/video_comment_sheet.dart';
@@ -286,18 +286,30 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     await _zoomPanAnimationController.forward();
   }
 
+  // Opens the player in fullscreen mode by sending a player signal to the repository.
+  void _openFullscreen() {
+    ref.read(playerRepositoryProvider).sendPlayerSignal(
+          PlayerSignal.enterFullscreen,
+        );
+  }
+
+  /// Hides the player controls by sending a player signal to the repository.
   void _hideControls() {
     ref
         .read(playerRepositoryProvider)
         .sendPlayerSignal(PlayerSignal.hideControls);
   }
 
+  /// Toggles the visibility of player controls based on the current state.
   void _toggleControls() {
+    // Check if player controls are currently visible
     if (ref.read(playerRepositoryProvider).playerViewState.showControls) {
+      // If visible, send a signal to hide controls
       ref
           .read(playerRepositoryProvider)
           .sendPlayerSignal(PlayerSignal.hideControls);
     } else {
+      // If not visible, send a signal to show controls
       ref
           .read(playerRepositoryProvider)
           .sendPlayerSignal(PlayerSignal.showControls);
@@ -354,18 +366,29 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
   }
 
+  /// Handles drag updates for an expanded player.
+  ///
+  /// Parameters:
+  ///   - details: The drag update details containing information about the drag.
   void _onDragExpandedPlayer(DragUpdateDetails details) {
+    // Hide controls during player drag
     _hideControls();
+
+    // Check the direction of the drag
     if (details.delta.dy < 0) {
+      // If dragging up
       if (marginNotifier.value > 0) {
+        // Prevent player from being dragged up beyond the top
         _preventPlayerDragUp = true;
+
+        // Adjust player view margin within valid limits
         marginNotifier.value = clampDouble(
           marginNotifier.value + details.delta.dy,
           0,
           (screenHeight - (screenHeight * heightRatio)),
         );
       } else if (!_preventPlayerDragUp) {
-        _preventPlayerDragDown = true;
+        // If not preventing drag up, adjust additionalHeightNotifier
         additionalHeightNotifier.value = clampDouble(
           additionalHeightNotifier.value + details.delta.dy,
           maxAdditionalHeight,
@@ -373,13 +396,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         );
       }
     } else {
+      // If dragging down
       if (!_preventPlayerDragDown) {
+        // Adjust player view margin within valid limits
         marginNotifier.value = clampDouble(
           marginNotifier.value + details.delta.dy,
           0,
           (screenHeight - (screenHeight * heightRatio)),
         );
       } else {
+        // If preventing drag down, adjust additionalHeightNotifier
         additionalHeightNotifier.value = clampDouble(
           additionalHeightNotifier.value + details.delta.dy,
           maxAdditionalHeight,
@@ -424,19 +450,26 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
   }
 
+  /// Handles drag updates for the player, determining the drag behavior based on its state.
   void _onDragPlayer(DragUpdateDetails details) {
-    if (!_activeZoomPanning) {
-      if (details.delta.dy > 0 && _preventPlayerDragUp) return;
-      if (details.delta.dy < 0 && _preventPlayerDragDown) return;
-
-      if (_expanded) {
-        _onDragExpandedPlayer(details);
-      } else {
-        _onDragNotExpandedPlayer(details);
-      }
-    } else {
+    // If active zoom panning is in progress, update zoom panning and return
+    if (_activeZoomPanning) {
       // Update zoom panning on swipe up or swipe down
       _swipeZoomPan(-(details.delta.dy / (screenHeight * heightRatio)));
+      return;
+    }
+
+    // If preventing player drag up or down, return without further processing
+    if (details.delta.dy > 0 && _preventPlayerDragUp) return;
+    if (details.delta.dy < 0 && _preventPlayerDragDown) return;
+
+    // Determine the drag behavior based on the player's state
+    if (_expanded) {
+      // If player is expanded, handle drag as per expanded player behavior
+      _onDragExpandedPlayer(details);
+    } else {
+      // If player is not expanded, handle drag as per not expanded player behavior
+      _onDragNotExpandedPlayer(details);
     }
   }
 
@@ -512,6 +545,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       final ended = ref.read(playerNotifierProvider).ended;
       if (ended && heightNotifier.value == 1 && !_activeZoomPanning) {
         _toggleControls();
+      }
+
+      if (_activeZoomPanning) {
+        final velocityY = details.velocity.pixelsPerSecond.dy;
+        if (velocityY < -200) _openFullscreen();
       }
     }
 

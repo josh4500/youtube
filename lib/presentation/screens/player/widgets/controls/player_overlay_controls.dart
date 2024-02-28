@@ -41,7 +41,7 @@ import 'package:youtube_clone/presentation/provider/state/player_signal_provider
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_next.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_previous.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_seek_slide_frame.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/player_notifications.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
 import 'package:youtube_clone/presentation/widgets/appbar_action.dart';
 import 'package:youtube_clone/presentation/widgets/player/playback/playback_progress.dart';
 
@@ -304,7 +304,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
               ValueListenableBuilder(
                 valueListenable: _showSlidingReleaseIndicator,
                 builder: (context, value, _) {
-                  print('CrossFade');
                   return AnimatedCrossFade(
                     firstChild: Align(
                       alignment: Alignment.topCenter,
