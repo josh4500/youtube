@@ -173,6 +173,56 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
         return hideStateAsync.when(
           data: (_) => Stack(
             children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: SeekIndicator(
+                  valueListenable: _showForward2XIndicator,
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('2X'),
+                      SizedBox(width: 4),
+                      Icon(Icons.fast_forward),
+                    ],
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: SeekIndicator(
+                  valueListenable: _showSlidingSeekIndicator,
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.linear_scale),
+                      SizedBox(width: 4),
+                      Text('Slide left or right to seek'),
+                    ],
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.lerp(
+                  Alignment.center,
+                  Alignment.bottomCenter,
+                  0.75,
+                )!,
+                child: SeekIndicator(
+                  valueListenable: _showSlidingSeekDuration,
+                  child: ValueListenableBuilder(
+                    valueListenable: _slidingSeekDuration,
+                    builder: (_, duration, __) {
+                      return SizedBox(
+                        child: duration != null
+                            ? Text(duration.hoursMinutesSeconds)
+                            : null,
+                      );
+                    },
+                  ),
+                ),
+              ),
               ValueListenableBuilder(
                 valueListenable: _showDoubleTapSeekIndicator,
                 builder: (context, value, childWidget) {
@@ -242,56 +292,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                   );
                 },
                 child: childWidget,
-              ),
-              Align(
-                alignment: Alignment.topCenter,
-                child: SeekIndicator(
-                  valueListenable: _showForward2XIndicator,
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('2X'),
-                      SizedBox(width: 4),
-                      Icon(Icons.fast_forward),
-                    ],
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.topCenter,
-                child: SeekIndicator(
-                  valueListenable: _showSlidingSeekIndicator,
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.linear_scale),
-                      SizedBox(width: 4),
-                      Text('Slide left or right to seek'),
-                    ],
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.lerp(
-                  Alignment.center,
-                  Alignment.bottomCenter,
-                  0.75,
-                )!,
-                child: SeekIndicator(
-                  valueListenable: _showSlidingSeekDuration,
-                  child: ValueListenableBuilder(
-                    valueListenable: _slidingSeekDuration,
-                    builder: (_, duration, __) {
-                      return SizedBox(
-                        child: duration != null
-                            ? Text(duration.hoursMinutesSeconds)
-                            : null,
-                      );
-                    },
-                  ),
-                ),
               ),
               Align(
                 alignment: Alignment.bottomLeft,
