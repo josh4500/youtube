@@ -70,7 +70,8 @@ enum PlayerSignal {
   minimize,
   maximize,
   enterExpanded,
-  exitExpanded;
+  exitExpanded,
+  fastForward;
 }
 
 class PlayerRepository {
@@ -106,6 +107,14 @@ class PlayerRepository {
 
         _ref.read(playerNotifierProvider.notifier).end();
         _positionMemory.delete('video');
+      }
+    });
+
+    _videoPlayer.stream.buffering.listen((buffering) {
+      if (buffering) {
+        _ref.read(playerNotifierProvider.notifier).buffering();
+      } else {
+        _ref.read(playerNotifierProvider.notifier).bufferingEnd();
       }
     });
 
@@ -201,6 +210,8 @@ class PlayerRepository {
         _playerViewState.add(PlayerViewState.visibleAmbient);
       case PlayerSignal.hideAmbient:
         _playerViewState.remove(PlayerViewState.visibleAmbient);
+      case PlayerSignal.fastForward:
+        break;
     }
 
     _playerSignalController.sink.add(signal);

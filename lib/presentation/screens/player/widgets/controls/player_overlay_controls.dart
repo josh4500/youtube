@@ -40,11 +40,13 @@ import 'package:youtube_clone/presentation/provider/state/player_state_provider.
 import 'package:youtube_clone/presentation/provider/state/player_signal_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_next.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_previous.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_seek_slide_frame.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/player_notifications.dart';
 import 'package:youtube_clone/presentation/widgets/appbar_action.dart';
 import 'package:youtube_clone/presentation/widgets/player/playback/playback_progress.dart';
 
 import 'player_autoplay_switch.dart';
+import 'player_cast_caption_control.dart';
 import 'player_fullscreen.dart';
 import 'player_minimize.dart';
 import 'player_play_pause_restart.dart';
@@ -62,7 +64,17 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   late final AnimationController _controlsOpacityController;
   late final Animation<double> _controlsAnimation;
 
+  static const double slideFrameHeight = 80;
+
+  final _showSlideFrame = ValueNotifier<bool>(false);
+  late final AnimationController _slideFrameController;
+  late final Animation<Offset> _slideFrameAnimation;
+
   bool _controlsHidden = true;
+
+  /// Flag to prevents control gestures
+  ///   - Double tap
+  bool _preventCommonControlGestures = false;
 
   final _progressIsVisible = ValueNotifier<bool>(true);
   late final AnimationController _progressController;
@@ -74,13 +86,15 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   Duration? _lowerboundSlideDuration;
 
   final _showSlidingSeekIndicator = ValueNotifier<bool>(false);
-  bool get _isSlidingSeek => _showSlidingSeekIndicator.value;
   final _slidingSeekDuration = ValueNotifier<Duration?>(null);
   final _showSlidingSeekDuration = ValueNotifier<bool>(false);
 
   final _showForward2XIndicator = ValueNotifier<bool>(false);
   bool _isForwardSeek = true;
   final _showDoubleTapSeekIndicator = ValueNotifier<bool>(false);
+
+  bool get _isSlidingSeek =>
+      _showSlidingSeekIndicator.value || _showSlideFrame.value;
 
   @override
   void initState() {
@@ -94,6 +108,23 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _controlsAnimation = CurvedAnimation(
       parent: _controlsOpacityController,
       curve: Curves.easeIn,
+    );
+
+    _slideFrameController = AnimationController(
+      vsync: this,
+      value: 1,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    _slideFrameAnimation = Tween<Offset>(
+      begin: const Offset(0, slideFrameHeight),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _slideFrameController,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      ),
     );
 
     _progressController = AnimationController(
@@ -125,13 +156,16 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   @override
   void dispose() {
     _timer?.cancel();
+    _controlsOpacityController.dispose();
+    _showSlidingSeekIndicator.dispose();
+    _showDoubleTapSeekIndicator.dispose();
+    _showForward2XIndicator.dispose();
+    _showSlidingSeekDuration.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final videoDuration =
-        ref.read(playerRepositoryProvider).currentVideoDuration;
     return Consumer(
       builder: (context, ref, childWidget) {
         ref.listen(
@@ -154,6 +188,9 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
               _timer = Timer(const Duration(seconds: 3), () async {
                 final isPlaying = ref.read(playerNotifierProvider).playing;
                 if (isPlaying) {
+                  // Reversing before sending signal, animates the reverse on
+                  // auto hide
+                  await _controlsOpacityController.reverse();
                   ref
                       .read(playerRepositoryProvider)
                       .sendPlayerSignal(PlayerSignal.hideControls);
@@ -164,13 +201,14 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
               _timer?.cancel();
               _progressController.forward();
               _progressIsVisible.value = false;
+              // Does not show opacity animation
               await _controlsOpacityController.reverse(from: 0);
             }
           },
         );
 
-        final hideStateAsync = ref.watch(playerSignalProvider);
-        return hideStateAsync.when(
+        final playerSignal = ref.watch(playerSignalProvider);
+        return playerSignal.when(
           data: (_) => Stack(
             children: [
               Align(
@@ -189,38 +227,29 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                 ),
               ),
               Align(
-                alignment: Alignment.topCenter,
-                child: SeekIndicator(
-                  valueListenable: _showSlidingSeekIndicator,
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.linear_scale),
-                      SizedBox(width: 4),
-                      Text('Slide left or right to seek'),
-                    ],
-                  ),
-                ),
-              ),
-              Align(
                 alignment: Alignment.lerp(
                   Alignment.center,
                   Alignment.bottomCenter,
                   0.75,
                 )!,
-                child: SeekIndicator(
-                  valueListenable: _showSlidingSeekDuration,
-                  child: ValueListenableBuilder(
-                    valueListenable: _slidingSeekDuration,
-                    builder: (_, duration, __) {
-                      return SizedBox(
-                        child: duration != null
-                            ? Text(duration.hoursMinutesSeconds)
-                            : null,
-                      );
-                    },
-                  ),
+                child: ValueListenableBuilder(
+                  valueListenable: _showSlideFrame,
+                  builder: (_, show, __) {
+                    if (show) return const SizedBox();
+                    return SeekIndicator(
+                      valueListenable: _showSlidingSeekDuration,
+                      child: ValueListenableBuilder(
+                        valueListenable: _slidingSeekDuration,
+                        builder: (_, duration, __) {
+                          return SizedBox(
+                            child: duration != null
+                                ? Text(duration.hoursMinutesSeconds)
+                                : null,
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
               ),
               ValueListenableBuilder(
@@ -271,6 +300,21 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                   ),
                 ),
               ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: SeekIndicator(
+                  valueListenable: _showSlidingSeekIndicator,
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.linear_scale),
+                      SizedBox(width: 4),
+                      Text('Slide left or right to seek'),
+                    ],
+                  ),
+                ),
+              ),
               AnimatedBuilder(
                 animation: _controlsAnimation,
                 builder: (context, innerChildWidget) {
@@ -281,35 +325,69 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                     onLongPressMoveUpdate: _onLongPressMoveUpdate,
                     child: Container(
                       color: Colors.transparent,
-                      child: Opacity(
-                        opacity: _controlsAnimation.value,
-                        child: Visibility(
-                          visible: _controlsAnimation.value != 0,
-                          child: innerChildWidget!,
-                        ),
+                      height: double.infinity,
+                      width: double.infinity,
+                      child: ValueListenableBuilder(
+                        valueListenable: _showSlideFrame,
+                        builder: (_, show, __) {
+                          if (show) return const SizedBox();
+                          return Opacity(
+                            opacity: _controlsAnimation.value,
+                            child: Visibility(
+                              visible: _controlsAnimation.value != 0,
+                              child: innerChildWidget!,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   );
                 },
                 child: childWidget,
               ),
+              PlayerSeekSlideFrame(
+                animationController: _slideFrameController,
+                frameHeight: slideFrameHeight,
+                valueListenable: _showSlideFrame,
+                onClose: _onEndSlideFrameSeek,
+                seekDurationIndicator: SeekIndicator(
+                  valueListenable: _showSlidingSeekDuration,
+                  child: ValueListenableBuilder(
+                    valueListenable: _slidingSeekDuration,
+                    builder: (_, duration, __) {
+                      return SizedBox(
+                        child: duration != null
+                            ? Text(duration.hoursMinutesSeconds)
+                            : null,
+                      );
+                    },
+                  ),
+                ),
+              ),
               Align(
                 alignment: Alignment.bottomLeft,
                 child: ValueListenableBuilder(
                   valueListenable: _progressIsVisible,
                   builder: (context, visible, childWidget) {
-                    return AnimatedOpacity(
-                      opacity: visible ? 1 : 0,
-                      curve: Curves.easeIn,
-                      duration: const Duration(milliseconds: 175),
-                      child: PlaybackProgress(
-                        progress: ref
+                    return Consumer(
+                      builder: (context, ref, child) {
+                        final videoDuration = ref
                             .read(playerRepositoryProvider)
-                            .currentVideoProgress,
-                        end: videoDuration,
-                        animation: _progressAnimation,
-                        bufferAnimation: _bufferAnimation,
-                      ),
+                            .currentVideoDuration;
+                        return AnimatedOpacity(
+                          opacity: visible ? 1 : 0,
+                          curve: Curves.easeIn,
+                          duration: const Duration(milliseconds: 175),
+                          child: PlaybackProgress(
+                            progress: ref
+                                .read(playerRepositoryProvider)
+                                .currentVideoProgress,
+                            end: videoDuration,
+                            animation: _progressAnimation,
+                            bufferAnimation: _bufferAnimation,
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -330,8 +408,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                 PlayerMinimize(),
                 Spacer(),
                 PlayerAutoplaySwitch(),
-                AppbarAction(icon: Icons.cast_outlined),
-                AppbarAction(icon: Icons.closed_caption_off),
+                PlayerCastCaptionControl(),
                 AppbarAction(icon: Icons.settings_outlined),
               ],
             ),
@@ -361,6 +438,9 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _controlsOpacityController.reverse(from: 0);
     _isForwardSeek = true;
     _showDoubleTapSeekIndicator.value = true;
+    ref.read(playerRepositoryProvider).sendPlayerSignal(
+          PlayerSignal.fastForward,
+        );
     final seekDuration = ref.read(preferencesProvider).doubleTapSeek;
     await ref.read(playerRepositoryProvider).seek(
           Duration(seconds: seekDuration),
@@ -372,6 +452,10 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _controlsOpacityController.reverse(from: 0);
     _isForwardSeek = false;
     _showDoubleTapSeekIndicator.value = true;
+    ref.read(playerRepositoryProvider).sendPlayerSignal(
+          PlayerSignal.fastForward,
+        );
+
     final seekDuration = ref.read(preferencesProvider).doubleTapSeek;
     await ref.read(playerRepositoryProvider).seek(
           Duration(seconds: seekDuration),
@@ -399,7 +483,13 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   void _hideSlideSeek() {
     _showSlidingSeekIndicator.value = false;
-    _controlsOpacityController.forward();
+    if (!_controlsHidden) {
+      if (!ref.read(playerNotifierProvider).playing) {
+        _controlsOpacityController.forward();
+      } else {
+        _controlsHidden = true;
+      }
+    }
     _hideProgressIndicator();
     if (_slidingSeekDuration.value != null) {
       ref.read(playerRepositoryProvider).seekTo(_slidingSeekDuration.value!);
@@ -413,7 +503,14 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _lowerboundSlideDuration = null;
   }
 
+  void _onEndSlideFrameSeek() {
+    _hideSlideSeek();
+    _preventCommonControlGestures = false;
+    SlideSeekEndPlayerNotification().dispatch(context);
+  }
+
   void _onDoubleTapDown(TapDownDetails details) {
+    if (_preventCommonControlGestures) return;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final greyArea = screenWidth * 0.2;
     final isForward = details.localPosition.dx > (screenWidth / 2) + greyArea;
@@ -429,8 +526,11 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   }
 
   bool _startedOnLongPress = false;
+  double _longPressYPosition = 0;
 
   void _onLongPressStart(LongPressStartDetails details) {
+    _longPressYPosition = details.localPosition.dy;
+
     if (!_controlsHidden) {
       final screenWidth = MediaQuery.sizeOf(context).width;
       final screenHeight = MediaQuery.sizeOf(context).height;
@@ -452,6 +552,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
       if ((!right && !left) && (!top && !bottom)) return;
     }
+
     _startedOnLongPress = true;
 
     final isPlaying = ref.read(playerNotifierProvider).playing;
@@ -466,6 +567,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   void _onLongPressEnd(LongPressEndDetails details) {
     if (!_startedOnLongPress) return;
+    _longPressYPosition = 0;
     _startedOnLongPress = false;
     final isPlaying = ref.read(playerNotifierProvider).playing;
     final hasEnded = ref.read(playerNotifierProvider).ended;
@@ -474,8 +576,18 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       Forward2xSpeedEndPlayerNotification().dispatch(context);
       _hide2xSpeed();
     } else {
-      SlideSeekEndPlayerNotification().dispatch(context);
-      _hideSlideSeek();
+      if (!_showSlideFrame.value) {
+        SlideSeekEndPlayerNotification().dispatch(context);
+        _hideSlideSeek();
+      }
+
+      if (_slideFrameController.value < 0.7) {
+        _showSlideFrame.value = false;
+        _slideFrameController.value = 0;
+        _hideSlideSeek();
+      } else {
+        _slideFrameController.value = 1;
+      }
     }
   }
 
@@ -489,6 +601,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       final lastPosition =
           ref.read(playerRepositoryProvider).currentVideoPosition;
       final localX = details.localPosition.dx;
+      final localY = details.localPosition.dy;
       final screenWidth = MediaQuery.sizeOf(context).width;
 
       final bound = Duration(microseconds: (totalMicroseconds * 0.1).floor());
@@ -527,8 +640,24 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
         }
       }
 
-      _showSlidingSeekDuration.value = true;
-      _slidingSeekDuration.value = newDuration;
+      if (!_showSlideFrame.value) {
+        _showSlidingSeekDuration.value = true;
+        _slidingSeekDuration.value = newDuration;
+      }
+
+      if (localY < (_longPressYPosition - 10)) {
+        if (!_showSlidingSeekIndicator.value) {
+          HapticFeedback.selectionClick();
+        }
+
+        _showSlidingSeekIndicator.value = false;
+        _showSlideFrame.value = true;
+        _slideFrameController.value = clampDouble(
+          (_longPressYPosition - localY) / 50,
+          0,
+          1,
+        );
+      }
     }
   }
 }

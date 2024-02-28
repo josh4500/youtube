@@ -235,6 +235,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Prevents player from being dragged down when set to true.
   bool _preventPlayerDragDown = false;
 
+  bool _isSeeking = false;
+
   /// Allows or disallows dragging for info. Set to true by default.
   bool _allowInfoDrag = true;
 
@@ -354,7 +356,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   void _onDragExpandedPlayer(DragUpdateDetails details) {
     _hideControls();
-    if (details.delta.dy < -1) {
+    if (details.delta.dy < 0) {
       if (marginNotifier.value > 0) {
         _preventPlayerDragUp = true;
         marginNotifier.value = clampDouble(
@@ -424,6 +426,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   void _onDragPlayer(DragUpdateDetails details) {
     if (!_activeZoomPanning) {
+      if (details.delta.dy > 0 && _preventPlayerDragUp) return;
+      if (details.delta.dy < 0 && _preventPlayerDragDown) return;
+
       if (_expanded) {
         _onDragExpandedPlayer(details);
       } else {
@@ -436,8 +441,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   Future<void> _onDragPlayerEnd(DragEndDetails details) async {
-    _preventPlayerDragUp = false;
-    _preventPlayerDragDown = false;
+    if (!_isSeeking) {
+      _preventPlayerDragUp = false;
+      _preventPlayerDragDown = false;
+    }
 
     if (_expanded) {
       if (additionalHeight > maxAdditionalHeight) {
@@ -503,7 +510,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _infoScrollPhysics.canScroll(true);
 
       final ended = ref.read(playerNotifierProvider).ended;
-      if (ended && heightNotifier.value == 1) {
+      if (ended && heightNotifier.value == 1 && !_activeZoomPanning) {
         _toggleControls();
       }
     }
@@ -713,7 +720,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         } else if (notification is SeekStartPlayerNotification) {
           _preventPlayerDragUp = true;
           _preventPlayerDragDown = true;
+          _isSeeking = true;
         } else if (notification is SeekEndPlayerNotification) {
+          _isSeeking = false;
           _preventPlayerDragUp = false;
           _preventPlayerDragDown = false;
         }

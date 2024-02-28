@@ -28,24 +28,76 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/provider/state/player_signal_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 
-class PlayerLoadingIndicator extends ConsumerWidget {
+class PlayerLoadingIndicator extends ConsumerStatefulWidget {
   const PlayerLoadingIndicator({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PlayerLoadingIndicator> createState() =>
+      _PlayerLoadingIndicatorState();
+}
+
+class _PlayerLoadingIndicatorState extends ConsumerState<PlayerLoadingIndicator>
+    with TickerProviderStateMixin {
+  late final AnimationController _controlsOpacityController;
+  late final Animation<double> _controlsAnimation;
+  @override
+  void initState() {
+    super.initState();
+    _controlsOpacityController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 175),
+      reverseDuration: const Duration(milliseconds: 100),
+    );
+
+    _controlsAnimation = CurvedAnimation(
+      parent: ReverseAnimation(_controlsOpacityController),
+      curve: Curves.easeIn,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controlsOpacityController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isLoading = ref.watch(
       playerNotifierProvider.select((value) => value.loading),
     );
+
     if (!isLoading) {
       return const SizedBox();
     }
-    return const SizedBox(
-      width: 60,
-      height: 60,
-      child: CircularProgressIndicator(
-        color: Colors.white,
+
+    ref.listen(playerSignalProvider, (previous, next) {
+      final signal = next.asData?.value;
+      if (signal == PlayerSignal.minimize) {
+        _controlsOpacityController.forward();
+      } else if (signal == PlayerSignal.maximize) {
+        _controlsOpacityController.reverse();
+      }
+    });
+
+    return AnimatedBuilder(
+      animation: _controlsAnimation,
+      builder: (context, childWidget) {
+        return Opacity(
+          opacity: _controlsAnimation.value,
+          child: childWidget,
+        );
+      },
+      child: const SizedBox(
+        width: 60,
+        height: 60,
+        child: CircularProgressIndicator(
+          color: Colors.white,
+        ),
       ),
     );
   }

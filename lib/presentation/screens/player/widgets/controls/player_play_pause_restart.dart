@@ -80,6 +80,7 @@ class PlayPauseRestartControlState
     final playerNotifier = ref.watch(playerNotifierProvider);
     final isPlaying = playerNotifier.playing;
     final isRestart = playerNotifier.ended;
+    final isBuffering = playerNotifier.loading;
 
     return PlayerControl(
       horizontalPadding: 32,
@@ -99,16 +100,18 @@ class PlayPauseRestartControlState
             );
       },
       builder: (context, _) {
+        if (isBuffering) return const SizedBox(width: 54);
         return isRestart
             ? const Icon(
                 Icons.restart_alt,
                 size: 54,
+                semanticLabel: 'Restart Video',
               )
             : AnimatedIcon(
                 icon: AnimatedIcons.pause_play,
                 progress: _animation,
-                size: 54.0,
-                // semanticLabel: isPlaying ? 'Pause video' : 'Play video',
+                size: 54,
+                semanticLabel: isPlaying ? 'Pause video' : 'Play video',
               );
       },
     );
