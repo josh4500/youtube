@@ -86,6 +86,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   Duration? _lowerboundSlideDuration;
 
   final _showSlidingSeekIndicator = ValueNotifier<bool>(false);
+  final _showSlidingReleaseIndicator = ValueNotifier<bool>(false);
   final _slidingSeekDuration = ValueNotifier<Duration?>(null);
   final _showSlidingSeekDuration = ValueNotifier<bool>(false);
 
@@ -300,20 +301,47 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.topCenter,
-                child: SeekIndicator(
-                  valueListenable: _showSlidingSeekIndicator,
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.linear_scale),
-                      SizedBox(width: 4),
-                      Text('Slide left or right to seek'),
-                    ],
-                  ),
-                ),
+              ValueListenableBuilder(
+                valueListenable: _showSlidingReleaseIndicator,
+                builder: (context, value, _) {
+                  print('CrossFade');
+                  return AnimatedCrossFade(
+                    firstChild: Align(
+                      alignment: Alignment.topCenter,
+                      child: SeekIndicator(
+                        valueListenable: _showSlidingSeekIndicator,
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.linear_scale),
+                            SizedBox(width: 4),
+                            Text('Slide left or right to seek'),
+                          ],
+                        ),
+                      ),
+                    ),
+                    secondChild: Align(
+                      alignment: Alignment.topCenter,
+                      child: Container(
+                        height: 24,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 16),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.black45,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        child: const Text('Release to cancel'),
+                      ),
+                    ),
+                    crossFadeState: value
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    duration: const Duration(milliseconds: 150),
+                  );
+                },
               ),
               AnimatedBuilder(
                 animation: _controlsAnimation,
@@ -527,6 +555,15 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   bool _startedOnLongPress = false;
   double _longPressYPosition = 0;
+  Timer? _releaseTimer;
+
+  void _showReleaseIndicator() {
+    _showSlidingReleaseIndicator.value = true;
+    _releaseTimer?.cancel();
+    _releaseTimer = Timer(const Duration(seconds: 2), () {
+      _showSlidingReleaseIndicator.value = false;
+    });
+  }
 
   void _onLongPressStart(LongPressStartDetails details) {
     _longPressYPosition = details.localPosition.dy;
@@ -619,11 +656,13 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       if (newDuration > _upperboundSlideDuration!) {
         if (_lastDuration! < _upperboundSlideDuration!) {
           HapticFeedback.selectionClick();
+          _showReleaseIndicator();
           _lastDuration = newDuration;
         }
       } else if (newDuration < _upperboundSlideDuration!) {
         if (_lastDuration! > _upperboundSlideDuration!) {
           HapticFeedback.selectionClick();
+          _showReleaseIndicator();
           _lastDuration = lastPosition;
         }
       }
@@ -631,11 +670,13 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       if (newDuration < _lowerboundSlideDuration!) {
         if (_lastDuration! > _lowerboundSlideDuration!) {
           HapticFeedback.selectionClick();
+          _showReleaseIndicator();
           _lastDuration = newDuration;
         }
       } else if (newDuration > _lowerboundSlideDuration!) {
         if (_lastDuration! < _lowerboundSlideDuration!) {
           HapticFeedback.selectionClick();
+          _showReleaseIndicator();
           _lastDuration = lastPosition;
         }
       }
