@@ -577,6 +577,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (_infoScrollController.offset == 0) {
       _allowInfoDrag = true;
     }
+
+    if (ref.read(playerNotifierProvider).ended && !_isMinimized) {
+      _toggleControls();
+    }
   }
 
   // Video Comment Sheet
