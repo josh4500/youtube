@@ -32,37 +32,41 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 
-class PlayerView extends StatelessWidget {
+class PlayerSizing {
+  final double minHeight;
+  final double maxHeight;
+
+  PlayerSizing({required this.minHeight, required this.maxHeight});
+}
+
+final playerSizingProvider = Provider<PlayerSizing>(
+  (ref) => throw UnimplementedError(),
+);
+
+class PlayerView extends ConsumerWidget {
   const PlayerView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playerSizing = ref.watch(playerSizingProvider);
     final screenHeight = MediaQuery.sizeOf(context).height;
     final screenWidth = MediaQuery.sizeOf(context).width;
 
-    return GestureDetector(
-      child: Container(
-        constraints: BoxConstraints(
-          minWidth: 135,
-          maxWidth: screenWidth,
-          maxHeight: screenHeight * avgVideoViewPortHeight,
-          minHeight: screenHeight * minVideoViewPortHeight,
-        ),
-        // child: Image.network(
-        //   'http://via.placeholder.com/640x360',
-        //   fit: BoxFit.fitWidth,
-        // ),
-        child: Consumer(
-          builder: (context, ref, child) {
-            final controller =
-                ref.watch(playerRepositoryProvider).videoController;
-            return Video(
-              controller: controller,
-              fit: BoxFit.fitWidth,
-              controls: null,
-            );
-          },
-        ),
+    final controller = ref.watch(playerRepositoryProvider).videoController;
+    final aspectRatio = (controller.player.state.width ?? 1) /
+        (controller.player.state.height ?? 1);
+    return Container(
+      constraints: BoxConstraints(
+        minWidth: 135,
+        maxWidth: screenWidth,
+        maxHeight: screenHeight * playerSizing.maxHeight,
+        minHeight: screenHeight * playerSizing.minHeight,
+      ),
+      child: Video(
+        controller: controller,
+        fit: BoxFit.fitWidth,
+        wakelock: true,
+        controls: null,
       ),
     );
   }

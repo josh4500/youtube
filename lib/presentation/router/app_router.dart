@@ -307,6 +307,24 @@ class AppRouter {
           );
         },
       ),
+      GoRoute(
+        name: AppRoutes.playerLandscapeScreen.name,
+        path: AppRoutes.playerLandscapeScreen.path,
+        parentNavigatorKey: rootKey,
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            transitionDuration: const Duration(milliseconds: 200),
+            reverseTransitionDuration: const Duration(milliseconds: 200),
+            transitionsBuilder: (context, animation, secAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            child: const PlayerLandscapeScreen(),
+          );
+        },
+      ),
     ],
   );
 }

@@ -29,10 +29,13 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
+import 'package:youtube_clone/presentation/router/app_router.dart';
+import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/player/player_components_wrapper.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -56,6 +59,10 @@ class PlayerScreen extends ConsumerStatefulWidget {
 
 class _PlayerScreenState extends ConsumerState<PlayerScreen>
     with TickerProviderStateMixin {
+  final GlobalKey _interactivePlayerKey = GlobalKey();
+  final GlobalKey _portraitPlayerKey = GlobalKey();
+  final GlobalKey _landscapePlayerKey = GlobalKey();
+
   final _infoScrollController = ScrollController();
   final _infoScrollPhysics = const CustomScrollableScrollPhysics(tag: 'info');
 
@@ -187,9 +194,20 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           clampDouble(size / (1 - heightRatio), 0, 1);
     });
 
-    Future(() {
+    Future(() async {
       ref.read(playerRepositoryProvider).openVideo();
+      _removeeeeeee();
     });
+  }
+
+  // TODO: Remove
+  _removeeeeeee() async {
+    await SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
+    await SystemChrome.restoreSystemUIOverlays();
+    await SystemChrome.setPreferredOrientations(DeviceOrientation.values);
   }
 
   @override
@@ -282,10 +300,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   // Opens the player in fullscreen mode by sending a player signal to the repository.
-  void _openFullscreen() {
+  void _openFullscreenPlayer() {
+    _hideControls();
     ref.read(playerRepositoryProvider).sendPlayerSignal(
           PlayerSignal.enterFullscreen,
         );
+    context.goto(AppRoutes.playerLandscapeScreen);
   }
 
   /// Hides the player controls by sending a player signal to the repository.
@@ -544,7 +564,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
       if (_activeZoomPanning) {
         final velocityY = details.velocity.pixelsPerSecond.dy;
-        if (velocityY < -200) _openFullscreen();
+        if (velocityY < -200) _openFullscreenPlayer();
       }
     }
 
@@ -554,11 +574,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     final lastScaleValue = _transformationController.value.getMaxScaleOnAxis();
     if (lastScaleValue <= minPlayerScale + 0.5 && lastScaleValue > 1.0) {
       if (lastScaleValue == minPlayerScale + 0.5) {
-        ref
-            .read(playerRepositoryProvider)
-            .sendPlayerSignal(PlayerSignal.enterFullscreen);
-        // TODO: Return on fullscreen
-        // return;
+        _openFullscreenPlayer();
       }
       await _reverseZoomPan();
 
@@ -720,6 +736,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   @override
   Widget build(BuildContext context) {
     final interactivePlayerView = PlayerComponentsWrapper(
+      key: _interactivePlayerKey,
       handleNotification: (notification) {
         if (notification is MinimizePlayerNotification) {
           _hideControls();
@@ -744,10 +761,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           ref
               .read(playerRepositoryProvider)
               .sendPlayerSignal(PlayerSignal.exitExpanded);
-        } else if (notification is FullscreenPlayerNotification) {
-          ref
-              .read(playerRepositoryProvider)
-              .sendPlayerSignal(PlayerSignal.enterFullscreen);
+        } else if (notification is EnterFullscreenPlayerNotification) {
+          _openFullscreenPlayer();
         } else if (notification is SettingsPlayerNotification) {
           // TODO: Open settings
         } else if (notification is SeekStartPlayerNotification) {
@@ -772,8 +787,21 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
             child: childWidget!,
           );
         },
-        child: const KeyedSubtree(
-          child: PlayerView(),
+        child: ProviderScope(
+          overrides: [
+            playerSizingProvider.overrideWithValue(
+              PlayerSizing(
+                minHeight: minVideoViewPortHeight,
+                maxHeight: heightRatio,
+              ),
+            ),
+          ],
+          child: const Hero(
+            tag: 'player',
+            child: KeyedSubtree(
+              child: PlayerView(),
+            ),
+          ),
         ),
       ),
     );
@@ -782,6 +810,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       valueListenable: heightNotifier,
       builder: (context, value, childWidget) {
         return SizedBox(
+          key: _portraitPlayerKey,
           height: screenHeight * heightNotifier.value,
           width: double.infinity,
           child: childWidget,

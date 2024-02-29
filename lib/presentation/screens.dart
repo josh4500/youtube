@@ -45,6 +45,7 @@ export 'screens/channel/channel_screen.dart';
 export 'screens/home/home_screen.dart';
 
 export 'screens/player/player_screen.dart';
+export 'screens/player/player_landscape_screen.dart';
 
 export 'screens/playlist/edit_playlist_screen.dart';
 export 'screens/playlist/playlist_screen.dart';

@@ -32,7 +32,9 @@ abstract class PlayerNotification extends Notification {}
 
 class MinimizePlayerNotification extends PlayerNotification {}
 
-class FullscreenPlayerNotification extends PlayerNotification {}
+class EnterFullscreenPlayerNotification extends PlayerNotification {}
+
+class ExitFullscreenPlayerNotification extends PlayerNotification {}
 
 class ExpandPlayerNotification extends PlayerNotification {}
 

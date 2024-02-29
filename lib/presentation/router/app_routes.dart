@@ -168,4 +168,13 @@ class AppRoutes {
     name: 'settings',
     path: '/settings',
   );
+
+  ///
+  /// Player
+  ///
+
+  static final playerLandscapeScreen = RouteInfo(
+    name: 'player',
+    path: '/player/landscape',
+  );
 }

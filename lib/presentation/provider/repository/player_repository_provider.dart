@@ -133,6 +133,7 @@ class PlayerRepository {
 
   void openPlayerScreen() {
     _ref.read(_playerOverlayStateProvider.notifier).state = true;
+    _playerViewState.clear();
   }
 
   void closePlayerScreen() {
