@@ -29,7 +29,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
@@ -46,6 +45,7 @@ import 'widgets/player/player.dart';
 import 'widgets/video_actions.dart';
 import 'widgets/video_comment_section.dart';
 import 'widgets/video_comment_sheet.dart';
+import 'widgets/video_context.dart';
 import 'widgets/video_description_section.dart';
 import 'widgets/video_description_sheet.dart';
 
@@ -61,7 +61,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     with TickerProviderStateMixin {
   final GlobalKey _interactivePlayerKey = GlobalKey();
   final GlobalKey _portraitPlayerKey = GlobalKey();
-  final GlobalKey _landscapePlayerKey = GlobalKey();
 
   final _infoScrollController = ScrollController();
   final _infoScrollPhysics = const CustomScrollableScrollPhysics(tag: 'info');
@@ -196,18 +195,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     Future(() async {
       ref.read(playerRepositoryProvider).openVideo();
-      _removeeeeeee();
     });
-  }
-
-  // TODO: Remove
-  _removeeeeeee() async {
-    await SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: SystemUiOverlay.values,
-    );
-    await SystemChrome.restoreSystemUIOverlays();
-    await SystemChrome.setPreferredOrientations(DeviceOrientation.values);
   }
 
   @override
@@ -733,6 +721,19 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     );
   }
 
+  // TODO: Rename
+  bool _onScrollDynamicTab(ScrollNotification notification) {
+    // Prevents info to be dragged down while scrolling in DynamicTab
+    if (notification.depth == 1) {
+      if (notification is ScrollStartNotification) {
+        _allowInfoDrag = false;
+      } else if (notification is ScrollEndNotification) {
+        _allowInfoDrag = true;
+      }
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final interactivePlayerView = PlayerComponentsWrapper(
@@ -787,18 +788,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
             child: childWidget!,
           );
         },
-        child: ProviderScope(
-          overrides: [
-            playerSizingProvider.overrideWithValue(
-              PlayerSizing(
-                minHeight: minVideoViewPortHeight,
-                maxHeight: heightRatio,
+        child: Hero(
+          tag: 'player',
+          child: ProviderScope(
+            overrides: [
+              playerSizingProvider.overrideWithValue(
+                PlayerSizing(
+                  minHeight: minVideoViewPortHeight,
+                  maxHeight: heightRatio,
+                ),
               ),
-            ),
-          ],
-          child: const Hero(
-            tag: 'player',
-            child: KeyedSubtree(
+            ],
+            child: const KeyedSubtree(
               child: PlayerView(),
             ),
           ),
@@ -912,64 +913,67 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                             child: childWidget,
                           );
                         },
-                        child: CustomScrollView(
-                          physics: _infoScrollPhysics,
-                          controller: _infoScrollController,
-                          slivers: [
-                            SliverToBoxAdapter(
-                              child: Column(
-                                children: [
-                                  VideoDescriptionSection(
-                                    onTap: _openDescSheet,
-                                  ),
-                                  // const VideoContext(),
-                                  const VideoActions(),
-                                  VideoCommentSection(
-                                    onTap: _openCommentSheet,
-                                  ),
-                                ],
+                        child: NotificationListener<ScrollNotification>(
+                          onNotification: _onScrollDynamicTab,
+                          child: CustomScrollView(
+                            physics: _infoScrollPhysics,
+                            controller: _infoScrollController,
+                            slivers: [
+                              SliverToBoxAdapter(
+                                child: Column(
+                                  children: [
+                                    VideoDescriptionSection(
+                                      onTap: _openDescSheet,
+                                    ),
+                                    const VideoContext(),
+                                    const VideoActions(),
+                                    VideoCommentSection(
+                                      onTap: _openCommentSheet,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SliverPersistentHeader(
-                              pinned: true,
-                              floating: true,
-                              delegate: SlidingHeaderDelegate(
-                                minHeight: 0,
-                                maxHeight: 40,
-                                child: const Material(
-                                  child: DynamicTab(
-                                    initialIndex: 0,
-                                    leadingWidth: 8,
-                                    options: <String>[
-                                      'All',
-                                      'Something',
-                                      'Related',
-                                      'Recently uploaded',
-                                      'Watched',
-                                    ],
+                              SliverPersistentHeader(
+                                pinned: true,
+                                floating: true,
+                                delegate: SlidingHeaderDelegate(
+                                  minHeight: 0,
+                                  maxHeight: 40,
+                                  child: const Material(
+                                    child: DynamicTab(
+                                      initialIndex: 0,
+                                      leadingWidth: 8,
+                                      options: <String>[
+                                        'All',
+                                        'Something',
+                                        'Related',
+                                        'Recently uploaded',
+                                        'Watched',
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SliverToBoxAdapter(
-                              child: ViewableVideoContent(),
-                            ),
-                            const SliverToBoxAdapter(
-                              child: ViewableVideoContent(),
-                            ),
-                            const SliverToBoxAdapter(
-                              child: ViewableVideoContent(),
-                            ),
-                            const SliverToBoxAdapter(
-                              child: ViewableVideoContent(),
-                            ),
-                            const SliverToBoxAdapter(
-                              child: ViewableVideoContent(),
-                            ),
-                            const SliverToBoxAdapter(
-                              child: ViewableVideoContent(),
-                            ),
-                          ],
+                              const SliverToBoxAdapter(
+                                child: ViewableVideoContent(),
+                              ),
+                              const SliverToBoxAdapter(
+                                child: ViewableVideoContent(),
+                              ),
+                              const SliverToBoxAdapter(
+                                child: ViewableVideoContent(),
+                              ),
+                              const SliverToBoxAdapter(
+                                child: ViewableVideoContent(),
+                              ),
+                              const SliverToBoxAdapter(
+                                child: ViewableVideoContent(),
+                              ),
+                              const SliverToBoxAdapter(
+                                child: ViewableVideoContent(),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
