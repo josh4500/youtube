@@ -154,12 +154,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
               bottom: PreferredSize(
-                preferredSize: Size(
-                  MediaQuery.sizeOf(context).width,
-                  MediaQuery.sizeOf(context).height * 0.05,
-                ),
+                preferredSize: Size(MediaQuery.sizeOf(context).width, 48),
                 child: SizedBox(
-                  height: MediaQuery.sizeOf(context).height * 0.05 + 8,
+                  height: 48,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: DynamicTab(
