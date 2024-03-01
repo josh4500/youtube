@@ -51,6 +51,7 @@ class MiniPlayer extends StatelessWidget {
       child: SizedBox(
         height: height,
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(

@@ -48,7 +48,7 @@ class _PlayerSeekSlideFrameState extends ConsumerState<PlayerSeekSlideFrame> {
 
   @override
   Widget build(BuildContext context) {
-    final framesCount = 10 + 2;
+    const framesCount = 10 + 2;
 
     return ValueListenableBuilder(
       valueListenable: widget.valueListenable,
