@@ -29,15 +29,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
-
-class PlayerSizing {
-  final double minHeight;
-  final double maxHeight;
-
-  PlayerSizing({required this.minHeight, required this.maxHeight});
-}
+import 'package:youtube_clone/presentation/view_models/playback/player_sizing.dart';
 
 final playerSizingProvider = Provider<PlayerSizing>(
   (ref) => throw UnimplementedError(),

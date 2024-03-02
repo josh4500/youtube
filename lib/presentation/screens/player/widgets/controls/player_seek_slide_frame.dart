@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-class PlayerSeekSlideFrame extends ConsumerStatefulWidget {
+class PlayerSeekSlideFrame extends StatefulWidget {
   final ValueNotifier<bool> valueListenable;
   final VoidCallback onClose;
-  final AnimationController animationController;
+  final Animation<double> animation;
   final double frameHeight;
   final Widget seekDurationIndicator;
 
   const PlayerSeekSlideFrame({
     super.key,
-    required this.animationController,
+    required this.animation,
     required this.frameHeight,
     required this.valueListenable,
     required this.onClose,
@@ -19,29 +20,21 @@ class PlayerSeekSlideFrame extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<PlayerSeekSlideFrame> createState() =>
-      _PlayerSeekSlideFrameState();
+  State<PlayerSeekSlideFrame> createState() => _PlayerSeekSlideFrameState();
 }
 
-class _PlayerSeekSlideFrameState extends ConsumerState<PlayerSeekSlideFrame> {
+class _PlayerSeekSlideFrameState extends State<PlayerSeekSlideFrame> {
   late Animation<double> _opacityAnimation;
   late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
-    _opacityAnimation = CurvedAnimation(
-      parent: widget.animationController,
-      curve: Curves.easeIn,
-    );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: const Offset(0, 0),
-    ).animate(
-      CurvedAnimation(
-        parent: widget.animationController,
-        curve: Curves.easeOutCubic,
-        reverseCurve: Curves.easeInCubic,
+    _opacityAnimation = widget.animation;
+    _slideAnimation = widget.animation.drive(
+      Tween<Offset>(
+        begin: const Offset(0, 0.4),
+        end: const Offset(0, 0),
       ),
     );
   }
@@ -75,90 +68,89 @@ class _PlayerSeekSlideFrameState extends ConsumerState<PlayerSeekSlideFrame> {
                 child: Consumer(
                   builder: (context, ref, child) {
                     return GestureDetector(
-                      onTap: () async {
+                      onTap: () {
                         widget.valueListenable.value = false;
-                        await ref.read(playerRepositoryProvider).playVideo();
                         widget.onClose();
+                        ref.read(playerRepositoryProvider).playVideo();
                       },
-                      child: GestureDetector(
-                        onTap: () async {
-                          widget.valueListenable.value = false;
-                          await ref.read(playerRepositoryProvider).playVideo();
-                          widget.onClose();
-                        },
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                width: 54,
-                                height: 54,
-                                alignment: Alignment.center,
-                                padding: const EdgeInsets.all(8),
-                                margin: const EdgeInsets.all(8),
-                                decoration: const BoxDecoration(
-                                  color: Colors.black26,
-                                  shape: BoxShape.circle,
+                      child: ClipRect(
+                        child: SlideTransition(
+                          position: _slideAnimation,
+                          child: FadeTransition(
+                            opacity: _opacityAnimation,
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    width: 54,
+                                    height: 54,
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.all(8),
+                                    margin: const EdgeInsets.all(8),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.black26,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.play_arrow,
+                                      color: Colors.white,
+                                      size: 36,
+                                    ),
+                                  ),
                                 ),
-                                child: const Icon(
-                                  Icons.play_arrow,
-                                  color: Colors.white,
-                                  size: 36,
+                                widget.seekDurationIndicator,
+                                const PlaybackProgress(
+                                  showBuffer: false,
                                 ),
-                              ),
+                                Stack(
+                                  children: [
+                                    SizedBox(
+                                      height: widget.frameHeight,
+                                      child: LayoutBuilder(
+                                        builder: (context, constraint) {
+                                          return ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            itemBuilder: (context, index) {
+                                              if (index == 0) {
+                                                return SizedBox(
+                                                  width:
+                                                      constraint.maxWidth / 2,
+                                                );
+                                              } else if (index ==
+                                                  framesCount - 1) {
+                                                return SizedBox(
+                                                  width:
+                                                      constraint.maxWidth / 2,
+                                                );
+                                              } else {
+                                                return Container(
+                                                  color: Colors.blue.shade100,
+                                                  width: 50,
+                                                );
+                                              }
+                                            },
+                                            itemCount: framesCount,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Container(
+                                        width: 3,
+                                        height: widget.frameHeight,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ],
                             ),
-                            widget.seekDurationIndicator,
-                          ],
+                          ),
                         ),
                       ),
                     );
                   },
-                ),
-              ),
-              ClipRRect(
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: FadeTransition(
-                    opacity: _opacityAnimation,
-                    child: Stack(
-                      children: [
-                        SizedBox(
-                          height: widget.frameHeight,
-                          child: LayoutBuilder(
-                            builder: (context, constraint) {
-                              return ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemBuilder: (context, index) {
-                                  if (index == 0) {
-                                    return SizedBox(
-                                      width: constraint.maxWidth / 2,
-                                    );
-                                  } else if (index == framesCount - 1) {
-                                    return SizedBox(
-                                      width: constraint.maxWidth / 2,
-                                    );
-                                  } else {
-                                    return Container(
-                                      color: Colors.blue.shade100,
-                                      width: 50,
-                                    );
-                                  }
-                                },
-                                itemCount: framesCount,
-                              );
-                            },
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Container(
-                            width: 3,
-                            height: widget.frameHeight,
-                            color: Colors.white,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
                 ),
               ),
             ],

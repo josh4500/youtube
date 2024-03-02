@@ -38,18 +38,18 @@ import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_signal_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_next.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_previous.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_seek_slide_frame.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
-import 'package:youtube_clone/presentation/widgets/appbar_action.dart';
-import 'package:youtube_clone/presentation/widgets/player/playback/playback_progress.dart';
+import 'package:youtube_clone/presentation/theme/device_theme.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../player/player_notifications.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';
 import 'player_fullscreen.dart';
 import 'player_minimize.dart';
+import 'player_next.dart';
 import 'player_play_pause_restart.dart';
+import 'player_previous.dart';
+import 'player_seek_slide_frame.dart';
 
 class PlayerOverlayControls extends ConsumerStatefulWidget {
   const PlayerOverlayControls({super.key});
@@ -61,7 +61,9 @@ class PlayerOverlayControls extends ConsumerStatefulWidget {
 
 class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     with TickerProviderStateMixin {
-  late final AnimationController _controlsOpacityController;
+  // Timer instance
+  Timer? _controlHideTimer;
+  late final AnimationController _controlsVisibilityController;
   late final Animation<double> _controlsAnimation;
 
   static const double slideFrameHeight = 80;
@@ -75,9 +77,10 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   ///   - Double tap
   bool _preventCommonControlGestures = false;
 
-  final _progressIsVisible = ValueNotifier<bool>(true);
+  final _showPlaybackProgress = ValueNotifier<bool>(true);
+  late final AnimationController _bufferController;
   late final AnimationController _progressController;
-  late final Animation<Color?> _progressAnimation;
+  late final Animation<double> _progressAnimation;
   late final Animation<Color?> _bufferAnimation;
 
   Duration? _lastDuration;
@@ -90,23 +93,26 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   final _showSlidingSeekDuration = ValueNotifier<bool>(false);
 
   final _showForward2XIndicator = ValueNotifier<bool>(false);
+  int _seekRate = 0;
   bool _isForwardSeek = true;
   final _showDoubleTapSeekIndicator = ValueNotifier<bool>(false);
 
-  bool get _isSlidingSeek =>
-      _showSlidingSeekIndicator.value || _showSlideFrame.value;
+  bool get _isSlidingSeek {
+    return _showSlidingSeekIndicator.value || _showSlideFrame.value;
+  }
 
   @override
   void initState() {
     super.initState();
-    _controlsOpacityController = AnimationController(
+
+    _controlsVisibilityController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 175),
       reverseDuration: const Duration(milliseconds: 100),
     );
 
     _controlsAnimation = CurvedAnimation(
-      parent: _controlsOpacityController,
+      parent: _controlsVisibilityController,
       curve: Curves.easeIn,
     );
 
@@ -116,39 +122,42 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       duration: const Duration(milliseconds: 300),
     );
 
-    _progressController = AnimationController(
+    _bufferController = AnimationController(
       vsync: this,
       value: 1,
       duration: const Duration(milliseconds: 175),
       reverseDuration: const Duration(milliseconds: 100),
     );
 
-    _progressAnimation = ColorTween(
-      begin: Colors.red,
-      end: Colors.white,
-    ).animate(_progressController);
+    _progressController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 175),
+      reverseDuration: const Duration(milliseconds: 100),
+    );
+
+    _progressAnimation = CurvedAnimation(
+      parent: _progressController,
+      curve: Curves.easeInCubic,
+      reverseCurve: Curves.easeOutCubic,
+    );
 
     _bufferAnimation = ColorTween(
-      begin: Colors.white24,
+      begin: Colors.white38,
       end: Colors.transparent,
-    ).animate(_progressController);
+    ).animate(_bufferController);
   }
-
-  // Timer instance
-  Timer? _timer;
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _controlsOpacityController.dispose();
+    _controlHideTimer?.cancel();
+    _controlsVisibilityController.dispose();
     _showSlidingSeekIndicator.dispose();
     _showDoubleTapSeekIndicator.dispose();
     _showForward2XIndicator.dispose();
     _showSlidingSeekDuration.dispose();
     _slideFrameController.dispose();
-    _progressController.dispose();
+    _bufferController.dispose();
     _showSlidingReleaseIndicator.dispose();
-    _showDoubleTapSeekIndicator.dispose();
     _slidingSeekDuration.dispose();
 
     super.dispose();
@@ -156,50 +165,75 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, childWidget) {
-        ref.listen(
-          playerSignalProvider,
-          (previous, next) async {
-            final signal = next.asData?.value;
-            if (signal == PlayerSignal.showControls) {
-              _controlsHidden = false;
-              _controlsOpacityController.forward();
+    ref.listen(
+      playerSignalProvider,
+      (previous, next) async {
+        final signal = next.asData?.value;
+        if (signal == PlayerSignal.showControls) {
+          if (context.orientation.isLandscape) {
+            _showPlaybackProgress.value = true;
+          }
+
+          _controlsHidden = false;
+          _controlsVisibilityController.forward();
+          _bufferController.reverse();
+
+          _progressController.forward();
+
+          // Cancels existing timer
+          _controlHideTimer?.cancel();
+
+          // Auto hide only when video is playing
+          _controlHideTimer = Timer(const Duration(seconds: 3), () async {
+            final isPlaying = ref.read(playerNotifierProvider).playing;
+            if (isPlaying) {
+              _controlsHidden = true;
+              // Note: Hide progress indicator first before hiding main controls
               _progressController.reverse();
 
-              _progressIsVisible.value = true;
+              // Reversing before sending signal, animates the reverse on
+              // auto hide
+              await _controlsVisibilityController.reverse();
 
-              // Cancel any existing timer
-              if (_timer != null && (_timer?.isActive ?? false)) {
-                _timer?.cancel();
+              // Hides PlaybackProgress
+              if (mounted && context.orientation.isLandscape) {
+                _showPlaybackProgress.value = false;
               }
 
-              // Auto hide only when video is playing
-              _timer = Timer(const Duration(seconds: 3), () async {
-                final isPlaying = ref.read(playerNotifierProvider).playing;
-                if (isPlaying) {
-                  // Reversing before sending signal, animates the reverse on
-                  // auto hide
-                  await _controlsOpacityController.reverse();
-                  ref
-                      .read(playerRepositoryProvider)
-                      .sendPlayerSignal(PlayerSignal.hideControls);
-                }
-              });
-            } else if (signal == PlayerSignal.hideControls) {
-              _controlsHidden = true;
-              _timer?.cancel();
-              _progressController.forward();
-              _progressIsVisible.value = false;
-              // Does not show opacity animation
-              await _controlsOpacityController.reverse(from: 0);
+              ref
+                  .read(playerRepositoryProvider)
+                  .sendPlayerSignal(PlayerSignal.hideControls);
             }
-          },
-        );
+          });
+        } else if (signal == PlayerSignal.hideControls) {
+          _controlsHidden = true;
+          _controlHideTimer?.cancel();
+          _bufferController.forward();
 
-        final playerSignal = ref.watch(playerSignalProvider);
-        return playerSignal.when(
-          data: (_) => Stack(
+          // Note: Hide progress indicator first before hiding main controls
+          _progressController.reverse();
+
+          // Reverse opacity without animation
+          // NOTE: from: 0 messes up ColorTween for the progress indicator
+          // _controlsVisibilityController is used for progress color indicator
+          await _controlsVisibilityController.reverse(from: 0);
+
+          // Hides PlaybackProgress while in landscape mode, when controls are
+          // hidden
+          if (mounted && context.orientation.isLandscape) {
+            _showPlaybackProgress.value = false;
+          }
+        } else if (signal == PlayerSignal.minimize) {
+          _showPlaybackProgress.value = false;
+        } else if (signal == PlayerSignal.maximize) {
+          _showPlaybackProgress.value = true;
+        }
+      },
+    );
+    return Column(
+      children: [
+        Expanded(
+          child: Stack(
             children: [
               Align(
                 alignment: Alignment.topCenter,
@@ -256,9 +290,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
                   child: ClipPath(
-                    clipper: SeekIndicatorClipper(
-                      forward: _isForwardSeek,
-                    ),
+                    clipper: SeekIndicatorClipper(forward: _isForwardSeek),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 32,
@@ -275,14 +307,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                           else
                             const Icon(Icons.fast_rewind),
                           const SizedBox(height: 8),
-                          Builder(
-                            builder: (context) {
-                              final seekRate =
-                                  ref.read(preferencesProvider).doubleTapSeek;
-                              return Text(
-                                '${_isForwardSeek ? '' : '-'}$seekRate seconds',
-                              );
-                            },
+                          Text(
+                            '${_isForwardSeek ? '' : '-'}$_seekRate seconds',
                           ),
                         ],
                       ),
@@ -314,9 +340,13 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                       child: Container(
                         height: 24,
                         padding: const EdgeInsets.symmetric(
-                            vertical: 4, horizontal: 16),
+                          vertical: 4,
+                          horizontal: 16,
+                        ),
                         margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 16),
+                          vertical: 8,
+                          horizontal: 16,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.black45,
                           borderRadius: BorderRadius.circular(32),
@@ -331,38 +361,68 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                   );
                 },
               ),
-              AnimatedBuilder(
-                animation: _controlsAnimation,
-                builder: (context, innerChildWidget) {
-                  return GestureDetector(
-                    onDoubleTapDown: _onDoubleTapDown,
-                    onLongPressStart: _onLongPressStart,
-                    onLongPressEnd: _onLongPressEnd,
-                    onLongPressMoveUpdate: _onLongPressMoveUpdate,
-                    child: Container(
+              GestureDetector(
+                onTap: _onTap,
+                onDoubleTapDown: _onDoubleTapDown,
+                onLongPressStart: _onLongPressStart,
+                onLongPressEnd: _onLongPressEnd,
+                onLongPressMoveUpdate: _onLongPressMoveUpdate,
+                child: AnimatedBuilder(
+                  animation: _controlsAnimation,
+                  builder: (context, childWidget) {
+                    return Container(
                       color: Colors.transparent,
                       height: double.infinity,
                       width: double.infinity,
                       child: ValueListenableBuilder(
                         valueListenable: _showSlideFrame,
-                        builder: (_, show, __) {
-                          if (show) return const SizedBox();
-                          return Opacity(
-                            opacity: _controlsAnimation.value,
-                            child: Visibility(
-                              visible: _controlsAnimation.value != 0,
-                              child: innerChildWidget!,
+                        builder: (_, showSlideFrame, __) {
+                          return Visibility(
+                            visible: _controlsAnimation.value != 0 &&
+                                !showSlideFrame,
+                            child: Opacity(
+                              opacity: _controlsAnimation.value,
+                              child: childWidget!,
                             ),
                           );
                         },
                       ),
+                    );
+                  },
+                  child: const ColoredBox(
+                    color: Colors.black26,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            PlayerMinimize(),
+                            Spacer(),
+                            PlayerAutoplaySwitch(),
+                            PlayerCastCaptionControl(),
+                            AppbarAction(icon: Icons.settings_outlined),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                PlayerPrevious(),
+                                PlayPauseRestartControl(),
+                                PlayerNext(),
+                              ],
+                            ),
+                          ],
+                        ),
+                        PlayerControlDuration(),
+                      ],
                     ),
-                  );
-                },
-                child: childWidget,
+                  ),
+                ),
               ),
               PlayerSeekSlideFrame(
-                animationController: _slideFrameController,
+                animation: _slideFrameController,
                 frameHeight: slideFrameHeight,
                 valueListenable: _showSlideFrame,
                 onClose: _onEndSlideFrameSeek,
@@ -382,107 +442,254 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
               ),
               Align(
                 alignment: Alignment.bottomLeft,
-                child: ValueListenableBuilder(
-                  valueListenable: _progressIsVisible,
-                  builder: (context, visible, childWidget) {
-                    return Consumer(
-                      builder: (context, ref, child) {
-                        final videoDuration = ref
-                            .read(playerRepositoryProvider)
-                            .currentVideoDuration;
-                        return AnimatedOpacity(
-                          opacity: visible ? 1 : 0,
-                          curve: Curves.easeIn,
-                          duration: const Duration(milliseconds: 175),
-                          child: PlaybackProgress(
-                            progress: ref
-                                .read(playerRepositoryProvider)
-                                .currentVideoProgress,
-                            end: videoDuration,
-                            animation: _progressAnimation,
-                            bufferAnimation: _bufferAnimation,
-                          ),
-                        );
-                      },
+                child: CustomOrientationBuilder(
+                  onLandscape: (context, childWidget) {
+                    return Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: childWidget,
                     );
                   },
+                  onPortrait: (context, childWidget) {
+                    return childWidget!;
+                  },
+                  child: Consumer(
+                    builder: (context, ref, child) {
+                      final videoDuration = ref
+                          .read(playerRepositoryProvider)
+                          .currentVideoDuration;
+
+                      return ValueListenableBuilder(
+                        valueListenable: _showPlaybackProgress,
+                        builder: (context, visible, childWidget) {
+                          return AnimatedOpacity(
+                            opacity: visible ? 1 : 0,
+                            curve: Curves.easeInCubic,
+                            duration: const Duration(milliseconds: 100),
+                            child: childWidget,
+                          );
+                        },
+                        child: PlaybackProgress(
+                          progress: ref
+                              .read(playerRepositoryProvider)
+                              .videoStreamProgress,
+                          start: ref
+                              .read(playerRepositoryProvider)
+                              .currentVideoProgress,
+                          end: videoDuration,
+                          animation: _progressAnimation,
+                          bufferAnimation: _bufferAnimation,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
           ),
-          error: (_, __) => const SizedBox(),
-          loading: () => const SizedBox(),
-        );
-      },
-      child: const ColoredBox(
-        color: Colors.black26,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                PlayerMinimize(),
-                Spacer(),
-                PlayerAutoplaySwitch(),
-                PlayerCastCaptionControl(),
-                AppbarAction(icon: Icons.settings_outlined),
-              ],
-            ),
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    PlayerPrevious(),
-                    PlayPauseRestartControl(),
-                    PlayerNext(),
-                  ],
-                ),
-              ],
-            ),
-            PlayerControlDuration(),
-          ],
         ),
-      ),
+        CustomOrientationBuilder(
+          onLandscape: (_, childWidget) => childWidget!,
+          onPortrait: (_, childWidget) => const SizedBox(),
+          child: GestureDetector(
+            onTap: _onTap,
+            child: AnimatedBuilder(
+              animation: _controlsAnimation,
+              builder: (context, childWidget) {
+                return ValueListenableBuilder(
+                  valueListenable: _showSlideFrame,
+                  builder: (_, showSlideFrame, __) {
+                    return Opacity(
+                      opacity: _controlsAnimation.value,
+                      child: childWidget!,
+                    );
+                  },
+                );
+              },
+              child: const ColoredBox(
+                color: Colors.black26,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(Icons.thumb_up_alt_outlined),
+                            Icon(Icons.thumb_down_alt_outlined),
+                            Icon(Icons.chat_outlined),
+                            Icon(Icons.chat_outlined),
+                            Icon(Icons.reply_outlined),
+                            Icon(Icons.more_horiz),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Spacer(),
+                            TappableArea(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        'More videos',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Tap or swipe up to see all',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(width: 8),
+                                  SizedBox(
+                                    width: 60,
+                                    height: 32,
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: Alignment.center,
+                                      children: [
+                                        Positioned(
+                                          top: -2,
+                                          child: PlayerMoreVideos(
+                                            width: 36,
+                                            height: 22,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 2,
+                                          width: 40,
+                                          child: PlayerMoreVideos(
+                                            width: 40,
+                                            height: 22,
+                                          ),
+                                        ),
+                                        PlayerMoreVideos(
+                                          height: 22,
+                                          width: 44,
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        )
+      ],
     );
   }
 
-  void _showProgressIndicator() {}
-  void _hideProgressIndicator() {}
+  void _showProgressIndicator() {
+    _progressController.value = 1;
+  }
+
+  void _hideProgressIndicator() {
+    _progressController.value = 0;
+  }
+
+  /// Toggles the visibility of player controls based on the current state.
+  void _onTap() {
+    // Check if player controls are currently visible
+    if (ref.read(playerRepositoryProvider).playerViewState.showControls) {
+      // If visible, send a signal to hide controls
+      ref
+          .read(playerRepositoryProvider)
+          .sendPlayerSignal(PlayerSignal.hideControls);
+    } else {
+      // If not visible, send a signal to show controls
+      ref
+          .read(playerRepositoryProvider)
+          .sendPlayerSignal(PlayerSignal.showControls);
+    }
+  }
+
+  Timer? _seekRateTimer;
+
+  void _resetSeekRate() {
+    _seekRateTimer = Timer(const Duration(milliseconds: 500), () {
+      _seekRate = 0;
+      _showDoubleTapSeekIndicator.value = false;
+    });
+  }
 
   Future<void> _showForwardSeek() async {
-    _controlsOpacityController.reverse(from: 0);
+    // Hide controls
+    _controlsVisibilityController.reverse(from: 0);
+
+    // Set forward direction of seek
     _isForwardSeek = true;
+
+    // Set seek rate
+    _seekRateTimer?.cancel();
+    _seekRate += ref.read(preferencesProvider).doubleTapSeek;
+
+    // Show seek rate widget
     _showDoubleTapSeekIndicator.value = true;
-    ref.read(playerRepositoryProvider).sendPlayerSignal(
-          PlayerSignal.fastForward,
-        );
-    final seekDuration = ref.read(preferencesProvider).doubleTapSeek;
-    await ref.read(playerRepositoryProvider).seek(
-          Duration(seconds: seekDuration),
-        );
-    _showDoubleTapSeekIndicator.value = false;
+
+    // Send signal for fast forward action
+    ref
+        .read(playerRepositoryProvider)
+        .sendPlayerSignal(PlayerSignal.fastForward);
+
+    // Seek player by seek rate
+    ref.read(playerRepositoryProvider).seek(Duration(seconds: _seekRate));
+
+    // Reset seek rate and hide widget
+    _resetSeekRate();
   }
 
   Future<void> _showReverseSeek() async {
-    _controlsOpacityController.reverse(from: 0);
-    _isForwardSeek = false;
-    _showDoubleTapSeekIndicator.value = true;
-    ref.read(playerRepositoryProvider).sendPlayerSignal(
-          PlayerSignal.fastForward,
-        );
+    // Hide controls
+    _controlsVisibilityController.reverse(from: 0);
 
-    final seekDuration = ref.read(preferencesProvider).doubleTapSeek;
-    await ref.read(playerRepositoryProvider).seek(
-          Duration(seconds: seekDuration),
-          reverse: true,
-        );
-    _showDoubleTapSeekIndicator.value = false;
+    // Set reverse direction of seek
+    _isForwardSeek = false;
+
+    // Set seek rate
+    _seekRateTimer?.cancel();
+    _seekRate += ref.read(preferencesProvider).doubleTapSeek;
+
+    // Show seek rate widget
+    _showDoubleTapSeekIndicator.value = true;
+
+    // Send signal for fast forward / rewind action
+    ref
+        .read(playerRepositoryProvider)
+        .sendPlayerSignal(PlayerSignal.fastForward);
+
+    // Seek player by seek rate
+    ref
+        .read(playerRepositoryProvider)
+        .seek(Duration(seconds: _seekRate), reverse: true);
+
+    // Reset seek rate and hide widget
+    _resetSeekRate();
   }
 
   void _show2xSpeed() {
     _showForward2XIndicator.value = true;
-    _controlsOpacityController.reverse(from: 0);
+    _controlsVisibilityController.reverse(from: 0);
     ref.read(playerRepositoryProvider).setSpeed();
   }
 
@@ -493,20 +700,23 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   void _showSlideSeek() {
     _showSlidingSeekIndicator.value = true;
-    _controlsOpacityController.reverse(from: 0);
+    _controlsVisibilityController.reverse(from: 0);
     _showProgressIndicator();
   }
 
   void _hideSlideSeek() {
     _showSlidingSeekIndicator.value = false;
+    _showPlaybackProgress.value = true;
+
     if (!_controlsHidden) {
       if (!ref.read(playerNotifierProvider).playing) {
-        _controlsOpacityController.forward();
+        _controlsVisibilityController.forward();
       } else {
         _controlsHidden = true;
       }
+      _hideProgressIndicator();
     }
-    _hideProgressIndicator();
+
     if (_slidingSeekDuration.value != null) {
       ref.read(playerRepositoryProvider).seekTo(_slidingSeekDuration.value!);
     }
@@ -522,6 +732,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   void _onEndSlideFrameSeek() {
     _hideSlideSeek();
     _preventCommonControlGestures = false;
+    // Show progress indicator
+    _showPlaybackProgress.value = true;
     SlideSeekEndPlayerNotification().dispatch(context);
   }
 
@@ -601,17 +813,18 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       Forward2xSpeedEndPlayerNotification().dispatch(context);
       _hide2xSpeed();
     } else {
+      // When slide frame is not active and slide seek is available
       if (!_showSlideFrame.value) {
         SlideSeekEndPlayerNotification().dispatch(context);
         _hideSlideSeek();
-      }
-
-      if (_slideFrameController.value < 0.7) {
-        _showSlideFrame.value = false;
-        _slideFrameController.value = 0;
-        _hideSlideSeek();
       } else {
-        _slideFrameController.value = 1;
+        if (_slideFrameController.value < 0.7) {
+          _showSlideFrame.value = false;
+          _slideFrameController.value = 0;
+          _hideSlideSeek();
+        } else {
+          _slideFrameController.value = 1;
+        }
       }
     }
   }
@@ -672,6 +885,9 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       if (!_showSlideFrame.value) {
         _showSlidingSeekDuration.value = true;
         _slidingSeekDuration.value = newDuration;
+
+        // Hide progress indicator
+        _showPlaybackProgress.value = false;
       }
 
       if (localY < (_longPressYPosition - 10)) {
@@ -688,6 +904,30 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
         );
       }
     }
+  }
+}
+
+class PlayerMoreVideos extends StatelessWidget {
+  final double width;
+  final double height;
+
+  const PlayerMoreVideos({
+    super.key,
+    this.width = 54,
+    this.height = 28,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.grey,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: Colors.white, width: 1),
+      ),
+    );
   }
 }
 
@@ -712,8 +952,19 @@ class _PlayerControlDurationState extends ConsumerState<PlayerControlDuration> {
 
     return GestureDetector(
       onTap: () => setState(() => reversed = !reversed),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
+      child: CustomOrientationBuilder(
+        onLandscape: (context, childWidget) {
+          return Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: childWidget,
+          );
+        },
+        onPortrait: (context, childWidget) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: childWidget,
+          );
+        },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
