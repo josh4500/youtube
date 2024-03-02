@@ -31,6 +31,7 @@ import 'package:flutter/material.dart';
 class PlayerControl extends StatefulWidget {
   final VoidCallback onTap;
   final bool enabled;
+  final double verticalPadding;
   final double horizontalPadding;
   final Color color;
   final Widget Function(BuildContext context, Animation animation) builder;
@@ -39,6 +40,7 @@ class PlayerControl extends StatefulWidget {
     super.key,
     this.enabled = true,
     this.color = Colors.black26,
+    this.verticalPadding = 0,
     this.horizontalPadding = 16,
     required this.onTap,
     required this.builder,
@@ -90,8 +92,11 @@ class PlayerControlState extends State<PlayerControl>
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: widget.horizontalPadding),
+    return Container(
+      margin: EdgeInsets.symmetric(
+        vertical: widget.verticalPadding,
+        horizontal: widget.horizontalPadding,
+      ),
       child: GestureDetector(
         onTap: widget.enabled ? widget.onTap : null,
         onTapDown: (_) => widget.enabled ? _bgController.forward() : null,
