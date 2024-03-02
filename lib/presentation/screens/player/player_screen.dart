@@ -40,6 +40,7 @@ import 'package:youtube_clone/presentation/screens/player/widgets/player/player_
 import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/persistent_header_delegate.dart';
 
+import '../../view_models/playback/player_sizing.dart';
 import 'widgets/player/mini_player.dart';
 import 'widgets/player/player.dart';
 import 'widgets/video_actions.dart';
@@ -321,11 +322,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Handles tap events on the player.
   Future<void> _onTapPlayer() async {
-    // If the player is fully expanded, show controls
-    if (heightNotifier.value == 1) {
-      _toggleControls();
-    }
-
     // Maximizes player
     if (widthNotifier.value != 1 && heightNotifier.value != 1) {
       // Set height and width to maximum
