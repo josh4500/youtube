@@ -126,11 +126,13 @@ class _HomePageState extends ConsumerState<HomePage>
                 },
                 child: Align(
                   alignment: Alignment.bottomCenter,
-                  child: LayoutBuilder(builder: (context, c) {
-                    return PlayerScreen(
-                      height: c.maxHeight,
-                    );
-                  }),
+                  child: LayoutBuilder(
+                    builder: (context, c) {
+                      return PlayerScreen(
+                        height: c.maxHeight,
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
