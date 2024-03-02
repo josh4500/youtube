@@ -44,12 +44,14 @@ import 'package:youtube_clone/presentation/widgets.dart';
 import '../player/player_notifications.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';
+import 'player_duration_control.dart';
 import 'player_fullscreen.dart';
 import 'player_minimize.dart';
 import 'player_next.dart';
 import 'player_play_pause_restart.dart';
 import 'player_previous.dart';
 import 'player_seek_slide_frame.dart';
+import 'seek_indicator.dart';
 
 class PlayerOverlayControls extends ConsumerStatefulWidget {
   const PlayerOverlayControls({super.key});
@@ -77,14 +79,35 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   ///   - Double tap
   bool _preventCommonControlGestures = false;
 
+  /// Flag to track whether the long press has started
+  bool _startedOnLongPress = false;
+
+  /// Y position of user pointer when long press action starts
+  double _longPressYPosition = 0;
+
+  /// Timer used for hiding `Release` message while slide seeking.
+  Timer? _releaseTimer;
+
+  /// Notifier for showing/hiding playback progress
   final _showPlaybackProgress = ValueNotifier<bool>(true);
+
+  /// Animation controllers and animations for buffering and progress
   late final AnimationController _bufferController;
   late final AnimationController _progressController;
   late final Animation<double> _progressAnimation;
   late final Animation<Color?> _bufferAnimation;
 
+  /// Latest duration of the playback
   Duration? _lastDuration;
+
+  /// Upper bound value for sliding seek duration.
+  ///
+  /// Sends a vibration when user slides over this value
   Duration? _upperboundSlideDuration;
+
+  /// Upper bound value for sliding seek duration
+  ///
+  /// Sends a vibration when user slides over this value
   Duration? _lowerboundSlideDuration;
 
   final _showSlidingSeekIndicator = ValueNotifier<bool>(false);
@@ -92,11 +115,19 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   final _slidingSeekDuration = ValueNotifier<Duration?>(null);
   final _showSlidingSeekDuration = ValueNotifier<bool>(false);
 
+  /// Notifiers and variables for forward seeking at 2x speed
   final _showForward2XIndicator = ValueNotifier<bool>(false);
+
+  /// Rate of seeking on double tap
   int _seekRate = 0;
+
+  /// Whether direction for seeking is forward.
   bool _isForwardSeek = true;
+
+  /// Notifier for showing double tap seek indicator
   final _showDoubleTapSeekIndicator = ValueNotifier<bool>(false);
 
+  /// Whether sliding seek is active
   bool get _isSlidingSeek {
     return _showSlidingSeekIndicator.value || _showSlideFrame.value;
   }
@@ -415,7 +446,13 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                             ),
                           ],
                         ),
-                        PlayerControlDuration(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            PlayerDurationControl(),
+                            PlayerFullscreen(),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -687,27 +724,33 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _resetSeekRate();
   }
 
+  // Method to show the 2x speed indicator and update player speed
   void _show2xSpeed() {
     _showForward2XIndicator.value = true;
     _controlsVisibilityController.reverse(from: 0);
-    ref.read(playerRepositoryProvider).setSpeed();
+    ref.read(playerRepositoryProvider).setSpeed(); // Update player speed
   }
 
+  /// Hide the 2x speed indicator and reset player speed to normal (1x)
   void _hide2xSpeed() {
     _showForward2XIndicator.value = false;
+    // Reset player speed to normal (1x)
     ref.read(playerRepositoryProvider).setSpeed(1.0);
   }
 
+  /// Shows  sliding seek indicator and initiate necessary actions
   void _showSlideSeek() {
     _showSlidingSeekIndicator.value = true;
     _controlsVisibilityController.reverse(from: 0);
     _showProgressIndicator();
   }
 
+  /// Hides the sliding seek indicator and perform related cleanup actions
   void _hideSlideSeek() {
     _showSlidingSeekIndicator.value = false;
     _showPlaybackProgress.value = true;
 
+    // If controls are not hidden, manage control visibility and progress indicator
     if (!_controlsHidden) {
       if (!ref.read(playerNotifierProvider).playing) {
         _controlsVisibilityController.forward();
@@ -717,13 +760,16 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       _hideProgressIndicator();
     }
 
+    // If a sliding seek duration is set, perform seek operation to that duration
     if (_slidingSeekDuration.value != null) {
       ref.read(playerRepositoryProvider).seekTo(_slidingSeekDuration.value!);
     }
+
+    // Reset sliding seek-related values and indicators
     _slidingSeekDuration.value = null;
     _showSlidingSeekDuration.value = false;
 
-    // Reset  values
+    // Reset duration variables for slide seeking
     _lastDuration = null;
     _upperboundSlideDuration = null;
     _lowerboundSlideDuration = null;
@@ -752,10 +798,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       _showReverseSeek();
     }
   }
-
-  bool _startedOnLongPress = false;
-  double _longPressYPosition = 0;
-  Timer? _releaseTimer;
 
   void _showReleaseIndicator() {
     _showSlidingReleaseIndicator.value = true;
@@ -929,139 +971,4 @@ class PlayerMoreVideos extends StatelessWidget {
       ),
     );
   }
-}
-
-class PlayerControlDuration extends ConsumerStatefulWidget {
-  const PlayerControlDuration({super.key});
-
-  @override
-  ConsumerState<PlayerControlDuration> createState() =>
-      _PlayerControlDurationState();
-}
-
-class _PlayerControlDurationState extends ConsumerState<PlayerControlDuration> {
-  bool reversed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final videoDuration =
-        ref.read(playerRepositoryProvider).currentVideoDuration;
-    final videoPosition =
-        ref.read(playerRepositoryProvider).currentVideoPosition;
-    final positionStream = ref.read(playerRepositoryProvider).positionStream;
-
-    return GestureDetector(
-      onTap: () => setState(() => reversed = !reversed),
-      child: CustomOrientationBuilder(
-        onLandscape: (context, childWidget) {
-          return Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: childWidget,
-          );
-        },
-        onPortrait: (context, childWidget) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: childWidget,
-          );
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                StreamBuilder<Duration>(
-                  stream: positionStream,
-                  initialData: videoPosition,
-                  builder: (context, snapshot) {
-                    final position = reversed
-                        ? videoDuration - (snapshot.data ?? Duration.zero)
-                        : snapshot.data ?? Duration.zero;
-                    return Text(reversed
-                        ? '-${position.hoursMinutesSeconds}'
-                        : position.hoursMinutesSeconds);
-                  },
-                ),
-                const Text(
-                  ' / ',
-                  style: TextStyle(
-                    color: Colors.white60,
-                  ),
-                ),
-                Text(
-                  videoDuration.hoursMinutesSeconds,
-                  style: const TextStyle(
-                    color: Colors.white60,
-                  ),
-                ),
-              ],
-            ),
-            const PlayerFullscreen(),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SeekIndicator extends StatelessWidget {
-  final ValueListenable<bool> valueListenable;
-  final Widget child;
-
-  const SeekIndicator({
-    super.key,
-    required this.valueListenable,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: valueListenable,
-      builder: (context, value, childWidget) {
-        return AnimatedOpacity(
-          duration: const Duration(milliseconds: 175),
-          opacity: value ? 1 : 0,
-          child: childWidget,
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        decoration: BoxDecoration(
-          color: Colors.black45,
-          borderRadius: BorderRadius.circular(32),
-        ),
-        child: child,
-      ),
-    );
-  }
-}
-
-class SeekIndicatorClipper extends CustomClipper<Path> {
-  final bool forward;
-
-  SeekIndicatorClipper({super.reclip, this.forward = true});
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-
-    if (forward) {
-      path.moveTo(size.width, 0);
-      path.lineTo(size.width, size.height);
-      path.lineTo(size.width * .2, size.height);
-      path.quadraticBezierTo(0, size.height * .5, size.width * .2, 0);
-    } else {
-      path.moveTo(0, 0);
-      path.lineTo(0, size.height);
-      path.lineTo(size.width * .8, size.height);
-      path.quadraticBezierTo(size.width, size.height * .5, size.width * .8, 0);
-    }
-
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper oldClipper) => true;
 }
