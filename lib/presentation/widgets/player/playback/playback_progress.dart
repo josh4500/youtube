@@ -28,31 +28,21 @@
 
 import 'package:flutter/material.dart';
 
-final class Progress {
-  final Duration buffer;
-  final Duration position;
+import '../../../../core/progress.dart';
 
-  const Progress({required this.buffer, required this.position});
-
-  static const Progress zero = Progress(
-    buffer: Duration.zero,
-    position: Duration.zero,
-  );
-}
-
-class PlaybackProgress extends StatelessWidget {
+class PlaybackProgress extends StatefulWidget {
   final Color? color;
-  final Animation<Color?>? animation;
+  final Animation<double?>? animation;
   final Animation<Color?>? bufferAnimation;
   final Color? backgroundColor;
   final Stream<Progress>? progress;
-  final Progress start;
-  final Duration end;
+  final Progress? start;
+  final Duration? end;
   final bool showBuffer;
 
   const PlaybackProgress({
     super.key,
-    this.color,
+    this.color = Colors.red,
     this.animation,
     this.bufferAnimation,
     this.progress,
@@ -63,39 +53,111 @@ class PlaybackProgress extends StatelessWidget {
   });
 
   @override
+  State<PlaybackProgress> createState() => _PlaybackProgressState();
+}
+
+class _PlaybackProgressState extends State<PlaybackProgress> {
+  Animation<double>? thumbAnimation;
+  Animation<Color?>? progressAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.animation != null) {
+      thumbAnimation = widget.animation!.drive(
+        Tween<double>(begin: 0, end: 8),
+      );
+      progressAnimation = widget.animation!.drive(
+        ColorTween(begin: Colors.white, end: Colors.red),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder<Progress>(
-      stream: progress,
-      initialData: start,
+      stream: widget.progress,
+      initialData: widget.start,
       builder: (context, snapshot) {
         final data = snapshot.data ?? Progress.zero;
-        final currentValue = data.position.inSeconds / end.inSeconds;
-        final bufferValue = data.buffer.inSeconds / end.inSeconds;
+        final positionValue =
+            data.position.inSeconds / (widget.end?.inSeconds ?? 0);
+        final bufferValue =
+            data.buffer.inSeconds / (widget.end?.inSeconds ?? 0);
 
-        return Stack(
-          children: [
-            if (showBuffer)
-              LinearProgressIndicator(
-                color: Colors.white24,
-                value: bufferValue.isNaN || bufferValue.isInfinite
-                    ? 0
-                    : bufferValue,
-                minHeight: 2,
-                valueColor: bufferAnimation,
-                backgroundColor: Colors.transparent,
+        return LayoutBuilder(
+          builder: (context, constraint) {
+            return GestureDetector(
+              onTapDown: (details) => _onTapDown(details, constraint.maxWidth),
+              onHorizontalDragStart: (details) =>
+                  _onHorizontalDragStart(details, constraint.maxWidth),
+              onHorizontalDragUpdate: (details) =>
+                  _onHorizontalDragUpdate(details, constraint.maxWidth),
+              onHorizontalDragEnd: (details) =>
+                  _onHorizontalDragEnd(details, constraint.maxWidth),
+              child: SizedBox(
+                height: 7,
+                child: Stack(
+                  alignment: Alignment.bottomLeft,
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Buffering Progress indicator
+                    if (widget.showBuffer)
+                      LinearProgressIndicator(
+                        color: Colors.white24,
+                        value: bufferValue.isNaN || bufferValue.isInfinite
+                            ? 0
+                            : bufferValue,
+                        minHeight: 2,
+                        valueColor: widget.bufferAnimation,
+                        backgroundColor: Colors.transparent,
+                      ),
+                    // Player position Indicator
+                    LinearProgressIndicator(
+                      color: widget.color,
+                      value: positionValue.isNaN || positionValue.isInfinite
+                          ? 0
+                          : positionValue,
+                      minHeight: 2,
+                      valueColor: progressAnimation,
+                      backgroundColor:
+                          widget.backgroundColor ?? Colors.transparent,
+                    ),
+
+                    // Thumb
+                    if (thumbAnimation != null)
+                      Positioned(
+                        bottom: -3,
+                        left: (positionValue * constraint.maxWidth) - 4,
+                        child: AnimatedBuilder(
+                          animation: thumbAnimation!,
+                          builder: (context, _) {
+                            return Container(
+                              width: thumbAnimation!.value,
+                              height: thumbAnimation!.value,
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            LinearProgressIndicator(
-              color: color ?? Colors.red,
-              value: currentValue.isNaN || currentValue.isInfinite
-                  ? 0
-                  : currentValue,
-              minHeight: 2,
-              valueColor: animation,
-              backgroundColor: backgroundColor ?? Colors.transparent,
-            ),
-          ],
+            );
+          },
         );
       },
     );
   }
+
+  void _onTapDown(TapDownDetails details, double width) {}
+
+  void _onHorizontalDragStart(DragStartDetails details, double width) {}
+
+  void _onHorizontalDragUpdate(DragUpdateDetails details, double width) {}
+
+  void _onHorizontalDragEnd(DragEndDetails details, double width) {}
 }
