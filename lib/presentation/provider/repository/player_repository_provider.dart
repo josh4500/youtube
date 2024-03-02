@@ -31,10 +31,10 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:youtube_clone/core/progress.dart';
 import 'package:youtube_clone/core/utils/progress.dart';
 import 'package:youtube_clone/infrastructure/services/cache/in_memory_cache.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
-import 'package:youtube_clone/presentation/widgets.dart';
 
 final _playerOverlayStateProvider = StateProvider<bool>((ref) => false);
 
@@ -77,15 +77,16 @@ enum PlayerSignal {
 class PlayerRepository {
   final Ref _ref;
 
-  final _positionMemory = InMemoryCache<Duration>('PositionMemory');
+  final _positionMemory = InMemoryCache<Progress>('PositionMemory');
 
   late final _videoPlayer = Player();
   late final _videoController = VideoController(_videoPlayer);
   VideoController get videoController => _videoController;
 
-  Stream<Progress> get currentVideoProgress => _videoPlayer.stream.progress;
+  Stream<Progress> get videoStreamProgress => _videoPlayer.stream.progress;
   Duration get currentVideoDuration => _videoPlayer.state.duration;
   Duration get currentVideoPosition => _videoPlayer.state.position;
+  Progress? get currentVideoProgress => _positionMemory.read('video');
   Stream<Duration> get positionStream => _videoPlayer.stream.position;
 
   late final _shortsPlayer = Player();
@@ -126,8 +127,8 @@ class PlayerRepository {
       }
     });
 
-    _videoPlayer.stream.position.listen((position) {
-      _positionMemory.write('video', position);
+    _videoPlayer.stream.progress.listen((progress) {
+      _positionMemory.write('video', progress);
     });
   }
 
@@ -150,6 +151,11 @@ class PlayerRepository {
 
   Future<void> seekTo(Duration position) async {
     await _videoPlayer.seek(position);
+    if (position < currentVideoDuration) {
+      _ref.read(playerNotifierProvider.notifier).restart(
+            _ref.read(playerNotifierProvider).playing,
+          );
+    }
   }
 
   Future<void> setSpeed([double rate = 2]) async {

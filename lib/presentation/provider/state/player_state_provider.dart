@@ -76,8 +76,8 @@ class PlayerNotifier extends _$PlayerNotifier {
     state = state.copyWith(buffering: false);
   }
 
-  void restart() {
-    state = state.copyWith(ended: false, playing: true);
+  void restart([bool playing = true]) {
+    state = state.copyWith(ended: false, playing: playing);
   }
 
   void reset() {
