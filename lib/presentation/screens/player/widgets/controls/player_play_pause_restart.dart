@@ -80,10 +80,10 @@ class PlayPauseRestartControlState
     final playerNotifier = ref.watch(playerNotifierProvider);
     final isPlaying = playerNotifier.playing;
     final isRestart = playerNotifier.ended;
-    final isBuffering = playerNotifier.loading;
+    final isBuffering = playerNotifier.buffering;
 
     return PlayerControl(
-      horizontalPadding: 32,
+      horizontalPadding: 64,
       onTap: () {
         if (!isRestart) {
           if (isPlaying) {
