@@ -67,9 +67,8 @@ class _PlayerLoadingIndicatorState extends ConsumerState<PlayerLoadingIndicator>
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(
-      playerNotifierProvider.select((value) => value.loading),
-    );
+    final playerNotifier = ref.watch(playerNotifierProvider);
+    final isLoading = playerNotifier.loading || playerNotifier.buffering;
 
     if (!isLoading) {
       return const SizedBox();
