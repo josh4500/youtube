@@ -31,12 +31,16 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/router/app_router.dart';
+import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets/appbar_action.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/dynamic_tab.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 import 'package:youtube_clone/presentation/widgets/viewable/viewable_video_content.dart';
+
+import '../../router/app_routes.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -215,7 +219,10 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Consumer(
                 builder: (context, ref, _) {
                   return ViewableVideoContent(
-                    onTap: () {
+                    onTap: () async {
+                      if (context.orientation.isLandscape) {
+                        await context.goto(AppRoutes.playerLandscapeScreen);
+                      }
                       ref.read(playerRepositoryProvider).openPlayerScreen();
                     },
                   );
