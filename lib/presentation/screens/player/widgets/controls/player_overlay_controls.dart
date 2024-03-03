@@ -46,6 +46,7 @@ import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';
 import 'player_duration_control.dart';
 import 'player_fullscreen.dart';
+import 'player_loading.dart';
 import 'player_minimize.dart';
 import 'player_next.dart';
 import 'player_play_pause_restart.dart';
@@ -434,16 +435,18 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                             AppbarAction(icon: Icons.settings_outlined),
                           ],
                         ),
-                        Column(
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                            PlayerPrevious(),
+                            Stack(
                               children: [
-                                PlayerPrevious(),
+                                PlayerLoadingIndicator(),
                                 PlayPauseRestartControl(),
-                                PlayerNext(),
                               ],
                             ),
+                            PlayerNext(),
                           ],
                         ),
                         Row(

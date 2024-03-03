@@ -290,7 +290,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   // Opens the player in fullscreen mode by sending a player signal to the repository.
   void _openFullscreenPlayer() {
-    _hideControls();
     ref.read(playerRepositoryProvider).sendPlayerSignal(
           PlayerSignal.enterFullscreen,
         );

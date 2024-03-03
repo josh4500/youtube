@@ -33,6 +33,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
+import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 import 'package:youtube_clone/presentation/widgets/custom_scroll_physics.dart';
 
 import '../../providers.dart';
@@ -92,6 +93,15 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
 
     Future(() async {
       await setLandscapeMode();
+      if (!ref.read(playerNotifierProvider).playing) {
+        ref
+            .read(playerRepositoryProvider)
+            .sendPlayerSignal(PlayerSignal.showControls);
+      } else {
+        ref
+            .read(playerRepositoryProvider)
+            .sendPlayerSignal(PlayerSignal.hideControls);
+      }
     });
   }
 
@@ -169,7 +179,6 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
 
   /// Closes the player in fullscreen mode by sending a player signal
   Future<void> _closeFullscreenPlayer() async {
-    _hideControls();
     ref.read(playerRepositoryProvider).sendPlayerSignal(
           PlayerSignal.exitFullscreen,
         );

@@ -57,7 +57,6 @@ class PlayerComponentsWrapper extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           child,
-          const PlayerLoadingIndicator(),
           const Positioned.fill(
             child: PlayerOverlayControls(),
           ),
