@@ -55,8 +55,8 @@ class PlayerFullscreen extends ConsumerWidget {
             DeExpandPlayerNotification().dispatch(context);
           }
           ref.read(playerRepositoryProvider).sendPlayerSignal(
-                PlayerSignal.showControls,
-              );
+            [PlayerSignal.showControls],
+          );
         } else {
           if (!ref
               .read(playerRepositoryProvider)
@@ -69,7 +69,7 @@ class PlayerFullscreen extends ConsumerWidget {
         }
       },
       color: Colors.transparent,
-      horizontalPadding: 0,
+      horizontalPadding: 8,
       builder: (context, _) {
         return const Icon(Icons.fullscreen);
       },

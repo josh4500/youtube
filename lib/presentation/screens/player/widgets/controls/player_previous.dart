@@ -40,8 +40,8 @@ class PlayerPrevious extends ConsumerWidget {
     return PlayerControl(
       onTap: () {
         ref.read(playerRepositoryProvider).sendPlayerSignal(
-              PlayerSignal.showControls,
-            );
+          [PlayerSignal.showControls],
+        );
       },
       enabled: false,
       builder: (context, _) {

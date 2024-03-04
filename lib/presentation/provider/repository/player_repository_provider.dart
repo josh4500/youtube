@@ -31,10 +31,13 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:youtube_clone/core/progress.dart';
 import 'package:youtube_clone/core/utils/progress.dart';
 import 'package:youtube_clone/infrastructure/services/cache/in_memory_cache.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
+
+part 'player_repository_provider.g.dart';
 
 final _playerOverlayStateProvider = StateProvider<bool>((ref) => false);
 
@@ -43,6 +46,11 @@ final playerOverlayStateProvider = Provider(
     return ref.watch(_playerOverlayStateProvider);
   },
 );
+
+@Riverpod(keepAlive: true)
+PlayerRepository playerRepository(PlayerRepositoryRef ref) {
+  return PlayerRepository(ref: ref);
+}
 
 enum PlayerViewState {
   expanded,
@@ -71,7 +79,9 @@ enum PlayerSignal {
   maximize,
   enterExpanded,
   exitExpanded,
-  fastForward;
+  fastForward,
+  hidePlaybackProgress,
+  showPlaybackProgress;
 }
 
 class PlayerRepository {
@@ -103,7 +113,7 @@ class PlayerRepository {
     _videoPlayer.stream.completed.listen((hasEnded) {
       if (hasEnded) {
         if (!_playerViewState.isMinimized) {
-          sendPlayerSignal(PlayerSignal.showControls);
+          sendPlayerSignal([PlayerSignal.showControls]);
         }
 
         _ref.read(playerNotifierProvider.notifier).end();
@@ -163,11 +173,11 @@ class PlayerRepository {
   }
 
   void minimize() {
-    sendPlayerSignal(PlayerSignal.minimize);
+    sendPlayerSignal([PlayerSignal.minimize]);
   }
 
   void minimizeAndPauseVideo() {
-    sendPlayerSignal(PlayerSignal.minimize);
+    sendPlayerSignal([PlayerSignal.minimize]);
     _ref.read(playerNotifierProvider.notifier).pause();
   }
 
@@ -195,34 +205,37 @@ class PlayerRepository {
     await _videoPlayer.play();
   }
 
-  void sendPlayerSignal(PlayerSignal signal) {
-    switch (signal) {
-      case PlayerSignal.minimize:
-        _playerViewState.add(PlayerViewState.minimized);
-      case PlayerSignal.maximize:
-        _playerViewState.remove(PlayerViewState.minimized);
-      case PlayerSignal.enterExpanded:
-        _playerViewState.add(PlayerViewState.expanded);
-      case PlayerSignal.exitExpanded:
-        _playerViewState.remove(PlayerViewState.expanded);
-      case PlayerSignal.enterFullscreen:
-        _playerViewState.add(PlayerViewState.fullscreen);
-      case PlayerSignal.exitFullscreen:
-        _playerViewState.remove(PlayerViewState.fullscreen);
-      case PlayerSignal.showControls:
-        _playerViewState.add(PlayerViewState.visibleControls);
-      case PlayerSignal.hideControls:
-        _playerViewState.remove(PlayerViewState.visibleControls);
-      case PlayerSignal.showAmbient:
-        _playerViewState.add(PlayerViewState.visibleAmbient);
-      case PlayerSignal.hideAmbient:
-        _playerViewState.remove(PlayerViewState.visibleAmbient);
-      case PlayerSignal.fastForward:
-        break;
+  void sendPlayerSignal(List<PlayerSignal> signals) {
+    for (final signal in signals) {
+      switch (signal) {
+        case PlayerSignal.minimize:
+          _playerViewState.add(PlayerViewState.minimized);
+        case PlayerSignal.maximize:
+          _playerViewState.remove(PlayerViewState.minimized);
+        case PlayerSignal.enterExpanded:
+          _playerViewState.add(PlayerViewState.expanded);
+        case PlayerSignal.exitExpanded:
+          _playerViewState.remove(PlayerViewState.expanded);
+        case PlayerSignal.enterFullscreen:
+          _playerViewState.add(PlayerViewState.fullscreen);
+        case PlayerSignal.exitFullscreen:
+          _playerViewState.remove(PlayerViewState.fullscreen);
+        case PlayerSignal.showControls:
+          _playerViewState.add(PlayerViewState.visibleControls);
+        case PlayerSignal.hideControls:
+          _playerViewState.remove(PlayerViewState.visibleControls);
+        case PlayerSignal.showAmbient:
+          _playerViewState.add(PlayerViewState.visibleAmbient);
+        case PlayerSignal.hideAmbient:
+          _playerViewState.remove(PlayerViewState.visibleAmbient);
+        case PlayerSignal.fastForward:
+          break;
+        case PlayerSignal.hidePlaybackProgress:
+          break;
+        case PlayerSignal.showPlaybackProgress:
+          break;
+      }
+      _playerSignalController.sink.add(signal);
     }
-
-    _playerSignalController.sink.add(signal);
   }
 }
-
-final playerRepositoryProvider = Provider((ref) => PlayerRepository(ref: ref));

@@ -39,8 +39,8 @@ class PlayerNext extends ConsumerWidget {
     return PlayerControl(
       onTap: () {
         ref.read(playerRepositoryProvider).sendPlayerSignal(
-              PlayerSignal.showControls,
-            );
+          [PlayerSignal.showControls],
+        );
       },
       builder: (context, _) {
         return const Padding(

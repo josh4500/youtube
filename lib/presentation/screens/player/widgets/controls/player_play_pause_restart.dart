@@ -83,7 +83,7 @@ class PlayPauseRestartControlState
     final isBuffering = playerNotifier.buffering;
 
     return PlayerControl(
-      horizontalPadding: 64,
+      horizontalPadding: 54,
       onTap: () {
         if (!isRestart) {
           if (isPlaying) {
@@ -96,8 +96,8 @@ class PlayPauseRestartControlState
         }
 
         ref.read(playerRepositoryProvider).sendPlayerSignal(
-              PlayerSignal.showControls,
-            );
+          [PlayerSignal.showControls],
+        );
       },
       builder: (context, _) {
         if (isBuffering) return const SizedBox(width: 54);

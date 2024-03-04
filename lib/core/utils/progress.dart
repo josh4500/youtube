@@ -10,6 +10,6 @@ extension ProgressStreamExtension on PlayerStream {
         buffer: a,
         position: b,
       );
-    });
+    }).asBroadcastStream();
   }
 }

@@ -70,8 +70,6 @@ class _YourVideosScreenState extends State<YourVideosScreen>
 
   @override
   Widget build(BuildContext context) {
-    print(38 / MediaQuery.devicePixelRatioOf(context));
-    print(MediaQuery.devicePixelRatioOf(context));
     return Scaffold(
       appBar: AppBar(
         title: AnimatedBuilder(

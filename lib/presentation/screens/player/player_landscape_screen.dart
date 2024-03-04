@@ -93,15 +93,6 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
 
     Future(() async {
       await setLandscapeMode();
-      if (!ref.read(playerNotifierProvider).playing) {
-        ref
-            .read(playerRepositoryProvider)
-            .sendPlayerSignal(PlayerSignal.showControls);
-      } else {
-        ref
-            .read(playerRepositoryProvider)
-            .sendPlayerSignal(PlayerSignal.hideControls);
-      }
     });
   }
 
@@ -119,12 +110,12 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
       // If visible, send a signal to hide controls
       ref
           .read(playerRepositoryProvider)
-          .sendPlayerSignal(PlayerSignal.hideControls);
+          .sendPlayerSignal([PlayerSignal.hideControls]);
     } else {
       // If not visible, send a signal to show controls
       ref
           .read(playerRepositoryProvider)
-          .sendPlayerSignal(PlayerSignal.showControls);
+          .sendPlayerSignal([PlayerSignal.showControls]);
     }
   }
 
@@ -174,14 +165,14 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
   void _hideControls() {
     ref
         .read(playerRepositoryProvider)
-        .sendPlayerSignal(PlayerSignal.hideControls);
+        .sendPlayerSignal([PlayerSignal.hideControls]);
   }
 
   /// Closes the player in fullscreen mode by sending a player signal
   Future<void> _closeFullscreenPlayer() async {
     ref.read(playerRepositoryProvider).sendPlayerSignal(
-          PlayerSignal.exitFullscreen,
-        );
+      [PlayerSignal.exitFullscreen],
+    );
     await resetOrientation();
     if (mounted) {
       context.pop();

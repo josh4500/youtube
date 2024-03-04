@@ -36,6 +36,7 @@ import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/provider/state/player_expanded_state_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_signal_provider.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
@@ -177,6 +178,17 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       begin: Colors.white38,
       end: Colors.transparent,
     ).animate(_bufferController);
+
+    Future(() {
+      if (!ref.read(playerNotifierProvider).playing) {
+        _controlsHidden = false;
+        _controlsVisibilityController.value = 1;
+      } else {
+        _controlsHidden = true;
+        _controlsVisibilityController.value = 0;
+        _showPlaybackProgress.value = false;
+      }
+    });
   }
 
   @override
@@ -202,7 +214,9 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       (previous, next) async {
         final signal = next.asData?.value;
         if (signal == PlayerSignal.showControls) {
-          if (context.orientation.isLandscape) {
+          final isExpanded =
+              ref.read(playerRepositoryProvider).playerViewState.isExpanded;
+          if (context.orientation.isLandscape || isExpanded) {
             _showPlaybackProgress.value = true;
           }
 
@@ -226,15 +240,16 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
               // Reversing before sending signal, animates the reverse on
               // auto hide
               await _controlsVisibilityController.reverse();
-
+              final isExpanded =
+                  ref.read(playerRepositoryProvider).playerViewState.isExpanded;
               // Hides PlaybackProgress
-              if (mounted && context.orientation.isLandscape) {
+              if (mounted && context.orientation.isLandscape || isExpanded) {
                 _showPlaybackProgress.value = false;
               }
 
               ref
                   .read(playerRepositoryProvider)
-                  .sendPlayerSignal(PlayerSignal.hideControls);
+                  .sendPlayerSignal([PlayerSignal.hideControls]);
             }
           });
         } else if (signal == PlayerSignal.hideControls) {
@@ -250,15 +265,21 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
           // _controlsVisibilityController is used for progress color indicator
           await _controlsVisibilityController.reverse(from: 0);
 
+          final isExpanded =
+              ref.read(playerRepositoryProvider).playerViewState.isExpanded;
           // Hides PlaybackProgress while in landscape mode, when controls are
           // hidden
-          if (mounted && context.orientation.isLandscape) {
+          if (mounted && context.orientation.isLandscape || isExpanded) {
             _showPlaybackProgress.value = false;
           }
-        } else if (signal == PlayerSignal.minimize) {
+        } else if (signal == PlayerSignal.hidePlaybackProgress) {
           _showPlaybackProgress.value = false;
-        } else if (signal == PlayerSignal.maximize) {
+        } else if (signal == PlayerSignal.showPlaybackProgress) {
           _showPlaybackProgress.value = true;
+        } else if (signal == PlayerSignal.minimize) {
+          _preventCommonControlGestures = true;
+        } else if (signal == PlayerSignal.maximize) {
+          _preventCommonControlGestures = false;
         }
       },
     );
@@ -394,7 +415,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                 },
               ),
               GestureDetector(
-                onTap: _onTap,
+                // onTap: _onTap,
                 onDoubleTapDown: _onDoubleTapDown,
                 onLongPressStart: _onLongPressStart,
                 onLongPressEnd: _onLongPressEnd,
@@ -421,62 +442,78 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                       ),
                     );
                   },
-                  child: const ColoredBox(
+                  child: ColoredBox(
                     color: Colors.black26,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            PlayerMinimize(),
-                            Spacer(),
-                            PlayerAutoplaySwitch(),
-                            PlayerCastCaptionControl(),
-                            AppbarAction(icon: Icons.settings_outlined),
-                          ],
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              const Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      PlayerMinimize(),
+                                      Spacer(),
+                                      PlayerAutoplaySwitch(),
+                                      PlayerCastCaptionControl(),
+                                      AppbarAction(
+                                          icon: Icons.settings_outlined),
+                                    ],
+                                  ),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      PlayerPrevious(),
+                                      Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          PlayerLoadingIndicator(),
+                                          PlayPauseRestartControl(),
+                                        ],
+                                      ),
+                                      PlayerNext(),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      PlayerDurationControl(),
+                                      PlayerFullscreen(),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              PlayerSeekSlideFrame(
+                                animation: _slideFrameController,
+                                frameHeight: slideFrameHeight,
+                                valueListenable: _showSlideFrame,
+                                onClose: _onEndSlideFrameSeek,
+                                seekDurationIndicator: SeekIndicator(
+                                  valueListenable: _showSlidingSeekDuration,
+                                  child: ValueListenableBuilder(
+                                    valueListenable: _slidingSeekDuration,
+                                    builder: (_, duration, __) {
+                                      return SizedBox(
+                                        child: duration != null
+                                            ? Text(duration.hoursMinutesSeconds)
+                                            : null,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            PlayerPrevious(),
-                            Stack(
-                              children: [
-                                PlayerLoadingIndicator(),
-                                PlayPauseRestartControl(),
-                              ],
-                            ),
-                            PlayerNext(),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            PlayerDurationControl(),
-                            PlayerFullscreen(),
-                          ],
-                        ),
+                        const PlayerActionsControl(),
                       ],
                     ),
-                  ),
-                ),
-              ),
-              PlayerSeekSlideFrame(
-                animation: _slideFrameController,
-                frameHeight: slideFrameHeight,
-                valueListenable: _showSlideFrame,
-                onClose: _onEndSlideFrameSeek,
-                seekDurationIndicator: SeekIndicator(
-                  valueListenable: _showSlidingSeekDuration,
-                  child: ValueListenableBuilder(
-                    valueListenable: _slidingSeekDuration,
-                    builder: (_, duration, __) {
-                      return SizedBox(
-                        child: duration != null
-                            ? Text(duration.hoursMinutesSeconds)
-                            : null,
-                      );
-                    },
                   ),
                 ),
               ),
@@ -485,37 +522,53 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                 child: CustomOrientationBuilder(
                   onLandscape: (context, childWidget) {
                     return Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0,
+                        vertical: 48,
+                      ),
                       child: childWidget,
                     );
                   },
                   onPortrait: (context, childWidget) {
-                    return childWidget!;
+                    return Consumer(
+                      builder: (context, ref, child) {
+                        ref.watch(playerExpandedStateProvider);
+                        final isExpanded = ref
+                            .read(playerRepositoryProvider)
+                            .playerViewState
+                            .isExpanded;
+                        if (isExpanded) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 40,
+                            ),
+                            child: childWidget!,
+                          );
+                        }
+                        return childWidget!;
+                      },
+                    );
                   },
                   child: Consumer(
                     builder: (context, ref, child) {
-                      final videoDuration = ref
-                          .read(playerRepositoryProvider)
-                          .currentVideoDuration;
+                      final playerRepository =
+                          ref.read(playerRepositoryProvider);
 
                       return ValueListenableBuilder(
                         valueListenable: _showPlaybackProgress,
                         builder: (context, visible, childWidget) {
-                          return AnimatedOpacity(
-                            opacity: visible ? 1 : 0,
-                            curve: Curves.easeInCubic,
-                            duration: const Duration(milliseconds: 100),
-                            child: childWidget,
+                          return Visibility(
+                            visible: visible,
+                            // opacity: visible ? 1 : 0,
+                            // curve: Curves.easeInCubic,
+                            // duration: const Duration(milliseconds: 100),
+                            child: childWidget!,
                           );
                         },
                         child: PlaybackProgress(
-                          progress: ref
-                              .read(playerRepositoryProvider)
-                              .videoStreamProgress,
-                          start: ref
-                              .read(playerRepositoryProvider)
-                              .currentVideoProgress,
-                          end: videoDuration,
+                          progress: playerRepository.videoStreamProgress,
+                          start: playerRepository.currentVideoProgress,
+                          end: playerRepository.currentVideoDuration,
                           animation: _progressAnimation,
                           bufferAnimation: _bufferAnimation,
                         ),
@@ -527,115 +580,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
             ],
           ),
         ),
-        CustomOrientationBuilder(
-          onLandscape: (_, childWidget) => childWidget!,
-          onPortrait: (_, childWidget) => const SizedBox(),
-          child: GestureDetector(
-            onTap: _onTap,
-            child: AnimatedBuilder(
-              animation: _controlsAnimation,
-              builder: (context, childWidget) {
-                return ValueListenableBuilder(
-                  valueListenable: _showSlideFrame,
-                  builder: (_, showSlideFrame, __) {
-                    return Opacity(
-                      opacity: _controlsAnimation.value,
-                      child: childWidget!,
-                    );
-                  },
-                );
-              },
-              child: const ColoredBox(
-                color: Colors.black26,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Icon(Icons.thumb_up_alt_outlined),
-                            Icon(Icons.thumb_down_alt_outlined),
-                            Icon(Icons.chat_outlined),
-                            Icon(Icons.chat_outlined),
-                            Icon(Icons.reply_outlined),
-                            Icon(Icons.more_horiz),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Spacer(),
-                            TappableArea(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        'More videos',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      Text(
-                                        'Tap or swipe up to see all',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 8),
-                                  SizedBox(
-                                    width: 60,
-                                    height: 32,
-                                    child: Stack(
-                                      clipBehavior: Clip.none,
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Positioned(
-                                          top: -2,
-                                          child: PlayerMoreVideos(
-                                            width: 36,
-                                            height: 22,
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: 2,
-                                          width: 40,
-                                          child: PlayerMoreVideos(
-                                            width: 40,
-                                            height: 22,
-                                          ),
-                                        ),
-                                        PlayerMoreVideos(
-                                          height: 22,
-                                          width: 44,
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        )
       ],
     );
   }
@@ -648,28 +592,12 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _progressController.value = 0;
   }
 
-  /// Toggles the visibility of player controls based on the current state.
-  void _onTap() {
-    // Check if player controls are currently visible
-    if (ref.read(playerRepositoryProvider).playerViewState.showControls) {
-      // If visible, send a signal to hide controls
-      ref
-          .read(playerRepositoryProvider)
-          .sendPlayerSignal(PlayerSignal.hideControls);
-    } else {
-      // If not visible, send a signal to show controls
-      ref
-          .read(playerRepositoryProvider)
-          .sendPlayerSignal(PlayerSignal.showControls);
-    }
-  }
-
   Timer? _seekRateTimer;
 
   void _resetSeekRate() {
     _seekRateTimer = Timer(const Duration(milliseconds: 500), () {
-      _seekRate = 0;
       _showDoubleTapSeekIndicator.value = false;
+      _seekRate = 0;
     });
   }
 
@@ -682,7 +610,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
     // Set seek rate
     _seekRateTimer?.cancel();
-    _seekRate += ref.read(preferencesProvider).doubleTapSeek;
+    final seekRate = ref.read(preferencesProvider).doubleTapSeek;
+    _seekRate += seekRate;
 
     // Show seek rate widget
     _showDoubleTapSeekIndicator.value = true;
@@ -690,10 +619,10 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     // Send signal for fast forward action
     ref
         .read(playerRepositoryProvider)
-        .sendPlayerSignal(PlayerSignal.fastForward);
+        .sendPlayerSignal([PlayerSignal.fastForward]);
 
     // Seek player by seek rate
-    ref.read(playerRepositoryProvider).seek(Duration(seconds: _seekRate));
+    ref.read(playerRepositoryProvider).seek(Duration(seconds: seekRate));
 
     // Reset seek rate and hide widget
     _resetSeekRate();
@@ -708,7 +637,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
     // Set seek rate
     _seekRateTimer?.cancel();
-    _seekRate += ref.read(preferencesProvider).doubleTapSeek;
+    final seekRate = ref.read(preferencesProvider).doubleTapSeek;
+    _seekRate += seekRate;
 
     // Show seek rate widget
     _showDoubleTapSeekIndicator.value = true;
@@ -716,12 +646,12 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     // Send signal for fast forward / rewind action
     ref
         .read(playerRepositoryProvider)
-        .sendPlayerSignal(PlayerSignal.fastForward);
+        .sendPlayerSignal([PlayerSignal.fastForward]);
 
     // Seek player by seek rate
     ref
         .read(playerRepositoryProvider)
-        .seek(Duration(seconds: _seekRate), reverse: true);
+        .seek(Duration(seconds: seekRate), reverse: true);
 
     // Reset seek rate and hide widget
     _resetSeekRate();
@@ -811,6 +741,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   }
 
   void _onLongPressStart(LongPressStartDetails details) {
+    if (_preventCommonControlGestures) return;
+
     _longPressYPosition = details.localPosition.dy;
 
     if (!_controlsHidden) {
@@ -848,6 +780,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   }
 
   void _onLongPressEnd(LongPressEndDetails details) {
+    if (_preventCommonControlGestures) return;
+
     if (!_startedOnLongPress) return;
     _longPressYPosition = 0;
     _startedOnLongPress = false;
@@ -875,6 +809,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   }
 
   void _onLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
+    if (_preventCommonControlGestures) return;
+
     if (_isSlidingSeek) {
       SlideSeekUpdatePlayerNotification().dispatch(context);
       final totalMicroseconds = ref
@@ -949,6 +885,122 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
         );
       }
     }
+  }
+}
+
+class PlayerActionsControl extends StatelessWidget {
+  const PlayerActionsControl({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomOrientationBuilder(
+      onLandscape: (_, childWidget) => childWidget!,
+      onPortrait: (_, childWidget) => Consumer(
+        builder: (context, ref, child) {
+          ref.watch(playerExpandedStateProvider);
+          if (ref.read(playerRepositoryProvider).playerViewState.isExpanded) {
+            return childWidget!;
+          }
+          return const SizedBox();
+        },
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: [
+            const Expanded(
+              flex: 3,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(Icons.thumb_up_alt_outlined),
+                  Icon(Icons.thumb_down_alt_outlined),
+                  Icon(Icons.chat_outlined),
+                  Icon(Icons.chat_outlined),
+                  Icon(Icons.reply_outlined),
+                  Icon(Icons.more_horiz),
+                ],
+              ),
+            ),
+            const Spacer(),
+            TappableArea(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Consumer(
+                    builder: (context, ref, child) {
+                      ref.watch(playerExpandedStateProvider);
+                      final isExpanded = ref
+                          .watch(playerRepositoryProvider)
+                          .playerViewState
+                          .isExpanded;
+                      if (isExpanded) {
+                        return const SizedBox();
+                      }
+
+                      return const Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                'More videos',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                'Tap or swipe up to see all',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(width: 8),
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(
+                    width: 60,
+                    height: 32,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.center,
+                      children: [
+                        Positioned(
+                          top: -2,
+                          child: PlayerMoreVideos(
+                            width: 36,
+                            height: 22,
+                          ),
+                        ),
+                        Positioned(
+                          top: 2,
+                          width: 40,
+                          child: PlayerMoreVideos(
+                            width: 40,
+                            height: 22,
+                          ),
+                        ),
+                        PlayerMoreVideos(
+                          height: 22,
+                          width: 44,
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
