@@ -29,6 +29,7 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:youtube_clone/presentation/theme/app_sizing.dart';
 import 'package:youtube_clone/presentation/theme/relative_size.dart';
 
@@ -192,6 +193,8 @@ class _DeviceThemeFromViewState extends State<_DeviceThemeFromView>
   DeviceThemeData? _parentData;
   DeviceThemeData? _data;
 
+  bool wasHidden = false;
+
   @override
   void initState() {
     super.initState();
@@ -202,6 +205,36 @@ class _DeviceThemeFromViewState extends State<_DeviceThemeFromView>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case ui.AppLifecycleState.inactive:
+        break;
+      case ui.AppLifecycleState.paused:
+        break;
+      case ui.AppLifecycleState.detached:
+        break;
+      case ui.AppLifecycleState.resumed:
+        if (wasHidden) {
+          _resetOrientation();
+        }
+        wasHidden = false;
+        break;
+      case ui.AppLifecycleState.hidden:
+        wasHidden = true;
+        break;
+    }
+  }
+
+  Future<void> _resetOrientation() async {
+    await SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    await SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
+    await SystemChrome.restoreSystemUIOverlays();
   }
 
   // For now we only need to listen to changes from metrics, to know the orientation

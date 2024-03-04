@@ -95,7 +95,6 @@ class SlidingHeaderDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     final double shrinkFactor = (shrinkOffset / (maxExtent - minHeight));
-    print(Offset(0, 1 - shrinkFactor.clamp(0, .5)));
     return OverflowBox(
       maxHeight: maxHeight,
       child: Opacity(
