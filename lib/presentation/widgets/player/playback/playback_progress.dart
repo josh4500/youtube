@@ -112,17 +112,34 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                         valueColor: widget.bufferAnimation,
                         backgroundColor: Colors.transparent,
                       ),
+                    // TODO: Remove temporary fix for color animation
                     // Player position Indicator
-                    LinearProgressIndicator(
-                      color: widget.color,
-                      value: positionValue.isNaN || positionValue.isInfinite
-                          ? 0
-                          : positionValue,
-                      minHeight: 2,
-                      valueColor: progressAnimation,
-                      backgroundColor:
-                          widget.backgroundColor ?? Colors.transparent,
-                    ),
+                    if (progressAnimation != null)
+                      AnimatedBuilder(
+                        animation: progressAnimation!,
+                        builder: (_, __) {
+                          return LinearProgressIndicator(
+                            color: progressAnimation!.value ?? widget.color,
+                            value:
+                                positionValue.isNaN || positionValue.isInfinite
+                                    ? 0
+                                    : positionValue,
+                            minHeight: 2,
+                            backgroundColor:
+                                widget.backgroundColor ?? Colors.transparent,
+                          );
+                        },
+                      )
+                    else
+                      LinearProgressIndicator(
+                        color: widget.color,
+                        value: positionValue.isNaN || positionValue.isInfinite
+                            ? 0
+                            : positionValue,
+                        minHeight: 2,
+                        backgroundColor:
+                            widget.backgroundColor ?? Colors.transparent,
+                      ),
 
                     // Thumb
                     if (thumbAnimation != null)
