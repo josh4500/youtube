@@ -40,7 +40,7 @@ class VideoContext extends StatelessWidget {
       ),
       margin: const EdgeInsets.symmetric(
         horizontal: 12,
-        vertical: 4,
+        vertical: 8,
       ),
       decoration: BoxDecoration(
         color: Colors.grey.shade900,

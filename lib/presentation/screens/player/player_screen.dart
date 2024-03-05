@@ -81,6 +81,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   late final ValueNotifier<double> heightNotifier;
   late final ValueNotifier<double> widthNotifier;
 
+  bool _controlWasTempHidden = false;
+
   double get screenWidth => MediaQuery.sizeOf(context).width;
   double get screenHeight => widget.height;
 
@@ -136,6 +138,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       maxAdditionalHeight,
     ));
 
+    // Added a callback to animate info opacity when additional heights changes
+    // (i.e when player going in or out of expanded mode)
+    // Opacity of info does not need to be updated when either bottom sheets are open
+    // (i.e Comment or Description Sheet)
     additionalHeightNotifier.addListener(() {
       double opacityValue;
       if (expandedMode) {
@@ -298,6 +304,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Hides the player controls by sending a player signal to the repository.
   void _hideControls() {
+    _controlWasTempHidden =
+        ref.read(playerRepositoryProvider).playerViewState.showControls;
     ref
         .read(playerRepositoryProvider)
         .sendPlayerSignal([PlayerSignal.hideControls]);
@@ -399,24 +407,32 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         additionalHeightNotifier.value = clampDouble(
           additionalHeightNotifier.value + details.delta.dy,
           0,
-          maxAdditionalHeight,
+          (screenHeight - (screenHeight * heightRatio)),
         );
       }
     } else {
       // If dragging down
       if (!_preventPlayerDragDown) {
-        // Adjust player view margin within valid limits
-        marginNotifier.value = clampDouble(
-          marginNotifier.value + details.delta.dy,
-          0,
-          (screenHeight - (screenHeight * heightRatio)),
-        );
+        if (additionalHeight >= screenHeight * (1 - heightRatio)) {
+          // Adjust player view margin within valid limits
+          marginNotifier.value = clampDouble(
+            marginNotifier.value + details.delta.dy,
+            0,
+            (screenHeight - (screenHeight * heightRatio)),
+          );
+        } else {
+          additionalHeightNotifier.value = clampDouble(
+            additionalHeightNotifier.value + details.delta.dy,
+            0,
+            screenHeight * (1 - heightRatio),
+          );
+        }
       } else {
         // If preventing drag down, adjust additionalHeightNotifier
         additionalHeightNotifier.value = clampDouble(
           additionalHeightNotifier.value + details.delta.dy,
           0,
-          maxAdditionalHeight,
+          screenHeight * (1 - heightRatio),
         );
       }
     }
@@ -591,13 +607,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           0,
           screenHeight * (1 - heightRatio),
         );
-        ref
-            .read(playerRepositoryProvider)
-            .sendPlayerSignal([PlayerSignal.hidePlaybackProgress]);
+        if (additionalHeight > 0) {
+          ref
+              .read(playerRepositoryProvider)
+              .sendPlayerSignal([PlayerSignal.hidePlaybackProgress]);
+        }
       }
     }
 
-    if (_allowInfoDrag) {
+    if (_allowInfoDrag && additionalHeight > 0 && !_controlWasTempHidden) {
       _hideControls();
     }
 
@@ -622,20 +640,23 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       } else {
         if (!expandedMode) {
           additionalHeightNotifier.value = 0;
+
+          ref.read(playerRepositoryProvider).sendPlayerSignal([
+            PlayerSignal.exitExpanded,
+            PlayerSignal.showPlaybackProgress,
+          ]);
+          _infoScrollPhysics.canScroll(true);
         }
       }
     }
 
-    if (additionalHeightNotifier.value == 0) {
-      ref.read(playerRepositoryProvider).sendPlayerSignal([
-        PlayerSignal.exitExpanded,
-        PlayerSignal.showPlaybackProgress,
-      ]);
-      _infoScrollPhysics.canScroll(true);
-    }
-
     if (_infoScrollController.offset == 0) {
       _allowInfoDrag = true;
+    }
+
+    if (_controlWasTempHidden) {
+      _controlWasTempHidden = false;
+      _toggleControls();
     }
   }
 
