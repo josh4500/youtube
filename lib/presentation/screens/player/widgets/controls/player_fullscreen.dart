@@ -70,6 +70,7 @@ class PlayerFullscreen extends ConsumerWidget {
       },
       color: Colors.transparent,
       horizontalPadding: 8,
+      verticalPadding: 4,
       builder: (context, _) {
         return const Icon(Icons.fullscreen);
       },
