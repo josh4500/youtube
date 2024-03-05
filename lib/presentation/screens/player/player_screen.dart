@@ -415,8 +415,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         // If preventing drag down, adjust additionalHeightNotifier
         additionalHeightNotifier.value = clampDouble(
           additionalHeightNotifier.value + details.delta.dy,
+          0,
           maxAdditionalHeight,
-          screenHeight * (1 - heightRatio),
         );
       }
     }
