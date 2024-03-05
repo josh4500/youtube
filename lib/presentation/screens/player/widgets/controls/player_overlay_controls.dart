@@ -36,12 +36,12 @@ import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
-import 'package:youtube_clone/presentation/provider/state/player_expanded_state_provider.dart';
+import 'package:youtube_clone/presentation/screens/player/providers/player_expanded_state_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
-import 'package:youtube_clone/presentation/provider/state/player_signal_provider.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../../providers/player_signal_provider.dart';
 import '../player/player_notifications.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';

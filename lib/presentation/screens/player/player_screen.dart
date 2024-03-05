@@ -757,7 +757,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   // TODO: Rename
   bool _onScrollDynamicTab(ScrollNotification notification) {
     // Prevents info to be dragged down while scrolling in DynamicTab
-    if (notification.depth == 1) {
+    if (notification.depth >= 1) {
       if (notification is ScrollStartNotification) {
         _allowInfoDrag = false;
       } else if (notification is ScrollEndNotification) {

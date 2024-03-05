@@ -71,16 +71,17 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
           child: Row(
             children: [
               ListenableBuilder(
-                  listenable: _pageController,
-                  builder: (context, _) {
-                    return Text(
-                      currentPage == 0 ? 'Comments' : 'Live chat replay',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    );
-                  }),
+                listenable: _pageController,
+                builder: (context, _) {
+                  return Text(
+                    currentPage == 0 ? 'Comments' : 'Live chat replay',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  );
+                },
+              ),
               if (!isRestrictedMode) ...[
                 const SizedBox(width: 8),
                 ListenableBuilder(
@@ -122,7 +123,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
                       ],
                     );
                   },
-                )
+                ),
             ],
           ),
         ),
@@ -176,7 +177,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
                           width: c.maxWidth,
                           child: PageView(
                             controller: _pageController,
-                            physics: const NeverScrollableScrollPhysics(),
+                            physics: const AlwaysScrollableScrollPhysics(),
                             onPageChanged: (page) => currentPage = page,
                             children: [
                               TappableArea(
