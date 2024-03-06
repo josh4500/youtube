@@ -299,7 +299,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   // Opens the player in fullscreen mode by sending a player signal to the repository.
   Future<void> _openFullscreenPlayer() async {
+    _hideControls();
     await context.goto(AppRoutes.playerLandscapeScreen);
+    _showControls(true);
   }
 
   /// Hides the player controls and save state whether control will be temporary
