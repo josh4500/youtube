@@ -57,11 +57,15 @@ class FadingSliverPersistentHeaderDelegate
     bool overlapsContent,
   ) {
     final scrollPercentage = (shrinkOffset / height).clamp(0.0, 1.0);
+    final double shrinkFactor = (shrinkOffset / (maxExtent - 0));
     final fadeValue = scrollPercentage;
 
     return Opacity(
       opacity: fadeValue,
-      child: child,
+      child: FractionalTranslation(
+        translation: Offset(0, 1 - fadeValue),
+        child: child,
+      ),
     );
   }
 

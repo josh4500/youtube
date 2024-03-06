@@ -93,7 +93,8 @@ class PlayerRepository {
   late final _videoController = VideoController(_videoPlayer);
   VideoController get videoController => _videoController;
 
-  Stream<Progress> get videoStreamProgress => _videoPlayer.stream.progress;
+  late final Stream<Progress> _videoProgressStream;
+  Stream<Progress> get videoProgressStream => _videoProgressStream;
   Duration get currentVideoDuration => _videoPlayer.state.duration;
   Duration get currentVideoPosition => _videoPlayer.state.position;
   Progress? get currentVideoProgress => _positionMemory.read('video');
@@ -110,6 +111,8 @@ class PlayerRepository {
   Set<PlayerViewState> get playerViewState => _playerViewState;
 
   PlayerRepository({required Ref ref}) : _ref = ref {
+    _videoProgressStream = _videoPlayer.stream.progress;
+
     _videoPlayer.stream.completed.listen((hasEnded) {
       if (hasEnded) {
         if (!_playerViewState.isMinimized) {
@@ -117,7 +120,6 @@ class PlayerRepository {
         }
 
         _ref.read(playerNotifierProvider.notifier).end();
-        _positionMemory.delete('video');
       }
     });
 
@@ -137,7 +139,7 @@ class PlayerRepository {
       }
     });
 
-    _videoPlayer.stream.progress.listen((progress) {
+    _videoProgressStream.listen((progress) {
       _positionMemory.write('video', progress);
     });
   }

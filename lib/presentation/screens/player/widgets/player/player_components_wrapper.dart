@@ -57,6 +57,8 @@ class PlayerComponentsWrapper extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           child,
+          // Shows loading indicator, regardless if controls are shown/hidden
+          const PlayerLoadingIndicator(),
           const Positioned.fill(
             child: PlayerOverlayControls(),
           ),

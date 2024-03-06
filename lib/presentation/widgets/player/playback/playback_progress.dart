@@ -57,6 +57,7 @@ class PlaybackProgress extends StatefulWidget {
 }
 
 class _PlaybackProgressState extends State<PlaybackProgress> {
+  Stream<Progress>? progressStream;
   Animation<double>? thumbAnimation;
   Animation<Color?>? progressAnimation;
 
@@ -150,8 +151,8 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                           animation: thumbAnimation!,
                           builder: (context, _) {
                             return Container(
-                              width: thumbAnimation!.value,
-                              height: thumbAnimation!.value,
+                              width: thumbAnimation?.value,
+                              height: thumbAnimation?.value,
                               decoration: const BoxDecoration(
                                 color: Colors.red,
                                 shape: BoxShape.circle,

@@ -41,13 +41,11 @@ import 'package:youtube_clone/presentation/provider/state/player_state_provider.
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../providers/player_signal_provider.dart';
 import '../player/player_notifications.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';
 import 'player_duration_control.dart';
 import 'player_fullscreen.dart';
-import 'player_loading.dart';
 import 'player_minimize.dart';
 import 'player_next.dart';
 import 'player_play_pause_restart.dart';
@@ -188,11 +186,91 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
         _controlsVisibilityController.value = 0;
         _showPlaybackProgress.value = false;
       }
+
+      // TODO: Fix listening stream issues. May consider using ref.listenManual(...)
+      final playerRepo = ref.read(playerRepositoryProvider);
+      _subscription = playerRepo.playerSignalStream.listen(
+        (signal) async {
+          if (signal == PlayerSignal.showControls) {
+            final isExpanded =
+                ref.read(playerRepositoryProvider).playerViewState.isExpanded;
+            if (context.orientation.isLandscape || isExpanded) {
+              _showPlaybackProgress.value = true;
+            }
+
+            _controlsHidden = false;
+            _controlsVisibilityController.forward();
+            _bufferController.reverse();
+
+            _progressController.forward();
+
+            // Cancels existing timer
+            _controlHideTimer?.cancel();
+
+            // Auto hide only when video is playing
+            _controlHideTimer = Timer(const Duration(seconds: 3), () async {
+              final isPlaying = ref.read(playerNotifierProvider).playing;
+              if (isPlaying) {
+                _controlsHidden = true;
+                // Note: Hide progress indicator first before hiding main controls
+                _progressController.reverse();
+
+                // Reversing before sending signal, animates the reverse on
+                // auto hide
+                await _controlsVisibilityController.reverse();
+                final isExpanded = ref
+                    .read(playerRepositoryProvider)
+                    .playerViewState
+                    .isExpanded;
+                // Hides PlaybackProgress
+                if (mounted && context.orientation.isLandscape || isExpanded) {
+                  _showPlaybackProgress.value = false;
+                }
+
+                ref
+                    .read(playerRepositoryProvider)
+                    .sendPlayerSignal([PlayerSignal.hideControls]);
+              }
+            });
+          } else if (signal == PlayerSignal.hideControls) {
+            _controlsHidden = true;
+            _controlHideTimer?.cancel();
+            _bufferController.forward();
+
+            // Note: Hide progress indicator first before hiding main controls
+            _progressController.reverse();
+
+            // Reverse opacity without animation
+            // NOTE: from: 0 messes up ColorTween for the progress indicator
+            // _controlsVisibilityController is used for progress color indicator
+            await _controlsVisibilityController.reverse(from: 0);
+
+            final isExpanded =
+                ref.read(playerRepositoryProvider).playerViewState.isExpanded;
+            // Hides PlaybackProgress while in landscape mode, when controls are
+            // hidden
+            if (mounted && context.orientation.isLandscape || isExpanded) {
+              _showPlaybackProgress.value = false;
+            }
+          } else if (signal == PlayerSignal.hidePlaybackProgress) {
+            _showPlaybackProgress.value = false;
+          } else if (signal == PlayerSignal.showPlaybackProgress) {
+            _showPlaybackProgress.value = true;
+          } else if (signal == PlayerSignal.minimize) {
+            _preventCommonControlGestures = true;
+          } else if (signal == PlayerSignal.maximize) {
+            _preventCommonControlGestures = false;
+          }
+        },
+      );
     });
   }
 
+  StreamSubscription? _subscription;
+
   @override
   void dispose() {
+    _subscription?.cancel();
     _controlHideTimer?.cancel();
     _controlsVisibilityController.dispose();
     _showSlidingSeekIndicator.dispose();
@@ -209,80 +287,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(
-      playerSignalProvider,
-      (previous, next) async {
-        final signal = next.asData?.value;
-        if (signal == PlayerSignal.showControls) {
-          final isExpanded =
-              ref.read(playerRepositoryProvider).playerViewState.isExpanded;
-          if (context.orientation.isLandscape || isExpanded) {
-            _showPlaybackProgress.value = true;
-          }
-
-          _controlsHidden = false;
-          _controlsVisibilityController.forward();
-          _bufferController.reverse();
-
-          _progressController.forward();
-
-          // Cancels existing timer
-          _controlHideTimer?.cancel();
-
-          // Auto hide only when video is playing
-          _controlHideTimer = Timer(const Duration(seconds: 3), () async {
-            final isPlaying = ref.read(playerNotifierProvider).playing;
-            if (isPlaying) {
-              _controlsHidden = true;
-              // Note: Hide progress indicator first before hiding main controls
-              _progressController.reverse();
-
-              // Reversing before sending signal, animates the reverse on
-              // auto hide
-              await _controlsVisibilityController.reverse();
-              final isExpanded =
-                  ref.read(playerRepositoryProvider).playerViewState.isExpanded;
-              // Hides PlaybackProgress
-              if (mounted && context.orientation.isLandscape || isExpanded) {
-                _showPlaybackProgress.value = false;
-              }
-
-              ref
-                  .read(playerRepositoryProvider)
-                  .sendPlayerSignal([PlayerSignal.hideControls]);
-            }
-          });
-        } else if (signal == PlayerSignal.hideControls) {
-          _controlsHidden = true;
-          _controlHideTimer?.cancel();
-          _bufferController.forward();
-
-          // Note: Hide progress indicator first before hiding main controls
-          _progressController.reverse();
-
-          // Reverse opacity without animation
-          // NOTE: from: 0 messes up ColorTween for the progress indicator
-          // _controlsVisibilityController is used for progress color indicator
-          await _controlsVisibilityController.reverse(from: 0);
-
-          final isExpanded =
-              ref.read(playerRepositoryProvider).playerViewState.isExpanded;
-          // Hides PlaybackProgress while in landscape mode, when controls are
-          // hidden
-          if (mounted && context.orientation.isLandscape || isExpanded) {
-            _showPlaybackProgress.value = false;
-          }
-        } else if (signal == PlayerSignal.hidePlaybackProgress) {
-          _showPlaybackProgress.value = false;
-        } else if (signal == PlayerSignal.showPlaybackProgress) {
-          _showPlaybackProgress.value = true;
-        } else if (signal == PlayerSignal.minimize) {
-          _preventCommonControlGestures = true;
-        } else if (signal == PlayerSignal.maximize) {
-          _preventCommonControlGestures = false;
-        }
-      },
-    );
     return Column(
       children: [
         Expanded(
@@ -469,13 +473,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       PlayerPrevious(),
-                                      Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          PlayerLoadingIndicator(),
-                                          PlayPauseRestartControl(),
-                                        ],
-                                      ),
+                                      PlayPauseRestartControl(),
                                       PlayerNext(),
                                     ],
                                   ),
@@ -531,7 +529,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                   },
                   onPortrait: (context, childWidget) {
                     return Consumer(
-                      builder: (context, ref, child) {
+                      builder: (context, ref, _) {
                         ref.watch(playerExpandedStateProvider);
                         final isExpanded = ref
                             .read(playerRepositoryProvider)
@@ -549,31 +547,30 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                       },
                     );
                   },
-                  child: Consumer(
-                    builder: (context, ref, child) {
-                      final playerRepository =
-                          ref.read(playerRepositoryProvider);
-
-                      return ValueListenableBuilder(
-                        valueListenable: _showPlaybackProgress,
-                        builder: (context, visible, childWidget) {
-                          return Visibility(
-                            visible: visible,
-                            // opacity: visible ? 1 : 0,
-                            // curve: Curves.easeInCubic,
-                            // duration: const Duration(milliseconds: 100),
-                            child: childWidget!,
-                          );
-                        },
-                        child: PlaybackProgress(
-                          progress: playerRepository.videoStreamProgress,
-                          start: playerRepository.currentVideoProgress,
-                          end: playerRepository.currentVideoDuration,
-                          animation: _progressAnimation,
-                          bufferAnimation: _bufferAnimation,
-                        ),
+                  child: ValueListenableBuilder(
+                    valueListenable: _showPlaybackProgress,
+                    builder: (context, visible, childWidget) {
+                      return Visibility(
+                        visible: visible,
+                        // opacity: visible ? 1 : 0,
+                        // curve: Curves.easeInCubic,
+                        // duration: const Duration(milliseconds: 100),
+                        child: childWidget!,
                       );
                     },
+                    child: Builder(
+                      builder: (context) {
+                        final playerRepo = ref.read(playerRepositoryProvider);
+                        return PlaybackProgress(
+                          progress: playerRepo.videoProgressStream,
+                          start: playerRepo.currentVideoProgress,
+                          // TODO: Get ready value
+                          end: const Duration(minutes: 1),
+                          animation: _progressAnimation,
+                          bufferAnimation: _bufferAnimation,
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -674,6 +671,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   /// Shows  sliding seek indicator and initiate necessary actions
   void _showSlideSeek() {
     _showSlidingSeekIndicator.value = true;
+    _showPlaybackProgress.value = true;
     _controlsVisibilityController.reverse(from: 0);
     _showProgressIndicator();
   }
@@ -681,16 +679,18 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   /// Hides the sliding seek indicator and perform related cleanup actions
   void _hideSlideSeek() {
     _showSlidingSeekIndicator.value = false;
-    _showPlaybackProgress.value = true;
 
     // If controls are not hidden, manage control visibility and progress indicator
     if (!_controlsHidden) {
       if (!ref.read(playerNotifierProvider).playing) {
         _controlsVisibilityController.forward();
+        _showPlaybackProgress.value = true;
       } else {
         _controlsHidden = true;
+        _showPlaybackProgress.value = false;
       }
-      _hideProgressIndicator();
+    } else {
+      _showPlaybackProgress.value = false;
     }
 
     // If a sliding seek duration is set, perform seek operation to that duration
@@ -866,9 +866,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       if (!_showSlideFrame.value) {
         _showSlidingSeekDuration.value = true;
         _slidingSeekDuration.value = newDuration;
-
-        // Hide progress indicator
-        _showPlaybackProgress.value = false;
       }
 
       if (localY < (_longPressYPosition - 10)) {

@@ -58,6 +58,11 @@ class PlayerView extends ConsumerWidget {
       child: Video(
         controller: controller,
         fit: BoxFit.fitWidth,
+        alignment: Alignment.center,
+        fill: Colors.black,
+        filterQuality: FilterQuality.none,
+        pauseUponEnteringBackgroundMode: true,
+        resumeUponEnteringForegroundMode: false,
         wakelock: true,
         controls: null,
       ),

@@ -243,6 +243,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Prevents player from being dragged down when set to true.
   bool _preventPlayerDragDown = false;
 
+  /// Prevents player margin changes
+  bool _preventPlayerMarginUpdate = false;
+
   bool _isSeeking = false;
 
   /// Allows or disallows dragging for info. Set to true by default.
@@ -295,20 +298,32 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   // Opens the player in fullscreen mode by sending a player signal to the repository.
-  void _openFullscreenPlayer() {
+  Future<void> _openFullscreenPlayer() async {
     ref.read(playerRepositoryProvider).sendPlayerSignal(
       [PlayerSignal.enterFullscreen],
     );
-    context.goto(AppRoutes.playerLandscapeScreen);
+    await context.goto(AppRoutes.playerLandscapeScreen);
   }
 
-  /// Hides the player controls by sending a player signal to the repository.
-  void _hideControls() {
-    _controlWasTempHidden =
-        ref.read(playerRepositoryProvider).playerViewState.showControls;
-    ref
-        .read(playerRepositoryProvider)
-        .sendPlayerSignal([PlayerSignal.hideControls]);
+  /// Hides the player controls and save state whether control will be temporary
+  /// hidden.
+  void _hideControls([bool force = false]) {
+    var hide = ref.read(playerRepositoryProvider).playerViewState.showControls;
+    if (hide || force) {
+      _controlWasTempHidden = true && !force;
+      ref
+          .read(playerRepositoryProvider)
+          .sendPlayerSignal([PlayerSignal.hideControls]);
+    }
+  }
+
+  void _showControls([bool force = false]) {
+    if (_controlWasTempHidden || force) {
+      _controlWasTempHidden = false;
+      ref
+          .read(playerRepositoryProvider)
+          .sendPlayerSignal([PlayerSignal.showControls]);
+    }
   }
 
   /// Toggles the visibility of player controls based on the current state.
@@ -386,9 +401,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Parameters:
   ///   - details: The drag update details containing information about the drag.
   void _onDragExpandedPlayer(DragUpdateDetails details) {
-    // Hide controls during player drag
-    _hideControls();
-
     // Check the direction of the drag
     if (details.delta.dy < 0) {
       // If dragging up
@@ -414,13 +426,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       // If dragging down
       if (!_preventPlayerDragDown) {
         if (additionalHeight >= screenHeight * (1 - heightRatio)) {
-          // Adjust player view margin within valid limits
-          marginNotifier.value = clampDouble(
-            marginNotifier.value + details.delta.dy,
-            0,
-            (screenHeight - (screenHeight * heightRatio)),
-          );
+          if (!_preventPlayerMarginUpdate) {
+            // Adjust player view margin within valid limits
+            marginNotifier.value = clampDouble(
+              marginNotifier.value + details.delta.dy,
+              0,
+              (screenHeight - (screenHeight * heightRatio)),
+            );
+          }
         } else {
+          _preventPlayerMarginUpdate = true;
           additionalHeightNotifier.value = clampDouble(
             additionalHeightNotifier.value + details.delta.dy,
             0,
@@ -485,6 +500,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       return;
     }
 
+    // Hide controls
+    _hideControls();
+
     // If preventing player drag up or down, return without further processing
     if (details.delta.dy > 0 && _preventPlayerDragUp) return;
     if (details.delta.dy < 0 && _preventPlayerDragDown) return;
@@ -503,6 +521,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (!_isSeeking) {
       _preventPlayerDragUp = false;
       _preventPlayerDragDown = false;
+      _preventPlayerMarginUpdate = false;
     }
 
     if (_expanded) {
@@ -572,18 +591,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
       _infoScrollPhysics.canScroll(true);
 
-      final ended = ref.read(playerNotifierProvider).ended;
-      if (ended && heightNotifier.value == 1 && !_activeZoomPanning) {
-        _toggleControls();
-      }
-
       if (_activeZoomPanning) {
         final velocityY = details.velocity.pixelsPerSecond.dy;
         if (velocityY < -200) _openFullscreenPlayer();
       }
     }
-
-    final hasEnded = ref.read(playerNotifierProvider).ended;
 
     // Reversing zoom due to swiping up
     final lastScaleValue = _transformationController.value.getMaxScaleOnAxis();
@@ -592,9 +604,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _openFullscreenPlayer();
       }
       await _reverseZoomPan();
-
-      if (hasEnded && !_isMinimized) _toggleControls();
     }
+
+    // Shows controls if it was temporary hidden and avoids showing controls
+    // when player is minimized
+    if (!_isMinimized) _showControls();
   }
 
   void _onDragInfo(PointerMoveEvent event) {
@@ -654,10 +668,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _allowInfoDrag = true;
     }
 
-    if (_controlWasTempHidden) {
-      _controlWasTempHidden = false;
-      _toggleControls();
-    }
+    _showControls();
   }
 
   // Video Comment Sheet
@@ -877,6 +888,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                               valueListenable: widthNotifier,
                               builder: (context, widthValue, _) {
                                 return Stack(
+                                  clipBehavior: Clip.none,
                                   children: [
                                     Align(
                                       alignment: Alignment.topRight,
@@ -970,9 +982,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                               SliverPersistentHeader(
                                 pinned: true,
                                 floating: true,
-                                delegate: SlidingHeaderDelegate(
-                                  minHeight: 0,
-                                  maxHeight: 40,
+                                delegate: FadingSliverPersistentHeaderDelegate(
+                                  height: 40,
                                   child: const Material(
                                     child: DynamicTab(
                                       initialIndex: 0,
