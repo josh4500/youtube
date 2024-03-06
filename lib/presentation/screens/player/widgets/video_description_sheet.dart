@@ -34,16 +34,16 @@ import 'package:youtube_clone/presentation/widgets/persistent_header_delegate.da
 
 class VideoDescriptionSheet extends StatefulWidget {
   final ScrollController? controller;
+  final bool showDragIndicator;
   final ValueNotifier<bool> transcriptNotifier;
   final VoidCallback closeDescription;
-  final DraggableScrollableController draggableController;
 
   const VideoDescriptionSheet({
     super.key,
     this.controller,
+    this.showDragIndicator = true,
     required this.transcriptNotifier,
     required this.closeDescription,
-    required this.draggableController,
   });
 
   @override
@@ -141,15 +141,16 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet>
                   maxHeight: 68,
                   child: Column(
                     children: [
-                      Container(
-                        height: 4,
-                        width: 45,
-                        margin: const EdgeInsets.only(top: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.circular(8),
+                      if (widget.showDragIndicator)
+                        Container(
+                          height: 4,
+                          width: 45,
+                          margin: const EdgeInsets.only(top: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
-                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 12,

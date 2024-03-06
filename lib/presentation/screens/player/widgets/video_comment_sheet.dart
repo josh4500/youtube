@@ -39,7 +39,8 @@ class VideoCommentsSheet extends StatefulWidget {
   final ValueNotifier<bool> replyNotifier;
   final VoidCallback closeComment;
   final double maxHeight;
-  final DraggableScrollableController draggableController;
+  final bool showDragIndicator;
+  final DraggableScrollableController? draggableController;
 
   const VideoCommentsSheet({
     super.key,
@@ -47,7 +48,8 @@ class VideoCommentsSheet extends StatefulWidget {
     required this.replyNotifier,
     required this.closeComment,
     required this.maxHeight,
-    required this.draggableController,
+    this.draggableController,
+    this.showDragIndicator = true,
   });
 
   @override
@@ -146,10 +148,12 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet>
   }
 
   void _onDragInfo(PointerMoveEvent event) {
+    if (widget.draggableController == null) return;
+
     if (_commentListController.offset == 0) {
       final yDist = event.delta.dy;
       final height = MediaQuery.sizeOf(context).height;
-      final size = widget.draggableController.size;
+      final size = widget.draggableController!.size;
 
       final newSize = clampDouble(
         size - (yDist / height),
@@ -163,15 +167,17 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet>
         _commentListPhysics.canScroll(false);
       }
 
-      widget.draggableController.jumpTo(newSize);
+      widget.draggableController!.jumpTo(newSize);
     }
   }
 
   void _onDragInfoUp(PointerUpEvent event) {
+    if (widget.draggableController == null) return;
+
     _commentListPhysics.canScroll(true);
-    final size = widget.draggableController.size;
+    final size = widget.draggableController!.size;
     if (size != 0.0 || size != 1 - widget.maxHeight) {
-      widget.draggableController.animateTo(
+      widget.draggableController!.animateTo(
         size < (1 - widget.maxHeight) / 2 ? 0.0 : 1 - widget.maxHeight,
         duration: const Duration(milliseconds: 150),
         curve: Curves.easeIn,
@@ -208,15 +214,18 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet>
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            height: 4,
-                            width: 45,
-                            margin: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                          ),
+                          if (widget.showDragIndicator)
+                            Container(
+                              height: 4,
+                              width: 45,
+                              margin: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(32),
+                              ),
+                            )
+                          else
+                            const SizedBox(height: 16),
                           childWidget!,
                           const SizedBox(height: 12),
                           if (showCommentTags) ...[

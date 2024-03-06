@@ -57,7 +57,8 @@ enum PlayerViewState {
   minimized,
   fullscreen,
   visibleAmbient,
-  visibleControls;
+  visibleControls,
+  visibleDescription;
 }
 
 extension PlayerViewStateExtension on Set<PlayerViewState> {
@@ -66,6 +67,7 @@ extension PlayerViewStateExtension on Set<PlayerViewState> {
   bool get isFullscreen => contains(PlayerViewState.fullscreen);
   bool get showAmbient => contains(PlayerViewState.visibleAmbient);
   bool get showControls => contains(PlayerViewState.visibleControls);
+  bool get showDescription => contains(PlayerViewState.visibleDescription);
 }
 
 enum PlayerSignal {
@@ -81,7 +83,11 @@ enum PlayerSignal {
   exitExpanded,
   fastForward,
   hidePlaybackProgress,
-  showPlaybackProgress;
+  showPlaybackProgress,
+  openDescription,
+  closeDescription,
+  openComments,
+  closeComments;
 }
 
 class PlayerRepository {
@@ -230,11 +236,15 @@ class PlayerRepository {
           _playerViewState.add(PlayerViewState.visibleAmbient);
         case PlayerSignal.hideAmbient:
           _playerViewState.remove(PlayerViewState.visibleAmbient);
-        case PlayerSignal.fastForward:
-          break;
-        case PlayerSignal.hidePlaybackProgress:
-          break;
-        case PlayerSignal.showPlaybackProgress:
+        case PlayerSignal.openDescription:
+          _playerViewState.add(PlayerViewState.visibleDescription);
+        case PlayerSignal.closeDescription:
+          _playerViewState.remove(PlayerViewState.visibleDescription);
+        case PlayerSignal.openComments:
+          _playerViewState.add(PlayerViewState.visibleDescription);
+        case PlayerSignal.closeComments:
+          _playerViewState.remove(PlayerViewState.visibleDescription);
+        default:
           break;
       }
       _playerSignalController.sink.add(signal);

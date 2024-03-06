@@ -38,6 +38,8 @@ import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/providers/player_expanded_state_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
+import 'package:youtube_clone/presentation/screens/player/providers/player_signal_provider.dart';
+import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_settings.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -907,11 +909,38 @@ class PlayerActionsControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomOrientationBuilder(
-      onLandscape: (_, childWidget) => childWidget!,
+      onLandscape: (_, childWidget) {
+        return Consumer(
+          builder: (context, ref, child) {
+            ref.watch(
+              playerSignalProvider.select(
+                (value) {
+                  final event = value.value;
+
+                  return event == PlayerSignal.enterFullscreen ||
+                      event == PlayerSignal.exitFullscreen ||
+                      event == PlayerSignal.openDescription ||
+                      event == PlayerSignal.closeDescription ||
+                      event == PlayerSignal.openComments ||
+                      event == PlayerSignal.closeComments;
+                },
+              ),
+            );
+
+            // Hides Action controls when description or comments is show
+            if (ref.read(playerViewStateProvider).showDescription) {
+              return const SizedBox();
+            }
+            return childWidget!;
+          },
+        );
+      },
       onPortrait: (_, childWidget) => Consumer(
         builder: (context, ref, child) {
           ref.watch(playerExpandedStateProvider);
-          if (ref.read(playerRepositoryProvider).playerViewState.isExpanded) {
+
+          // Shows Action controls when player is expanded
+          if (ref.read(playerViewStateProvider).isExpanded) {
             return childWidget!;
           }
           return const SizedBox();
@@ -921,20 +950,32 @@ class PlayerActionsControl extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Row(
           children: [
-            const Expanded(
+            Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(Icons.thumb_up_alt_outlined),
-                  Icon(Icons.thumb_down_alt_outlined),
-                  Icon(Icons.chat_outlined),
-                  Icon(Icons.chat_outlined),
-                  Icon(Icons.reply_outlined),
-                  Icon(Icons.more_horiz),
+                  const Icon(Icons.thumb_up_alt_outlined),
+                  const Icon(Icons.thumb_down_alt_outlined),
+                  Consumer(
+                    builder: (context, ref, child) {
+                      return AppbarAction(
+                        icon: Icons.chat_outlined,
+                        onTap: () {
+                          ref.read(playerRepositoryProvider).sendPlayerSignal([
+                            PlayerSignal.hideControls,
+                            PlayerSignal.openComments,
+                          ]);
+                        },
+                      );
+                    },
+                  ),
+                  const Icon(Icons.add_box_outlined),
+                  const Icon(Icons.reply_outlined),
+                  const Icon(Icons.more_horiz),
                 ],
               ),
             ),
-            // const Spacer(),
+            const Spacer(),
             const SizedBox(width: 32),
             TappableArea(
               child: Row(

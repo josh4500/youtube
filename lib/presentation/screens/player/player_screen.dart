@@ -26,6 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -102,6 +103,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   double get additionalHeight => additionalHeightNotifier.value;
+
+  /// PlayerSignal StreamSubscription
+  StreamSubscription<PlayerSignal>? _subscription;
 
   @override
   void initState() {
@@ -201,12 +205,29 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     });
 
     Future(() async {
-      ref.read(playerRepositoryProvider).openVideo();
+      final playerRepo = ref.read(playerRepositoryProvider);
+
+      playerRepo.openVideo(); // Opens and play video
+
+      // Listens to PlayerSignal events related to description and comments
+      // Events are usually sent from PlayerLandscapeScreen
+      _subscription = playerRepo.playerSignalStream.listen((signal) {
+        if (signal == PlayerSignal.openDescription) {
+          _openDescSheet(); // Opens description sheet in this screen
+        } else if (signal == PlayerSignal.closeDescription) {
+          _closeDescSheet(); // Closes description sheet in this screen
+        } else if (signal == PlayerSignal.openComments) {
+          _openCommentSheet(); // Opens comment sheet in this screen
+        } else if (signal == PlayerSignal.closeComments) {
+          _closeCommentSheet(); // Closes comment sheet in this screen
+        }
+      });
     });
   }
 
   @override
   void dispose() {
+    _subscription?.cancel();
     _draggableOpacityController.dispose();
     _zoomPanAnimationController.dispose();
     _transformationController.dispose();
@@ -1085,7 +1106,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                         controller: controller,
                         closeDescription: _closeDescSheet,
                         transcriptNotifier: _transcriptNotifier,
-                        draggableController: _descDraggableController,
                       );
                     },
                   ),

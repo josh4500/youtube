@@ -27,10 +27,17 @@ class PlayerDescription extends ConsumerWidget {
       playerSignalProvider.select(
         (value) {
           final event = value.value;
-          return event == PlayerSignal.enterExpanded ||
-              event == PlayerSignal.exitExpanded ||
-              event == PlayerSignal.enterFullscreen ||
-              event == PlayerSignal.exitFullscreen;
+          if (showOnExpanded) {
+            return event == PlayerSignal.enterExpanded ||
+                event == PlayerSignal.exitExpanded;
+          }
+
+          return event == PlayerSignal.enterFullscreen ||
+              event == PlayerSignal.exitFullscreen ||
+              event == PlayerSignal.openDescription ||
+              event == PlayerSignal.closeDescription ||
+              event == PlayerSignal.openComments ||
+              event == PlayerSignal.closeComments;
         },
       ),
     );
@@ -42,13 +49,16 @@ class PlayerDescription extends ConsumerWidget {
     } else {
       if (!ref.read(playerViewStateProvider).isFullscreen) {
         return const SizedBox();
+      } else if (ref.read(playerViewStateProvider).showDescription) {
+        return const SizedBox();
       }
     }
 
     return GestureDetector(
-      onTap: () {
-        // TODO: Open description
-      },
+      onTap: () => ref.read(playerRepositoryProvider).sendPlayerSignal([
+        PlayerSignal.hideControls,
+        PlayerSignal.openDescription,
+      ]),
       child: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(

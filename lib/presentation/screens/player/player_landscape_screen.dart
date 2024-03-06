@@ -26,13 +26,18 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:async';
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/video_comment_sheet.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/video_description_sheet.dart';
 import 'package:youtube_clone/presentation/widgets/custom_scroll_physics.dart';
 
 import '../../providers.dart';
@@ -72,6 +77,19 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
   double get screenHeight => MediaQuery.sizeOf(context).height;
   double get screenWidth => MediaQuery.sizeOf(context).width;
 
+  bool _descIsOpened = false;
+  final _transcriptionNotifier = ValueNotifier(false);
+  late final AnimationController _descController;
+  late final Animation<double> _descAnimation;
+
+  bool _commentIsOpened = false;
+  final _replyNotifier = ValueNotifier(false);
+  late final AnimationController _commentController;
+  late final Animation<double> _commentAnimation;
+
+  /// PlayerSignal StreamSubscription
+  StreamSubscription<PlayerSignal>? _subscription;
+
   @override
   void initState() {
     super.initState();
@@ -90,6 +108,30 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
       Tween(begin: 1, end: 0.95),
     );
 
+    _descController = AnimationController(
+      vsync: this,
+      value: 0,
+      duration: const Duration(milliseconds: 100),
+    );
+
+    _descAnimation = CurvedAnimation(
+      parent: _descController,
+      curve: Curves.bounceIn,
+      reverseCurve: Curves.bounceInOut,
+    );
+
+    _commentController = AnimationController(
+      vsync: this,
+      value: 0,
+      duration: const Duration(milliseconds: 100),
+    );
+
+    _commentAnimation = CurvedAnimation(
+      parent: _commentController,
+      curve: Curves.bounceIn,
+      reverseCurve: Curves.bounceInOut,
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       ref.read(playerRepositoryProvider).sendPlayerSignal(
         [PlayerSignal.enterFullscreen],
@@ -98,14 +140,49 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
 
     Future(() async {
       await setLandscapeMode();
+      final playerRepo = ref.read(playerRepositoryProvider);
+      _subscription = playerRepo.playerSignalStream.listen((signal) {
+        if (signal == PlayerSignal.openDescription) {
+          _openDesc(); // Opens description in this screen
+        } else if (signal == PlayerSignal.openComments) {
+          _openComment(); // Opens comments in this screen
+        }
+      });
     });
   }
 
   @override
   void dispose() {
+    _subscription?.cancel();
     _transformationController.dispose();
     _viewController.dispose();
     super.dispose();
+  }
+
+  void _openDesc() {
+    _descIsOpened = true;
+    _descController.forward();
+  }
+
+  void _closeDesc() {
+    ref.read(playerRepositoryProvider).sendPlayerSignal([
+      PlayerSignal.hideControls,
+      PlayerSignal.closeDescription,
+    ]);
+    _descController.reverse();
+  }
+
+  void _openComment() {
+    _commentIsOpened = true;
+    _commentController.forward();
+  }
+
+  void _closeComment() {
+    ref.read(playerRepositoryProvider).sendPlayerSignal([
+      PlayerSignal.hideControls,
+      PlayerSignal.closeComments,
+    ]);
+    _commentController.reverse();
   }
 
   /// Handles tap events on the player.
@@ -235,23 +312,54 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
     );
 
     return Material(
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          SlideTransition(
-            position: _slideAnimation,
-            child: GestureDetector(
-              onTap: _onTapPlayer,
-              onVerticalDragUpdate: _onDragPlayer,
-              onVerticalDragEnd: _onDragPlayerEnd,
-              behavior: HitTestBehavior.opaque,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: interactivePlayerView,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: Row(
+            children: [
+              Expanded(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    GestureDetector(
+                      onTap: _onTapPlayer,
+                      onVerticalDragUpdate: _onDragPlayer,
+                      onVerticalDragEnd: _onDragPlayerEnd,
+                      behavior: HitTestBehavior.opaque,
+                      child: interactivePlayerView,
+                    ),
+                  ],
+                ),
               ),
-            ),
+              SizeTransition(
+                sizeFactor: _descAnimation,
+                axis: Axis.horizontal,
+                child: SizedBox(
+                  width: MediaQuery.sizeOf(context).width * .4,
+                  child: VideoDescriptionSheet(
+                    transcriptNotifier: _transcriptionNotifier,
+                    closeDescription: _closeDesc,
+                    showDragIndicator: false,
+                  ),
+                ),
+              ),
+              SizeTransition(
+                sizeFactor: _commentAnimation,
+                axis: Axis.horizontal,
+                child: SizedBox(
+                  width: MediaQuery.sizeOf(context).width * .4,
+                  child: VideoCommentsSheet(
+                    replyNotifier: _replyNotifier,
+                    closeComment: _closeComment,
+                    showDragIndicator: false,
+                    maxHeight: 0,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
