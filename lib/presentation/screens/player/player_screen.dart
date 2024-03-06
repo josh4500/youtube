@@ -299,9 +299,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   // Opens the player in fullscreen mode by sending a player signal to the repository.
   Future<void> _openFullscreenPlayer() async {
-    ref.read(playerRepositoryProvider).sendPlayerSignal(
-      [PlayerSignal.enterFullscreen],
-    );
     await context.goto(AppRoutes.playerLandscapeScreen);
   }
 

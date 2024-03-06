@@ -38,12 +38,14 @@ import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/providers/player_expanded_state_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_settings.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../player/player_notifications.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';
+import 'player_description.dart';
 import 'player_duration_control.dart';
 import 'player_fullscreen.dart';
 import 'player_minimize.dart';
@@ -457,14 +459,25 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
+                                  Column(
                                     children: [
-                                      PlayerMinimize(),
-                                      Spacer(),
-                                      PlayerAutoplaySwitch(),
-                                      PlayerCastCaptionControl(),
-                                      AppbarAction(
-                                          icon: Icons.settings_outlined),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          PlayerMinimize(),
+                                          Expanded(
+                                            child: PlayerDescription(
+                                              showOnFullscreen: true,
+                                            ),
+                                          ),
+                                          PlayerAutoplaySwitch(),
+                                          PlayerCastCaptionControl(),
+                                          PlayerSettings(),
+                                        ],
+                                      ),
+                                      PlayerDescription(
+                                        showOnExpanded: true,
+                                      ),
                                     ],
                                   ),
                                   Row(
@@ -538,7 +551,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                         if (isExpanded) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(
-                              vertical: 40,
+                              vertical: 48,
+                              horizontal: 8,
                             ),
                             child: childWidget!,
                           );
@@ -908,7 +922,6 @@ class PlayerActionsControl extends StatelessWidget {
         child: Row(
           children: [
             const Expanded(
-              flex: 3,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -921,7 +934,8 @@ class PlayerActionsControl extends StatelessWidget {
                 ],
               ),
             ),
-            const Spacer(),
+            // const Spacer(),
+            const SizedBox(width: 32),
             TappableArea(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,

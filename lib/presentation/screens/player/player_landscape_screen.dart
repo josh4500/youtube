@@ -90,6 +90,12 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
       Tween(begin: 1, end: 0.95),
     );
 
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(playerRepositoryProvider).sendPlayerSignal(
+        [PlayerSignal.enterFullscreen],
+      );
+    });
+
     Future(() async {
       await setLandscapeMode();
     });
