@@ -38,13 +38,12 @@ import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/providers/player_expanded_state_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/providers/player_signal_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_settings.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../player/player_notifications.dart';
+import 'player_actions_control.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';
 import 'player_description.dart';
@@ -191,7 +190,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
         _showPlaybackProgress.value = false;
       }
 
-      // TODO: Fix listening stream issues. May consider using ref.listenManual(...)
       final playerRepo = ref.read(playerRepositoryProvider);
       _subscription = playerRepo.playerSignalStream.listen(
         (signal) async {
@@ -601,10 +599,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _progressController.value = 1;
   }
 
-  void _hideProgressIndicator() {
-    _progressController.value = 0;
-  }
-
   Timer? _seekRateTimer;
 
   void _resetSeekRate() {
@@ -898,184 +892,5 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
         );
       }
     }
-  }
-}
-
-class PlayerActionsControl extends StatelessWidget {
-  const PlayerActionsControl({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomOrientationBuilder(
-      onLandscape: (_, childWidget) {
-        return Consumer(
-          builder: (context, ref, child) {
-            ref.watch(
-              playerSignalProvider.select(
-                (value) {
-                  final event = value.value;
-
-                  return event == PlayerSignal.enterFullscreen ||
-                      event == PlayerSignal.exitFullscreen ||
-                      event == PlayerSignal.openDescription ||
-                      event == PlayerSignal.closeDescription ||
-                      event == PlayerSignal.openComments ||
-                      event == PlayerSignal.closeComments;
-                },
-              ),
-            );
-
-            // Hides Action controls when description or comments is show
-            if (ref.read(playerViewStateProvider).showDescription) {
-              return const SizedBox();
-            }
-            return childWidget!;
-          },
-        );
-      },
-      onPortrait: (_, childWidget) => Consumer(
-        builder: (context, ref, child) {
-          ref.watch(playerExpandedStateProvider);
-
-          // Shows Action controls when player is expanded
-          if (ref.read(playerViewStateProvider).isExpanded) {
-            return childWidget!;
-          }
-          return const SizedBox();
-        },
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: Row(
-          children: [
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Icon(Icons.thumb_up_alt_outlined),
-                  const Icon(Icons.thumb_down_alt_outlined),
-                  Consumer(
-                    builder: (context, ref, child) {
-                      return AppbarAction(
-                        icon: Icons.chat_outlined,
-                        onTap: () {
-                          ref.read(playerRepositoryProvider).sendPlayerSignal([
-                            PlayerSignal.hideControls,
-                            PlayerSignal.openComments,
-                          ]);
-                        },
-                      );
-                    },
-                  ),
-                  const Icon(Icons.add_box_outlined),
-                  const Icon(Icons.reply_outlined),
-                  const Icon(Icons.more_horiz),
-                ],
-              ),
-            ),
-            const Spacer(),
-            const SizedBox(width: 32),
-            TappableArea(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Consumer(
-                    builder: (context, ref, child) {
-                      ref.watch(playerExpandedStateProvider);
-                      final isExpanded = ref
-                          .watch(playerRepositoryProvider)
-                          .playerViewState
-                          .isExpanded;
-                      if (isExpanded) {
-                        return const SizedBox();
-                      }
-
-                      return const Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                'More videos',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Text(
-                                'Tap or swipe up to see all',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(width: 8),
-                        ],
-                      );
-                    },
-                  ),
-                  const SizedBox(
-                    width: 60,
-                    height: 32,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      alignment: Alignment.center,
-                      children: [
-                        Positioned(
-                          top: -2,
-                          child: PlayerMoreVideos(
-                            width: 36,
-                            height: 22,
-                          ),
-                        ),
-                        Positioned(
-                          top: 2,
-                          width: 40,
-                          child: PlayerMoreVideos(
-                            width: 40,
-                            height: 22,
-                          ),
-                        ),
-                        PlayerMoreVideos(
-                          height: 22,
-                          width: 44,
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PlayerMoreVideos extends StatelessWidget {
-  final double width;
-  final double height;
-
-  const PlayerMoreVideos({
-    super.key,
-    this.width = 54,
-    this.height = 28,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.grey,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Colors.white, width: 1),
-      ),
-    );
   }
 }
