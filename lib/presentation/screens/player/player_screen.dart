@@ -30,6 +30,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
@@ -220,6 +221,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           _openCommentSheet(); // Opens comment sheet in this screen
         } else if (signal == PlayerSignal.closeComments) {
           _closeCommentSheet(); // Closes comment sheet in this screen
+        } else if (signal == PlayerSignal.enterExpanded) {
+          SystemChrome.setEnabledSystemUIMode(
+            SystemUiMode.immersive,
+            overlays: [],
+          );
+        } else if (signal == PlayerSignal.exitExpanded) {
+          SystemChrome.setEnabledSystemUIMode(
+            SystemUiMode.manual,
+            overlays: SystemUiOverlay.values,
+          );
         }
       });
     });
@@ -1004,20 +1015,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                 floating: false,
                                 delegate: FadingSliverPersistentHeaderDelegate(
                                   height: 40,
-                                  child: SizedBox(
-                                    height: 40,
-                                    child: const Material(
-                                      child: DynamicTab(
-                                        initialIndex: 0,
-                                        leadingWidth: 8,
-                                        options: <String>[
-                                          'All',
-                                          'Something',
-                                          'Related',
-                                          'Recently uploaded',
-                                          'Watched',
-                                        ],
-                                      ),
+                                  child: const Material(
+                                    child: DynamicTab(
+                                      initialIndex: 0,
+                                      leadingWidth: 8,
+                                      options: <String>[
+                                        'All',
+                                        'Something',
+                                        'Related',
+                                        'Recently uploaded',
+                                        'Watched',
+                                      ],
                                     ),
                                   ),
                                 ),
