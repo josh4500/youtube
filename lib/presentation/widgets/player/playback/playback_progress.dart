@@ -42,7 +42,7 @@ class PlaybackProgress extends StatefulWidget {
 
   const PlaybackProgress({
     super.key,
-    this.color = Colors.red,
+    this.color = const Color(0xFFFF0000),
     this.animation,
     this.bufferAnimation,
     this.progress,
@@ -66,10 +66,10 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
     super.initState();
     if (widget.animation != null) {
       thumbAnimation = widget.animation!.drive(
-        Tween<double>(begin: 0, end: 8),
+        Tween<double>(begin: 0, end: 12),
       );
       progressAnimation = widget.animation!.drive(
-        ColorTween(begin: Colors.white, end: Colors.red),
+        ColorTween(begin: Colors.white, end: const Color(0xFFFF0000)),
       );
     }
   }
@@ -105,11 +105,11 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                     // Buffering Progress indicator
                     if (widget.showBuffer)
                       LinearProgressIndicator(
-                        color: Colors.white24,
+                        color: Colors.white12,
                         value: bufferValue.isNaN || bufferValue.isInfinite
                             ? 0
                             : bufferValue,
-                        minHeight: 2,
+                        minHeight: 1.75,
                         valueColor: widget.bufferAnimation,
                         backgroundColor: Colors.transparent,
                       ),
@@ -125,7 +125,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                                 positionValue.isNaN || positionValue.isInfinite
                                     ? 0
                                     : positionValue,
-                            minHeight: 2,
+                            minHeight: 1.75,
                             backgroundColor:
                                 widget.backgroundColor ?? Colors.transparent,
                           );
@@ -137,7 +137,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                         value: positionValue.isNaN || positionValue.isInfinite
                             ? 0
                             : positionValue,
-                        minHeight: 2,
+                        minHeight: 1.75,
                         backgroundColor:
                             widget.backgroundColor ?? Colors.transparent,
                       ),
@@ -145,8 +145,8 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                     // Thumb
                     if (thumbAnimation != null)
                       Positioned(
-                        bottom: -3,
-                        left: (positionValue * constraint.maxWidth) - 4,
+                        bottom: -4.75,
+                        left: (positionValue * constraint.maxWidth) - 6,
                         child: AnimatedBuilder(
                           animation: thumbAnimation!,
                           builder: (context, _) {
@@ -154,7 +154,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                               width: thumbAnimation?.value,
                               height: thumbAnimation?.value,
                               decoration: const BoxDecoration(
-                                color: Colors.red,
+                                color: Color(0xFFFF0000),
                                 shape: BoxShape.circle,
                               ),
                             );

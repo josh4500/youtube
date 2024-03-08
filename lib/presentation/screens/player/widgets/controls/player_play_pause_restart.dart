@@ -83,7 +83,7 @@ class PlayPauseRestartControlState
     final isBuffering = playerNotifier.buffering;
 
     return PlayerControl(
-      horizontalPadding: 62,
+      horizontalPadding: 54,
       onTap: () {
         if (!isRestart) {
           if (isPlaying) {
@@ -100,17 +100,17 @@ class PlayPauseRestartControlState
         );
       },
       builder: (context, _) {
-        if (isBuffering) return const SizedBox(width: 54);
+        if (isBuffering) return const SizedBox(width: 48);
         return isRestart
             ? const Icon(
                 Icons.restart_alt,
-                size: 54,
+                size: 48,
                 semanticLabel: 'Restart Video',
               )
             : AnimatedIcon(
                 icon: AnimatedIcons.pause_play,
                 progress: _animation,
-                size: 54,
+                size: 48,
                 semanticLabel: isPlaying ? 'Pause video' : 'Play video',
               );
       },

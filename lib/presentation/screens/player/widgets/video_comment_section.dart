@@ -58,6 +58,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
       preferencesProvider.select((value) => value.restrictedMode),
     );
     // TODO: Check for isLiveVideo
+    const isDisabled = false;
     const isLiveVideo = true;
     const showHighlighted = true;
 

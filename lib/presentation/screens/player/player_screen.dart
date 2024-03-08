@@ -1001,20 +1001,23 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                               ),
                               SliverPersistentHeader(
                                 pinned: true,
-                                floating: true,
+                                floating: false,
                                 delegate: FadingSliverPersistentHeaderDelegate(
                                   height: 40,
-                                  child: const Material(
-                                    child: DynamicTab(
-                                      initialIndex: 0,
-                                      leadingWidth: 8,
-                                      options: <String>[
-                                        'All',
-                                        'Something',
-                                        'Related',
-                                        'Recently uploaded',
-                                        'Watched',
-                                      ],
+                                  child: SizedBox(
+                                    height: 40,
+                                    child: const Material(
+                                      child: DynamicTab(
+                                        initialIndex: 0,
+                                        leadingWidth: 8,
+                                        options: <String>[
+                                          'All',
+                                          'Something',
+                                          'Related',
+                                          'Recently uploaded',
+                                          'Watched',
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),

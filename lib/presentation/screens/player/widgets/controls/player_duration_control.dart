@@ -56,13 +56,13 @@ class _PlayerDurationControlState extends ConsumerState<PlayerDurationControl> {
       child: CustomOrientationBuilder(
         onLandscape: (context, childWidget) {
           return Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
             child: childWidget,
           );
         },
         onPortrait: (context, childWidget) {
           return Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
             child: childWidget,
           );
         },

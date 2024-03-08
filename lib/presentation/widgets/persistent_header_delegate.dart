@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/rendering.dart';
 
 class PersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
   final double minHeight;
@@ -24,7 +25,7 @@ class PersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => maxHeight;
 
   @override
-  double get minExtent => minHeight;
+  double get minExtent => 0;
 
   @override
   bool shouldRebuild(covariant PersistentHeaderDelegate oldDelegate) {
@@ -56,14 +57,11 @@ class FadingSliverPersistentHeaderDelegate
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    final scrollPercentage = (shrinkOffset / height).clamp(0.0, 1.0);
-    final double shrinkFactor = (shrinkOffset / (maxExtent - 0));
-    final fadeValue = scrollPercentage;
-
-    return Opacity(
-      opacity: fadeValue,
-      child: FractionalTranslation(
-        translation: Offset(0, 1 - fadeValue),
+    final shrinkFactor = (shrinkOffset / maxExtent);
+    return FractionalTranslation(
+      translation: Offset(0, 1 - shrinkFactor),
+      child: Opacity(
+        opacity: shrinkFactor,
         child: child,
       ),
     );
@@ -71,8 +69,15 @@ class FadingSliverPersistentHeaderDelegate
 
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
-    return false;
+    return true;
   }
+
+  @override
+  PersistentHeaderShowOnScreenConfiguration? get showOnScreenConfiguration =>
+      const PersistentHeaderShowOnScreenConfiguration(
+        maxShowOnScreenExtent: 0,
+        minShowOnScreenExtent: 0,
+      );
 }
 
 class SlidingHeaderDelegate extends SliverPersistentHeaderDelegate {

@@ -45,12 +45,15 @@ class PlayerMinimize extends ConsumerWidget {
         }
         MinimizePlayerNotification().dispatch(context);
       },
-      horizontalPadding: 4,
+      horizontalPadding: 14,
       color: Colors.transparent,
       builder: (context, _) {
         return const RotatedBox(
           quarterTurns: 1,
-          child: Icon(Icons.chevron_right_rounded),
+          child: Icon(
+            Icons.chevron_right_rounded,
+            size: 26,
+          ),
         );
       },
     );

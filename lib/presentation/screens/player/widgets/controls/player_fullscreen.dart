@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_control.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
 
@@ -42,12 +43,7 @@ class PlayerFullscreen extends ConsumerWidget {
 
     return PlayerControl(
       onTap: () {
-        final isExpanded = ref
-            .read(
-              playerRepositoryProvider,
-            )
-            .playerViewState
-            .isExpanded;
+        final isExpanded = ref.read(playerViewStateProvider).isExpanded;
         if (expandedMode || isExpanded) {
           if (!isExpanded) {
             ExpandPlayerNotification().dispatch(context);
@@ -70,9 +66,13 @@ class PlayerFullscreen extends ConsumerWidget {
       },
       color: Colors.transparent,
       horizontalPadding: 8,
-      verticalPadding: 14,
+      verticalPadding: 12,
       builder: (context, _) {
-        return const Icon(Icons.fullscreen);
+        final isExpanded = ref.read(playerViewStateProvider).isExpanded;
+        final isFullscreen = ref.read(playerViewStateProvider).isFullscreen;
+        return isExpanded || isFullscreen
+            ? const Icon(Icons.fullscreen_exit)
+            : const Icon(Icons.fullscreen);
       },
     );
   }

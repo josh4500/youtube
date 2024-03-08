@@ -38,6 +38,7 @@ import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/providers/player_expanded_state_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
+import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_settings.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -544,14 +545,12 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                     return Consumer(
                       builder: (context, ref, _) {
                         ref.watch(playerExpandedStateProvider);
-                        final isExpanded = ref
-                            .read(playerRepositoryProvider)
-                            .playerViewState
-                            .isExpanded;
+                        final isExpanded =
+                            ref.read(playerViewStateProvider).isExpanded;
                         if (isExpanded) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(
-                              vertical: 48,
+                              vertical: 58,
                               horizontal: 8,
                             ),
                             child: childWidget!,
