@@ -317,7 +317,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet>
                         const SizedBox(height: 16),
                         SizedBox(
                           height: 24,
-                          child: Row(
+                          child: Wrap(
                             children: [
                               CustomActionChip(
                                 title: '#SangitaMyaska',
