@@ -961,9 +961,22 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                         left: 0,
                                         bottom: 0,
                                         width: screenWidth,
-                                        child: const PlaybackProgress(
-                                          showBuffer: false,
-                                          backgroundColor: Colors.transparent,
+                                        child: Builder(
+                                          builder: (context) {
+                                            final playerRepo = ref
+                                                .read(playerRepositoryProvider);
+                                            return PlaybackProgress(
+                                              progress: playerRepo
+                                                  .videoProgressStream,
+                                              start: playerRepo
+                                                  .currentVideoProgress,
+                                              // TODO: Get ready value
+                                              end: const Duration(minutes: 1),
+                                              showBuffer: false,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                            );
+                                          },
                                         ),
                                       ),
                                   ],
