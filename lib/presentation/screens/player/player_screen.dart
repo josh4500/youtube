@@ -172,8 +172,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     heightNotifier.addListener(() {
       _recomputeDraggableHeight(heightNotifier.value);
-      final opacityValue =
-          1 - heightNotifier.value / (1 - minVideoViewPortHeight);
+      final opacityValue = (1 - (heightNotifier.value - 0.45) / (1 - 0.45));
 
       _draggableOpacityController.value = opacityValue;
       if (!_commentIsOpened && !_descIsOpened) {
@@ -894,6 +893,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         );
       },
       child: Material(
+        color: Colors.black,
         child: Stack(
           alignment: Alignment.bottomCenter,
           children: [
@@ -987,7 +987,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                         builder: (context, childWidget) {
                           return Opacity(
                             opacity: _infoOpacityAnimation.value,
-                            child: childWidget,
+                            child: Material(
+                              child: childWidget,
+                            ),
                           );
                         },
                         child: NotificationListener<ScrollNotification>(
