@@ -55,7 +55,7 @@ class AppRouter {
                 name: AppRoutes.home.name,
                 path: AppRoutes.home.path,
                 builder: (BuildContext context, GoRouterState state) {
-                  return HomeScreen(
+                  return HomeFeedScreen(
                     key: state.pageKey,
                   );
                 },

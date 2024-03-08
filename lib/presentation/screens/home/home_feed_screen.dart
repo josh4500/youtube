@@ -42,15 +42,17 @@ import 'package:youtube_clone/presentation/widgets/viewable/viewable_video_conte
 
 import '../../router/app_routes.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeFeedScreen extends StatefulWidget {
+  const HomeFeedScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeFeedScreen> createState() => _HomeFeedScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeFeedScreenState extends State<HomeFeedScreen> {
   final _scrollController = ScrollController();
+
+  /// Play Something notifier
   final _playSNotifier = ValueNotifier(false);
 
   @override
@@ -59,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _scrollController.addListener(_checker);
   }
 
+  /// Animates size of "Play Something" button depending on the scroll direction
   void _checker() {
     final direction = _scrollController.position.userScrollDirection;
     final offset = _scrollController.offset;

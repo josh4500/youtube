@@ -42,7 +42,7 @@ export 'screens/accounts/your_videos_screen.dart';
 export 'screens/channel/channel_description_screen.dart';
 export 'screens/channel/channel_screen.dart';
 
-export 'screens/home/home_screen.dart';
+export 'screens/home/home_feed_screen.dart';
 
 export 'screens/player/player_screen.dart';
 export 'screens/player/player_landscape_screen.dart';
