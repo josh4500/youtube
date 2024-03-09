@@ -51,6 +51,10 @@ class ViewableVideoContent extends StatelessWidget {
                 child: PlaybackView(
                   placeholder: Container(
                     color: const Color(0xFF656565),
+                    child: Image.network(
+                      'https://picsum.photos/900/500',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),

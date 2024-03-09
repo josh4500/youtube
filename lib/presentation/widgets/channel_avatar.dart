@@ -26,6 +26,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class ChannelAvatar extends StatelessWidget {
@@ -33,25 +35,52 @@ class ChannelAvatar extends StatelessWidget {
   final VoidCallback? onTap;
   const ChannelAvatar({super.key, this.size, this.onTap});
 
-  bool get hasLive => false;
-
   @override
   Widget build(BuildContext context) {
+    bool hasLive = Random().nextBool();
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: size ?? 50,
-        height: size ?? 50,
-        decoration: BoxDecoration(
-          color: Colors.white12,
-          border: hasLive
-              ? Border.all(
-                  width: 2,
-                  color: Colors.red,
-                )
-              : null,
-          shape: BoxShape.circle,
-        ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.bottomCenter,
+        children: [
+          Container(
+            width: size ?? 50,
+            height: size ?? 50,
+            decoration: BoxDecoration(
+              color: Colors.white12,
+              image: const DecorationImage(
+                image: NetworkImage('https://i.pravatar.cc/300'),
+                fit: BoxFit.cover,
+              ),
+              border: hasLive
+                  ? Border.all(
+                      width: 2,
+                      color: const Color(0xFFFF0000),
+                    )
+                  : null,
+              shape: BoxShape.circle,
+            ),
+          ),
+          if (hasLive)
+            Positioned(
+              bottom: -6,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF0000),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'Live',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            )
+        ],
       ),
     );
   }

@@ -241,7 +241,6 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
             const SliverToBoxAdapter(
               child: ViewableVideoContent(),
             ),
-            const SliverFillRemaining(),
           ],
         ),
       ),
