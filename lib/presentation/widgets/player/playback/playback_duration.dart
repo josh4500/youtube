@@ -43,7 +43,7 @@ class PlaybackDuration extends StatelessWidget {
         vertical: 12,
       ),
       decoration: BoxDecoration(
-        color: Colors.black87,
+        color: Colors.black54,
         borderRadius: BorderRadius.circular(4),
       ),
       child: const Text(

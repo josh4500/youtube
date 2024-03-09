@@ -47,10 +47,10 @@ class ViewableVideoContent extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(
-                height: 208,
+                height: 227,
                 child: PlaybackView(
                   placeholder: Container(
-                    color: Colors.blue,
+                    color: const Color(0xFF656565),
                   ),
                 ),
               ),
@@ -61,21 +61,7 @@ class ViewableVideoContent extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 12.0,
-                            horizontal: 4,
-                          ),
-                          child: Visibility(
-                            visible: false,
-                            maintainSize: true,
-                            maintainState: true,
-                            maintainAnimation: true,
-                            child: ChannelAvatar(
-                              size: 48,
-                            ),
-                          ),
-                        ),
+                        const SizedBox(width: 44),
                         Flexible(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
@@ -91,7 +77,7 @@ class ViewableVideoContent extends StatelessWidget {
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 6),
                                 Row(
                                   children: [
                                     RichText(
@@ -111,6 +97,7 @@ class ViewableVideoContent extends StatelessWidget {
                                     ),
                                   ],
                                 ),
+                                const SizedBox(height: 6),
                               ],
                             ),
                           ),
@@ -135,17 +122,17 @@ class ViewableVideoContent extends StatelessWidget {
         ),
         const Positioned(
           left: 8,
-          bottom: 24,
+          bottom: 32,
           child: Padding(
             padding: EdgeInsets.symmetric(
               vertical: 12.0,
               horizontal: 4,
             ),
-            child: ChannelAvatar(size: 44),
+            child: ChannelAvatar(size: 36),
           ),
         ),
         Positioned(
-          right: 8,
+          right: 9.5,
           bottom: 48,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 6.0),

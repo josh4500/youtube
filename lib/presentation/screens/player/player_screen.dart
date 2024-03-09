@@ -1034,17 +1034,27 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                 pinned: true,
                                 floating: false,
                                 delegate: FadingSliverPersistentHeaderDelegate(
-                                  height: 40,
+                                  height: 48,
                                   child: const Material(
-                                    child: DynamicTab(
-                                      initialIndex: 0,
-                                      leadingWidth: 8,
-                                      options: <String>[
-                                        'All',
-                                        'Something',
-                                        'Related',
-                                        'Recently uploaded',
-                                        'Watched',
+                                    child: Column(
+                                      children: [
+                                        Spacer(),
+                                        SizedBox(
+                                          height: 40,
+                                          child: DynamicTab(
+                                            initialIndex: 0,
+                                            leadingWidth: 8,
+                                            options: <String>[
+                                              'All',
+                                              'Something',
+                                              'Related',
+                                              'Recently uploaded',
+                                              'Watched',
+                                            ],
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        Divider(height: 0, thickness: 1.5),
                                       ],
                                     ),
                                   ),
