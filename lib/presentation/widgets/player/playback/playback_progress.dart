@@ -30,7 +30,10 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/progress.dart';
 
+const defaultPlaybackProgressTapSize = 10.0;
+
 class PlaybackProgress extends StatefulWidget {
+  final double tapSize;
   final Color? color;
   final Animation<double?>? animation;
   final Animation<Color?>? bufferAnimation;
@@ -39,9 +42,14 @@ class PlaybackProgress extends StatefulWidget {
   final Progress? start;
   final Duration? end;
   final bool showBuffer;
+  final void Function(Duration position)? onTap;
+  final void Function(Duration position)? onDragStart;
+  final void Function()? onDragEnd;
+  final void Function(Duration position)? onChangePosition;
 
   const PlaybackProgress({
     super.key,
+    this.tapSize = defaultPlaybackProgressTapSize,
     this.color = const Color(0xFFFF0000),
     this.animation,
     this.bufferAnimation,
@@ -50,6 +58,10 @@ class PlaybackProgress extends StatefulWidget {
     this.end = Duration.zero,
     this.showBuffer = true,
     this.backgroundColor = Colors.white30,
+    this.onTap,
+    this.onDragStart,
+    this.onDragEnd,
+    this.onChangePosition,
   });
 
   @override
@@ -97,7 +109,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
               onHorizontalDragEnd: (details) =>
                   _onHorizontalDragEnd(details, constraint.maxWidth),
               child: SizedBox(
-                height: 7,
+                height: widget.tapSize,
                 child: Stack(
                   alignment: Alignment.bottomLeft,
                   clipBehavior: Clip.none,
@@ -171,11 +183,43 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
     );
   }
 
-  void _onTapDown(TapDownDetails details, double width) {}
+  void _onTapDown(TapDownDetails details, double width) {
+    final positionInMilliseconds = _getRelativePosition(
+      details.localPosition.dx,
+      width,
+    );
+    if (widget.onTap != null) {
+      widget.onTap!(Duration(milliseconds: positionInMilliseconds));
+    }
+  }
 
-  void _onHorizontalDragStart(DragStartDetails details, double width) {}
+  void _onHorizontalDragStart(DragStartDetails details, double width) {
+    final positionInMilliseconds = _getRelativePosition(
+      details.localPosition.dx,
+      width,
+    );
+    if (widget.onDragStart != null) {
+      widget.onDragStart!(Duration(milliseconds: positionInMilliseconds));
+    }
+  }
 
-  void _onHorizontalDragUpdate(DragUpdateDetails details, double width) {}
+  void _onHorizontalDragUpdate(DragUpdateDetails details, double width) {
+    final positionInMilliseconds = _getRelativePosition(
+      details.localPosition.dx,
+      width,
+    );
+    if (widget.onDragStart != null) {
+      widget.onChangePosition!(Duration(milliseconds: positionInMilliseconds));
+    }
+  }
 
-  void _onHorizontalDragEnd(DragEndDetails details, double width) {}
+  void _onHorizontalDragEnd(DragEndDetails details, double width) {
+    if (widget.onDragEnd != null) {
+      widget.onDragEnd!();
+    }
+  }
+
+  int _getRelativePosition(double dx, double width) {
+    return ((widget.end?.inMilliseconds ?? 0) * (dx / width)).floor();
+  }
 }

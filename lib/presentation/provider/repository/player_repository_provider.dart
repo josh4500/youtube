@@ -90,6 +90,10 @@ enum PlayerSignal {
   closeComments;
 }
 
+enum PlayerLock {
+  progress;
+}
+
 class PlayerRepository {
   final Ref _ref;
 
@@ -99,8 +103,8 @@ class PlayerRepository {
   late final _videoController = VideoController(_videoPlayer);
   VideoController get videoController => _videoController;
 
-  late final Stream<Progress> _videoProgressStream;
-  Stream<Progress> get videoProgressStream => _videoProgressStream;
+  late final Stream<Progress> _videoPlayerProgressStream;
+
   Duration get currentVideoDuration => _videoPlayer.state.duration;
   Duration get currentVideoPosition => _videoPlayer.state.position;
   Progress? get currentVideoProgress => _positionMemory.read('video');
@@ -113,11 +117,16 @@ class PlayerRepository {
   final _playerSignalController = StreamController<PlayerSignal>.broadcast();
   Stream<PlayerSignal> get playerSignalStream => _playerSignalController.stream;
 
+  final _progressController = StreamController<Progress>.broadcast();
+  Stream<Progress> get videoProgressStream => _progressController.stream;
+
   final Set<PlayerViewState> _playerViewState = <PlayerViewState>{};
   Set<PlayerViewState> get playerViewState => _playerViewState;
 
+  final Set<PlayerLock> _lock = <PlayerLock>{};
+
   PlayerRepository({required Ref ref}) : _ref = ref {
-    _videoProgressStream = _videoPlayer.stream.progress;
+    _videoPlayerProgressStream = _videoPlayer.stream.progress;
 
     _videoPlayer.stream.completed.listen((hasEnded) {
       if (hasEnded) {
@@ -145,8 +154,11 @@ class PlayerRepository {
       }
     });
 
-    _videoProgressStream.listen((progress) {
+    _videoPlayerProgressStream.listen((progress) {
       _positionMemory.write('video', progress);
+      if (!_lock.contains(PlayerLock.progress)) {
+        _progressController.sink.add(progress);
+      }
     });
   }
 
@@ -249,5 +261,18 @@ class PlayerRepository {
       }
       _playerSignalController.sink.add(signal);
     }
+  }
+
+  void updatePosition(Duration position, {bool lockProgress = true}) {
+    if (lockProgress) {
+      _lock.add(PlayerLock.progress);
+    } else {
+      _lock.remove(PlayerLock.progress);
+    }
+    final lastProgress = _positionMemory.read('video') ?? Progress.zero;
+    _progressController.sink.add(
+      lastProgress.copyWith(position: position),
+    );
+    _positionMemory.write('video', lastProgress.copyWith(position: position));
   }
 }

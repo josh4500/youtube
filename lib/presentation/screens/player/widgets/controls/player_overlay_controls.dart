@@ -89,6 +89,9 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   /// Y position of user pointer when long press action starts
   double _longPressYPosition = 0;
 
+  /// X position of user pointer when long press action starts
+  double _longPressXPosition = 0;
+
   /// Timer used for hiding `Release` message while slide seeking.
   Timer? _releaseTimer;
 
@@ -114,6 +117,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   /// Sends a vibration when user slides over this value
   Duration? _lowerboundSlideDuration;
 
+  bool _showPullUp = false;
   final _showSlidingSeekIndicator = ValueNotifier<bool>(false);
   final _showSlidingReleaseIndicator = ValueNotifier<bool>(false);
   final _slidingSeekDuration = ValueNotifier<Duration?>(null);
@@ -294,6 +298,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       children: [
         Expanded(
           child: Stack(
+            clipBehavior: Clip.none,
             children: [
               Align(
                 alignment: Alignment.topCenter,
@@ -384,13 +389,19 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                       alignment: Alignment.topCenter,
                       child: SeekIndicator(
                         valueListenable: _showSlidingSeekIndicator,
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.linear_scale),
-                            SizedBox(width: 4),
-                            Text('Slide left or right to seek'),
+                            _showPullUp
+                                ? const Icon(Icons.expand_less)
+                                : const Icon(Icons.linear_scale),
+                            const SizedBox(width: 4),
+                            Text(
+                              _showPullUp
+                                  ? 'Pull up for precise seeking'
+                                  : 'Slide left or right to seek',
+                            ),
                           ],
                         ),
                       ),
@@ -455,6 +466,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                       children: [
                         Expanded(
                           child: Stack(
+                            clipBehavior: Clip.none,
                             children: [
                               const Column(
                                 mainAxisAlignment:
@@ -581,6 +593,10 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                           end: const Duration(minutes: 1),
                           animation: _progressAnimation,
                           bufferAnimation: _bufferAnimation,
+                          onTap: _onPlaybackProgressTap,
+                          onDragStart: _onPlaybackProgressDragStart,
+                          onChangePosition: _onPlaybackProgressPositionChanged,
+                          onDragEnd: _onPlaybackProgressDragEnd,
                         );
                       },
                     ),
@@ -687,7 +703,30 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   /// Hides the sliding seek indicator and perform related cleanup actions
   void _hideSlideSeek() {
+    _preventCommonControlGestures = false;
     _showSlidingSeekIndicator.value = false;
+
+    // If a sliding seek duration is set, perform seek operation to that duration
+    if (_slidingSeekDuration.value != null) {
+      // Release updating from player
+      ref.read(playerRepositoryProvider).updatePosition(
+            _slidingSeekDuration.value!,
+            lockProgress: false,
+          );
+      ref.read(playerRepositoryProvider).seekTo(_slidingSeekDuration.value!);
+    }
+
+    // Reset sliding seek-related values and indicators
+    _slidingSeekDuration.value = null;
+    _showSlidingSeekDuration.value = false;
+
+    // Reset duration variables for slide seeking
+    _lastDuration = null;
+    _upperboundSlideDuration = null;
+    _lowerboundSlideDuration = null;
+
+    // Contingency to hide pull up message
+    _showPullUp = false;
 
     // If controls are not hidden, manage control visibility and progress indicator
     if (!_controlsHidden) {
@@ -701,20 +740,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     } else {
       _showPlaybackProgress.value = false;
     }
-
-    // If a sliding seek duration is set, perform seek operation to that duration
-    if (_slidingSeekDuration.value != null) {
-      ref.read(playerRepositoryProvider).seekTo(_slidingSeekDuration.value!);
-    }
-
-    // Reset sliding seek-related values and indicators
-    _slidingSeekDuration.value = null;
-    _showSlidingSeekDuration.value = false;
-
-    // Reset duration variables for slide seeking
-    _lastDuration = null;
-    _upperboundSlideDuration = null;
-    _lowerboundSlideDuration = null;
   }
 
   void _onEndSlideFrameSeek() {
@@ -753,6 +778,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     if (_preventCommonControlGestures) return;
 
     _longPressYPosition = details.localPosition.dy;
+    _longPressXPosition = details.localPosition.dx;
 
     if (!_controlsHidden) {
       final screenWidth = MediaQuery.sizeOf(context).width;
@@ -828,6 +854,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
           .inMicroseconds;
       final lastPosition =
           ref.read(playerRepositoryProvider).currentVideoPosition;
+
       final localX = details.localPosition.dx;
       final localY = details.localPosition.dy;
       final screenWidth = MediaQuery.sizeOf(context).width;
@@ -839,42 +866,42 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       _upperboundSlideDuration ??= lastPosition + bound;
       _lowerboundSlideDuration ??= lastPosition - bound;
 
+      final longPressXDuration = Duration(
+        microseconds:
+            (_longPressXPosition * totalMicroseconds / screenWidth).floor(),
+      );
+
+      // TODO: This might fix inconsistency with changes in position
+      // Duration newDuration;
+      // if (_longPressXPosition < localX) {
+      //   newDuration = longPressXDuration +
+      //       Duration(
+      //         microseconds: ((localX - _longPressXPosition) *
+      //                 totalMicroseconds /
+      //                 screenWidth)
+      //             .floor(),
+      //       );
+      // }else {
+      //   newDuration = longPressXDuration  -
+      //       Duration(
+      //         microseconds: (( _longPressXPosition - localX) *
+      //             totalMicroseconds /
+      //             screenWidth)
+      //             .floor(),
+      //       );
+      // }
       final newDuration = Duration(
         microseconds: (localX * totalMicroseconds / screenWidth).floor(),
       );
 
-      // Send a vibration
-      if (newDuration > _upperboundSlideDuration!) {
-        if (_lastDuration! < _upperboundSlideDuration!) {
-          HapticFeedback.selectionClick();
-          _showReleaseIndicator();
-          _lastDuration = newDuration;
-        }
-      } else if (newDuration < _upperboundSlideDuration!) {
-        if (_lastDuration! > _upperboundSlideDuration!) {
-          HapticFeedback.selectionClick();
-          _showReleaseIndicator();
-          _lastDuration = lastPosition;
-        }
-      }
-
-      if (newDuration < _lowerboundSlideDuration!) {
-        if (_lastDuration! > _lowerboundSlideDuration!) {
-          HapticFeedback.selectionClick();
-          _showReleaseIndicator();
-          _lastDuration = newDuration;
-        }
-      } else if (newDuration > _lowerboundSlideDuration!) {
-        if (_lastDuration! < _lowerboundSlideDuration!) {
-          HapticFeedback.selectionClick();
-          _showReleaseIndicator();
-          _lastDuration = lastPosition;
-        }
-      }
+      _checkOutOfBound(lastPosition, newDuration);
 
       if (!_showSlideFrame.value) {
         _showSlidingSeekDuration.value = true;
         _slidingSeekDuration.value = newDuration;
+
+        // Updates and locks progress from player
+        ref.read(playerRepositoryProvider).updatePosition(newDuration);
       }
 
       if (localY < (_longPressYPosition - 10)) {
@@ -891,5 +918,98 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
         );
       }
     }
+  }
+
+  void _checkOutOfBound(Duration lastPosition, Duration newDuration) {
+    // Send a vibration
+    if (newDuration > _upperboundSlideDuration!) {
+      if (_lastDuration! < _upperboundSlideDuration!) {
+        HapticFeedback.selectionClick();
+        _showReleaseIndicator();
+        _lastDuration = newDuration;
+      }
+    } else if (newDuration < _upperboundSlideDuration!) {
+      if (_lastDuration! > _upperboundSlideDuration!) {
+        HapticFeedback.selectionClick();
+        _showReleaseIndicator();
+        _lastDuration = lastPosition;
+      }
+    }
+
+    if (newDuration < _lowerboundSlideDuration!) {
+      if (_lastDuration! > _lowerboundSlideDuration!) {
+        HapticFeedback.selectionClick();
+        _showReleaseIndicator();
+        _lastDuration = newDuration;
+      }
+    } else if (newDuration > _lowerboundSlideDuration!) {
+      if (_lastDuration! < _lowerboundSlideDuration!) {
+        HapticFeedback.selectionClick();
+        _showReleaseIndicator();
+        _lastDuration = lastPosition;
+      }
+    }
+  }
+
+  bool wasPlaying = false;
+
+  /// When PlaybackProgress is tapped to change the position of currently playing
+  /// video.
+  void _onPlaybackProgressTap(Duration position) {
+    if (_showPlaybackProgress.value) {
+      ref.read(playerRepositoryProvider).seekTo(position);
+    }
+  }
+
+  void _onPlaybackProgressDragStart(Duration position) {
+    wasPlaying = ref.read(playerNotifierProvider).playing;
+    if (wasPlaying) ref.read(playerRepositoryProvider).pauseVideo();
+
+    _showPullUp = true;
+    _showSlidingSeekDuration.value = true;
+    _slidingSeekDuration.value = position;
+
+    _showSlideSeek();
+    // Updates and locks progress from player
+    ref.read(playerRepositoryProvider).updatePosition(position);
+  }
+
+  void _onPlaybackProgressDragEnd() {
+    if (_slidingSeekDuration.value != null) {
+      ref.read(playerRepositoryProvider).seekTo(_slidingSeekDuration.value!);
+      // Updates the progress for the las time and unlocks getting progress from
+      // player
+      ref.read(playerRepositoryProvider).updatePosition(
+            _slidingSeekDuration.value!,
+            lockProgress: false, // Releases lock on player progress
+          );
+    }
+
+    _showPullUp = false;
+    _slidingSeekDuration.value = null;
+    _hideSlideSeek();
+
+    if (wasPlaying) ref.read(playerRepositoryProvider).playVideo();
+    wasPlaying = false;
+  }
+
+  void _onPlaybackProgressPositionChanged(Duration position) {
+    final lastPosition =
+        ref.read(playerRepositoryProvider).currentVideoPosition;
+    final totalMicroseconds =
+        ref.read(playerRepositoryProvider).currentVideoDuration.inMicroseconds;
+    final bound = Duration(microseconds: (totalMicroseconds * 0.1).floor());
+
+    // Set initial values
+    _lastDuration ??= lastPosition;
+    _upperboundSlideDuration ??= lastPosition + bound;
+    _lowerboundSlideDuration ??= lastPosition - bound;
+
+    // Send vibration feedback when going in or out of lower and upper bound
+    _checkOutOfBound(lastPosition, position);
+
+    _slidingSeekDuration.value = position;
+    // Updates and locks progress from player
+    ref.read(playerRepositoryProvider).updatePosition(position);
   }
 }

@@ -396,6 +396,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           PlayerSignal.hidePlaybackProgress,
         ]);
       }
+      // TODO: Check why _isSeeking is not released after ended seeking
+      _isSeeking = false;
+      _preventPlayerDragDown = false;
+      _preventPlayerDragUp = false;
     }
 
     // Adjust additional height if within limits
@@ -896,6 +900,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         color: Colors.black,
         child: Stack(
           alignment: Alignment.bottomCenter,
+          clipBehavior: Clip.none,
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.center,

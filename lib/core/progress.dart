@@ -47,4 +47,14 @@ final class Progress {
 
   @override
   int get hashCode => buffer.hashCode ^ position.hashCode;
+
+  Progress copyWith({
+    Duration? buffer,
+    Duration? position,
+  }) {
+    return Progress(
+      buffer: buffer ?? this.buffer,
+      position: position ?? this.position,
+    );
+  }
 }
