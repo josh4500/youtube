@@ -39,10 +39,27 @@ class _PlayerSeekSlideFrameState extends State<PlayerSeekSlideFrame> {
     );
   }
 
+  int get framesCount {
+    // TODO: Get real value
+    const duration = Duration(seconds: 1);
+    int value;
+    if (duration < const Duration(minutes: 3)) {
+      value = duration.inSeconds;
+    } else if (duration < const Duration(minutes: 5)) {
+      value = (duration.inSeconds / 3).floor();
+    } else if (duration < const Duration(minutes: 10)) {
+      value = (duration.inSeconds / 5).floor();
+    } else if (duration < const Duration(seconds: 60)) {
+      value = (duration.inSeconds / 10).floor();
+    } else {
+      value = duration.inSeconds;
+    }
+
+    return value + 2;
+  }
+
   @override
   Widget build(BuildContext context) {
-    const framesCount = 10 + 2;
-
     return ValueListenableBuilder(
       valueListenable: widget.valueListenable,
       builder: (context, show, _) {

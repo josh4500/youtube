@@ -866,12 +866,11 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       _upperboundSlideDuration ??= lastPosition + bound;
       _lowerboundSlideDuration ??= lastPosition - bound;
 
-      final longPressXDuration = Duration(
-        microseconds:
-            (_longPressXPosition * totalMicroseconds / screenWidth).floor(),
-      );
-
       // TODO: This might fix inconsistency with changes in position
+      //  final longPressXDuration = Duration(
+      //         microseconds:
+      //             (_longPressXPosition * totalMicroseconds / screenWidth).floor(),
+      //       );
       // Duration newDuration;
       // if (_longPressXPosition < localX) {
       //   newDuration = longPressXDuration +
