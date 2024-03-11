@@ -86,6 +86,9 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
     }
   }
 
+  // TODO: Compute based on video data
+  double get barHeight => 2;
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Progress>(
@@ -108,57 +111,64 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                   _onHorizontalDragUpdate(details, constraint.maxWidth),
               onHorizontalDragEnd: (details) =>
                   _onHorizontalDragEnd(details, constraint.maxWidth),
-              child: SizedBox(
+              child: Container(
+                color: Colors.transparent,
                 height: widget.tapSize,
                 child: Stack(
                   alignment: Alignment.bottomLeft,
                   clipBehavior: Clip.none,
                   children: [
-                    // Buffering Progress indicator
-                    if (widget.showBuffer)
-                      LinearProgressIndicator(
-                        color: Colors.white12,
-                        value: bufferValue.isNaN || bufferValue.isInfinite
-                            ? 0
-                            : bufferValue,
-                        minHeight: 1.75,
-                        valueColor: widget.bufferAnimation,
-                        backgroundColor: Colors.transparent,
-                      ),
-                    // TODO: Remove temporary fix for color animation
-                    // Player position Indicator
-                    if (progressAnimation != null)
-                      AnimatedBuilder(
-                        animation: progressAnimation!,
-                        builder: (_, __) {
-                          return LinearProgressIndicator(
-                            color: progressAnimation!.value ?? widget.color,
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        // Buffering Progress indicator
+                        if (widget.showBuffer)
+                          LinearProgressIndicator(
+                            color: Colors.white12,
+                            value: bufferValue.isNaN || bufferValue.isInfinite
+                                ? 0
+                                : bufferValue,
+                            minHeight: barHeight,
+                            valueColor: widget.bufferAnimation,
+                            backgroundColor: Colors.transparent,
+                          ),
+                        // TODO: Remove temporary fix for color animation
+                        // Player position Indicator
+                        if (progressAnimation != null)
+                          AnimatedBuilder(
+                            animation: progressAnimation!,
+                            builder: (_, __) {
+                              return LinearProgressIndicator(
+                                color: progressAnimation!.value ?? widget.color,
+                                value: positionValue.isNaN ||
+                                        positionValue.isInfinite
+                                    ? 0
+                                    : positionValue,
+                                minHeight: barHeight,
+                                backgroundColor: widget.backgroundColor ??
+                                    Colors.transparent,
+                              );
+                            },
+                          )
+                        else
+                          LinearProgressIndicator(
+                            color: widget.color,
                             value:
                                 positionValue.isNaN || positionValue.isInfinite
                                     ? 0
                                     : positionValue,
-                            minHeight: 1.75,
+                            minHeight: barHeight,
                             backgroundColor:
                                 widget.backgroundColor ?? Colors.transparent,
-                          );
-                        },
-                      )
-                    else
-                      LinearProgressIndicator(
-                        color: widget.color,
-                        value: positionValue.isNaN || positionValue.isInfinite
-                            ? 0
-                            : positionValue,
-                        minHeight: 1.75,
-                        backgroundColor:
-                            widget.backgroundColor ?? Colors.transparent,
-                      ),
+                          ),
+                      ],
+                    ),
 
                     // Thumb
                     if (thumbAnimation != null)
                       Positioned(
                         bottom: -4.75,
-                        left: (positionValue * constraint.maxWidth) - 6,
+                        left: (positionValue * constraint.maxWidth) - 1.5,
                         child: AnimatedBuilder(
                           animation: thumbAnimation!,
                           builder: (context, _) {
@@ -222,4 +232,81 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
   int _getRelativePosition(double dx, double width) {
     return ((widget.end?.inMilliseconds ?? 0) * (dx / width)).floor();
   }
+}
+
+class ProgressChaptersClipper extends CustomClipper<Path> {
+  static const double _space = 3;
+
+  static const List<double> chapters = [0.167, .3334, .5001, 0.6668, 0.8335, 1];
+
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    // Begin
+    path.moveTo(0, 0);
+
+    for (int i = 0; i < chapters.length; i++) {
+      final chapter = chapters[i];
+      path.lineTo(size.width * chapter, 0);
+      path.lineTo(size.width * chapter, size.height);
+
+      if (i == 0) {
+        path.lineTo(0, size.height);
+        path.lineTo(0, 0);
+
+        if (chapters.length > 1) {
+          final nextChapter = chapters[i + 1];
+          path.moveTo((size.width * nextChapter) + _space, 0);
+        }
+      } else {
+        final prevChapter = chapters[i - 1];
+        path.lineTo((size.width * prevChapter) + _space, size.height);
+        path.lineTo((size.width * prevChapter) + _space, 0);
+
+        if (i != chapters.length - 1) {
+          final nextChapter = chapters[i + 1];
+          path.moveTo((size.width * nextChapter) + _space, 0);
+        }
+      }
+    }
+
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class ProgressChapterPainter extends CustomPainter {
+  static const double _radius = 2.5;
+
+  static const List<double> chapters = [
+    0.125,
+    0.25,
+    0.375,
+    0.5,
+    0.625,
+    0.75,
+    0.875
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..strokeWidth = 1
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    for (int i = 0; i < chapters.length; i++) {
+      canvas.drawCircle(
+        Offset((size.width * chapters[i]) + (_radius / 2), size.height / 2),
+        _radius,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
