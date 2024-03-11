@@ -332,30 +332,34 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
                   ],
                 ),
               ),
-              SizeTransition(
-                sizeFactor: _descAnimation,
-                axis: Axis.horizontal,
-                child: SizedBox(
-                  width: MediaQuery.sizeOf(context).width * .4,
-                  child: VideoDescriptionSheet(
-                    transcriptNotifier: _transcriptionNotifier,
-                    closeDescription: _closeDesc,
-                    showDragIndicator: false,
+              Row(
+                children: [
+                  SizeTransition(
+                    sizeFactor: _descAnimation,
+                    axis: Axis.horizontal,
+                    child: SizedBox(
+                      width: MediaQuery.sizeOf(context).width * .4,
+                      child: VideoDescriptionSheet(
+                        transcriptNotifier: _transcriptionNotifier,
+                        closeDescription: _closeDesc,
+                        showDragIndicator: false,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              SizeTransition(
-                sizeFactor: _commentAnimation,
-                axis: Axis.horizontal,
-                child: SizedBox(
-                  width: MediaQuery.sizeOf(context).width * .4,
-                  child: VideoCommentsSheet(
-                    replyNotifier: _replyNotifier,
-                    closeComment: _closeComment,
-                    showDragIndicator: false,
-                    maxHeight: 0,
+                  SizeTransition(
+                    sizeFactor: _commentAnimation,
+                    axis: Axis.horizontal,
+                    child: SizedBox(
+                      width: MediaQuery.sizeOf(context).width * .4,
+                      child: VideoCommentsSheet(
+                        replyNotifier: _replyNotifier,
+                        closeComment: _closeComment,
+                        showDragIndicator: false,
+                        maxHeight: 0,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),

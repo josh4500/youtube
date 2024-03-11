@@ -49,6 +49,7 @@ class PlayerView extends ConsumerWidget {
     final aspectRatio = (controller.player.state.width ?? 1) /
         (controller.player.state.height ?? 1);
     return Container(
+      color: Colors.transparent,
       constraints: BoxConstraints(
         minWidth: 135,
         maxWidth: screenWidth,
@@ -59,7 +60,7 @@ class PlayerView extends ConsumerWidget {
         controller: controller,
         fit: BoxFit.fitWidth,
         alignment: Alignment.center,
-        fill: Colors.black,
+        fill: Colors.transparent,
         filterQuality: FilterQuality.none,
         pauseUponEnteringBackgroundMode: true,
         resumeUponEnteringForegroundMode: false,

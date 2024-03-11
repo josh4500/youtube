@@ -65,7 +65,7 @@ class PlayerFullscreen extends ConsumerWidget {
         }
       },
       color: Colors.transparent,
-      horizontalPadding: 8,
+      horizontalPadding: 0,
       verticalPadding: 12,
       builder: (context, _) {
         final isExpanded = ref.read(playerViewStateProvider).isExpanded;

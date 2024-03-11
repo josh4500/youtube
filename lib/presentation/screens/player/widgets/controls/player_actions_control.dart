@@ -112,13 +112,14 @@ class PlayerActionsControl extends StatelessWidget {
                               Text(
                                 'More videos',
                                 style: TextStyle(
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               Text(
                                 'Tap or swipe up to see all',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 10,
                                   color: Colors.grey,
                                 ),
                               ),

@@ -48,9 +48,9 @@ class PlayerAutoplaySwitch extends ConsumerWidget {
         );
       },
       activeColor: Colors.white,
-      activeTrackColor: Colors.black12,
-      inactiveTrackColor: Colors.black12,
-      inactiveThumbColor: Colors.grey,
+      activeTrackColor: Colors.white30,
+      inactiveTrackColor: Colors.white30,
+      inactiveThumbColor: const Color(0xFF606060),
       thumbIcon: MaterialStateProperty.resolveWith(
         (states) {
           if (states.contains(MaterialState.selected)) {

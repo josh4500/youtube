@@ -146,7 +146,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
     _controlsVisibilityController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 175),
+      duration: const Duration(milliseconds: 225),
       reverseDuration: const Duration(milliseconds: 100),
     );
 
@@ -164,13 +164,13 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _bufferController = AnimationController(
       vsync: this,
       value: 1,
-      duration: const Duration(milliseconds: 175),
+      duration: const Duration(milliseconds: 225),
       reverseDuration: const Duration(milliseconds: 100),
     );
 
     _progressController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 175),
+      duration: const Duration(milliseconds: 225),
       reverseDuration: const Duration(milliseconds: 100),
     );
 
@@ -185,14 +185,17 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       end: Colors.transparent,
     ).animate(_bufferController);
 
+    // TODO: Use Orientation for condition
     Future(() {
-      if (!ref.read(playerNotifierProvider).playing) {
-        _controlsHidden = false;
-        _controlsVisibilityController.value = 1;
-      } else {
-        _controlsHidden = true;
-        _controlsVisibilityController.value = 0;
-        _showPlaybackProgress.value = false;
+      if (!ref.read(playerNotifierProvider).loading) {
+        if (!ref.read(playerNotifierProvider).playing) {
+          _controlsHidden = false;
+          _controlsVisibilityController.value = 1;
+        } else {
+          _controlsHidden = true;
+          _controlsVisibilityController.value = 0;
+          _showPlaybackProgress.value = false;
+        }
       }
 
       final playerRepo = ref.read(playerRepositoryProvider);
@@ -345,7 +348,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                 valueListenable: _showDoubleTapSeekIndicator,
                 builder: (context, value, childWidget) {
                   return AnimatedOpacity(
-                    duration: const Duration(milliseconds: 175),
+                    duration: const Duration(milliseconds: 225),
                     opacity: value ? 1 : 0,
                     child: childWidget,
                   );
@@ -461,58 +464,14 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                     );
                   },
                   child: ColoredBox(
-                    color: Colors.black26,
+                    color: Colors.black54,
                     child: Column(
                       children: [
                         Expanded(
                           child: Stack(
                             clipBehavior: Clip.none,
                             children: [
-                              const Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    children: [
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          PlayerMinimize(),
-                                          Expanded(
-                                            child: PlayerDescription(
-                                              showOnFullscreen: true,
-                                            ),
-                                          ),
-                                          PlayerAutoplaySwitch(),
-                                          PlayerCastCaptionControl(),
-                                          PlayerSettings(),
-                                        ],
-                                      ),
-                                      PlayerDescription(
-                                        showOnExpanded: true,
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      PlayerPrevious(),
-                                      PlayPauseRestartControl(),
-                                      PlayerNext(),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      PlayerDurationControl(),
-                                      PlayerFullscreen(),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                              const _GroupControl(),
                               PlayerSeekSlideFrame(
                                 animation: _slideFrameController,
                                 frameHeight: slideFrameHeight,
@@ -548,7 +507,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12.0,
-                        vertical: 48,
+                        vertical: 58,
                       ),
                       child: childWidget,
                     );
@@ -955,7 +914,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   /// When PlaybackProgress is tapped to change the position of currently playing
   /// video.
   void _onPlaybackProgressTap(Duration position) {
-    if (_showPlaybackProgress.value) {
+    if (_progressController.value > 0) {
       ref.read(playerRepositoryProvider).seekTo(position);
     }
   }
@@ -1010,5 +969,129 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _slidingSeekDuration.value = position;
     // Updates and locks progress from player
     ref.read(playerRepositoryProvider).updatePosition(position);
+  }
+}
+
+class _GroupControl extends StatelessWidget {
+  const _GroupControl();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _TopControl(),
+        _MiddleControl(),
+        _BottomControl(),
+      ],
+    );
+  }
+}
+
+class _TopControl extends StatelessWidget {
+  const _TopControl();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            PlayerMinimize(),
+            Expanded(
+              child: PlayerDescription(
+                showOnFullscreen: true,
+              ),
+            ),
+            PlayerAutoplaySwitch(),
+            PlayerCastCaptionControl(),
+            PlayerSettings(),
+          ],
+        ),
+        PlayerDescription(
+          showOnExpanded: true,
+        ),
+      ],
+    );
+  }
+}
+
+class _MiddleControl extends StatelessWidget {
+  const _MiddleControl();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        PlayerPrevious(),
+        PlayPauseRestartControl(),
+        PlayerNext(),
+      ],
+    );
+  }
+}
+
+class _BottomControl extends StatelessWidget {
+  const _BottomControl();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 12.0),
+      child: Row(
+        children: [
+          PlayerDurationControl(),
+          PlayerChapterControl(),
+          Spacer(),
+          PlayerFullscreen(),
+        ],
+      ),
+    );
+  }
+}
+
+class PlayerChapterControl extends StatelessWidget {
+  const PlayerChapterControl({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text.rich(
+          TextSpan(
+            text: '·  ',
+            style: TextStyle(
+              fontSize: 13.5,
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+            ),
+            children: [
+              TextSpan(
+                text: 'Best title you will ever see',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.clip,
+        ),
+        Icon(
+          Icons.chevron_right_outlined,
+          size: 18,
+        ),
+      ],
+    );
   }
 }
