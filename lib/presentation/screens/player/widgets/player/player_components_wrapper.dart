@@ -26,8 +26,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_watermark.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../controls/player_loading.dart';
 import '../controls/player_overlay_controls.dart';
@@ -55,15 +58,27 @@ class PlayerComponentsWrapper extends StatelessWidget {
       },
       child: Stack(
         alignment: Alignment.center,
+        clipBehavior: Clip.none,
         children: [
           child,
           // Shows loading indicator, regardless if controls are shown/hidden
           const PlayerLoadingIndicator(),
+          // Shows video channel watermark image in fullscreen mode
+          const PlayerWatermark(),
           const Positioned.fill(
             child: PlayerOverlayControls(),
           ),
         ],
       ),
     );
+  }
+}
+
+class PlayerCaption extends StatelessWidget {
+  const PlayerCaption({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const PlaybackCaption();
   }
 }
