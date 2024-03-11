@@ -47,11 +47,12 @@ class VideoDescriptionSection extends StatelessWidget {
               vertical: 8,
               horizontal: 12,
             ),
+            borderRadius: BorderRadius.zero,
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'The Notebook Latest Yoruba Movie 2024 Drama Ronke Odusanya|Mecry Aigbe|Lateef Adedimeji',
+                  'Google Chromecast: Official video',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -63,12 +64,29 @@ class VideoDescriptionSection extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      '1,484 views 5d ago ',
+                      '189k views 10y ago',
                       style: TextStyle(
-                        color: Colors.grey,
+                        color: Color(0xFFAAAAAA),
                         fontSize: 13,
                       ),
                     ),
+                    // Row(
+                    //   children: [
+                    //     Icon(
+                    //       Icons.shopping_bag_outlined,
+                    //       color: Color(0xFFAAAAAA),
+                    //       size: 14,
+                    //     ),
+                    //     Text(
+                    //       ' Shop ',
+                    //       style: TextStyle(
+                    //         color: Color(0xFFAAAAAA),
+                    //         fontSize: 13,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                    SizedBox(width: 6),
                     Text(
                       '...more',
                       style: TextStyle(
@@ -81,32 +99,46 @@ class VideoDescriptionSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          TappableArea(
-            padding: const EdgeInsets.symmetric(
-              vertical: 4,
-              horizontal: 12,
-            ),
-            child: Row(
-              children: [
-                const ChannelAvatar(size: 36),
-                const SizedBox(width: 12),
-                const Text(
-                  'Muy Authentic Tv',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+          Stack(
+            children: [
+              const TappableArea(
+                padding: EdgeInsets.symmetric(
+                  vertical: 4,
+                  horizontal: 12,
                 ),
-                const SizedBox(width: 8),
-                const Text(
-                  '34.5K',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 13,
-                  ),
+                borderRadius: BorderRadius.zero,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ChannelAvatar(size: 40),
+                    SizedBox(width: 12),
+                    Text(
+                      'Harris Craycraft',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      '101K',
+                      style: TextStyle(
+                        color: Color(0xFFAAAAAA),
+                        fontSize: 13,
+                      ),
+                    ),
+                    Spacer(),
+                    SizedBox(
+                      width: 74,
+                      height: 30,
+                    ),
+                  ],
                 ),
-                const Spacer(),
-                Container(
+              ),
+              Positioned(
+                top: 6,
+                right: 12,
+                child: Container(
                   padding: const EdgeInsets.symmetric(
                     vertical: 9,
                     horizontal: 14,
@@ -123,9 +155,9 @@ class VideoDescriptionSection extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                )
-              ],
-            ),
+                ),
+              )
+            ],
           ),
         ],
       ),

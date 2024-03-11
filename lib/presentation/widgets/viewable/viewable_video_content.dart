@@ -94,7 +94,7 @@ class ViewableVideoContent extends StatelessWidget {
                                           TextSpan(text: '1 hour ago'),
                                         ],
                                         style: TextStyle(
-                                          color: Colors.grey,
+                                          color: Color(0xFFAAAAAA),
                                           fontSize: 12,
                                         ),
                                       ),

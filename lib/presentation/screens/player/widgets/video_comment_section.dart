@@ -84,12 +84,17 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
                 },
               ),
               if (!isRestrictedMode) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: 4),
                 ListenableBuilder(
                   listenable: _pageController,
                   builder: (context, _) {
                     if (currentPage != 0) return const SizedBox();
-                    return const Text('16k');
+                    return const Text(
+                      '16k',
+                      style: TextStyle(
+                        color: Color(0xFFAAAAAA),
+                      ),
+                    );
                   },
                 ),
               ],
@@ -150,7 +155,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
                   )
                 : null,
           ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 8),
       ],
     );
 

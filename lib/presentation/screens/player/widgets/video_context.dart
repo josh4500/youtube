@@ -38,12 +38,9 @@ class VideoContext extends StatelessWidget {
         vertical: 12,
         horizontal: 16,
       ),
-      margin: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 8,
-      ),
+      margin: const EdgeInsets.only(left: 12, right: 12, top: 5, bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.grey.shade900,
+        color: const Color(0xFF272727),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -60,14 +57,14 @@ class VideoContext extends StatelessWidget {
                         child: Icon(
                           Icons.open_in_new,
                           color: Colors.blue,
-                          size: 13.5,
+                          size: 12,
                         ),
                       )
                     ],
-                    style: TextStyle(fontSize: 13.5, color: Colors.blue),
+                    style: TextStyle(fontSize: 12, color: Color(0xFF3EA6FF)),
                   ),
                 ],
-                style: TextStyle(fontSize: 13.5),
+                style: TextStyle(fontSize: 12),
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 2,

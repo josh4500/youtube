@@ -54,9 +54,9 @@ class VideoActions extends StatelessWidget {
               child: const Row(
                 children: [
                   CustomActionButton(
-                    title: '9.5k',
+                    title: '336',
                     leadingWidth: 4,
-                    padding: EdgeInsets.symmetric(horizontal: 14),
+                    padding: EdgeInsets.symmetric(horizontal: 12),
                     icon: Icon(Icons.thumb_up_outlined, size: 14),
                   ),
                   Padding(
@@ -70,7 +70,7 @@ class VideoActions extends StatelessWidget {
                     ),
                   ),
                   CustomActionButton(
-                    padding: EdgeInsets.symmetric(horizontal: 14),
+                    padding: EdgeInsets.symmetric(horizontal: 12),
                     icon: Icon(Icons.thumb_down_outlined, size: 14),
                   ),
                 ],
