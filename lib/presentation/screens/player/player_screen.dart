@@ -37,10 +37,10 @@ import 'package:youtube_clone/presentation/provider/repository/player_repository
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
+import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/player/player_components_wrapper.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/persistent_header_delegate.dart';
 
 import '../../view_models/playback/player_sizing.dart';
 import 'widgets/player/mini_player.dart';
@@ -66,7 +66,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   final GlobalKey _portraitPlayerKey = GlobalKey();
 
   final _infoScrollController = ScrollController();
-  final _infoScrollPhysics = const CustomScrollableScrollPhysics(tag: 'info');
+  final _infoScrollPhysics = const CustomScrollableScrollPhysics(
+    parent: AlwaysScrollableScrollPhysics(),
+    tag: 'info',
+  );
 
   final _transformationController = TransformationController();
   late final AnimationController _zoomPanAnimationController;
@@ -83,6 +86,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   late final ValueNotifier<double> heightNotifier;
   late final ValueNotifier<double> widthNotifier;
 
+  late final Animation<double> sizeAnimation;
+
   bool _controlWasTempHidden = false;
 
   double get screenWidth => MediaQuery.sizeOf(context).width;
@@ -97,7 +102,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     return avgVideoViewPortHeight;
   }
 
-  bool get expandedMode => heightRatio != videoViewHeight;
+  // TODO: Compute bool value
+  bool get expandedMode => false;
 
   double get maxAdditionalHeight {
     return (screenHeight * (1 - avgVideoViewPortHeight) / 1.5);
@@ -165,6 +171,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     marginNotifier = ValueNotifier<double>(0);
     heightNotifier = ValueNotifier<double>(1);
     widthNotifier = ValueNotifier<double>(1);
+
+    sizeAnimation = CurvedAnimation(
+      parent: Animation.fromValueListenable(heightNotifier),
+      curve: const Interval(minVideoViewPortHeight, 1),
+    );
 
     if (additionalHeight > 0) {
       _infoScrollPhysics.canScroll(false);
@@ -332,7 +343,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   Future<void> _openFullscreenPlayer() async {
     _hideControls();
     await context.goto(AppRoutes.playerLandscapeScreen);
-    _showControls(true);
+    if (!ref.read(playerViewStateProvider).isMinimized) {
+      _showControls(true);
+    }
   }
 
   /// Hides the player controls and save state whether control will be temporary
@@ -656,15 +669,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           screenHeight * (1 - heightRatio),
         );
         if (additionalHeight > 0) {
+          // Hides the playback progress while animating "to" expanded view
           ref
               .read(playerRepositoryProvider)
               .sendPlayerSignal([PlayerSignal.hidePlaybackProgress]);
+
+          _hideControls();
         }
       }
-    }
-
-    if (_allowInfoDrag && additionalHeight > 0 && !_controlWasTempHidden) {
-      _hideControls();
     }
 
     if (event.delta.dy < 0 && _infoScrollController.offset > 0) {
@@ -676,7 +688,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
   }
 
-  // TODO: Fix issue where just a tap triggers _onDragInfoUp
   void _onDragInfoUp(PointerUpEvent event) {
     if (additionalHeight > 0 && _allowInfoDrag) {
       if (additionalHeight > maxAdditionalHeight) {
@@ -686,7 +697,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         additionalHeightNotifier.value =
             screenHeight - (screenHeight * heightRatio);
       } else {
-        if (!expandedMode) {
+        if (expandedMode) {
+          // TODO: Handle expanded mode
+        } else {
           additionalHeightNotifier.value = 0;
 
           ref.read(playerRepositoryProvider).sendPlayerSignal([
@@ -696,6 +709,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           _infoScrollPhysics.canScroll(true);
         }
       }
+    } else if (_allowInfoDrag && additionalHeight == 0) {
+      ref.read(playerRepositoryProvider).sendPlayerSignal([
+        PlayerSignal.exitExpanded,
+        PlayerSignal.showPlaybackProgress,
+      ]);
     }
 
     if (_infoScrollController.offset == 0) {
@@ -838,9 +856,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
             additionalHeightNotifier.value = 0;
           }
           _hideControls();
-          ref
-              .read(playerRepositoryProvider)
-              .sendPlayerSignal([PlayerSignal.exitExpanded]);
+          ref.read(playerRepositoryProvider).sendPlayerSignal([
+            PlayerSignal.exitExpanded,
+            PlayerSignal.showPlaybackProgress,
+          ]);
         } else if (notification is EnterFullscreenPlayerNotification) {
           _openFullscreenPlayer();
         } else if (notification is SettingsPlayerNotification) {
@@ -882,6 +901,77 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
               child: PlayerView(),
             ),
           ),
+        ),
+      ),
+    );
+
+    final playerRepo = ref.read(playerRepositoryProvider);
+    final miniplayerProgress = PlaybackProgress(
+      progress: playerRepo.videoProgressStream,
+      start: playerRepo.currentVideoProgress,
+      // TODO: Get ready value
+      end: const Duration(minutes: 1),
+      showBuffer: false,
+      backgroundColor: Colors.transparent,
+    );
+
+    final infoScrollview = ScrollConfiguration(
+      behavior: const NoOverScrollGlowBehavior(),
+      child: NotificationListener<ScrollNotification>(
+        onNotification: _onScrollDynamicTab,
+        child: CustomScrollView(
+          physics: _infoScrollPhysics,
+          controller: _infoScrollController,
+          slivers: [
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  VideoDescriptionSection(onTap: _openDescSheet),
+                  const VideoContext(),
+                  const VideoActions(),
+                  VideoCommentSection(onTap: _openCommentSheet),
+                  const SizedBox(height: 12),
+                ],
+              ),
+            ),
+            // SliverPersistentHeader(
+            //   pinned: true,
+            //   floating: false,
+            //   delegate: FadingSliverPersistentHeaderDelegate(
+            //     height: 48,
+            //     child: const Material(
+            //       child: Column(
+            //         children: [
+            //           Spacer(),
+            //           SizedBox(
+            //             height: 40,
+            //             child: DynamicTab(
+            //               initialIndex: 0,
+            //               leadingWidth: 8,
+            //               options: <String>[
+            //                 'All',
+            //                 'Something',
+            //                 'Related',
+            //                 'Recently uploaded',
+            //                 'Watched',
+            //               ],
+            //             ),
+            //           ),
+            //           Spacer(),
+            //           Divider(height: 0, thickness: 1.5),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // TODO: Remove test
+            const SliverToBoxAdapter(child: ViewableVideoContent()),
+            const SliverToBoxAdapter(child: ViewableVideoContent()),
+            const SliverToBoxAdapter(child: ViewableVideoContent()),
+            const SliverToBoxAdapter(child: ViewableVideoContent()),
+            const SliverToBoxAdapter(child: ViewableVideoContent()),
+            const SliverToBoxAdapter(child: ViewableVideoContent()),
+          ],
         ),
       ),
     );
@@ -943,8 +1033,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                           return Container(
                                             margin: EdgeInsets.only(
                                               top: marginValue,
-                                              left: marginValue > 0 ? 10 : 0,
-                                              right: marginValue > 0 ? 10 : 0,
+                                              left: marginValue.clamp(0, 10),
+                                              right: marginValue.clamp(0, 10),
                                             ),
                                             constraints: addHeightValue > 0
                                                 ? null
@@ -966,22 +1056,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                         left: 0,
                                         bottom: 0,
                                         width: screenWidth,
-                                        child: Builder(
-                                          builder: (context) {
-                                            final playerRepo = ref
-                                                .read(playerRepositoryProvider);
-                                            return PlaybackProgress(
-                                              progress: playerRepo
-                                                  .videoProgressStream,
-                                              start: playerRepo
-                                                  .currentVideoProgress,
-                                              // TODO: Get ready value
-                                              end: const Duration(minutes: 1),
-                                              showBuffer: false,
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                            );
-                                          },
+                                        child: Opacity(
+                                          opacity: widthValue
+                                              .normalize(
+                                                minVideoViewPortWidth,
+                                                1,
+                                              )
+                                              .invertByOne,
+                                          child: miniplayerProgress,
                                         ),
                                       ),
                                   ],
@@ -994,94 +1076,22 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                     );
                   },
                 ),
+                // TODO: Create custom column and overlap first child on top of second
                 Flexible(
                   child: Listener(
                     onPointerMove: _onDragInfo,
                     onPointerUp: _onDragInfoUp,
-                    child: ScrollConfiguration(
-                      behavior: const NoOverScrollGlowBehavior(),
-                      child: AnimatedBuilder(
-                        animation: _infoOpacityAnimation,
-                        builder: (context, childWidget) {
-                          return Opacity(
-                            opacity: _infoOpacityAnimation.value,
-                            child: Material(
-                              child: childWidget,
-                            ),
-                          );
-                        },
-                        child: NotificationListener<ScrollNotification>(
-                          onNotification: _onScrollDynamicTab,
-                          child: CustomScrollView(
-                            physics: _infoScrollPhysics,
-                            controller: _infoScrollController,
-                            slivers: [
-                              SliverToBoxAdapter(
-                                child: Column(
-                                  children: [
-                                    VideoDescriptionSection(
-                                      onTap: _openDescSheet,
-                                    ),
-                                    const VideoContext(),
-                                    const VideoActions(),
-                                    VideoCommentSection(
-                                      onTap: _openCommentSheet,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SliverPersistentHeader(
-                                pinned: true,
-                                floating: false,
-                                delegate: FadingSliverPersistentHeaderDelegate(
-                                  height: 48,
-                                  child: const Material(
-                                    child: Column(
-                                      children: [
-                                        Spacer(),
-                                        SizedBox(
-                                          height: 40,
-                                          child: DynamicTab(
-                                            initialIndex: 0,
-                                            leadingWidth: 8,
-                                            options: <String>[
-                                              'All',
-                                              'Something',
-                                              'Related',
-                                              'Recently uploaded',
-                                              'Watched',
-                                            ],
-                                          ),
-                                        ),
-                                        Spacer(),
-                                        Divider(height: 0, thickness: 1.5),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SliverToBoxAdapter(
-                                child: ViewableVideoContent(),
-                              ),
-                              const SliverToBoxAdapter(
-                                child: ViewableVideoContent(),
-                              ),
-                              const SliverToBoxAdapter(
-                                child: ViewableVideoContent(),
-                              ),
-                              const SliverToBoxAdapter(
-                                child: ViewableVideoContent(),
-                              ),
-                              const SliverToBoxAdapter(
-                                child: ViewableVideoContent(),
-                              ),
-                              const SliverToBoxAdapter(
-                                child: ViewableVideoContent(),
-                              ),
-                            ],
+                    child: AnimatedBuilder(
+                      animation: _infoOpacityAnimation,
+                      builder: (context, childWidget) {
+                        return Opacity(
+                          opacity: _infoOpacityAnimation.value,
+                          child: Material(
+                            child: childWidget,
                           ),
-                        ),
-                      ),
+                        );
+                      },
+                      child: infoScrollview,
                     ),
                   ),
                 ),
@@ -1158,4 +1168,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       ),
     );
   }
+}
+
+double normalizeDouble(double value, double min, double max) {
+  return (value - min) / (max - min);
+}
+
+extension NormalizeDoubleExtension on double {
+  double normalize(double min, double max) {
+    return (this - min) / (max - min);
+  }
+
+  double get invertByOne => 1 - this;
 }
