@@ -111,6 +111,7 @@ class _HomePageState extends ConsumerState<HomePage>
     return SafeArea(
       bottom: false,
       child: Scaffold(
+        extendBody: true,
         body: Stack(
           children: [
             widget.child,
