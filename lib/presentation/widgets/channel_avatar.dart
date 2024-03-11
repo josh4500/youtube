@@ -30,6 +30,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+// TODO: Use clipper to create if channel is live
 class ChannelAvatar extends StatelessWidget {
   final double? size;
   final VoidCallback? onTap;
@@ -44,44 +45,58 @@ class ChannelAvatar extends StatelessWidget {
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
         children: [
-          Container(
-            width: size ?? 50,
-            height: size ?? 50,
-            decoration: BoxDecoration(
-              color: Colors.white12,
-              image: const DecorationImage(
-                image: NetworkImage('https://i.pravatar.cc/300'),
-                fit: BoxFit.cover,
+          CustomPaint(
+            painter: LiveCustomPainer(),
+            child: Container(
+              width: size ?? 50,
+              height: size ?? 50,
+              padding: hasLive ? const EdgeInsets.all(1) : null,
+              decoration: const BoxDecoration(
+                color: Colors.white12,
+                image: DecorationImage(
+                  image: NetworkImage('https://i.pravatar.cc/300'),
+                  fit: BoxFit.cover,
+                ),
+                shape: BoxShape.circle,
               ),
-              border: hasLive
-                  ? Border.all(
-                      width: 2,
-                      color: const Color(0xFFFF0000),
-                    )
-                  : null,
-              shape: BoxShape.circle,
             ),
           ),
-          if (hasLive)
-            Positioned(
-              bottom: -6,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF0000),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  'Live',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-            )
+          // if (hasLive)
+          //   Positioned(
+          //     bottom: -1,
+          //     child: Container(
+          //       padding: const EdgeInsets.symmetric(
+          //         horizontal: 1.5,
+          //       ),
+          //       decoration: BoxDecoration(
+          //         color: const Color(0xFFFF0000),
+          //         borderRadius: BorderRadius.circular(2),
+          //       ),
+          //       child: const Text(
+          //         'Live',
+          //         style: TextStyle(
+          //           fontSize: 12,
+          //           fontWeight: FontWeight.w400,
+          //         ),
+          //       ),
+          //     ),
+          //   ),
         ],
       ),
     );
   }
+}
+
+class LiveCustomPainer extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..strokeWidth = 2
+      ..color = const Color(0xFFFF0000)
+      ..style = PaintingStyle.stroke;
+    canvas.drawCircle(Offset(size.width / 2, size.height / 2), 2, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

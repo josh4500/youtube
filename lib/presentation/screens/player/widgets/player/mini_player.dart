@@ -51,7 +51,6 @@ class MiniPlayer extends StatelessWidget {
       child: SizedBox(
         height: height,
         child: Row(
-          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
@@ -66,17 +65,21 @@ class MiniPlayer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'ted | John and Ted Get High for the First Time',
+                      'Google Chromecast: Official Video',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: Color(0xFFF1F1F1),
+                      ),
                     ),
                     SizedBox(height: 6),
                     Text(
-                      'Mrwhosetheboss',
+                      'Harris Craycraft',
                       maxLines: 1,
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
+                        fontSize: 12.5,
+                        color: Color(0xFFAAAAAA),
                       ),
                     ),
                   ],
@@ -110,6 +113,7 @@ class _MiniPlayerPausePlayButton extends ConsumerWidget {
     final playerNotifier = ref.watch(playerNotifierProvider);
     final isPlaying = playerNotifier.playing;
     final isRestart = playerNotifier.ended;
+    final isLoading = playerNotifier.loading;
     return TappableArea(
       onPressed: () {
         if (!isRestart) {
@@ -118,7 +122,7 @@ class _MiniPlayerPausePlayButton extends ConsumerWidget {
           } else {
             ref.read(playerRepositoryProvider).playVideo();
           }
-        } else {
+        } else if (!isLoading) {
           ref.read(playerRepositoryProvider).restartVideo();
         }
       },
