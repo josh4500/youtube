@@ -176,7 +176,22 @@ class PlayerRepository {
     final position = reverse
         ? _videoPlayer.state.position - duration
         : _videoPlayer.state.position + duration;
-    await _videoPlayer.seek(position);
+    // Ends if seek position is greater or equal to the video duration
+    if (position >= currentVideoDuration) {
+      _ref.read(playerNotifierProvider.notifier).end();
+    }
+    // If already ended and position is below the video duration, it removes end
+    // state and change to a pause state
+    else if (_ref.read(playerNotifierProvider).ended &&
+        position < currentVideoDuration) {
+      // Pass argument true make it a pause state
+      _ref.read(playerNotifierProvider.notifier).restart(false);
+    }
+    if (position.isNegative) {
+      await _videoPlayer.seek(Duration.zero);
+    } else {
+      await _videoPlayer.seek(position);
+    }
   }
 
   Future<void> seekTo(Duration position) async {

@@ -48,6 +48,7 @@ class ViewableVideoContent extends StatelessWidget {
             children: [
               SizedBox(
                 height: 227,
+                width: double.infinity,
                 child: PlaybackView(
                   placeholder: Container(
                     color: const Color(0xFF656565),

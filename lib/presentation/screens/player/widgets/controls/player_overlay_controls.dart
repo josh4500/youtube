@@ -50,6 +50,7 @@ import 'player_cast_caption_control.dart';
 import 'player_description.dart';
 import 'player_duration_control.dart';
 import 'player_fullscreen.dart';
+import 'player_loading.dart';
 import 'player_minimize.dart';
 import 'player_next.dart';
 import 'player_play_pause_restart.dart';
@@ -90,7 +91,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   double _longPressYPosition = 0;
 
   /// X position of user pointer when long press action starts
-  double _longPressXPosition = 0;
+  //double _longPressXPosition = 0;
 
   /// Timer used for hiding `Release` message while slide seeking.
   Timer? _releaseTimer;
@@ -127,13 +128,14 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   final _showForward2XIndicator = ValueNotifier<bool>(false);
 
   /// Rate of seeking on double tap
-  int _seekRate = 0;
+  final _seekRate = ValueNotifier<int>(0);
 
   /// Whether direction for seeking is forward.
-  bool _isForwardSeek = true;
+  final _isForwardSeek = ValueNotifier<bool>(true);
 
   /// Notifier for showing double tap seek indicator
-  final _showDoubleTapSeekIndicator = ValueNotifier<bool>(false);
+  late final AnimationController _showDoubleTapSeekIndicator;
+  late final Animation<double> _showDoubleTapSeekAnimation;
 
   /// Whether sliding seek is active
   bool get _isSlidingSeek {
@@ -184,6 +186,17 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       begin: Colors.white38,
       end: Colors.transparent,
     ).animate(_bufferController);
+
+    _showDoubleTapSeekIndicator = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 225),
+    );
+
+    _showDoubleTapSeekAnimation = CurvedAnimation(
+      parent: _showDoubleTapSeekIndicator,
+      curve: Curves.easeInCubic,
+      reverseCurve: Curves.easeOutCubic,
+    );
 
     // TODO: Use Orientation for condition
     Future(() {
@@ -344,44 +357,53 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                   },
                 ),
               ),
-              ValueListenableBuilder(
-                valueListenable: _showDoubleTapSeekIndicator,
-                builder: (context, value, childWidget) {
-                  return AnimatedOpacity(
-                    duration: const Duration(milliseconds: 225),
-                    opacity: value ? 1 : 0,
+              AnimatedBuilder(
+                animation: _showDoubleTapSeekAnimation,
+                builder: (context, childWidget) {
+                  return Opacity(
+                    opacity: _showDoubleTapSeekAnimation.value,
                     child: childWidget,
                   );
                 },
-                child: Align(
-                  alignment: _isForwardSeek
-                      ? Alignment.centerRight
-                      : Alignment.centerLeft,
-                  child: ClipPath(
-                    clipper: SeekIndicatorClipper(forward: _isForwardSeek),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                      ),
-                      width: MediaQuery.sizeOf(context).width / 2,
-                      decoration: const BoxDecoration(
-                        color: Colors.black12,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (_isForwardSeek)
-                            const Icon(Icons.fast_forward)
-                          else
-                            const Icon(Icons.fast_rewind),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${_isForwardSeek ? '' : '-'}$_seekRate seconds',
+                child: ValueListenableBuilder(
+                  valueListenable: _isForwardSeek,
+                  builder: (_, isForwardSeek, childWidget) {
+                    return Align(
+                      alignment: isForwardSeek
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
+                      child: ClipPath(
+                        clipper: SeekIndicatorClipper(forward: isForwardSeek),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
                           ),
-                        ],
+                          width: MediaQuery.sizeOf(context).width / 2,
+                          decoration: const BoxDecoration(
+                            color: Colors.black12,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (isForwardSeek)
+                                const Icon(Icons.fast_forward)
+                              else
+                                const Icon(Icons.fast_rewind),
+                              const SizedBox(height: 8),
+                              ValueListenableBuilder(
+                                valueListenable: _seekRate,
+                                builder: (context, value, __) {
+                                  return Text(
+                                    '${isForwardSeek ? '' : '-'}$value seconds',
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ),
               ValueListenableBuilder(
@@ -500,6 +522,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                   ),
                 ),
               ),
+              // Shows loading indicator, regardless if controls are shown/hidden
+              const Center(child: PlayerLoadingIndicator()),
               Align(
                 alignment: Alignment.bottomLeft,
                 child: CustomOrientationBuilder(
@@ -576,9 +600,9 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   Timer? _seekRateTimer;
 
   void _resetSeekRate() {
-    _seekRateTimer = Timer(const Duration(milliseconds: 500), () {
-      _showDoubleTapSeekIndicator.value = false;
-      _seekRate = 0;
+    _seekRateTimer = Timer(const Duration(milliseconds: 200), () async {
+      await _showDoubleTapSeekIndicator.reverse();
+      _seekRate.value = 0;
     });
   }
 
@@ -587,23 +611,18 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _controlsVisibilityController.reverse(from: 0);
 
     // Set forward direction of seek
-    _isForwardSeek = true;
+    _isForwardSeek.value = true;
 
     // Set seek rate
     _seekRateTimer?.cancel();
     final seekRate = ref.read(preferencesProvider).doubleTapSeek;
-    _seekRate += seekRate;
-
-    // Show seek rate widget
-    _showDoubleTapSeekIndicator.value = true;
-
-    // Send signal for fast forward action
-    ref
-        .read(playerRepositoryProvider)
-        .sendPlayerSignal([PlayerSignal.fastForward]);
+    _seekRate.value += seekRate;
 
     // Seek player by seek rate
     ref.read(playerRepositoryProvider).seek(Duration(seconds: seekRate));
+
+    // Show seek rate widget
+    await _showDoubleTapSeekIndicator.forward();
 
     // Reset seek rate and hide widget
     _resetSeekRate();
@@ -614,25 +633,20 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _controlsVisibilityController.reverse(from: 0);
 
     // Set reverse direction of seek
-    _isForwardSeek = false;
+    _isForwardSeek.value = false;
 
     // Set seek rate
     _seekRateTimer?.cancel();
     final seekRate = ref.read(preferencesProvider).doubleTapSeek;
-    _seekRate += seekRate;
-
-    // Show seek rate widget
-    _showDoubleTapSeekIndicator.value = true;
-
-    // Send signal for fast forward / rewind action
-    ref
-        .read(playerRepositoryProvider)
-        .sendPlayerSignal([PlayerSignal.fastForward]);
+    _seekRate.value += seekRate;
 
     // Seek player by seek rate
     ref
         .read(playerRepositoryProvider)
         .seek(Duration(seconds: seekRate), reverse: true);
+
+    // Show seek rate widget
+    await _showDoubleTapSeekIndicator.forward();
 
     // Reset seek rate and hide widget
     _resetSeekRate();
@@ -737,7 +751,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     if (_preventCommonControlGestures) return;
 
     _longPressYPosition = details.localPosition.dy;
-    _longPressXPosition = details.localPosition.dx;
+    // _longPressXPosition = details.localPosition.dx;
 
     if (!_controlsHidden) {
       final screenWidth = MediaQuery.sizeOf(context).width;

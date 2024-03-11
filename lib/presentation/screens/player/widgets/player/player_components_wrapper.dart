@@ -61,8 +61,6 @@ class PlayerComponentsWrapper extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           child,
-          // Shows loading indicator, regardless if controls are shown/hidden
-          const PlayerLoadingIndicator(),
           // Shows video channel watermark image in fullscreen mode
           const PlayerWatermark(),
           const Positioned.fill(
