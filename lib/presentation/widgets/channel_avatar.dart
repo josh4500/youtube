@@ -45,20 +45,17 @@ class ChannelAvatar extends StatelessWidget {
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
         children: [
-          CustomPaint(
-            painter: LiveCustomPainer(),
-            child: Container(
-              width: size ?? 50,
-              height: size ?? 50,
-              padding: hasLive ? const EdgeInsets.all(1) : null,
-              decoration: const BoxDecoration(
-                color: Colors.white12,
-                image: DecorationImage(
-                  image: NetworkImage('https://i.pravatar.cc/300'),
-                  fit: BoxFit.cover,
-                ),
-                shape: BoxShape.circle,
+          Container(
+            width: size ?? 50,
+            height: size ?? 50,
+            padding: hasLive ? const EdgeInsets.all(1) : null,
+            decoration: const BoxDecoration(
+              color: Colors.white12,
+              image: DecorationImage(
+                image: NetworkImage('https://i.pravatar.cc/300'),
+                fit: BoxFit.cover,
               ),
+              shape: BoxShape.circle,
             ),
           ),
           // if (hasLive)
@@ -87,14 +84,18 @@ class ChannelAvatar extends StatelessWidget {
   }
 }
 
-class LiveCustomPainer extends CustomPainter {
+class LiveCustomPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..strokeWidth = 2
       ..color = const Color(0xFFFF0000)
       ..style = PaintingStyle.stroke;
-    canvas.drawCircle(Offset(size.width / 2, size.height / 2), 2, paint);
+    canvas.drawCircle(
+      Offset(size.width / 2, size.height / 2),
+      size.width / 2,
+      paint,
+    );
   }
 
   @override

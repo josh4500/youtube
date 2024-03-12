@@ -750,7 +750,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
   }
 
-  void _openCommentSheet() async {
+  Future<void> _openCommentSheet() async {
     _commentIsOpened = true;
     final wait = !_showCommentDraggable.value;
     _showCommentDraggable.value = true;
@@ -787,7 +787,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   final _descDraggableController = DraggableScrollableController();
   final _transcriptNotifier = ValueNotifier<bool>(false);
 
-  void _openDescSheet() async {
+  Future<void> _openDescSheet() async {
     _descIsOpened = true;
     final wait = !_showCommentDraggable.value;
     _showDescDraggable.value = true;
