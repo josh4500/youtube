@@ -930,6 +930,10 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   void _onPlaybackProgressTap(Duration position) {
     if (_progressController.value > 0) {
       ref.read(playerRepositoryProvider).seekTo(position);
+    } else {
+      ref
+          .read(playerRepositoryProvider)
+          .sendPlayerSignal([PlayerSignal.showControls]);
     }
   }
 
