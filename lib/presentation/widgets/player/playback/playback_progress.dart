@@ -42,6 +42,8 @@ class PlaybackProgress extends StatefulWidget {
   final Progress? start;
   final Duration? end;
   final bool showBuffer;
+  final List<KeyConcept> keyConcepts;
+  final List<Chapter> chapters;
   final void Function(Duration position)? onTap;
   final void Function(Duration position)? onDragStart;
   final void Function()? onDragEnd;
@@ -57,6 +59,8 @@ class PlaybackProgress extends StatefulWidget {
     this.start = Progress.zero,
     this.end = Duration.zero,
     this.showBuffer = true,
+    this.keyConcepts = const <KeyConcept>[],
+    this.chapters = const <Chapter>[],
     this.backgroundColor = Colors.white30,
     this.onTap,
     this.onDragStart,
@@ -81,13 +85,21 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
         Tween<double>(begin: 0, end: 12),
       );
       progressAnimation = widget.animation!.drive(
-        ColorTween(begin: Colors.white, end: const Color(0xFFFF0000)),
+        ColorTween(begin: Colors.white70, end: const Color(0xFFFF0000)),
       );
     }
   }
 
   // TODO: Compute based on video data
-  double get barHeight => 2;
+  double get barHeight => widget.keyConcepts.isEmpty ? 2 : 4;
+
+  List<double> get keyConceptPositions => widget.keyConcepts
+      .map((e) => e.position.inMicroseconds / widget.end!.inMicroseconds)
+      .toList();
+
+  List<double> get chaptersPositions => widget.chapters
+      .map((e) => e.position.inMicroseconds / widget.end!.inMicroseconds)
+      .toList();
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +112,71 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
             data.position.inSeconds / (widget.end?.inSeconds ?? 0);
         final bufferValue =
             data.buffer.inSeconds / (widget.end?.inSeconds ?? 0);
+
+        // TODO: Design widget so that we don't rebuild unnecessary stuffs
+        Widget indicators = Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Buffering Progress indicator
+            if (widget.showBuffer)
+              LinearProgressIndicator(
+                color: Colors.white12,
+                value: bufferValue.isNaN || bufferValue.isInfinite
+                    ? 0
+                    : bufferValue,
+                minHeight: barHeight,
+                valueColor: widget.bufferAnimation,
+                backgroundColor: Colors.transparent,
+              ),
+            // TODO: Remove temporary fix for color animation
+            // Player position Indicator
+            if (progressAnimation != null)
+              AnimatedBuilder(
+                animation: progressAnimation!,
+                builder: (_, __) {
+                  return LinearProgressIndicator(
+                    color: progressAnimation!.value ?? widget.color,
+                    value: positionValue.isNaN || positionValue.isInfinite
+                        ? 0
+                        : positionValue,
+                    minHeight: barHeight,
+                    backgroundColor:
+                        widget.backgroundColor ?? Colors.transparent,
+                  );
+                },
+              )
+            else
+              LinearProgressIndicator(
+                color: widget.color,
+                value: positionValue.isNaN || positionValue.isInfinite
+                    ? 0
+                    : positionValue,
+                minHeight: barHeight,
+                backgroundColor: widget.backgroundColor ?? Colors.transparent,
+              ),
+          ],
+        );
+
+        // TODO: Should not be in stream block statement
+        if (widget.chapters.isNotEmpty) {
+          indicators = ClipPath(
+            clipper: ProgressChapterClipper(
+              chapters: chaptersPositions,
+            ),
+            child: indicators,
+          );
+        }
+
+        // TODO: Should not be in stream block statement
+        // If KeyConcepts are available we paint positions of Key
+        if (widget.keyConcepts.isNotEmpty) {
+          indicators = CustomPaint(
+            foregroundPainter: ProgressKeyConceptPainter(
+              keyConcepts: keyConceptPositions,
+            ),
+            child: indicators,
+          );
+        }
 
         return LayoutBuilder(
           builder: (context, constraint) {
@@ -118,52 +195,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                   alignment: Alignment.bottomLeft,
                   clipBehavior: Clip.none,
                   children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        // Buffering Progress indicator
-                        if (widget.showBuffer)
-                          LinearProgressIndicator(
-                            color: Colors.white12,
-                            value: bufferValue.isNaN || bufferValue.isInfinite
-                                ? 0
-                                : bufferValue,
-                            minHeight: barHeight,
-                            valueColor: widget.bufferAnimation,
-                            backgroundColor: Colors.transparent,
-                          ),
-                        // TODO: Remove temporary fix for color animation
-                        // Player position Indicator
-                        if (progressAnimation != null)
-                          AnimatedBuilder(
-                            animation: progressAnimation!,
-                            builder: (_, __) {
-                              return LinearProgressIndicator(
-                                color: progressAnimation!.value ?? widget.color,
-                                value: positionValue.isNaN ||
-                                        positionValue.isInfinite
-                                    ? 0
-                                    : positionValue,
-                                minHeight: barHeight,
-                                backgroundColor: widget.backgroundColor ??
-                                    Colors.transparent,
-                              );
-                            },
-                          )
-                        else
-                          LinearProgressIndicator(
-                            color: widget.color,
-                            value:
-                                positionValue.isNaN || positionValue.isInfinite
-                                    ? 0
-                                    : positionValue,
-                            minHeight: barHeight,
-                            backgroundColor:
-                                widget.backgroundColor ?? Colors.transparent,
-                          ),
-                      ],
-                    ),
-
+                    indicators,
                     // Thumb
                     if (thumbAnimation != null)
                       Positioned(
@@ -234,10 +266,12 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
   }
 }
 
-class ProgressChaptersClipper extends CustomClipper<Path> {
+class ProgressChapterClipper extends CustomClipper<Path> {
   static const double _space = 3;
 
-  static const List<double> chapters = [0.167, .3334, .5001, 0.6668, 0.8335, 1];
+  final List<double> chapters;
+
+  ProgressChapterClipper({super.reclip, required this.chapters});
 
   @override
   Path getClip(Size size) {
@@ -278,18 +312,11 @@ class ProgressChaptersClipper extends CustomClipper<Path> {
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
-class ProgressChapterPainter extends CustomPainter {
+class ProgressKeyConceptPainter extends CustomPainter {
+  final List<double> keyConcepts;
   static const double _radius = 2.5;
 
-  static const List<double> chapters = [
-    0.125,
-    0.25,
-    0.375,
-    0.5,
-    0.625,
-    0.75,
-    0.875
-  ];
+  ProgressKeyConceptPainter({super.repaint, required this.keyConcepts});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -298,9 +325,9 @@ class ProgressChapterPainter extends CustomPainter {
       ..color = Colors.white
       ..style = PaintingStyle.fill;
 
-    for (int i = 0; i < chapters.length; i++) {
+    for (int i = 0; i < keyConcepts.length; i++) {
       canvas.drawCircle(
-        Offset((size.width * chapters[i]) + (_radius / 2), size.height / 2),
+        Offset((size.width * keyConcepts[i]) + (_radius / 2), size.height / 2),
         _radius,
         paint,
       );
@@ -308,5 +335,23 @@ class ProgressChapterPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class KeyConcept {
+  final Duration position;
+
+  KeyConcept({required this.position});
+}
+
+class Chapter {
+  /// Position represent where the chapter begins.
+  ///
+  /// No need or use of an end duration because the next chapter beginning will be
+  /// the end of the current chapter.
+  ///
+  /// If no next chapter, the end of the video will be the end of the chapter
+  final Duration position;
+
+  Chapter({required this.position});
 }
