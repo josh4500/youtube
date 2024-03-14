@@ -27,11 +27,13 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets/shimmer.dart';
 
 import 'over_scroll_glow_behavior.dart';
 import 'tappable_area.dart';
 
 class DynamicTab extends StatefulWidget {
+  final double height;
   final int initialIndex;
   final bool useTappable;
   final List<String> options;
@@ -43,6 +45,7 @@ class DynamicTab extends StatefulWidget {
 
   const DynamicTab({
     super.key,
+    this.height = 48.0,
     this.useTappable = false,
     this.leading,
     this.leadingWidth,
@@ -55,6 +58,25 @@ class DynamicTab extends StatefulWidget {
 
   @override
   State<DynamicTab> createState() => _DynamicTabState();
+
+  static Widget shimmer([int count = 10]) {
+    return SizedBox(
+      height: 48,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        itemBuilder: (context, _) {
+          return Shimmer(
+            color: const Color(0xFF272727),
+            margin: const EdgeInsets.all(4),
+            borderRadius: BorderRadius.circular(8),
+            width: 96,
+          );
+        },
+        itemCount: count,
+      ),
+    );
+  }
 }
 
 class _DynamicTabState extends State<DynamicTab> {

@@ -26,9 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/shimmer.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
@@ -55,10 +53,10 @@ class ViewableVideoContent extends StatelessWidget {
                 child: PlaybackView(
                   placeholder: Container(
                     color: const Color(0xFF656565),
-                    // child: Image.network(
-                    //   'https://picsum.photos/900/500',
-                    //   fit: BoxFit.cover,
-                    // ),
+                    child: Image.network(
+                      'https://picsum.photos/900/500',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
