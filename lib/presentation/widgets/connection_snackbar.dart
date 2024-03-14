@@ -144,11 +144,18 @@ class _ConnectionSnackbarState extends State<ConnectionSnackbar>
           return AnimatedContainer(
             width: double.infinity,
             alignment: Alignment.center,
-            padding: const EdgeInsets.all(2.0),
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2.0),
             curve: Curves.easeInCubic,
             duration: widget.labelSwitchDuration,
-            color: state.isConnected ? Colors.green : Colors.grey,
-            child: Text(state.isConnected ? 'Back online' : 'No connection'),
+            color: state.isConnected
+                ? const Color(0xFF2BA640)
+                : const Color(0xFF212121),
+            child: Text(
+              state.isConnected ? 'Back online' : 'No connection',
+              style: const TextStyle(
+                fontSize: 12,
+              ),
+            ),
           );
         },
       ),
