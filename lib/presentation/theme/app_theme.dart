@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:youtube_clone/presentation/theme/app_style.dart';
 
 import 'app_color.dart';
@@ -61,13 +62,15 @@ abstract final class AppTheme {
     ),
     extensions: [
       _lightAppColors,
+      _lightAppStyles,
     ],
   );
 
   static final _lightAppColors = AppColorsExtension(
-    primary: Colors.black,
-    background: Colors.white,
-    settingsPopupBackgroundColor: Colors.white,
+    primary: AppPalette.primary.light,
+    background: AppPalette.backgroundColor.light,
+    settingsPopupBackgroundColor: AppPalette.settingsPopupBackgroundColor.light,
+    shimmer: AppPalette.shimmerColor.light,
   );
 
   static final _lightAppStyles = AppStylesExtension(
@@ -97,6 +100,7 @@ abstract final class AppTheme {
       iconTheme: const IconThemeData(weight: 100),
       elevation: 0,
       titleTextStyle: AppStyle.appBar.dark,
+      systemOverlayStyle: const SystemUiOverlayStyle(),
     ),
     listTileTheme: const ListTileThemeData(
       horizontalTitleGap: 0,
@@ -110,9 +114,10 @@ abstract final class AppTheme {
   );
 
   static final _darkAppColors = AppColorsExtension(
-    primary: Colors.white,
-    background: const Color(0xFF0F0F0F),
-    settingsPopupBackgroundColor: const Color(0xFF212121),
+    primary: AppPalette.primary.dark,
+    background: AppPalette.backgroundColor.dark,
+    settingsPopupBackgroundColor: AppPalette.settingsPopupBackgroundColor.dark,
+    shimmer: AppPalette.shimmerColor.dark,
   );
 
   static final _darkAppStyles = AppStylesExtension(

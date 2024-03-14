@@ -43,8 +43,8 @@ abstract final class AppPalette {
   // BLACK
 
   static const primary = BrightnessPair<Color>(
-    light: Color(0xFFFFFFFF),
-    dark: Color(0xFF000000),
+    light: Color(0xFF000000),
+    dark: Color(0xFFFFFFFF),
   );
   static const backgroundColor = BrightnessPair<Color>(
     light: Color(0xFFFFFFFF),
@@ -54,28 +54,37 @@ abstract final class AppPalette {
     light: Color(0xFFFFFFFF),
     dark: Color(0xFF212121),
   );
+
+  static const shimmerColor = BrightnessPair<Color>(
+    light: Color(0xFFE5E5E5),
+    dark: Color(0xFF3F3F3F),
+  );
 }
 
 class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   AppColorsExtension({
     required this.primary,
     required this.background,
+    required this.shimmer,
     required this.settingsPopupBackgroundColor,
   });
 
   final Color primary;
   final Color background;
+  final Color shimmer;
   final Color settingsPopupBackgroundColor;
 
   @override
   ThemeExtension<AppColorsExtension> copyWith({
     Color? primary,
     Color? background,
+    Color? shimmer,
     Color? settingsPopupBackgroundColor,
   }) {
     return AppColorsExtension(
       primary: primary ?? this.primary,
       background: background ?? this.background,
+      shimmer: shimmer ?? this.shimmer,
       settingsPopupBackgroundColor:
           settingsPopupBackgroundColor ?? this.settingsPopupBackgroundColor,
     );
@@ -93,6 +102,7 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     return AppColorsExtension(
       primary: Color.lerp(primary, other.primary, t)!,
       background: Color.lerp(background, other.background, t)!,
+      shimmer: Color.lerp(shimmer, other.shimmer, t)!,
       settingsPopupBackgroundColor: Color.lerp(
         settingsPopupBackgroundColor,
         other.settingsPopupBackgroundColor,

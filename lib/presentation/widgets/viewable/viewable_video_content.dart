@@ -26,7 +26,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:youtube_clone/presentation/widgets/shimmer.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 import '../channel_avatar.dart';
@@ -52,10 +55,10 @@ class ViewableVideoContent extends StatelessWidget {
                 child: PlaybackView(
                   placeholder: Container(
                     color: const Color(0xFF656565),
-                    child: Image.network(
-                      'https://picsum.photos/900/500',
-                      fit: BoxFit.cover,
-                    ),
+                    // child: Image.network(
+                    //   'https://picsum.photos/900/500',
+                    //   fit: BoxFit.cover,
+                    // ),
                   ),
                 ),
               ),
@@ -80,6 +83,7 @@ class ViewableVideoContent extends StatelessWidget {
                                   'Japan stocks: a minute\'s silence, then a slide | REUTERS',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
+                                    color: Color(0xFFF1F1F1),
                                   ),
                                 ),
                                 const SizedBox(height: 6),
@@ -154,6 +158,52 @@ class ViewableVideoContent extends StatelessWidget {
             ),
           ),
         ),
+      ],
+    );
+  }
+
+  static Widget shimmer() {
+    return Column(
+      children: [
+        const Shimmer(
+          height: 227,
+          width: double.infinity,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Shimmer(width: 36, height: 36, shape: BoxShape.circle),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Shimmer(
+                      width: double.infinity,
+                      height: 16,
+                      borderRadius: BorderRadius.circular(1.5),
+                    ),
+                    const SizedBox(height: 15),
+                    Shimmer(
+                      width: double.infinity,
+                      height: 16,
+                      borderRadius: BorderRadius.circular(1.5),
+                    ),
+                    const SizedBox(height: 15),
+                    Shimmer(
+                      width: 120,
+                      height: 16,
+                      borderRadius: BorderRadius.circular(1.5),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
+              )
+            ],
+          ),
+        )
       ],
     );
   }

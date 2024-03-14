@@ -50,6 +50,11 @@ class App extends StatelessWidget {
             view: View.of(context),
             child: MaterialApp.router(
               title: 'Youtube',
+              themeAnimationStyle: AnimationStyle(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInCubic,
+                reverseCurve: Curves.easeOutCubic,
+              ),
               debugShowCheckedModeBanner: false,
               localizationsDelegates: const [
                 S.delegate,

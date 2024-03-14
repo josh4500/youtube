@@ -168,7 +168,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: DynamicTab(
                       initialIndex: 0,
-                      leadingWidth: 8,
+                      leadingWidth: 7.5,
                       leading: Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: CustomActionChip(
@@ -232,8 +232,8 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                 },
               ),
             ),
-            const SliverToBoxAdapter(
-              child: ViewableVideoContent(),
+            SliverToBoxAdapter(
+              child: ViewableVideoContent.shimmer(),
             ),
             const SliverToBoxAdapter(
               child: ViewableVideoContent(),
