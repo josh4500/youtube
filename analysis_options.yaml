@@ -2,7 +2,7 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   plugins:
-    - custom_lint
+    custom_lint
 
 linter:
   rules:

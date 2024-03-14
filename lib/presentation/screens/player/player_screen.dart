@@ -1157,6 +1157,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                         controller: controller,
                         closeDescription: _closeDescSheet,
                         transcriptNotifier: _transcriptNotifier,
+                        draggableController: _descDraggableController,
                       );
                     },
                   ),

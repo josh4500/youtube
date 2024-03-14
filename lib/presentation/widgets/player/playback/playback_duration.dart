@@ -35,15 +35,15 @@ class PlaybackDuration extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        vertical: 4,
-        horizontal: 6,
+        vertical: 2,
+        horizontal: 4,
       ),
       margin: const EdgeInsets.symmetric(
         horizontal: 8,
         vertical: 12,
       ),
       decoration: BoxDecoration(
-        color: Colors.black54,
+        color: Colors.black45,
         borderRadius: BorderRadius.circular(4),
       ),
       child: const Text(

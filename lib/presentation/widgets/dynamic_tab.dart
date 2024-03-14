@@ -98,23 +98,25 @@ class _DynamicTabState extends State<DynamicTab> {
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(
                   vertical: 8,
-                  horizontal: 12.5,
+                  horizontal: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: index == selectedIndex ? Colors.white : Colors.white12,
+                  color: index == selectedIndex
+                      ? const Color(0xFFF1F1F1)
+                      : const Color(0xFF272727),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   widget.options[index],
                   style: widget.textStyle?.copyWith(
                         color: index == selectedIndex
-                            ? Colors.black
-                            : Colors.white,
+                            ? const Color(0xFF0F0F0F)
+                            : const Color(0xFFF1F1F1),
                       ) ??
                       TextStyle(
                         color: index == selectedIndex
-                            ? Colors.black
-                            : Colors.white,
+                            ? const Color(0xFF0F0F0F)
+                            : const Color(0xFFF1F1F1),
                         fontWeight: FontWeight.w500,
                       ),
                 ),
