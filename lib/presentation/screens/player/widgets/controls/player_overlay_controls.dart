@@ -47,6 +47,7 @@ import '../player/player_notifications.dart';
 import 'player_actions_control.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';
+import 'player_chapters_control.dart';
 import 'player_description.dart';
 import 'player_duration_control.dart';
 import 'player_fullscreen.dart';
@@ -581,19 +582,19 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                           onChangePosition: _onPlaybackProgressPositionChanged,
                           onDragEnd: _onPlaybackProgressDragEnd,
                           // TODO: Remove test data
-                          // keyConcepts: [
-                          //   KeyConcept(position: const Duration(seconds: 15)),
-                          //   KeyConcept(position: const Duration(seconds: 18)),
-                          //   KeyConcept(position: const Duration(seconds: 50)),
-                          // ],
-                          // chapters: [
-                          //   Chapter(position: const Duration(seconds: 5)),
-                          //   Chapter(position: const Duration(seconds: 10)),
-                          //   Chapter(position: const Duration(seconds: 25)),
-                          //   Chapter(position: const Duration(seconds: 48)),
-                          //   Chapter(position: const Duration(seconds: 53)),
-                          //   Chapter(position: const Duration(seconds: 60)),
-                          // ],
+                          keyConcepts: [
+                            KeyConcept(position: const Duration(seconds: 15)),
+                            KeyConcept(position: const Duration(seconds: 18)),
+                            KeyConcept(position: const Duration(seconds: 50)),
+                          ],
+                          chapters: [
+                            Chapter(position: const Duration(seconds: 5)),
+                            Chapter(position: const Duration(seconds: 10)),
+                            Chapter(position: const Duration(seconds: 25)),
+                            Chapter(position: const Duration(seconds: 48)),
+                            Chapter(position: const Duration(seconds: 53)),
+                            Chapter(position: const Duration(seconds: 60)),
+                          ],
                         );
                       },
                     ),
@@ -1081,49 +1082,6 @@ class _BottomControl extends StatelessWidget {
           PlayerFullscreen(),
         ],
       ),
-    );
-  }
-}
-
-class PlayerChapterControl extends StatelessWidget {
-  const PlayerChapterControl({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text.rich(
-          TextSpan(
-            text: '·  ',
-            style: TextStyle(
-              fontSize: 13.5,
-              color: Colors.white,
-              fontWeight: FontWeight.w900,
-            ),
-            children: [
-              TextSpan(
-                text: 'Best title you will ever see',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.clip,
-        ),
-        Icon(
-          Icons.chevron_right_outlined,
-          size: 18,
-        ),
-      ],
     );
   }
 }

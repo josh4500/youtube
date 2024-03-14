@@ -87,7 +87,9 @@ enum PlayerSignal {
   openDescription,
   closeDescription,
   openComments,
-  closeComments;
+  closeComments,
+  openChapters,
+  closeChapters;
 }
 
 enum PlayerLock {

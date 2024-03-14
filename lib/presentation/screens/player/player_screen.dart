@@ -33,6 +33,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
+import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
@@ -46,6 +47,7 @@ import '../../view_models/playback/player_sizing.dart';
 import 'widgets/player/mini_player.dart';
 import 'widgets/player/player.dart';
 import 'widgets/video_actions.dart';
+import 'widgets/video_chapters_sheet.dart';
 import 'widgets/video_comment_section.dart';
 import 'widgets/video_comment_sheet.dart';
 import 'widgets/video_context.dart';
@@ -113,6 +115,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// PlayerSignal StreamSubscription
   StreamSubscription<PlayerSignal>? _subscription;
+
+  /// Whether video was temporary paused
+  bool _wasTempPaused = false;
 
   @override
   void initState() {
@@ -203,16 +208,29 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _descDraggableController.addListener(() {
       final size = _descDraggableController.size;
-      if (size == 0) _descIsOpened = false;
-      _infoOpacityController.value =
-          clampDouble(size / (1 - heightRatio), 0, 1);
+      if (size == 0 && heightNotifier.value != minVideoViewPortHeight) {
+        _descIsOpened = false;
+      }
+      _changeInfoOpacityOnDraggable(size);
+      _checkDraggableSizeToPause(size);
     });
 
     _commentDraggableController.addListener(() {
       final size = _commentDraggableController.size;
-      if (size == 0) _commentIsOpened = false;
-      _infoOpacityController.value =
-          clampDouble(size / (1 - heightRatio), 0, 1);
+      if (size == 0 && heightNotifier.value != minVideoViewPortHeight) {
+        _commentIsOpened = false;
+      }
+      _changeInfoOpacityOnDraggable(size);
+      _checkDraggableSizeToPause(size);
+    });
+
+    _chaptersDraggableController.addListener(() {
+      final size = _chaptersDraggableController.size;
+      if (size == 0 && heightNotifier.value != minVideoViewPortHeight) {
+        _chaptersIsOpened = false;
+      }
+      _changeInfoOpacityOnDraggable(size);
+      _checkDraggableSizeToPause(size);
     });
 
     Future(() async {
@@ -231,6 +249,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           _openCommentSheet(); // Opens comment sheet in this screen
         } else if (signal == PlayerSignal.closeComments) {
           _closeCommentSheet(); // Closes comment sheet in this screen
+        } else if (signal == PlayerSignal.openChapters) {
+          _openChaptersSheet(); // Opens chapters sheet in this screen
+        } else if (signal == PlayerSignal.closeChapters) {
+          _closeChaptersSheet(); // Closes chapters sheet in this screen
         } else if (signal == PlayerSignal.enterExpanded) {
           SystemChrome.setEnabledSystemUIMode(
             SystemUiMode.immersive,
@@ -292,6 +314,50 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Allows or disallows dragging for info. Set to true by default.
   bool _allowInfoDrag = true;
+
+  /// Callback to pause and play video when draggable sheets change its size
+  void _checkDraggableSizeToPause(double size) {
+    if (size == 1) {
+      if (ref.read(playerNotifierProvider).playing) {
+        _wasTempPaused = true;
+        ref.read(playerRepositoryProvider).pauseVideo();
+      }
+    } else if (size <= 1 - avgVideoViewPortHeight) {
+      if (_wasTempPaused) {
+        ref.read(playerRepositoryProvider).playVideo();
+      }
+    }
+  }
+
+  /// Callback to updates the info opacity when draggable sheets changes its size
+  void _changeInfoOpacityOnDraggable(double size) {
+    if (heightNotifier.value == 1) {
+      _infoOpacityController.value =
+          clampDouble(size / (1 - heightRatio), 0, 1);
+    }
+  }
+
+  /// Callback to change Draggable heights when the Player height changes (via [heightNotifier])
+  void _recomputeDraggableHeight(double value) {
+    if (_commentIsOpened) {
+      if (heightNotifier.value == minVideoViewPortHeight) {
+        _commentDraggableController.jumpTo(0);
+      } else {
+        _commentDraggableController.jumpTo(
+          clampDouble(value - minVideoViewPortHeight, 0, (1 - heightRatio)),
+        );
+      }
+    }
+    if (_descIsOpened) {
+      if (heightNotifier.value == minVideoViewPortHeight) {
+        _descDraggableController.jumpTo(0);
+      } else {
+        _descDraggableController.jumpTo(
+          clampDouble(value - minVideoViewPortHeight, 0, (1 - heightRatio)),
+        );
+      }
+    }
+  }
 
   /// Handles zooming and panning based on a swipe gesture.
   ///
@@ -729,27 +795,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   final _commentDraggableController = DraggableScrollableController();
   final _replyIsOpenedNotifier = ValueNotifier<bool>(false);
 
-  void _recomputeDraggableHeight(double value) {
-    if (_commentIsOpened) {
-      if (heightNotifier.value == minVideoViewPortHeight) {
-        _commentDraggableController.jumpTo(0);
-      } else {
-        _commentDraggableController.jumpTo(
-          clampDouble(value - minVideoViewPortHeight, 0, (1 - heightRatio)),
-        );
-      }
-    }
-    if (_descIsOpened) {
-      if (heightNotifier.value == minVideoViewPortHeight) {
-        _descDraggableController.jumpTo(0);
-      } else {
-        _descDraggableController.jumpTo(
-          clampDouble(value - minVideoViewPortHeight, 0, (1 - heightRatio)),
-        );
-      }
-    }
-  }
-
+  /// Callback to open Comments draggable sheets
   Future<void> _openCommentSheet() async {
     _commentIsOpened = true;
     final wait = !_showCommentDraggable.value;
@@ -767,6 +813,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     );
   }
 
+  /// Callback to close Comments draggable sheets
   void _closeCommentSheet() {
     if (_replyIsOpenedNotifier.value) {
       _replyIsOpenedNotifier.value = false;
@@ -811,6 +858,40 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _descIsOpened = false;
     _descDraggableController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  // Video Chapter
+  bool _chaptersIsOpened = false;
+  final _showChaptersDraggable = ValueNotifier(false);
+  final _chaptersDraggableController = DraggableScrollableController();
+
+  Future<void> _openChaptersSheet() async {
+    _chaptersIsOpened = true;
+    final wait = !_showChaptersDraggable.value;
+    _showChaptersDraggable.value = true;
+
+    if (wait) await Future.delayed(const Duration(milliseconds: 150));
+
+    // TODO: Check for expanded mode
+    // Changes the additional heights to zero on Expanded mode
+    if (videoViewHeight != heightRatio && additionalHeight > 0) {
+      additionalHeightNotifier.value = 0;
+    }
+
+    _chaptersDraggableController.animateTo(
+      (1 - heightRatio),
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeInCubic,
+    );
+  }
+
+  void _closeChaptersSheet() {
+    _chaptersIsOpened = false;
+    _chaptersDraggableController.animateTo(
       0,
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeOutCubic,
@@ -1164,21 +1245,41 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                 );
               },
             ),
+            ValueListenableBuilder(
+              valueListenable: _showChaptersDraggable,
+              builder: (context, show, childWidget) {
+                if (!show) return const SizedBox();
+                return AnimatedBuilder(
+                  animation: _draggableOpacityAnimation,
+                  builder: (_, childWidget) {
+                    return Opacity(
+                      opacity: _draggableOpacityAnimation.value,
+                      child: childWidget,
+                    );
+                  },
+                  child: DraggableScrollableSheet(
+                    snap: true,
+                    minChildSize: 0,
+                    maxChildSize: 1,
+                    initialChildSize: 0,
+                    snapSizes: const [0.0, (1 - avgVideoViewPortHeight)],
+                    shouldCloseOnMinExtent: false,
+                    controller: _chaptersDraggableController,
+                    snapAnimationDuration: const Duration(milliseconds: 300),
+                    builder: (context, controller) {
+                      return VideoChaptersSheet(
+                        controller: controller,
+                        closeChapter: _closeChaptersSheet,
+                        draggableController: _chaptersDraggableController,
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
     );
   }
-}
-
-double normalizeDouble(double value, double min, double max) {
-  return (value - min) / (max - min);
-}
-
-extension NormalizeDoubleExtension on double {
-  double normalize(double min, double max) {
-    return (this - min) / (max - min);
-  }
-
-  double get invertByOne => 1 - this;
 }
