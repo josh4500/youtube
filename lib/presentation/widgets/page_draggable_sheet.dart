@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class PageDraggableSheet extends StatefulWidget {
   ) contentBuilder;
   final DraggableScrollableController? draggableController;
   final List<Widget> actions;
-  final List<PageDraggableOverlayChildItem> overlayChildren;
+  final List<PageDraggableOverlayChild> overlayChildren;
   final ValueChanged<int>? onOpenOverlayChild;
   final DynamicTab? dynamicTab;
   final double dynamicTabShowOffset;
@@ -43,7 +44,7 @@ class PageDraggableSheet extends StatefulWidget {
     required this.baseHeight,
     this.dynamicTabShowOffset = 100,
     this.actions = const <Widget>[],
-    this.overlayChildren = const <PageDraggableOverlayChildItem>[],
+    this.overlayChildren = const <PageDraggableOverlayChild>[],
     this.onOpenOverlayChild,
   });
 
@@ -51,8 +52,10 @@ class PageDraggableSheet extends StatefulWidget {
   State<PageDraggableSheet> createState() => _PageDraggableSheetState();
 }
 
-class _PageDraggableSheetState extends State<PageDraggableSheet>
-    with TickerProviderStateMixin {
+class _PageDraggableSheetState extends State<PageDraggableSheet> {
+  final Queue<int> _overlayChildQueue = Queue<int>();
+  int? _overlayChildIndex;
+  int _overlayChildOpenCount = 0;
   bool _overlayAnyChildIsOpened = false;
 
   late final ScrollController _innerListController;
@@ -68,19 +71,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     _dynamicTabNotifier = ValueNotifier<bool>(widget.dynamicTab != null);
 
     for (int i = 0; i < widget.overlayChildren.length; i++) {
-      widget.overlayChildren[i].addAnimation(
-        AnimationController(
-          vsync: this,
-          duration: const Duration(milliseconds: 250),
-          reverseDuration: const Duration(milliseconds: 250),
-        ),
-      );
-    }
-
-    for (int i = 0; i < widget.overlayChildren.length; i++) {
       final overlayChild = widget.overlayChildren[i];
-      // TODO: Revise code
-      overlayChild.listenable.addListener(() => _onOpenOverlayChild(i));
+      overlayChild.controller.addListener(() => _onOpenOverlayChild(i));
     }
 
     // Adds listener to hide DynamicTabs if available
@@ -90,17 +82,29 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
   }
 
   Future<void> _onOpenOverlayChild(int index) async {
-    final opened = widget.overlayChildren[index].listenable.value;
+    final opened = widget.overlayChildren[index].controller.isOpened;
     if (widget.dynamicTab != null) {
       if (opened) {
+        _overlayChildOpenCount += 1;
         _dynamicTabNotifier.value = false;
+        _overlayAnyChildIsOpened = true;
+        _overlayChildIndex = index;
+        _overlayChildQueue.add(index);
       } else {
+        _overlayChildOpenCount -= 1;
+        _overlayAnyChildIsOpened = _overlayChildOpenCount >= 1;
+
+        // Resets the topmost to null
+        if (!_overlayAnyChildIsOpened) {
+          _overlayChildIndex = null;
+        } else {}
+
+        _overlayChildQueue.removeWhere((val) => val == index);
         if (_innerListController.offset < 100) {
           _dynamicTabNotifier.value = true;
         }
       }
     }
-    _overlayAnyChildIsOpened &= opened;
   }
 
   Future<void> _onHideDynamicTabsCallback() async {
@@ -122,28 +126,46 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
 
   void _onPointerMoveOnSheetContent(PointerMoveEvent event) {
     if (widget.draggableController != null) {
-      if (_innerListController.offset == 0) {
-        final yDist = event.delta.dy;
-        final height = MediaQuery.sizeOf(context).height;
-        final size = widget.draggableController!.size;
-
-        final newSize = event.delta.dy < 0 && size <= widget.baseHeight
-            ? clampDouble(size - (yDist / height), 0, widget.baseHeight)
-            : clampDouble(size - (yDist / height), 0, 1);
-
-        if (newSize >= widget.baseHeight) {
-          _innerListPhysics.canScroll(true);
-        } else {
-          _innerListPhysics.canScroll(false);
+      if (_innerListController.offset == 0 && !_overlayAnyChildIsOpened) {
+        _changeDraggableSize(_innerListPhysics, event);
+      } else if (_overlayAnyChildIsOpened && _overlayChildIndex != null) {
+        final controller =
+            widget.overlayChildren[_overlayChildIndex!].controller;
+        if (controller._scrollController.offset == 0 && controller.isOpened) {
+          _changeDraggableSize(controller._scrollPhysics, event);
         }
-        widget.draggableController!.jumpTo(newSize);
       }
     }
+  }
+
+  void _changeDraggableSize(
+    CustomScrollableScrollPhysics scrollPhysics,
+    PointerMoveEvent event,
+  ) {
+    final yDist = event.delta.dy;
+    final height = MediaQuery.sizeOf(context).height;
+    final size = widget.draggableController!.size;
+
+    final newSize = event.delta.dy < 0 && size <= widget.baseHeight
+        ? clampDouble(size - (yDist / height), 0, widget.baseHeight)
+        : clampDouble(size - (yDist / height), 0, 1);
+    if (newSize >= widget.baseHeight) {
+      scrollPhysics.canScroll(true);
+    } else {
+      scrollPhysics.canScroll(false);
+    }
+    widget.draggableController!.jumpTo(newSize);
   }
 
   void _onPointerLeaveOnSheetContent(PointerUpEvent event) {
     if (widget.draggableController != null) {
       _innerListPhysics.canScroll(true);
+      if (_overlayAnyChildIsOpened) {
+        if (_overlayChildIndex != null) {
+          widget.overlayChildren[_overlayChildIndex!].controller._scrollPhysics
+              .canScroll(true);
+        }
+      }
       final size = widget.draggableController!.size;
       if ((size != 0.0 || size != widget.baseHeight) && size != 1) {
         widget.draggableController!.animateTo(
@@ -157,7 +179,9 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
 
   void _closeSheet() {
     if (_overlayAnyChildIsOpened) {
-      // TODO: _closeAllOverChild();
+      for (var element in widget.overlayChildren) {
+        element.controller.close();
+      }
     }
     widget.onClose();
   }
@@ -259,12 +283,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                         ],
                       ),
                       for (final overlayChild in widget.overlayChildren)
-                        _OverlayChildTitle(
-                          slideAnimation: overlayChild.slideAnimation,
-                          opacityAnimation: overlayChild.opacityAnimation,
-                          title: overlayChild.title,
-                          onClose: () {},
-                        ),
+                        _OverlayChildTitle(controller: overlayChild.controller),
                     ],
                   ),
                 ),
@@ -284,9 +303,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                         _innerListPhysics,
                       ),
                       for (final overlayChild in widget.overlayChildren)
-                        _PageDraggableOverlayChild(
-                          item: overlayChild,
-                        ),
+                        overlayChild,
                     ],
                   ),
                 ),
@@ -299,82 +316,142 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
   }
 }
 
-class _PageDraggableOverlayChild extends StatefulWidget {
-  final PageDraggableOverlayChildItem item;
+class PageDraggableOverlayChild extends StatefulWidget {
+  final PageDraggableOverlayChildController controller;
+  final Widget Function(
+    BuildContext context,
+    ScrollController controller,
+    CustomScrollableScrollPhysics scrollPhysics,
+  ) builder;
 
-  const _PageDraggableOverlayChild({
-    required this.item,
+  const PageDraggableOverlayChild({
+    super.key,
+    required this.controller,
+    required this.builder,
   });
 
   @override
-  State<_PageDraggableOverlayChild> createState() =>
+  State<PageDraggableOverlayChild> createState() =>
       _PageDraggableOverlayChildState();
 }
 
-class _PageDraggableOverlayChildState
-    extends State<_PageDraggableOverlayChild> {
+class _PageDraggableOverlayChildState extends State<PageDraggableOverlayChild>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController controller;
+  late final Animation<Offset> slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+      reverseDuration: const Duration(milliseconds: 250),
+    );
+    slideAnimation = Tween<Offset>(
+      begin: const Offset(1, 0),
+      end: const Offset(0, 0),
+    ).animate(controller);
+    widget.controller.addListener(() {
+      if (widget.controller.isOpened) {
+        controller.forward();
+      } else {
+        controller.reverse();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    // NOTE: Disposing the controller once in here
+    widget.controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SlideTransition(
-      position: widget.item.slideAnimation,
+      position: slideAnimation,
       child: Material(
-        child: widget.item.builder(context),
+        child: widget.builder(
+          context,
+          widget.controller._scrollController,
+          widget.controller._scrollPhysics,
+        ),
       ),
     );
   }
 }
 
-class PageDraggableOverlayChildItem {
+class PageDraggableOverlayChildController extends ChangeNotifier {
   final String title;
-  final ValueNotifier<bool> listenable;
-  final Widget Function(BuildContext context) builder;
-  final int? count;
+  final _scrollController = ScrollController();
+  final _scrollPhysics = const CustomScrollableScrollPhysics(tag: 'innerchild');
+
+  bool _isOpened = false;
+  bool get isOpened => _isOpened;
+
+  PageDraggableOverlayChildController({
+    required this.title,
+  });
+
+  void open() {
+    _isOpened = true;
+    notifyListeners();
+  }
+
+  void close() {
+    _isOpened = false;
+    notifyListeners();
+  }
+}
+
+class _OverlayChildTitle extends StatefulWidget {
+  final PageDraggableOverlayChildController controller;
+
+  const _OverlayChildTitle({required this.controller});
+
+  @override
+  State<_OverlayChildTitle> createState() => _OverlayChildTitleState();
+}
+
+class _OverlayChildTitleState extends State<_OverlayChildTitle>
+    with SingleTickerProviderStateMixin {
   late final AnimationController controller;
   late final Animation<double> opacityAnimation;
   late final Animation<Offset> slideAnimation;
-
-  PageDraggableOverlayChildItem({
-    required this.title,
-    required this.listenable,
-    required this.builder,
-    this.count,
-  });
-
-  void addAnimation(AnimationController animation) {
-    controller = animation;
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+      reverseDuration: const Duration(milliseconds: 250),
+    );
     opacityAnimation = CurvedAnimation(
-      parent: animation,
+      parent: controller,
       curve: Curves.easeInOutCubic,
     );
     slideAnimation = Tween<Offset>(
       begin: const Offset(1, 0),
       end: const Offset(0, 0),
-    ).animate(animation);
+    ).animate(controller);
+
+    widget.controller.addListener(() {
+      if (widget.controller.isOpened) {
+        controller.forward();
+      } else {
+        controller.reverse();
+      }
+    });
   }
 
-  void open() {
-    listenable.value = true;
-    controller.forward();
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
   }
-
-  void close() {
-    listenable.value = false;
-    controller.reverse();
-  }
-}
-
-class _OverlayChildTitle extends StatelessWidget {
-  final Animation<Offset> slideAnimation;
-  final Animation<double> opacityAnimation;
-  final String title;
-  final VoidCallback onClose;
-
-  const _OverlayChildTitle({
-    required this.slideAnimation,
-    required this.opacityAnimation,
-    required this.title,
-    required this.onClose,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -388,12 +465,12 @@ class _OverlayChildTitle extends StatelessWidget {
             children: [
               InkWell(
                 borderRadius: BorderRadius.circular(32),
-                onTap: onClose,
+                onTap: widget.controller.close,
                 child: const Icon(Icons.arrow_back),
               ),
               const SizedBox(width: 32),
               Text(
-                title,
+                widget.controller.title,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

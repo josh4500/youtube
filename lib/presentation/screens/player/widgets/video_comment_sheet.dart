@@ -26,17 +26,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/page_draggable_sheet.dart';
-import 'package:youtube_clone/presentation/widgets/persistent_header_delegate.dart';
 
 import 'video_comment_guidelines.dart';
 
-class VideoCommentsSheet extends StatelessWidget {
+class VideoCommentsSheet extends StatefulWidget {
   final ScrollController? controller;
   final ValueNotifier<bool> replyNotifier;
   final VoidCallback closeComment;
@@ -55,14 +52,21 @@ class VideoCommentsSheet extends StatelessWidget {
   });
 
   @override
+  State<VideoCommentsSheet> createState() => _VideoCommentsSheetState();
+}
+
+class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
+  final _replyController = PageDraggableOverlayChildController(title: 'Reply');
+
+  @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Comments',
       scrollTag: 'player_comments',
-      controller: controller ?? ScrollController(),
-      onClose: closeComment,
-      showDragIndicator: showDragIndicator,
-      draggableController: draggableController,
+      controller: widget.controller ?? ScrollController(),
+      onClose: widget.closeComment,
+      showDragIndicator: widget.showDragIndicator,
+      draggableController: widget.draggableController,
       dynamicTab: const DynamicTab(
         initialIndex: 0,
         options: ['Top', 'Timed', 'Newest'],
@@ -78,7 +82,7 @@ class VideoCommentsSheet extends StatelessWidget {
                   if (index == 0) {
                     return const VideoCommentGuidelines();
                   }
-                  return CommentTile(openReply: () {});
+                  return CommentTile(openReply: _replyController.open);
                 },
                 itemCount: 20,
               ),
@@ -96,6 +100,27 @@ class VideoCommentsSheet extends StatelessWidget {
         );
       },
       baseHeight: 1 - avgVideoViewPortHeight,
+      overlayChildren: [
+        PageDraggableOverlayChild(
+          controller: _replyController,
+          builder: (context, controller, physics) {
+            return ListView.builder(
+              controller: controller,
+              physics: physics,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return const CommentTile(
+                    showReplies: false,
+                    backgroundColor: Color(0xFF272727),
+                  );
+                }
+                return const ReplyTile();
+              },
+              itemCount: 20,
+            );
+          },
+        ),
+      ],
     );
   }
 }

@@ -34,7 +34,7 @@ import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dar
 import 'package:youtube_clone/presentation/widgets/page_draggable_sheet.dart';
 import 'package:youtube_clone/presentation/widgets/persistent_header_delegate.dart';
 
-class VideoDescriptionSheet extends StatelessWidget {
+class VideoDescriptionSheet extends StatefulWidget {
   final ScrollController? controller;
   final bool showDragIndicator;
   final ValueNotifier<bool> transcriptNotifier;
@@ -51,14 +51,22 @@ class VideoDescriptionSheet extends StatelessWidget {
   });
 
   @override
+  State<VideoDescriptionSheet> createState() => _VideoDescriptionSheetState();
+}
+
+class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
+  final _tScriptController = PageDraggableOverlayChildController(
+    title: 'Transcript',
+  );
+  @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Description',
       scrollTag: 'player_description',
-      controller: controller ?? ScrollController(),
-      onClose: closeDescription,
-      showDragIndicator: showDragIndicator,
-      draggableController: draggableController,
+      controller: widget.controller ?? ScrollController(),
+      onClose: widget.closeDescription,
+      showDragIndicator: widget.showDragIndicator,
+      draggableController: widget.draggableController,
       contentBuilder: (context, controller, physics) {
         return ListView(
           physics: physics,
@@ -212,12 +220,12 @@ class VideoDescriptionSheet extends StatelessWidget {
                 CustomActionChip(
                   title: 'Show transcript',
                   alignment: Alignment.center,
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(12),
                   border: Border.all(
                     color: Colors.grey,
                     width: 0.7,
                   ),
-                  onTap: () {},
+                  onTap: _tScriptController.open,
                   textStyle: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -299,6 +307,21 @@ class VideoDescriptionSheet extends StatelessWidget {
         );
       },
       baseHeight: 1 - avgVideoViewPortHeight,
+      overlayChildren: [
+        PageDraggableOverlayChild(
+          controller: _tScriptController,
+          builder: (context, controller, physics) {
+            return ListView.builder(
+              physics: physics,
+              controller: controller,
+              itemBuilder: (context, index) {
+                return const TranscriptTile();
+              },
+              itemCount: 20,
+            );
+          },
+        ),
+      ],
     );
   }
 }
@@ -308,6 +331,28 @@ class TranscriptTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox();
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: const Text(
+              '0:00',
+              style: TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          const SizedBox(width: 32),
+          const Text('You do know that the one piece treasure'),
+        ],
+      ),
+    );
   }
 }

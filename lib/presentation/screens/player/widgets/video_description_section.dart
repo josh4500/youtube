@@ -70,22 +70,23 @@ class VideoDescriptionSection extends StatelessWidget {
                         fontSize: 13,
                       ),
                     ),
-                    // Row(
-                    //   children: [
-                    //     Icon(
-                    //       Icons.shopping_bag_outlined,
-                    //       color: Color(0xFFAAAAAA),
-                    //       size: 14,
-                    //     ),
-                    //     Text(
-                    //       ' Shop ',
-                    //       style: TextStyle(
-                    //         color: Color(0xFFAAAAAA),
-                    //         fontSize: 13,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
+                    Row(
+                      children: [
+                        SizedBox(width: 4),
+                        Icon(
+                          Icons.shopping_bag_outlined,
+                          color: Color(0xFFAAAAAA),
+                          size: 14,
+                        ),
+                        Text(
+                          ' Shop ',
+                          style: TextStyle(
+                            color: Color(0xFFAAAAAA),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
                     SizedBox(width: 6),
                     Text(
                       '...more',
