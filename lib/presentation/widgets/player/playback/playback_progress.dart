@@ -188,7 +188,6 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                 valueColor: widget.bufferAnimation,
                 backgroundColor: Colors.transparent,
               ),
-            // TODO: Remove temporary fix for color animation
             // Player position Indicator
             if (progressAnimation != null)
               AnimatedBuilder(
@@ -241,19 +240,21 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
       );
     }
 
-    final thumbIndicator = AnimatedBuilder(
-      animation: thumbAnimation!,
-      builder: (context, _) {
-        return Container(
-          width: thumbAnimation?.value,
-          height: thumbAnimation?.value,
-          decoration: const BoxDecoration(
-            color: Color(0xFFFF0000),
-            shape: BoxShape.circle,
-          ),
-        );
-      },
-    );
+    final thumbIndicator = thumbAnimation != null
+        ? AnimatedBuilder(
+            animation: thumbAnimation!,
+            builder: (context, _) {
+              return Container(
+                width: thumbAnimation?.value,
+                height: thumbAnimation?.value,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFF0000),
+                  shape: BoxShape.circle,
+                ),
+              );
+            },
+          )
+        : null;
 
     return LayoutBuilder(
       builder: (context, constraint) {
@@ -288,7 +289,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                       return Positioned(
                         bottom: -4.75,
                         left: (positionValue * constraint.maxWidth) - 1.5,
-                        child: thumbIndicator,
+                        child: thumbIndicator!,
                       );
                     },
                   ),
