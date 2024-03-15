@@ -29,6 +29,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -118,6 +119,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Whether video was temporary paused
   bool _wasTempPaused = false;
+
+  /// [MiniPlayer] PlaybackProgress indicator opacity value
+  double get miniPlayerOpacity => const Interval(
+        minVideoViewPortWidth,
+        1,
+        curve: Curves.easeInCubic,
+      ).transform(widthNotifier.value).invertByOne;
 
   @override
   void initState() {
@@ -1132,21 +1140,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                         },
                                       ),
                                     ),
-                                    if (heightValue == minVideoViewPortHeight)
-                                      Positioned(
-                                        left: 0,
-                                        bottom: 0,
-                                        width: screenWidth,
+                                    Positioned(
+                                      left: 0,
+                                      bottom: 0,
+                                      width: screenWidth,
+                                      child: Visibility(
+                                        visible: miniPlayerOpacity > 0,
                                         child: Opacity(
-                                          opacity: widthValue
-                                              .normalize(
-                                                minVideoViewPortWidth,
-                                                1,
-                                              )
-                                              .invertByOne,
+                                          opacity: miniPlayerOpacity,
                                           child: miniplayerProgress,
                                         ),
                                       ),
+                                    ),
                                   ],
                                 );
                               },
