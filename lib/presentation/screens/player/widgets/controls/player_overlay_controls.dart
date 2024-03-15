@@ -978,12 +978,14 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
     _showPullUp = false;
     _slidingSeekDuration.value = null;
+    _showSlidingReleaseIndicator.value = false;
     _hideSlideSeek();
 
     if (wasPlaying) ref.read(playerRepositoryProvider).playVideo();
     wasPlaying = false;
   }
 
+  /// Callback for when Video position is changed from the PlaybackProgress indicator
   void _onPlaybackProgressPositionChanged(Duration position) {
     final lastPosition =
         ref.read(playerRepositoryProvider).currentVideoPosition;
