@@ -177,7 +177,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         opacityValue = additionalHeight / maxAdditionalHeight;
         _draggableOpacityController.value = opacityValue;
       }
-      if (!_commentIsOpened && !_descIsOpened) {
+      if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
         _infoOpacityController.value = opacityValue;
       }
     });
@@ -200,7 +200,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       final opacityValue = (1 - (heightNotifier.value - 0.45) / (1 - 0.45));
 
       _draggableOpacityController.value = opacityValue;
-      if (!_commentIsOpened && !_descIsOpened) {
+      if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
         _infoOpacityController.value = opacityValue;
       }
     });
@@ -358,6 +358,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       }
     }
     if (_descIsOpened) {
+      if (heightNotifier.value == minVideoViewPortHeight) {
+        _descDraggableController.jumpTo(0);
+      } else {
+        _descDraggableController.jumpTo(
+          clampDouble(value - minVideoViewPortHeight, 0, (1 - heightRatio)),
+        );
+      }
+    }
+
+    if (_chaptersIsOpened) {
       if (heightNotifier.value == minVideoViewPortHeight) {
         _descDraggableController.jumpTo(0);
       } else {
@@ -907,6 +917,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     );
   }
 
+  // TODO: Check if to use similar methods for Comments and Description
+  void _closeChapterSheetSignal() {
+    ref.read(playerRepositoryProvider).sendPlayerSignal(
+      [PlayerSignal.closeChapters],
+    );
+  }
+
+  // TODO: Will add Membership sheet too
+
   // TODO: Rename
   bool _onScrollDynamicTab(ScrollNotification notification) {
     // Prevents info to be dragged down while scrolling in DynamicTab
@@ -1276,7 +1295,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                     builder: (context, controller) {
                       return VideoChaptersSheet(
                         controller: controller,
-                        closeChapter: _closeChaptersSheet,
+                        closeChapter: _closeChapterSheetSignal,
                         draggableController: _chaptersDraggableController,
                       );
                     },

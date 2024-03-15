@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
 
 class PlayerChapterControl extends ConsumerWidget {
   const PlayerChapterControl({
@@ -13,7 +14,10 @@ class PlayerChapterControl extends ConsumerWidget {
       onTap: () {
         ref.read(playerRepositoryProvider).sendPlayerSignal([
           PlayerSignal.openChapters,
-          PlayerSignal.hideControls,
+          if (ref.read(playerViewStateProvider).showChapters)
+            PlayerSignal.showControls
+          else
+            PlayerSignal.hideControls,
         ]);
       },
       child: const Row(

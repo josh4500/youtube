@@ -232,8 +232,8 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                 },
               ),
             ),
-            SliverToBoxAdapter(
-              child: ViewableVideoContent.shimmer(),
+            const SliverToBoxAdapter(
+              child: ViewableVideoContent(),
             ),
             const SliverToBoxAdapter(
               child: ViewableVideoContent(),

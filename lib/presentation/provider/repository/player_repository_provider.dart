@@ -39,8 +39,13 @@ import 'package:youtube_clone/presentation/provider/state/player_state_provider.
 
 part 'player_repository_provider.g.dart';
 
+/// Provider state that defines if the PlayerScreen is overlay in home_Screen
+///
+/// NOTE: This state should not be exposed but can be listened to,
+/// from `playerOverlayStateProvider`
 final _playerOverlayStateProvider = StateProvider<bool>((ref) => false);
 
+/// Provider state that defines if the PlayerScreen is overlay in home_Screen
 final playerOverlayStateProvider = Provider(
   (ref) {
     return ref.watch(_playerOverlayStateProvider);
@@ -58,6 +63,7 @@ enum PlayerViewState {
   fullscreen,
   visibleAmbient,
   visibleControls,
+  visibleChapters,
   visibleDescription;
 }
 
@@ -67,6 +73,7 @@ extension PlayerViewStateExtension on Set<PlayerViewState> {
   bool get isFullscreen => contains(PlayerViewState.fullscreen);
   bool get showAmbient => contains(PlayerViewState.visibleAmbient);
   bool get showControls => contains(PlayerViewState.visibleControls);
+  bool get showChapters => contains(PlayerViewState.visibleChapters);
   bool get showDescription => contains(PlayerViewState.visibleDescription);
 }
 
@@ -101,7 +108,7 @@ class PlayerRepository {
 
   final _positionMemory = InMemoryCache<Progress>('PositionMemory');
 
-  late final _videoPlayer = Player();
+  final _videoPlayer = Player();
   late final _videoController = VideoController(_videoPlayer);
   VideoController get videoController => _videoController;
 
@@ -112,19 +119,17 @@ class PlayerRepository {
   Progress? get currentVideoProgress => _positionMemory.read('video');
   Stream<Duration> get positionStream => _videoPlayer.stream.position;
 
-  late final _shortsPlayer = Player();
-  late final _shortsController = VideoController(_shortsPlayer);
-  VideoController get shortsController => _shortsController;
-
   final _playerSignalController = StreamController<PlayerSignal>.broadcast();
   Stream<PlayerSignal> get playerSignalStream => _playerSignalController.stream;
 
   final _progressController = StreamController<Progress>.broadcast();
   Stream<Progress> get videoProgressStream => _progressController.stream;
 
+  // TODO: May use a Riverpod provider (It may deprecate the use of playerNotifierProvider)
   final Set<PlayerViewState> _playerViewState = <PlayerViewState>{};
   Set<PlayerViewState> get playerViewState => _playerViewState;
 
+  // TODO: May use a Riverpod provider
   final Set<PlayerLock> _lock = <PlayerLock>{};
 
   PlayerRepository({required Ref ref}) : _ref = ref {
@@ -164,14 +169,37 @@ class PlayerRepository {
     });
   }
 
+  // TODO: Should be able open video
   void openPlayerScreen() {
     _ref.read(_playerOverlayStateProvider.notifier).state = true;
-    _playerViewState.clear();
   }
 
   void closePlayerScreen() {
+    _lock.clear();
     _videoPlayer.stop();
+    _playerViewState.clear();
+    _ref.read(playerNotifierProvider.notifier).reset();
     _ref.read(_playerOverlayStateProvider.notifier).state = false;
+  }
+
+  Future<void> openVideo() async {
+    await _videoPlayer.open(
+      Media(
+        'https://user-images.githubusercontent.com/28951144/229373695-22f88f13-d18f-4288-9bf1-c3e078d83722.mp4',
+      ),
+      play: true,
+    );
+  }
+
+  Future<void> playVideo() async => await _videoPlayer.play();
+  Future<void> pauseVideo() async => await _videoPlayer.pause();
+  Future<void> seekTo(Duration position) async {
+    await _videoPlayer.seek(position);
+    if (position < currentVideoDuration) {
+      _ref.read(playerNotifierProvider.notifier).restart(
+            _ref.read(playerNotifierProvider).playing,
+          );
+    }
   }
 
   Future<void> seek(Duration duration, {bool reverse = false}) async {
@@ -196,30 +224,8 @@ class PlayerRepository {
     }
   }
 
-  Future<void> seekTo(Duration position) async {
-    await _videoPlayer.seek(position);
-    if (position < currentVideoDuration) {
-      _ref.read(playerNotifierProvider.notifier).restart(
-            _ref.read(playerNotifierProvider).playing,
-          );
-    }
-  }
-
   Future<void> setSpeed([double rate = 2]) async {
     await _videoPlayer.setRate(rate);
-  }
-
-  void minimize() {
-    sendPlayerSignal([PlayerSignal.minimize]);
-  }
-
-  void minimizeAndPauseVideo() {
-    sendPlayerSignal([PlayerSignal.minimize]);
-    _ref.read(playerNotifierProvider.notifier).pause();
-  }
-
-  Future<void> pauseVideo() async {
-    await _videoPlayer.pause();
   }
 
   Future<void> restartVideo() async {
@@ -228,18 +234,24 @@ class PlayerRepository {
     await playVideo();
   }
 
-  Future<void> openVideo() async {
-    _ref.read(playerNotifierProvider.notifier).reset();
-    await _videoPlayer.open(
-      Media(
-        'https://user-images.githubusercontent.com/28951144/229373695-22f88f13-d18f-4288-9bf1-c3e078d83722.mp4',
-      ),
-      play: true,
+  void updatePosition(Duration position, {bool lockProgress = true}) {
+    if (lockProgress) {
+      _lock.add(PlayerLock.progress);
+    } else {
+      _lock.remove(PlayerLock.progress);
+    }
+    final lastProgress = _positionMemory.read('video') ?? Progress.zero;
+    _progressController.sink.add(
+      lastProgress.copyWith(position: position),
     );
+    _positionMemory.write('video', lastProgress.copyWith(position: position));
   }
 
-  Future<void> playVideo() async {
-    await _videoPlayer.play();
+  void minimize() => sendPlayerSignal([PlayerSignal.minimize]);
+
+  void minimizeAndPauseVideo() {
+    sendPlayerSignal([PlayerSignal.minimize]);
+    pauseVideo();
   }
 
   void sendPlayerSignal(List<PlayerSignal> signals) {
@@ -273,23 +285,18 @@ class PlayerRepository {
           _playerViewState.add(PlayerViewState.visibleDescription);
         case PlayerSignal.closeComments:
           _playerViewState.remove(PlayerViewState.visibleDescription);
+        case PlayerSignal.openChapters:
+          _playerViewState.add(PlayerViewState.visibleChapters);
+        case PlayerSignal.closeChapters:
+          _playerViewState.remove(PlayerViewState.visibleChapters);
         default:
           break;
       }
       _playerSignalController.sink.add(signal);
     }
   }
-
-  void updatePosition(Duration position, {bool lockProgress = true}) {
-    if (lockProgress) {
-      _lock.add(PlayerLock.progress);
-    } else {
-      _lock.remove(PlayerLock.progress);
-    }
-    final lastProgress = _positionMemory.read('video') ?? Progress.zero;
-    _progressController.sink.add(
-      lastProgress.copyWith(position: position),
-    );
-    _positionMemory.write('video', lastProgress.copyWith(position: position));
-  }
 }
+
+// late final _shortsPlayer = Player();
+// late final _shortsController = VideoController(_shortsPlayer);
+// VideoController get shortsController => _shortsController;
