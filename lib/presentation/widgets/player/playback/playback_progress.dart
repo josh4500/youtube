@@ -30,23 +30,77 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/progress.dart';
 
+/// Default size of the tappable area for seeking playback.
 const defaultPlaybackProgressTapSize = 10.0;
 
+/// Equivalent value between 0 - 1 of Position and Buffer duration to the full
+/// length duration of the playback
+typedef ProgressValue = (double, double);
+
+/// A widget that displays a visual representation of playback progress,
+/// including chapters, key concepts, and buffer indication (optional).
+/// Creates a new PlaybackProgress widget.
+///
+/// Example usage:
+/// ```dart
+/// PlaybackProgress(
+///   chapters: [
+///     Chapter(title: "Introduction", startTime: Duration(seconds: 0), endTime: Duration(seconds: 60)),
+///     Chapter(title: "Chapter 1", startTime: Duration(seconds: 60), endTime: Duration(seconds: 120)),
+///   ],
+///   keyConcepts: [
+///     KeyConcept(title: "Concept A", time: Duration(seconds: 30)),
+///     KeyConcept(title: "Concept B", time: Duration(seconds: 90)),
+///   ],
+///   onTap: (position) {
+///     // Seek to the tapped position.
+///   },
+/// ),
+/// ```
 class PlaybackProgress extends StatefulWidget {
+  /// Size of the tappable area for seeking playback.
   final double tapSize;
+
+  /// Color of the progress indicator.
   final Color? color;
+
+  /// Animation for the progress indicator (optional).
   final Animation<double?>? animation;
+
+  /// Animation for the buffer indicator color (optional).
   final Animation<Color?>? bufferAnimation;
+
+  /// Background color of the widget.
   final Color? backgroundColor;
+
+  /// Stream of progress updates (optional).
   final Stream<Progress>? progress;
-  final Progress? start;
+
+  /// Starting position of the playback.
+  final Progress start;
+
+  /// Total duration of the playback content.
   final Duration? end;
+
+  /// Whether to show the buffer indicator.
   final bool showBuffer;
+
+  /// List of key concepts and their positions within the playback duration.
   final List<KeyConcept> keyConcepts;
+
+  /// List of chapters and their positions within the playback duration.
   final List<Chapter> chapters;
+
+  /// Callback triggered when the user taps on the progress indicator.
   final void Function(Duration position)? onTap;
+
+  /// Callback triggered when the user starts dragging the progress indicator.
   final void Function(Duration position)? onDragStart;
+
+  /// Callback triggered when the user finishes dragging the progress indicator.
   final void Function()? onDragEnd;
+
+  /// Callback triggered when the user changes the playback position (during drag).
   final void Function(Duration position)? onChangePosition;
 
   const PlaybackProgress({
@@ -82,7 +136,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
     super.initState();
     if (widget.animation != null) {
       thumbAnimation = widget.animation!.drive(
-        Tween<double>(begin: barHeight, end: 12),
+        Tween<double>(begin: _indicatorHeight, end: 12),
       );
       progressAnimation = widget.animation!.drive(
         ColorTween(begin: Colors.white70, end: const Color(0xFFFF0000)),
@@ -90,31 +144,37 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
     }
   }
 
-  // TODO: Compute based on video data
-  double get barHeight => widget.keyConcepts.isEmpty ? 2 : 4;
+  /// Progress Indicators minimum height
+  double get _indicatorHeight => widget.keyConcepts.isEmpty ? 2 : 4;
 
-  List<double> get keyConceptPositions => widget.keyConcepts
+  /// Equivalent value between 0 - 1 of the KeyConcepts duration positions
+  List<double> get _keyConceptPositions => widget.keyConcepts
       .map((e) => e.position.inMicroseconds / widget.end!.inMicroseconds)
       .toList();
 
-  List<double> get chaptersPositions => widget.chapters
+  /// Equivalent value between 0 - 1 of the Chapter duration positions
+  List<double> get _chaptersPositions => widget.chapters
       .map((e) => e.position.inMicroseconds / widget.end!.inMicroseconds)
       .toList();
+
+  /// Computes playback progress values
+  ProgressValue _computeProgressValue(Progress data) {
+    final positionValue =
+        data.position.inSeconds / (widget.end?.inSeconds ?? 0);
+    final bufferValue = data.buffer.inSeconds / (widget.end?.inSeconds ?? 0);
+    return (positionValue, bufferValue);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Progress>(
+    Widget indicators = StreamBuilder<Progress>(
       stream: widget.progress,
       initialData: widget.start,
       builder: (context, snapshot) {
-        final data = snapshot.data ?? Progress.zero;
-        final positionValue =
-            data.position.inSeconds / (widget.end?.inSeconds ?? 0);
-        final bufferValue =
-            data.buffer.inSeconds / (widget.end?.inSeconds ?? 0);
-
-        // TODO: Design widget so that we don't rebuild unnecessary stuffs
-        Widget indicators = Stack(
+        final data = _computeProgressValue(snapshot.data ?? Progress.zero);
+        final positionValue = data.$1;
+        final bufferValue = data.$2;
+        return Stack(
           clipBehavior: Clip.none,
           children: [
             // Buffering Progress indicator
@@ -124,7 +184,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                 value: bufferValue.isNaN || bufferValue.isInfinite
                     ? 0
                     : bufferValue,
-                minHeight: barHeight,
+                minHeight: _indicatorHeight,
                 valueColor: widget.bufferAnimation,
                 backgroundColor: Colors.transparent,
               ),
@@ -139,7 +199,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                     value: positionValue.isNaN || positionValue.isInfinite
                         ? 0
                         : positionValue,
-                    minHeight: barHeight,
+                    minHeight: _indicatorHeight,
                     backgroundColor:
                         widget.backgroundColor ?? Colors.transparent,
                   );
@@ -151,187 +211,278 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                 value: positionValue.isNaN || positionValue.isInfinite
                     ? 0
                     : positionValue,
-                minHeight: barHeight,
+                minHeight: _indicatorHeight,
                 backgroundColor: widget.backgroundColor ?? Colors.transparent,
               ),
           ],
         );
+      },
+    );
 
-        // TODO: Should not be in stream block statement
-        if (widget.chapters.isNotEmpty) {
-          indicators = ClipPath(
-            clipper: ProgressChapterClipper(
-              chapters: chaptersPositions,
-            ),
-            child: indicators,
-          );
-        }
+    // Updates the `indicators` widget based on the presence of chapters.
+    if (widget.chapters.isNotEmpty) {
+      // Draws progress indicators for chapters based on their positions.
+      indicators = ClipPath(
+        clipper: ProgressChapterClipper(
+          chapters: _chaptersPositions,
+        ),
+        child: indicators,
+      );
+    }
 
-        // TODO: Should not be in stream block statement
-        // If KeyConcepts are available we paint positions of Key
-        if (widget.keyConcepts.isNotEmpty) {
-          indicators = CustomPaint(
-            foregroundPainter: ProgressKeyConceptPainter(
-              keyConcepts: keyConceptPositions,
-            ),
-            child: indicators,
-          );
-        }
+    // Updates the `indicators` widget based on the presence of key concepts.
+    if (widget.keyConcepts.isNotEmpty) {
+      // Paints circles at positions corresponding to key concept progress.
+      indicators = CustomPaint(
+        foregroundPainter: ProgressKeyConceptPainter(
+          keyConcepts: _keyConceptPositions,
+        ),
+        child: indicators,
+      );
+    }
 
-        return LayoutBuilder(
-          builder: (context, constraint) {
-            return GestureDetector(
-              onTapDown: (details) => _onTapDown(details, constraint.maxWidth),
-              onHorizontalDragStart: (details) =>
-                  _onHorizontalDragStart(details, constraint.maxWidth),
-              onHorizontalDragUpdate: (details) =>
-                  _onHorizontalDragUpdate(details, constraint.maxWidth),
-              onHorizontalDragEnd: (details) =>
-                  _onHorizontalDragEnd(details, constraint.maxWidth),
-              child: Container(
-                color: Colors.transparent,
-                height: widget.tapSize,
-                child: Stack(
-                  alignment: Alignment.bottomLeft,
-                  clipBehavior: Clip.none,
-                  children: [
-                    indicators,
-                    // Thumb
-                    if (thumbAnimation != null)
-                      Positioned(
+    final thumbIndicator = AnimatedBuilder(
+      animation: thumbAnimation!,
+      builder: (context, _) {
+        return Container(
+          width: thumbAnimation?.value,
+          height: thumbAnimation?.value,
+          decoration: const BoxDecoration(
+            color: Color(0xFFFF0000),
+            shape: BoxShape.circle,
+          ),
+        );
+      },
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraint) {
+        return GestureDetector(
+          onTapDown: (details) => _onTapDown(details, constraint.maxWidth),
+          onHorizontalDragStart: (details) =>
+              _onHorizontalDragStart(details, constraint.maxWidth),
+          onHorizontalDragUpdate: (details) =>
+              _onHorizontalDragUpdate(details, constraint.maxWidth),
+          onHorizontalDragEnd: (details) =>
+              _onHorizontalDragEnd(details, constraint.maxWidth),
+          child: Container(
+            color: Colors.transparent,
+            height: widget.tapSize,
+            child: Stack(
+              alignment: Alignment.bottomLeft,
+              clipBehavior: Clip.none,
+              children: [
+                // Stacked Position and Buffer indicators
+                indicators,
+                // Thumb Indicator
+                if (thumbAnimation != null)
+                  StreamBuilder<Progress>(
+                    stream: widget.progress,
+                    initialData: widget.start,
+                    builder: (context, snapshot) {
+                      final data = _computeProgressValue(
+                        snapshot.data ?? Progress.zero,
+                      );
+                      final positionValue = data.$1;
+
+                      return Positioned(
                         bottom: -4.75,
                         left: (positionValue * constraint.maxWidth) - 1.5,
-                        child: AnimatedBuilder(
-                          animation: thumbAnimation!,
-                          builder: (context, _) {
-                            return Container(
-                              width: thumbAnimation?.value,
-                              height: thumbAnimation?.value,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFFF0000),
-                                shape: BoxShape.circle,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            );
-          },
+                        child: thumbIndicator,
+                      );
+                    },
+                  ),
+              ],
+            ),
+          ),
         );
       },
     );
   }
 
+  /// Handles tap down event on the widget and triggers the `onTap` callback
+  /// if provided.
+  ///
+  /// [details]: The details of the tap down event.
+  /// [width]: The width of the widget.
   void _onTapDown(TapDownDetails details, double width) {
-    final positionInMilliseconds = _getRelativePosition(
-      details.localPosition.dx,
-      width,
-    );
+    // Get the position in milliseconds relative to the widget width.
+    final positionInMilliseconds =
+        _getRelativePosition(details.localPosition.dx, width);
+
+    // Call the passed `onTap` callback if available.
     if (widget.onTap != null) {
       widget.onTap!(Duration(milliseconds: positionInMilliseconds));
     }
   }
 
+  /// Handles the start of a horizontal drag event and triggers the `onDragStart`
+  /// callback if provided.
+  ///
+  /// [details]: The details of the drag start event.
+  /// [width]: The width of the widget.
   void _onHorizontalDragStart(DragStartDetails details, double width) {
-    final positionInMilliseconds = _getRelativePosition(
-      details.localPosition.dx,
-      width,
-    );
+    // Get the position in milliseconds relative to the widget width.
+    final positionInMilliseconds =
+        _getRelativePosition(details.localPosition.dx, width);
+
+    // Call the passed `onDragStart` callback if available.
     if (widget.onDragStart != null) {
       widget.onDragStart!(Duration(milliseconds: positionInMilliseconds));
     }
   }
 
+  /// Handles updates during a horizontal drag event and triggers the
+  /// `onChangePosition` callback if provided.
+  ///
+  /// [details]: The details of the drag update event.
+  /// [width]: The width of the widget.
   void _onHorizontalDragUpdate(DragUpdateDetails details, double width) {
-    final positionInMilliseconds = _getRelativePosition(
-      details.localPosition.dx,
-      width,
-    );
-    if (widget.onDragStart != null) {
+    // Get the position in milliseconds relative to the widget width.
+    final positionInMilliseconds =
+        _getRelativePosition(details.localPosition.dx, width);
+
+    // Call the passed `onChangePosition` callback if available.
+    if (widget.onChangePosition != null) {
       widget.onChangePosition!(Duration(milliseconds: positionInMilliseconds));
     }
   }
 
+  /// Handles the end of a horizontal drag event and triggers the `onDragEnd`
+  /// callback if provided.
+  ///
+  /// [details]: The details of the drag end event.
   void _onHorizontalDragEnd(DragEndDetails details, double width) {
+    // Call the passed `onDragEnd` callback if available.
     if (widget.onDragEnd != null) {
       widget.onDragEnd!();
     }
   }
 
+  /// Calculates the position in milliseconds relative to the widget width.
+  ///
+  /// This function takes the horizontal position (`dx`) of a tap or drag event
+  /// and the width of the widget and returns the corresponding position in
+  /// milliseconds based on the assumed total duration (accessible through
+  /// `widget.end`).
   int _getRelativePosition(double dx, double width) {
+    // Use the provided end value (or 0 if not provided) and scale it
+    // proportionally based on the tap/drag position and widget width.
+    // Then convert the result to milliseconds and return the floor value
+    // (rounded down to nearest whole number).
     return ((widget.end?.inMilliseconds ?? 0) * (dx / width)).floor();
   }
 }
 
+/// Creates a custom clipper that generates a path representing progress
+/// through a series of chapters, with visual separation between chapters.
 class ProgressChapterClipper extends CustomClipper<Path> {
+  /// Constant spacing between chapters in the visual representation.
   static const double _space = 2.5;
 
+  /// List of chapter progress values, ranging from 0.0 (no progress) to 1.0
+  /// (complete).
   final List<double> chapters;
 
+  /// Creates a new ProgressChapterClipper.
+  ///
+  /// [chapters]: A list of chapter progress values.
   ProgressChapterClipper({super.reclip, required this.chapters});
 
+  /// Generates the clipping path based on the provided size and chapter progress.
   @override
   Path getClip(Size size) {
     final path = Path();
-    // Begin
+
+    // Start path creation at the top-left corner.
     path.moveTo(0, 0);
 
+    // Iterate through each chapter to create path segments.
     for (int i = 0; i < chapters.length; i++) {
       final chapter = chapters[i];
+
+      // Draw a horizontal line to the progress point of the current chapter.
       path.lineTo(size.width * chapter, 0);
+
+      // Draw a vertical line down to the bottom of the clip area.
       path.lineTo(size.width * chapter, size.height);
 
+      // Handle special cases for the first and last chapters:
+
       if (i == 0) {
+        // Close the path back to the top-left corner for the first chapter.
         path.lineTo(0, size.height);
         path.lineTo(0, 0);
       } else {
+        // Add a visual gap between chapters using `_space`.
         final prevChapter = chapters[i - 1];
         path.lineTo((size.width * prevChapter) + _space, size.height);
         path.lineTo((size.width * prevChapter) + _space, 0);
       }
 
       if (i != chapters.length - 1) {
+        // Move the path to the start of the next chapter, accounting for spacing.
         final nextChapter = chapters[i + 1];
         path.moveTo((size.width * nextChapter) + _space, 0);
       }
     }
 
+    // Close the path to form a complete shape.
     path.close();
+
     return path;
   }
 
+  /// Indicates that re-clipping is unnecessary for this clipper.
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
+/// A custom painter that draws circles at positions corresponding to key concept progress.
 class ProgressKeyConceptPainter extends CustomPainter {
+  /// List of key concept progress values, ranging from 0.0 (no progress) to 1.0
+  /// (complete).
   final List<double> keyConcepts;
+
+  /// Constant radius of the circles representing key concepts.
   static const double _radius = 2;
 
+  /// Creates a new ProgressKeyConceptPainter.
+  ///
+  /// [keyConcepts]: A list of key concept progress values.
   ProgressKeyConceptPainter({super.repaint, required this.keyConcepts});
 
+  /// Paints circles on the canvas based on the provided size and key concept progress.
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..strokeWidth = 1
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
+      ..strokeWidth = 1 // Sets the width of the circle's stroke.
+      ..color = Colors.white // Sets the color of the circle to white.
+      ..style = PaintingStyle.fill; // Fills the circles with the paint color.
 
+    // Loop through each key concept and draw a circle at its corresponding position.
     for (int i = 0; i < keyConcepts.length; i++) {
+      final conceptProgress = keyConcepts[i];
+
+      // Calculate the center of the circle based on progress and radius.
+      final centerX = (size.width * conceptProgress) + (_radius / 2);
+      final centerY = size.height / 2;
+
+      // Draw the circle on the canvas.
       canvas.drawCircle(
-        Offset((size.width * keyConcepts[i]) + (_radius / 2), size.height / 2),
+        Offset(centerX, centerY),
         _radius,
         paint,
       );
     }
   }
 
+  /// Indicates that re-painting is unnecessary unless the [keyConcepts] list changes.
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
+// TODO: Move to different file
 
 class KeyConcept {
   final Duration position;
