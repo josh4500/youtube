@@ -82,7 +82,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
     super.initState();
     if (widget.animation != null) {
       thumbAnimation = widget.animation!.drive(
-        Tween<double>(begin: 0, end: 12),
+        Tween<double>(begin: barHeight, end: 12),
       );
       progressAnimation = widget.animation!.drive(
         ColorTween(begin: Colors.white70, end: const Color(0xFFFF0000)),
@@ -267,7 +267,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
 }
 
 class ProgressChapterClipper extends CustomClipper<Path> {
-  static const double _space = 3;
+  static const double _space = 2.5;
 
   final List<double> chapters;
 
@@ -287,20 +287,15 @@ class ProgressChapterClipper extends CustomClipper<Path> {
       if (i == 0) {
         path.lineTo(0, size.height);
         path.lineTo(0, 0);
-
-        if (chapters.length > 1) {
-          final nextChapter = chapters[i + 1];
-          path.moveTo((size.width * nextChapter) + _space, 0);
-        }
       } else {
         final prevChapter = chapters[i - 1];
         path.lineTo((size.width * prevChapter) + _space, size.height);
         path.lineTo((size.width * prevChapter) + _space, 0);
+      }
 
-        if (i != chapters.length - 1) {
-          final nextChapter = chapters[i + 1];
-          path.moveTo((size.width * nextChapter) + _space, 0);
-        }
+      if (i != chapters.length - 1) {
+        final nextChapter = chapters[i + 1];
+        path.moveTo((size.width * nextChapter) + _space, 0);
       }
     }
 
@@ -314,7 +309,7 @@ class ProgressChapterClipper extends CustomClipper<Path> {
 
 class ProgressKeyConceptPainter extends CustomPainter {
   final List<double> keyConcepts;
-  static const double _radius = 2.5;
+  static const double _radius = 2;
 
   ProgressKeyConceptPainter({super.repaint, required this.keyConcepts});
 
