@@ -49,6 +49,7 @@ import '../../view_models/playback/player_sizing.dart';
 import 'widgets/player/mini_player.dart';
 import 'widgets/player/player.dart';
 import 'widgets/video_actions.dart';
+import 'widgets/video_channel_section.dart';
 import 'widgets/video_chapters_sheet.dart';
 import 'widgets/video_comment_section.dart';
 import 'widgets/video_comment_sheet.dart';
@@ -1037,6 +1038,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
               child: Column(
                 children: [
                   VideoDescriptionSection(onTap: _openDescSheet),
+                  const VideoChannelSection(),
                   const VideoContext(),
                   const VideoActions(),
                   VideoCommentSection(onTap: _openCommentSheet),
