@@ -26,6 +26,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/progress.dart';
@@ -128,7 +130,9 @@ class PlaybackProgress extends StatefulWidget {
 
 class _PlaybackProgressState extends State<PlaybackProgress> {
   Stream<Progress>? progressStream;
+  // TODO: Show use TweenInterval and rename property
   Animation<double>? thumbAnimation;
+  // TODO: Rename property
   Animation<Color?>? progressAnimation;
 
   @override
@@ -136,7 +140,8 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
     super.initState();
     if (widget.animation != null) {
       thumbAnimation = widget.animation!.drive(
-        Tween<double>(begin: _indicatorHeight, end: 12),
+        // TODO: Begin at _indicatorHeight
+        Tween<double>(begin: 0, end: 12),
       );
       progressAnimation = widget.animation!.drive(
         ColorTween(begin: Colors.white70, end: const Color(0xFFFF0000)),
@@ -244,14 +249,18 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
         ? AnimatedBuilder(
             animation: thumbAnimation!,
             builder: (context, _) {
-              return Container(
-                width: thumbAnimation?.value,
-                height: thumbAnimation?.value,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFF0000),
-                  shape: BoxShape.circle,
-                ),
-              );
+              return AnimatedBuilder(
+                  animation: progressAnimation!,
+                  builder: (context, _) {
+                    return Container(
+                      width: thumbAnimation?.value,
+                      height: thumbAnimation?.value,
+                      decoration: BoxDecoration(
+                        color: progressAnimation!.value,
+                        shape: BoxShape.circle,
+                      ),
+                    );
+                  });
             },
           )
         : null;
@@ -286,9 +295,14 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                       );
                       final positionValue = data.$1;
 
+                      // TODO: When begin at _indicatorHeight, animate bottom based on thumbAnimation
                       return Positioned(
-                        bottom: -4.75,
-                        left: (positionValue * constraint.maxWidth) - 1.5,
+                        bottom: -4,
+                        left: clampDouble(
+                          (positionValue * constraint.maxWidth) - 4,
+                          0,
+                          constraint.maxWidth - 12,
+                        ),
                         child: thumbIndicator!,
                       );
                     },

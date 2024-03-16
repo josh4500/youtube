@@ -446,7 +446,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                           horizontal: 16,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.black45,
+                          color: Colors.black54,
                           borderRadius: BorderRadius.circular(32),
                         ),
                         child: const Text('Release to cancel'),
@@ -584,20 +584,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                           onDragStart: _onPlaybackProgressDragStart,
                           onChangePosition: _onPlaybackProgressPositionChanged,
                           onDragEnd: _onPlaybackProgressDragEnd,
-                          // TODO: Remove test data
-                          keyConcepts: [
-                            KeyConcept(position: const Duration(seconds: 15)),
-                            KeyConcept(position: const Duration(seconds: 18)),
-                            KeyConcept(position: const Duration(seconds: 50)),
-                          ],
-                          chapters: [
-                            Chapter(position: const Duration(seconds: 5)),
-                            Chapter(position: const Duration(seconds: 10)),
-                            Chapter(position: const Duration(seconds: 25)),
-                            Chapter(position: const Duration(seconds: 48)),
-                            Chapter(position: const Duration(seconds: 53)),
-                            Chapter(position: const Duration(seconds: 60)),
-                          ],
                         );
                       },
                     ),

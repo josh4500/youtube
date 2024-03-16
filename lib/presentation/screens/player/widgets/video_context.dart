@@ -33,6 +33,8 @@ class VideoContext extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: This space should between videoChannelSection and VideoActions
+    // return const SizedBox(height: 8);
     return Container(
       padding: const EdgeInsets.symmetric(
         vertical: 12,

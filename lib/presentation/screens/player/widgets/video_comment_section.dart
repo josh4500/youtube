@@ -161,6 +161,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
 
     if (!isRestrictedMode) {
       return Container(
+        clipBehavior: Clip.none,
         margin: const EdgeInsets.symmetric(
           vertical: 12,
           horizontal: 12,

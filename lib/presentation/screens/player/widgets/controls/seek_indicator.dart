@@ -54,7 +54,7 @@ class SeekIndicator extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.black45,
+          color: Colors.black.withOpacity(0.6),
           borderRadius: BorderRadius.circular(32),
         ),
         child: child,

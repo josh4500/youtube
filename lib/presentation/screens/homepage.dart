@@ -111,7 +111,7 @@ class _HomePageState extends ConsumerState<HomePage>
     return SafeArea(
       bottom: false,
       child: Scaffold(
-        // extendBody: true,
+        extendBody: true,
         body: Stack(
           children: [
             widget.child,
@@ -196,7 +196,7 @@ class _CustomNavigatorBarState extends State<CustomNavigatorBar>
     _controller = AnimationController(
       vsync: this,
       duration: widget.duration,
-      value: 1,
+      value: 0,
       animationBehavior: AnimationBehavior.preserve,
     );
 
