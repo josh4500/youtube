@@ -205,8 +205,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
                     pinned: true,
                     floating: true,
                     delegate: PersistentHeaderDelegate(
-                      minHeight: 60,
-                      maxHeight: showDynamicTabs ? 100 : 60,
+                      minHeight: 66,
+                      maxHeight: showDynamicTabs ? 111 : 66,
                       child: Material(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -223,11 +223,9 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
                               )
                             else
                               const SizedBox(height: 16),
+                            const SizedBox(height: 4),
                             childWidget!,
-                            if (showDynamicTabs)
-                              const SizedBox(height: 8)
-                            else
-                              const SizedBox(height: 16),
+                            const SizedBox(height: 18),
                             if (showDynamicTabs) ...[
                               Column(
                                 children: [
@@ -239,7 +237,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
                                 ],
                               ),
                             ],
-                            const Divider(thickness: 1.5, height: 0),
+                            const Divider(thickness: 1.1, height: 0),
                           ],
                         ),
                       ),
@@ -248,7 +246,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
+                    horizontal: 12.0,
                   ),
                   child: Stack(
                     children: [
@@ -257,7 +255,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
                           Text(
                             widget.title,
                             style: const TextStyle(
-                              fontSize: 18,
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -468,7 +466,7 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
                 onTap: widget.controller.close,
                 child: const Icon(Icons.arrow_back),
               ),
-              const SizedBox(width: 32),
+              const SizedBox(width: 20),
               Text(
                 widget.controller.title,
                 style: const TextStyle(

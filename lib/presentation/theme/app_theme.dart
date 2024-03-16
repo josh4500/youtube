@@ -106,6 +106,7 @@ abstract final class AppTheme {
       horizontalTitleGap: 0,
       minVerticalPadding: 0,
     ),
+    dividerColor: const Color(0xFF3F3F3F),
   ).copyWith(
     extensions: [
       _darkAppColors,

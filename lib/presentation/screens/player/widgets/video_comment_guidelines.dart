@@ -34,11 +34,19 @@ class VideoCommentGuidelines extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      color: Colors.grey,
-      child: const Text(
-        'Remember to keep comments respectful and to follow our Community Guidelines',
-        style: TextStyle(fontSize: 11),
+      padding: const EdgeInsets.all(12),
+      color: Colors.white10,
+      child: RichText(
+        text: const TextSpan(
+          text: 'Remember to keep comments respectful and to follow our ',
+          children: [
+            TextSpan(
+              text: 'Community Guidelines',
+              style: TextStyle(color: Colors.blue, fontSize: 12),
+            ),
+          ],
+          style: TextStyle(fontSize: 12),
+        ),
       ),
     );
   }
