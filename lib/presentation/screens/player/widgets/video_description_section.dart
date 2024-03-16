@@ -27,7 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets/channel_avatar.dart';
+import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class VideoDescriptionSection extends StatelessWidget {

@@ -27,7 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets/channel_avatar.dart';
+import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class ViewablePostContent extends StatelessWidget {
@@ -48,7 +48,7 @@ class ViewablePostContent extends StatelessWidget {
             children: [
               const Padding(
                 padding: EdgeInsets.all(6.0),
-                child: ChannelAvatar(),
+                child: AccountAvatar(),
               ),
               const Expanded(
                 child: Padding(

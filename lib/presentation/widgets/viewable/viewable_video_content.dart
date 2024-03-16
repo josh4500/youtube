@@ -30,7 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets/shimmer.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
-import '../channel_avatar.dart';
+import '../account_avatar.dart';
 import '../player/playback/playback_view.dart';
 
 class ViewableVideoContent extends StatelessWidget {
@@ -135,7 +135,7 @@ class ViewableVideoContent extends StatelessWidget {
               vertical: 12.0,
               horizontal: 4,
             ),
-            child: ChannelAvatar(size: 36),
+            child: AccountAvatar(size: 36),
           ),
         ),
         Positioned(

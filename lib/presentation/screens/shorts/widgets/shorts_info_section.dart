@@ -27,7 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets/channel_avatar.dart';
+import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 
 import 'shorts_audio_button.dart';
 import 'shorts_context_info.dart';
@@ -108,7 +108,7 @@ class ShortsInfoSection extends StatelessWidget {
                       ],
                       Row(
                         children: [
-                          const ChannelAvatar(size: 32),
+                          const AccountAvatar(size: 32),
                           const SizedBox(width: 8),
                           const Text('@maxymilliano'),
                           const SizedBox(width: 12),

@@ -27,7 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 export 'widgets/appbar_action.dart';
-export 'widgets/channel_avatar.dart';
+export 'widgets/account_avatar.dart';
 export 'widgets/clip_thumb_clipper.dart';
 export 'widgets/comment_textfield_placeholder.dart';
 export 'widgets/comment_tile.dart';

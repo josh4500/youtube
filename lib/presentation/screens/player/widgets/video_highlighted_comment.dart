@@ -27,7 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets/channel_avatar.dart';
+import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 
 class VideoHighlightedComment extends StatefulWidget {
   const VideoHighlightedComment({super.key});
@@ -42,7 +42,7 @@ class _VideoHighlightedCommentState extends State<VideoHighlightedComment> {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        ChannelAvatar(size: 24),
+        AccountAvatar(size: 24),
         SizedBox(width: 8),
         Expanded(
           child: Text(

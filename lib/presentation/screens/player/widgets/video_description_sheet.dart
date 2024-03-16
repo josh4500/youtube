@@ -28,7 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
-import 'package:youtube_clone/presentation/widgets/channel_avatar.dart';
+import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/page_draggable_sheet.dart';
@@ -238,7 +238,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
               children: [
                 const Row(
                   children: [
-                    ChannelAvatar(size: 48),
+                    AccountAvatar(size: 48),
                     SizedBox(width: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

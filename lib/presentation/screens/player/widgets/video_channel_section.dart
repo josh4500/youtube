@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets/channel_avatar.dart';
+import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class VideoChannelSection extends StatelessWidget {
@@ -34,7 +34,7 @@ class VideoChannelButton extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          ChannelAvatar(size: 40),
+          AccountAvatar(size: 40),
           SizedBox(width: 12),
           Text(
             'Harris Craycraft',

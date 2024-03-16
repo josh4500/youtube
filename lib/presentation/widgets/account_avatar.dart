@@ -31,10 +31,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 // TODO: Use clipper to create if channel is live
-class ChannelAvatar extends StatelessWidget {
+class AccountAvatar extends StatelessWidget {
   final double? size;
   final VoidCallback? onTap;
-  const ChannelAvatar({super.key, this.size, this.onTap});
+  const AccountAvatar({super.key, this.size, this.onTap});
 
   @override
   Widget build(BuildContext context) {

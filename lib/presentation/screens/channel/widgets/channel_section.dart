@@ -29,7 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
-import 'package:youtube_clone/presentation/widgets/channel_avatar.dart';
+import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
@@ -60,7 +60,7 @@ class ChannelSection extends StatelessWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const ChannelAvatar(size: 88),
+                  const AccountAvatar(size: 88),
                   const SizedBox(width: 8),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
