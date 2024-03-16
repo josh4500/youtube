@@ -29,12 +29,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:youtube_clone/core/constants/constants.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
-import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/player_screen.dart';
-import 'package:youtube_clone/presentation/widgets/builders/auth_state_builder.dart';
-import 'package:youtube_clone/presentation/widgets/connection_snackbar.dart';
+
+import '../constants.dart';
+import '../providers.dart';
+import '../screens.dart' show PlayerScreen;
+import '../widgets.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   final StatefulNavigationShell child;
@@ -112,6 +111,15 @@ class _HomePageState extends ConsumerState<HomePage>
       bottom: false,
       child: Scaffold(
         extendBody: true,
+        resizeToAvoidBottomInset: false,
+        drawerEnableOpenDragGesture: false,
+        drawer: Drawer(
+          child: ListView(
+            children: const <Widget>[
+              AppLogo(),
+            ],
+          ),
+        ),
         body: Stack(
           children: [
             widget.child,

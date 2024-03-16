@@ -26,6 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+export 'widgets/app_logo.dart';
 export 'widgets/appbar_action.dart';
 export 'widgets/account_avatar.dart';
 export 'widgets/clip_thumb_clipper.dart';

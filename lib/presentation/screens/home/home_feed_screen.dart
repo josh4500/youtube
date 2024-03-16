@@ -29,18 +29,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/core/constants/constants.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
+import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
-import 'package:youtube_clone/presentation/widgets/appbar_action.dart';
-import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
-import 'package:youtube_clone/presentation/widgets/dynamic_tab.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
-import 'package:youtube_clone/presentation/widgets/viewable/viewable_video_content.dart';
-
-import '../../router/app_routes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class HomeFeedScreen extends StatefulWidget {
   const HomeFeedScreen({super.key});
@@ -146,6 +140,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
             SliverAppBar(
               floating: true,
               automaticallyImplyLeading: false,
+              title: const AppLogo(),
               actions: [
                 AppbarAction(
                   icon: Icons.cast_outlined,
@@ -175,6 +170,9 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                           borderRadius: BorderRadius.circular(4),
                           backgroundColor: Colors.white12,
                           icon: const Icon(Icons.assistant_navigation),
+                          onTap: () {
+                            // TODO: Opens drawer
+                          },
                         ),
                       ),
                       trailing: Padding(

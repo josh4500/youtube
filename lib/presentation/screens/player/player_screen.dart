@@ -29,11 +29,9 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/core/progress.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
@@ -45,6 +43,7 @@ import 'package:youtube_clone/presentation/screens/player/widgets/player/player_
 import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../../constants.dart';
 import '../../view_models/playback/player_sizing.dart';
 import 'widgets/controls/player_ambient.dart';
 import 'widgets/player/mini_player.dart';

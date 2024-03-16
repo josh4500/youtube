@@ -40,6 +40,7 @@ import 'package:youtube_clone/presentation/screens/player/widgets/video_comment_
 import 'package:youtube_clone/presentation/screens/player/widgets/video_description_sheet.dart';
 import 'package:youtube_clone/presentation/widgets/custom_scroll_physics.dart';
 
+import '../../constants.dart';
 import '../../providers.dart';
 import '../../view_models/playback/player_sizing.dart';
 import 'widgets/player/player.dart';
