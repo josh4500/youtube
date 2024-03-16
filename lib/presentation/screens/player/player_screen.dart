@@ -46,6 +46,7 @@ import 'package:youtube_clone/presentation/screens/player/widgets/player/player_
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../view_models/playback/player_sizing.dart';
+import 'widgets/controls/player_ambient.dart';
 import 'widgets/player/mini_player.dart';
 import 'widgets/player/player.dart';
 import 'widgets/video_actions.dart';
@@ -1035,14 +1036,20 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           controller: _infoScrollController,
           slivers: [
             SliverToBoxAdapter(
-              child: Column(
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  VideoDescriptionSection(onTap: _openDescSheet),
-                  const VideoChannelSection(),
-                  const VideoContext(),
-                  const VideoActions(),
-                  VideoCommentSection(onTap: _openCommentSheet),
-                  const SizedBox(height: 12),
+                  const PlayerAmbient(),
+                  Column(
+                    children: [
+                      VideoDescriptionSection(onTap: _openDescSheet),
+                      const VideoChannelSection(),
+                      const VideoContext(),
+                      const VideoActions(),
+                      VideoCommentSection(onTap: _openCommentSheet),
+                      const SizedBox(height: 12),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -1195,9 +1202,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                       builder: (context, childWidget) {
                         return Opacity(
                           opacity: _infoOpacityAnimation.value,
-                          child: Material(
-                            child: childWidget,
-                          ),
+                          child: childWidget,
                         );
                       },
                       child: infoScrollview,
