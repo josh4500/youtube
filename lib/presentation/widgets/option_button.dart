@@ -29,15 +29,6 @@
 import 'package:flutter/material.dart';
 
 class OptionButton extends StatefulWidget {
-  final String title;
-  final Widget? leading;
-  final double? leadingWidth;
-  final Alignment? alignment;
-  final Color? backgroundColor;
-  final BorderRadius? borderRadius;
-  final EdgeInsets? padding;
-  final TextStyle? textStyle;
-
   const OptionButton({
     super.key,
     required this.title,
@@ -49,6 +40,15 @@ class OptionButton extends StatefulWidget {
     this.padding,
     this.textStyle,
   });
+
+  final String title;
+  final Widget? leading;
+  final double? leadingWidth;
+  final Alignment? alignment;
+  final Color? backgroundColor;
+  final BorderRadius? borderRadius;
+  final EdgeInsets? padding;
+  final TextStyle? textStyle;
 
   @override
   State<OptionButton> createState() => _OptionButtonState();
@@ -96,8 +96,8 @@ class _OptionButtonState extends State<OptionButton>
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            if (widget.leading != null) ...[
+          children: <Widget>[
+            if (widget.leading != null) ...<Widget>[
               widget.leading!,
               SizedBox(width: widget.leadingWidth ?? 8),
             ],
@@ -112,14 +112,14 @@ class _OptionButtonState extends State<OptionButton>
             ),
             AnimatedBuilder(
               animation: _animation,
-              builder: (context, child) {
+              builder: (BuildContext context, Widget? child) {
                 return Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     color: _animation.value,
                   ),
-                  child: child!,
+                  child: child,
                 );
               },
               child: const RotatedBox(
@@ -129,7 +129,7 @@ class _OptionButtonState extends State<OptionButton>
                   size: 16,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

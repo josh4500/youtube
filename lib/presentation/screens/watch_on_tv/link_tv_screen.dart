@@ -53,10 +53,10 @@ class _LinkTvScreenState extends State<LinkTvScreen> {
         title: const Text('Link with TV code'),
       ),
       body: Column(
-        children: [
+        children: <Widget>[
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+            children: <Widget>[
               const SizedBox(height: 32),
               SizedBox(
                 width: 200,
@@ -65,12 +65,11 @@ class _LinkTvScreenState extends State<LinkTvScreen> {
                   controller: _controller,
                   focusNode: _focusNode,
                   maxLength: 15,
-                  onTapOutside: (event) {
+                  onTapOutside: (PointerDownEvent event) {
                     _focusNode.requestFocus();
                   },
                   keyboardType: TextInputType.number,
                   autocorrect: false,
-                  canRequestFocus: true,
                   autofocus: true,
                   cursorOpacityAnimates: true,
                   cursorColor: Colors.blue,

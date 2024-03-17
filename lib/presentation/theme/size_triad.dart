@@ -43,18 +43,6 @@ import 'enum.dart';
 /// var differentSizes = SizeTriad.double(5.0, 8.0);
 /// ```
 class SizeTriad<T> {
-  /// Size for Android phones.
-  final T android;
-
-  /// Size for iOS phones.
-  final T ios;
-
-  /// Size for Android tablets.
-  final T androidTablet;
-
-  /// Size for iPads.
-  final T ipad;
-
   /// Constructs a SizeTriad with sizes for each platform.
   ///
   /// All parameters are required, and they represent the sizes for Android
@@ -71,7 +59,7 @@ class SizeTriad<T> {
   /// Parameters:
   /// - [value]: The size value to be used for all platforms.
   factory SizeTriad.single(T value) {
-    return SizeTriad(
+    return SizeTriad<T>(
       android: value,
       ios: value,
       androidTablet: value,
@@ -85,13 +73,25 @@ class SizeTriad<T> {
   /// - [phone]: The size value for phones (Android and iOS).
   /// - [tablet]: The size value for tablets (Android and iPad).
   factory SizeTriad.double(T phone, T tablet) {
-    return SizeTriad(
+    return SizeTriad<T>(
       android: phone,
       ios: phone,
       androidTablet: tablet,
       ipad: tablet,
     );
   }
+
+  /// Size for Android phones.
+  final T android;
+
+  /// Size for iOS phones.
+  final T ios;
+
+  /// Size for Android tablets.
+  final T androidTablet;
+
+  /// Size for iPads.
+  final T ipad;
 
   T resolveWithDeviceType(DeviceType type) {
     switch (type) {

@@ -36,26 +36,27 @@ abstract final class AppPalette {
   static const Color white1 = Color(0xFFF1F1F1);
 
   // RED
-  static const red = Color(0xFFFF0000);
+  static const Color red = Color(0xFFFF0000);
 
   // GREY
 
   // BLACK
 
-  static const primary = BrightnessPair<Color>(
+  static const BrightnessPair<Color> primary = BrightnessPair<Color>(
     light: Color(0xFF000000),
     dark: Color(0xFFFFFFFF),
   );
-  static const backgroundColor = BrightnessPair<Color>(
+  static const BrightnessPair<Color> backgroundColor = BrightnessPair<Color>(
     light: Color(0xFFFFFFFF),
     dark: Color(0xFF0F0F0F),
   );
-  static const settingsPopupBackgroundColor = BrightnessPair<Color>(
+  static const BrightnessPair<Color> settingsPopupBackgroundColor =
+      BrightnessPair<Color>(
     light: Color(0xFFFFFFFF),
     dark: Color(0xFF212121),
   );
 
-  static const shimmerColor = BrightnessPair<Color>(
+  static const BrightnessPair<Color> shimmerColor = BrightnessPair<Color>(
     light: Color(0xFFE5E5E5),
     dark: Color(0xFF3F3F3F),
   );

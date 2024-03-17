@@ -37,7 +37,7 @@ Future<T?> showHistoryMenu<T>(
   return showMenu<T>(
     context: context,
     position: position,
-    items: [
+    items: <PopupMenuEntry<T>>[
       const PopupMenuItem(
         child: Text('Pause watch history'),
       ),

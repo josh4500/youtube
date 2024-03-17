@@ -27,23 +27,14 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/core/enums/auth_state.dart';
+import 'package:youtube_clone/infrastructure/services/internet_connectivity/connectivity_state.dart';
 import 'package:youtube_clone/presentation/widgets/builders/auth_state_builder.dart';
 
 import '../../../widgets/builders/network_builder.dart';
 import '../view_models/pref_option.dart';
 
 class SettingsTile extends StatelessWidget {
-  final String title;
-  final String? summary;
-  final String? Function(PrefOption prefOption)? onGenerateSummary;
-  final bool networkRequired;
-  final bool accountRequired;
-  final bool disableOnNoNetwork;
-  final bool selected;
-  final bool? enabled;
-  final PrefOption? prefOption;
-  final VoidCallback? onTap;
-
   const SettingsTile({
     super.key,
     required this.title,
@@ -57,6 +48,16 @@ class SettingsTile extends StatelessWidget {
     this.prefOption,
     this.onTap,
   });
+  final String title;
+  final String? summary;
+  final String? Function(PrefOption prefOption)? onGenerateSummary;
+  final bool networkRequired;
+  final bool accountRequired;
+  final bool disableOnNoNetwork;
+  final bool selected;
+  final bool? enabled;
+  final PrefOption? prefOption;
+  final VoidCallback? onTap;
 
   Widget? _buildTrailing(bool isConnected) {
     if (prefOption != null) {
@@ -93,45 +94,52 @@ class SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AuthStateBuilder(builder: (context, state) {
-      if (state.isNotAuthenticated && accountRequired) {
-        return const SizedBox();
-      }
-
-      return NetworkBuilder(builder: (context, state) {
-        if (networkRequired && !disableOnNoNetwork && state.isNotConnected) {
+    return AuthStateBuilder(
+      builder: (BuildContext context, AuthState state) {
+        if (state.isNotAuthenticated && accountRequired) {
           return const SizedBox();
         }
 
-        String? effectiveSummary;
-        if (onGenerateSummary != null && prefOption != null) {
-          effectiveSummary = onGenerateSummary!(prefOption!);
-        } else if (summary != null) {
-          effectiveSummary = summary;
-        }
+        return NetworkBuilder(
+          builder: (BuildContext context, ConnectivityState state) {
+            if (networkRequired &&
+                !disableOnNoNetwork &&
+                state.isNotConnected) {
+              return const SizedBox();
+            }
 
-        return ListTile(
-          selected: selected,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 1,
-          ),
-          selectedColor: Colors.white,
-          selectedTileColor: Colors.grey,
-          title: Text(title),
-          subtitle: effectiveSummary != null
-              ? Text(
-                  effectiveSummary,
-                  style: const TextStyle(
-                    color: Color(0xFFAAAAAA),
-                  ),
-                )
-              : null,
-          trailing: _buildTrailing(state.isConnected),
-          onTap: onTap,
-          enabled: enabled ?? (disableOnNoNetwork ? state.isConnected : true),
+            String? effectiveSummary;
+            if (onGenerateSummary != null && prefOption != null) {
+              effectiveSummary = onGenerateSummary!(prefOption!);
+            } else if (summary != null) {
+              effectiveSummary = summary;
+            }
+
+            return ListTile(
+              selected: selected,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 1,
+              ),
+              selectedColor: Colors.white,
+              selectedTileColor: Colors.grey,
+              title: Text(title),
+              subtitle: effectiveSummary != null
+                  ? Text(
+                      effectiveSummary,
+                      style: const TextStyle(
+                        color: Color(0xFFAAAAAA),
+                      ),
+                    )
+                  : null,
+              trailing: _buildTrailing(state.isConnected),
+              onTap: onTap,
+              enabled:
+                  enabled ?? (disableOnNoNetwork ? state.isConnected : true),
+            );
+          },
         );
-      });
-    });
+      },
+    );
   }
 }

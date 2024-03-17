@@ -15,8 +15,10 @@ class RemoteDataRepository extends DataRepository {
 
   @override
   T use<T extends DataResource>() {
-    final resource = _resourceStore[T];
-    if (resource == null) throw UnregisteredResource<T>();
+    final DataResource? resource = _resourceStore[T];
+    if (resource == null) {
+      throw UnregisteredResource<T>();
+    }
     return resource as T;
   }
 }

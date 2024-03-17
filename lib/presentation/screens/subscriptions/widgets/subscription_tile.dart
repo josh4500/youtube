@@ -41,7 +41,7 @@ class SubscriptionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       alignment: Alignment.centerRight,
-      children: [
+      children: <Widget>[
         TappableArea(
           onPressed: () {
             context.goto(
@@ -50,9 +50,8 @@ class SubscriptionTile extends StatelessWidget {
               ),
             );
           },
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
           child: const Row(
-            children: [
+            children: <Widget>[
               AccountAvatar(),
               SizedBox(width: 16),
               Text(
@@ -68,7 +67,7 @@ class SubscriptionTile extends StatelessWidget {
         const Positioned(
           right: 8,
           child: NotificationOption(),
-        )
+        ),
       ],
     );
   }

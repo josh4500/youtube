@@ -40,7 +40,7 @@ class VideoHistory extends StatelessWidget {
       behavior: const OverScrollGlowBehavior(enabled: false),
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemBuilder: (context, index) {
+        itemBuilder: (BuildContext context, int index) {
           return const PlayableVideoContent(
             height: 160,
           );

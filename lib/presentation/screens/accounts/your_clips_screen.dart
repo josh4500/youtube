@@ -76,10 +76,10 @@ class _YourClipsScreenState extends State<YourClipsScreen>
       appBar: AppBar(
         title: AnimatedBuilder(
           animation: animation,
-          builder: (context, child) {
+          builder: (BuildContext context, Widget? child) {
             return Opacity(
               opacity: animation.value,
-              child: child!,
+              child: child,
             );
           },
           child: const Text(
@@ -89,7 +89,7 @@ class _YourClipsScreenState extends State<YourClipsScreen>
             ),
           ),
         ),
-        actions: [
+        actions: <Widget>[
           AppbarAction(
             icon: Icons.cast_outlined,
             onTap: () {},
@@ -100,8 +100,8 @@ class _YourClipsScreenState extends State<YourClipsScreen>
           ),
           AppbarAction(
             icon: Icons.more_vert_outlined,
-            onTapDown: (details) async {
-              final position = details.globalPosition;
+            onTapDown: (TapDownDetails details) async {
+              final Offset position = details.globalPosition;
               await showYourClipsMenu(
                 context,
                 RelativeRect.fromLTRB(position.dx, 0, 0, 0),
@@ -116,7 +116,7 @@ class _YourClipsScreenState extends State<YourClipsScreen>
         ),
         child: CustomScrollView(
           controller: controller,
-          slivers: [
+          slivers: <Widget>[
             const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(
@@ -134,7 +134,7 @@ class _YourClipsScreenState extends State<YourClipsScreen>
             ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) {
+                (BuildContext context, int index) {
                   return TappableArea(
                     onPressed: () {},
                     padding: const EdgeInsets.symmetric(

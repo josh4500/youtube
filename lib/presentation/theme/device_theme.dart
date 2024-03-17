@@ -45,6 +45,20 @@ enum _DeviceThemeAspects {
 }
 
 class DeviceThemeData {
+  const DeviceThemeData({
+    required this.deviceType,
+    required this.screenSize,
+  });
+
+  factory DeviceThemeData.fromView(
+    ui.FlutterView view, {
+    DeviceThemeData? platformData,
+  }) {
+    return DeviceThemeData(
+      deviceType: DeviceType.byPlatform,
+      screenSize: view.physicalSize / view.devicePixelRatio,
+    );
+  }
   final DeviceType deviceType;
   final Size screenSize;
 
@@ -60,21 +74,6 @@ class DeviceThemeData {
       .resolveWithDeviceType(deviceType)
       .resolveWithOrientation(orientation);
 
-  const DeviceThemeData({
-    required this.deviceType,
-    required this.screenSize,
-  });
-
-  factory DeviceThemeData.fromView(
-    ui.FlutterView view, {
-    DeviceThemeData? platformData,
-  }) {
-    return DeviceThemeData(
-      deviceType: DeviceType.byPlatform,
-      screenSize: view.physicalSize / view.devicePixelRatio,
-    );
-  }
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -88,13 +87,12 @@ class DeviceThemeData {
 }
 
 class DeviceTheme extends InheritedModel<_DeviceThemeAspects> {
-  final DeviceThemeData data;
-
   const DeviceTheme({
     super.key,
     required this.data,
     required super.child,
   });
+  final DeviceThemeData data;
 
   static DeviceThemeData of(BuildContext context) {
     return _of(context);
@@ -140,7 +138,7 @@ class DeviceTheme extends InheritedModel<_DeviceThemeAspects> {
     DeviceTheme oldWidget,
     Set<Object> dependencies,
   ) {
-    for (final dependency in dependencies) {
+    for (final Object dependency in dependencies) {
       if (dependency is _DeviceThemeAspects) {
         switch (dependency) {
           case _DeviceThemeAspects.deviceType:
@@ -176,13 +174,13 @@ class DeviceTheme extends InheritedModel<_DeviceThemeAspects> {
 }
 
 class _DeviceThemeFromView extends StatefulWidget {
-  final Widget child;
-  final ui.FlutterView view;
   const _DeviceThemeFromView({
     super.key,
     required this.view,
     required this.child,
   });
+  final Widget child;
+  final ui.FlutterView view;
 
   @override
   State<_DeviceThemeFromView> createState() => _DeviceThemeFromViewState();
@@ -265,7 +263,7 @@ class _DeviceThemeFromViewState extends State<_DeviceThemeFromView>
 
   @override
   Widget build(BuildContext context) {
-    DeviceThemeData effectiveData = _data!;
+    final DeviceThemeData effectiveData = _data!;
 
     return DeviceTheme(
       data: effectiveData,

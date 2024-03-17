@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets/comment_tile.dart';
+import 'package:youtube_clone/presentation/widgets/custom_scroll_physics.dart';
 import 'package:youtube_clone/presentation/widgets/page_draggable_sheet.dart';
 
-import '../../../widgets/comment_textfield_placeholder.dart';
-
 class ShortsCommentsBottomSheet extends StatelessWidget {
-  final ScrollController controller;
-  final ValueNotifier<bool> replyNotifier;
-  final VoidCallback closeComment;
-  final DraggableScrollableController draggableController;
   const ShortsCommentsBottomSheet({
     super.key,
     required this.controller,
@@ -16,6 +11,10 @@ class ShortsCommentsBottomSheet extends StatelessWidget {
     required this.closeComment,
     required this.draggableController,
   });
+  final ScrollController controller;
+  final ValueNotifier<bool> replyNotifier;
+  final VoidCallback closeComment;
+  final DraggableScrollableController draggableController;
 
   @override
   Widget build(BuildContext context) {
@@ -31,21 +30,22 @@ class ShortsCommentsBottomSheet extends StatelessWidget {
       onClose: closeComment,
       showDragIndicator: true,
       draggableController: draggableController,
-      actions: [
+      actions: <Widget>[
         InkWell(
           onTap: () {},
           borderRadius: BorderRadius.circular(32),
           child: const Icon(Icons.tune_outlined, size: 24),
         ),
       ],
-      contentBuilder: (context, scrollController, scrollPhysics) {
+      contentBuilder: (BuildContext context, ScrollController scrollController,
+          CustomScrollableScrollPhysics scrollPhysics) {
         return Column(
-          children: [
+          children: <Widget>[
             Expanded(
               child: ListView.builder(
                 physics: scrollPhysics,
                 controller: scrollController,
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, int index) {
                   return CommentTile(
                     openReply: () {},
                   );
@@ -53,7 +53,7 @@ class ShortsCommentsBottomSheet extends StatelessWidget {
                 itemCount: 20,
               ),
             ),
-            // TODO: Fix CommentTextFieldPlaceholder overflow issues
+            // TODO(Josh): Fix CommentTextFieldPlaceholder overflow issues
             // ValueListenableBuilder(
             //   valueListenable: replyNotifier,
             //   builder: (context, value, _) {

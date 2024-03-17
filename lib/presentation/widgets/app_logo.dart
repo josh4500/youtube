@@ -6,7 +6,7 @@ class AppLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Row(
-      children: [
+      children: <Widget>[
         Text(
           'YouTube',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),

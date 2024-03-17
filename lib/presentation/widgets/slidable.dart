@@ -29,8 +29,9 @@
 import 'package:flutter/material.dart';
 
 class Slidable extends StatefulWidget {
-  final Widget child;
   const Slidable({super.key, required this.child});
+
+  final Widget child;
 
   @override
   State<Slidable> createState() => _SlidableState();
@@ -71,7 +72,7 @@ class _SlidableState extends State<Slidable>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onHorizontalDragUpdate: (details) {
+      onHorizontalDragUpdate: (DragUpdateDetails details) {
         // Slide to the left when dragging to the left
         if (details.primaryDelta! < 0) {
           _controller.forward();
@@ -81,11 +82,11 @@ class _SlidableState extends State<Slidable>
           _controller.reverse();
         }
       },
-      onHorizontalDragEnd: (details) {
+      onHorizontalDragEnd: (DragEndDetails details) {
         // You can add additional logic here if needed
       },
       child: Stack(
-        children: [
+        children: <Widget>[
           Align(
             alignment: Alignment.centerRight,
             child: Container(
@@ -100,7 +101,7 @@ class _SlidableState extends State<Slidable>
           ),
           AnimatedBuilder(
             animation: _animation,
-            builder: (context, childWidget) {
+            builder: (BuildContext context, Widget? childWidget) {
               return Transform.translate(
                 offset: _animation.value,
                 child: childWidget,

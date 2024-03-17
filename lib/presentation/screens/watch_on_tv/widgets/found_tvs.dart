@@ -37,7 +37,7 @@ class FoundTVs extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: <Widget>[
           const Text('No TVs found'),
           const SizedBox(height: 16),
           const Text(

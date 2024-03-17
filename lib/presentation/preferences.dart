@@ -30,6 +30,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod/src/notifier.dart';
 import 'package:youtube_clone/core/enums/settings_enums.dart';
 import 'package:youtube_clone/infrastructure/services/cache/hive_cache_provider.dart';
 
@@ -37,85 +38,88 @@ import '../infrastructure/services/cache/read_write_value.dart';
 
 class Preferences extends Notifier<PreferenceState> {
   /// Dynamic Preference [HiveCacheProvider]
-  final _prefBox = HiveCacheProvider('preferences');
+  final HiveCacheProvider _prefBox = HiveCacheProvider('preferences');
 
-  late final _themeMode = ReadWriteEnum<ThemeMode>(
+  late final ReadWriteEnum<ThemeMode> _themeMode = ReadWriteEnum<ThemeMode>(
     'themeMode',
     ThemeMode.system,
     _prefBox,
     ThemeMode.values,
   );
 
-  late final _locale = ReadWriteValue<Locale>(
+  late final ReadWriteValue<Locale> _locale = ReadWriteValue<Locale>(
     'locale',
     const Locale('en'),
     _prefBox,
-    encoder: (locale) => locale.languageCode,
-    decoder: (languageCode) => Locale(languageCode),
+    encoder: (Locale locale) => locale.languageCode,
+    decoder: (String languageCode) => Locale(languageCode),
   );
 
-  late final _remindForBreak = ReadWriteValue<RemindForBreak>(
+  late final ReadWriteValue<RemindForBreak> _remindForBreak =
+      ReadWriteValue<RemindForBreak>(
     'remindForBreak',
     RemindForBreak.defaultPref,
     _prefBox,
-    encoder: (value) => value.toJson(),
-    decoder: (value) => RemindForBreak.fromJson(value),
+    encoder: (RemindForBreak value) => value.toJson(),
+    decoder: (String value) => RemindForBreak.fromJson(value),
   );
 
-  late final _remindForBedtime = ReadWriteValue<RemindForBedtime>(
+  late final ReadWriteValue<RemindForBedtime> _remindForBedtime =
+      ReadWriteValue<RemindForBedtime>(
     'remindForBedtime',
     RemindForBedtime.defaultPref,
     _prefBox,
-    encoder: (value) => value.toJson(),
-    decoder: (value) => RemindForBedtime.fromJson(value),
+    encoder: (RemindForBedtime value) => value.toJson(),
+    decoder: (String value) => RemindForBedtime.fromJson(value),
   );
 
-  late final _playbackInFeeds = ReadWriteEnum<PlaybackInFeeds>(
+  late final ReadWriteEnum<PlaybackInFeeds> _playbackInFeeds =
+      ReadWriteEnum<PlaybackInFeeds>(
     'playbackInFeeds',
     PlaybackInFeeds.wifiOnly,
     _prefBox,
     PlaybackInFeeds.values,
   );
 
-  late final _doubleTapSeek = ReadWriteValue<int>(
+  late final ReadWriteValue<int> _doubleTapSeek = ReadWriteValue<int>(
     'doubleTapToSeek',
     10,
     _prefBox,
   );
 
-  late final _zoomFillScreen = ReadWriteValue<bool>(
+  late final ReadWriteValue<bool> _zoomFillScreen = ReadWriteValue<bool>(
     'zoomFillScreen',
     false,
     _prefBox,
   );
 
-  late final _voiceSearchLocale = ReadWriteValue<Locale>(
+  late final ReadWriteValue<Locale> _voiceSearchLocale = ReadWriteValue<Locale>(
     'voiceSearchLocale',
     const Locale('en'),
     _prefBox,
-    encoder: (locale) => locale.languageCode,
-    decoder: (languageCode) => Locale(languageCode),
+    encoder: (Locale locale) => locale.languageCode,
+    decoder: (String languageCode) => Locale(languageCode),
   );
 
-  late final _restrictedMode = ReadWriteValue<bool>(
+  late final ReadWriteValue<bool> _restrictedMode = ReadWriteValue<bool>(
     'restrictedMode',
     false,
     _prefBox,
   );
 
-  late final _autoPlay = ReadWriteValue<bool>(
+  late final ReadWriteValue<bool> _autoPlay = ReadWriteValue<bool>(
     'autoPlay',
     false,
     _prefBox,
   );
 
-  late final _enableStatForNerds = ReadWriteValue<bool>(
+  late final ReadWriteValue<bool> _enableStatForNerds = ReadWriteValue<bool>(
     'enableStatForNerds',
     false,
     _prefBox,
   );
 
-  late final _enableDataSaving = ReadWriteValue<bool>(
+  late final ReadWriteValue<bool> _enableDataSaving = ReadWriteValue<bool>(
     'enableDataSaving',
     false,
     _prefBox,
@@ -123,43 +127,48 @@ class Preferences extends Notifier<PreferenceState> {
 
   late final Country _location;
 
-  late final _uploadNetwork = ReadWriteEnum<UploadNetwork>(
+  late final ReadWriteEnum<UploadNetwork> _uploadNetwork =
+      ReadWriteEnum<UploadNetwork>(
     'uploadNetwork',
     UploadNetwork.onlyWifi,
     _prefBox,
     UploadNetwork.values,
   );
 
-  late final _dataSaving = ReadWriteValue<DataSavingPreferences>(
+  late final ReadWriteValue<DataSavingPreferences> _dataSaving =
+      ReadWriteValue<DataSavingPreferences>(
     'dataSaving',
     DataSavingPreferences.defaultPref,
     _prefBox,
-    encoder: (pref) => pref.toJson(),
-    decoder: (prefJson) => DataSavingPreferences.fromJson(prefJson),
+    encoder: (DataSavingPreferences pref) => pref.toJson(),
+    decoder: (String prefJson) => DataSavingPreferences.fromJson(prefJson),
   );
 
-  late final _videoQuality = ReadWriteValue<VideoQualityPreferences>(
+  late final ReadWriteValue<VideoQualityPreferences> _videoQuality =
+      ReadWriteValue<VideoQualityPreferences>(
     'videoQuality',
     VideoQualityPreferences.defaultPref,
     _prefBox,
-    encoder: (pref) => pref.toJson(),
-    decoder: (prefJson) => VideoQualityPreferences.fromJson(prefJson),
+    encoder: (VideoQualityPreferences pref) => pref.toJson(),
+    decoder: (String prefJson) => VideoQualityPreferences.fromJson(prefJson),
   );
 
-  late final _downloads = ReadWriteValue<DownloadPreferences>(
+  late final ReadWriteValue<DownloadPreferences> _downloads =
+      ReadWriteValue<DownloadPreferences>(
     'downloads',
     DownloadPreferences.defaultPref,
     _prefBox,
-    encoder: (pref) => pref.toJson(),
-    decoder: (prefJson) => DownloadPreferences.fromJson(prefJson),
+    encoder: (DownloadPreferences pref) => pref.toJson(),
+    decoder: (String prefJson) => DownloadPreferences.fromJson(prefJson),
   );
 
-  late final _accessibility = ReadWriteValue<AccessibilityPreferences>(
+  late final ReadWriteValue<AccessibilityPreferences> _accessibility =
+      ReadWriteValue<AccessibilityPreferences>(
     'accessibility',
     AccessibilityPreferences.defaultPref,
     _prefBox,
-    encoder: (pref) => pref.toJson(),
-    decoder: (prefJson) => AccessibilityPreferences.fromJson(prefJson),
+    encoder: (AccessibilityPreferences pref) => pref.toJson(),
+    decoder: (String prefJson) => AccessibilityPreferences.fromJson(prefJson),
   );
 
   set autoPlay(bool autoPlay) {
@@ -217,7 +226,8 @@ class Preferences extends Notifier<PreferenceState> {
     frequency =
         frequency != null && frequency.inSeconds == 0 ? null : frequency;
 
-    final newValue = _remindForBreak.value = _remindForBreak.value.copyWith(
+    final RemindForBreak newValue =
+        _remindForBreak.value = _remindForBreak.value.copyWith(
       frequency: frequency,
       enabled: enabled,
     );
@@ -230,7 +240,7 @@ class Preferences extends Notifier<PreferenceState> {
     bool? enabled,
   }) {
     if (remindForBedtime != null || enabled != null) {
-      final newValue = _remindForBedtime.value =
+      final RemindForBedtime newValue = _remindForBedtime.value =
           (remindForBedtime ?? _remindForBedtime.value)
               .copyWith(enabled: enabled);
       state = state.copyWith(remindForBedtime: newValue);
@@ -238,7 +248,8 @@ class Preferences extends Notifier<PreferenceState> {
   }
 
   void changeVideoQuality({VideoQuality? mobile, VideoQuality? wifi}) {
-    final newValue = _videoQuality.value = _videoQuality.value.copyWith(
+    final VideoQualityPreferences newValue =
+        _videoQuality.value = _videoQuality.value.copyWith(
       mobile: mobile,
       wifi: wifi,
     );
@@ -247,7 +258,8 @@ class Preferences extends Notifier<PreferenceState> {
   }
 
   void changeAccessibility({bool? enabled, int? hideDuration}) {
-    final newValue = _accessibility.value = _accessibility.value.copyWith(
+    final AccessibilityPreferences newValue =
+        _accessibility.value = _accessibility.value.copyWith(
       enabled: enabled,
       hideDuration: hideDuration,
     );
@@ -255,7 +267,8 @@ class Preferences extends Notifier<PreferenceState> {
   }
 
   void changeDownloadsPref({int? quality, bool? wifiOnly, bool? recommend}) {
-    final newValue = _downloads.value = _downloads.value.copyWith(
+    final DownloadPreferences newValue =
+        _downloads.value = _downloads.value.copyWith(
       quality: quality,
       wifiOnly: wifiOnly,
       recommend: recommend,
@@ -286,22 +299,6 @@ class Preferences extends Notifier<PreferenceState> {
 }
 
 class PreferenceState {
-  final ThemeMode themeMode;
-  final Locale locale;
-  final RemindForBreak remindForBreak;
-  final RemindForBedtime remindForBedtime;
-
-  final PlaybackInFeeds playbackInFeeds;
-  final int doubleTapSeek;
-  final bool zoomFillScreen;
-  final UploadNetwork uploadNetwork;
-  final bool restrictedMode;
-  final bool enableStatsForNerds;
-  final VideoQualityPreferences videoQualityPreferences;
-  final DownloadPreferences downloadPreferences;
-  final AccessibilityPreferences accessibilityPreferences;
-  final bool autoplay;
-
   PreferenceState({
     required this.themeMode,
     required this.locale,
@@ -318,6 +315,21 @@ class PreferenceState {
     required this.accessibilityPreferences,
     required this.autoplay,
   });
+  final ThemeMode themeMode;
+  final Locale locale;
+  final RemindForBreak remindForBreak;
+  final RemindForBedtime remindForBedtime;
+
+  final PlaybackInFeeds playbackInFeeds;
+  final int doubleTapSeek;
+  final bool zoomFillScreen;
+  final UploadNetwork uploadNetwork;
+  final bool restrictedMode;
+  final bool enableStatsForNerds;
+  final VideoQualityPreferences videoQualityPreferences;
+  final DownloadPreferences downloadPreferences;
+  final AccessibilityPreferences accessibilityPreferences;
+  final bool autoplay;
 
   PreferenceState copyWith({
     ThemeMode? themeMode,
@@ -357,22 +369,7 @@ class PreferenceState {
 }
 
 class RemindForBreak {
-  final Duration frequency;
-  final bool enabled;
-
   const RemindForBreak({required this.frequency, required this.enabled});
-
-  static const defaultPref = RemindForBreak(
-    frequency: Duration(hours: 1, minutes: 15),
-    enabled: false,
-  );
-
-  String toJson() {
-    return jsonEncode({
-      'frequency': frequency.inMilliseconds,
-      'enabled': enabled,
-    });
-  }
 
   factory RemindForBreak.fromJson(String source) {
     final Map<String, dynamic> map = jsonDecode(source);
@@ -380,6 +377,20 @@ class RemindForBreak {
       frequency: Duration(milliseconds: map['frequency'] as int),
       enabled: map['enabled'] as bool,
     );
+  }
+  final Duration frequency;
+  final bool enabled;
+
+  static const RemindForBreak defaultPref = RemindForBreak(
+    frequency: Duration(hours: 1, minutes: 15),
+    enabled: false,
+  );
+
+  String toJson() {
+    return jsonEncode(<String, Object>{
+      'frequency': frequency.inMilliseconds,
+      'enabled': enabled,
+    });
   }
 
   RemindForBreak copyWith({
@@ -394,20 +405,6 @@ class RemindForBreak {
 }
 
 class RemindForBedtime {
-  final bool onDeviceBedtime;
-  final Duration customStartSchedule;
-  final Duration customStopSchedule;
-  final bool waitTillFinishVideo;
-  final bool enabled;
-
-  static const defaultPref = RemindForBedtime(
-    onDeviceBedtime: false,
-    customStartSchedule: Duration(hours: 12, minutes: 15),
-    customStopSchedule: Duration(hours: 17, minutes: 15),
-    waitTillFinishVideo: true,
-    enabled: false,
-  );
-
   const RemindForBedtime({
     required this.onDeviceBedtime,
     required this.customStartSchedule,
@@ -415,16 +412,6 @@ class RemindForBedtime {
     required this.waitTillFinishVideo,
     required this.enabled,
   });
-
-  String toJson() {
-    return jsonEncode({
-      'onDeviceBedtime': onDeviceBedtime,
-      'customStartSchedule': customStartSchedule.inSeconds,
-      'customStopSchedule': customStopSchedule.inSeconds,
-      'waitTillFinishVideo': waitTillFinishVideo,
-      'enabled': enabled,
-    });
-  }
 
   factory RemindForBedtime.fromJson(String source) {
     final Map<String, dynamic> map = jsonDecode(source);
@@ -435,6 +422,29 @@ class RemindForBedtime {
       waitTillFinishVideo: map['waitTillFinishVideo'] as bool,
       enabled: map['enabled'] as bool,
     );
+  }
+  final bool onDeviceBedtime;
+  final Duration customStartSchedule;
+  final Duration customStopSchedule;
+  final bool waitTillFinishVideo;
+  final bool enabled;
+
+  static const RemindForBedtime defaultPref = RemindForBedtime(
+    onDeviceBedtime: false,
+    customStartSchedule: Duration(hours: 12, minutes: 15),
+    customStopSchedule: Duration(hours: 17, minutes: 15),
+    waitTillFinishVideo: true,
+    enabled: false,
+  );
+
+  String toJson() {
+    return jsonEncode(<String, Object>{
+      'onDeviceBedtime': onDeviceBedtime,
+      'customStartSchedule': customStartSchedule.inSeconds,
+      'customStopSchedule': customStopSchedule.inSeconds,
+      'waitTillFinishVideo': waitTillFinishVideo,
+      'enabled': enabled,
+    });
   }
 
   RemindForBedtime copyWith({
@@ -455,14 +465,6 @@ class RemindForBedtime {
 }
 
 class DataSavingPreferences {
-  final bool reduceVideoQuality;
-  final bool reduceDownloadQuality;
-  final bool reduceSmartDownloadQuality;
-  final bool onlyWifiUpload;
-  final bool mutedPlaybackOnWifi;
-  final bool selectVideoQuality;
-  final bool usageReminder;
-
   const DataSavingPreferences({
     required this.reduceVideoQuality,
     required this.reduceDownloadQuality,
@@ -472,28 +474,6 @@ class DataSavingPreferences {
     required this.selectVideoQuality,
     required this.usageReminder,
   });
-
-  static const defaultPref = DataSavingPreferences(
-    reduceVideoQuality: true,
-    reduceDownloadQuality: false,
-    reduceSmartDownloadQuality: false,
-    onlyWifiUpload: true,
-    mutedPlaybackOnWifi: true,
-    selectVideoQuality: false,
-    usageReminder: false,
-  );
-
-  String toJson() {
-    return jsonEncode({
-      'reduceVideoQuality': reduceVideoQuality,
-      'reduceDownloadQuality': reduceDownloadQuality,
-      'reduceSmartDownloadQuality': reduceSmartDownloadQuality,
-      'onlyWifiUpload': onlyWifiUpload,
-      'mutedPlaybackOnWifi': mutedPlaybackOnWifi,
-      'selectVideoQuality': selectVideoQuality,
-      'usageReminder': usageReminder,
-    });
-  }
 
   factory DataSavingPreferences.fromJson(String source) {
     final Map<String, dynamic> map = jsonDecode(source);
@@ -507,40 +487,68 @@ class DataSavingPreferences {
       usageReminder: map['usageReminder'] as bool,
     );
   }
+  final bool reduceVideoQuality;
+  final bool reduceDownloadQuality;
+  final bool reduceSmartDownloadQuality;
+  final bool onlyWifiUpload;
+  final bool mutedPlaybackOnWifi;
+  final bool selectVideoQuality;
+  final bool usageReminder;
+
+  static const DataSavingPreferences defaultPref = DataSavingPreferences(
+    reduceVideoQuality: true,
+    reduceDownloadQuality: false,
+    reduceSmartDownloadQuality: false,
+    onlyWifiUpload: true,
+    mutedPlaybackOnWifi: true,
+    selectVideoQuality: false,
+    usageReminder: false,
+  );
+
+  String toJson() {
+    return jsonEncode(<String, bool>{
+      'reduceVideoQuality': reduceVideoQuality,
+      'reduceDownloadQuality': reduceDownloadQuality,
+      'reduceSmartDownloadQuality': reduceSmartDownloadQuality,
+      'onlyWifiUpload': onlyWifiUpload,
+      'mutedPlaybackOnWifi': mutedPlaybackOnWifi,
+      'selectVideoQuality': selectVideoQuality,
+      'usageReminder': usageReminder,
+    });
+  }
 }
 
 class VideoQualityPreferences {
-  final VideoQuality mobile;
-  final VideoQuality wifi;
-
   const VideoQualityPreferences({
     required this.mobile,
     required this.wifi,
   });
 
-  static const defaultPref = VideoQualityPreferences(
+  factory VideoQualityPreferences.fromJson(String source) {
+    final Map<String, dynamic> map = jsonDecode(source);
+    return VideoQualityPreferences(
+      mobile: VideoQuality.values.firstWhere(
+        (VideoQuality element) => element.name == map['mobile'],
+      ),
+      wifi: VideoQuality.values.firstWhere(
+        (VideoQuality element) => element.name == map['wifi'],
+        orElse: () => VideoQuality.auto,
+      ),
+    );
+  }
+  final VideoQuality mobile;
+  final VideoQuality wifi;
+
+  static const VideoQualityPreferences defaultPref = VideoQualityPreferences(
     mobile: VideoQuality.auto,
     wifi: VideoQuality.auto,
   );
 
   String toJson() {
-    return jsonEncode({
+    return jsonEncode(<String, String>{
       'mobile': mobile.name,
       'wifi': wifi.name,
     });
-  }
-
-  factory VideoQualityPreferences.fromJson(String source) {
-    final Map<String, dynamic> map = jsonDecode(source);
-    return VideoQualityPreferences(
-      mobile: VideoQuality.values.firstWhere(
-        (element) => element.name == map['mobile'],
-      ),
-      wifi: VideoQuality.values.firstWhere(
-        (element) => element.name == map['wifi'],
-        orElse: () => VideoQuality.auto,
-      ),
-    );
   }
 
   VideoQualityPreferences copyWith({
@@ -555,22 +563,30 @@ class VideoQualityPreferences {
 }
 
 class DownloadPreferences {
-  final int quality;
-  final bool wifiOnly;
-  final bool recommend;
-
-  static const defaultPref = DownloadPreferences(
-    quality: 0,
-    wifiOnly: true,
-    recommend: false,
-  );
-
 //<editor-fold desc="Data Methods">
   const DownloadPreferences({
     required this.quality,
     required this.wifiOnly,
     required this.recommend,
   });
+
+  factory DownloadPreferences.fromJson(String source) {
+    final Map<String, dynamic> map = jsonDecode(source);
+    return DownloadPreferences(
+      quality: map['quality'] as int,
+      wifiOnly: map['wifiOnly'] as bool,
+      recommend: map['recommend'] as bool,
+    );
+  }
+  final int quality;
+  final bool wifiOnly;
+  final bool recommend;
+
+  static const DownloadPreferences defaultPref = DownloadPreferences(
+    quality: 0,
+    wifiOnly: true,
+    recommend: false,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -597,39 +613,37 @@ class DownloadPreferences {
   }
 
   String toJson() {
-    return jsonEncode({
+    return jsonEncode(<String, Object>{
       'quality': quality,
       'wifiOnly': wifiOnly,
       'recommend': recommend,
     });
   }
-
-  factory DownloadPreferences.fromJson(String source) {
-    final Map<String, dynamic> map = jsonDecode(source);
-    return DownloadPreferences(
-      quality: map['quality'] as int,
-      wifiOnly: map['wifiOnly'] as bool,
-      recommend: map['recommend'] as bool,
-    );
-  }
 }
 
 class AccessibilityPreferences {
-  final bool enabled;
-
-  /// -1 = Never; -2 = Use device settings;
-  final int hideDuration;
-
-  static const defaultPref = AccessibilityPreferences(
-    enabled: false,
-    hideDuration: -1,
-  );
-
 //<editor-fold desc="Data Methods">
   const AccessibilityPreferences({
     required this.enabled,
     required this.hideDuration,
   });
+
+  factory AccessibilityPreferences.fromJson(String source) {
+    final Map<String, dynamic> map = jsonDecode(source);
+    return AccessibilityPreferences(
+      enabled: map['enabled'] as bool,
+      hideDuration: map['hideDuration'] as int,
+    );
+  }
+  final bool enabled;
+
+  /// -1 = Never; -2 = Use device settings;
+  final int hideDuration;
+
+  static const AccessibilityPreferences defaultPref = AccessibilityPreferences(
+    enabled: false,
+    hideDuration: -1,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -653,15 +667,8 @@ class AccessibilityPreferences {
   }
 
   String toJson() {
-    return jsonEncode({'enabled': enabled, 'hideDuration': hideDuration});
-  }
-
-  factory AccessibilityPreferences.fromJson(String source) {
-    final Map<String, dynamic> map = jsonDecode(source);
-    return AccessibilityPreferences(
-      enabled: map['enabled'] as bool,
-      hideDuration: map['hideDuration'] as int,
-    );
+    return jsonEncode(
+        <String, Object>{'enabled': enabled, 'hideDuration': hideDuration});
   }
 }
 
@@ -673,6 +680,7 @@ extension IsDarkExtension on ThemeMode {
   bool get isSystem => this == ThemeMode.system;
 }
 
-final preferencesProvider = NotifierProvider<Preferences, PreferenceState>(
+final NotifierProviderImpl<Preferences, PreferenceState> preferencesProvider =
+    NotifierProvider<Preferences, PreferenceState>(
   () => Preferences(),
 );

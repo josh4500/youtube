@@ -2,15 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 
 class PersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final double minHeight;
-  final double maxHeight;
-  final Widget child;
-
-  PersistentHeaderDelegate({
+  const PersistentHeaderDelegate({
     required this.minHeight,
     required this.maxHeight,
     required this.child,
   });
+
+  final double minHeight;
+  final double maxHeight;
+  final Widget child;
 
   @override
   Widget build(
@@ -37,13 +37,12 @@ class PersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
 
 class FadingSliverPersistentHeaderDelegate
     extends SliverPersistentHeaderDelegate {
-  final double height;
-  final Widget child;
-
   FadingSliverPersistentHeaderDelegate({
     required this.height,
     required this.child,
   });
+  final double height;
+  final Widget child;
 
   @override
   double get minExtent => height;
@@ -57,7 +56,7 @@ class FadingSliverPersistentHeaderDelegate
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    final shrinkFactor = (shrinkOffset / maxExtent);
+    final double shrinkFactor = shrinkOffset / maxExtent;
     return FractionalTranslation(
       translation: Offset(0, 1 - shrinkFactor),
       child: Opacity(
@@ -81,15 +80,14 @@ class FadingSliverPersistentHeaderDelegate
 }
 
 class SlidingHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final double minHeight;
-  final double maxHeight;
-  final Widget child;
-
   SlidingHeaderDelegate({
     required this.minHeight,
     required this.maxHeight,
     required this.child,
   });
+  final double minHeight;
+  final double maxHeight;
+  final Widget child;
 
   @override
   double get minExtent => 0.1;
@@ -103,7 +101,7 @@ class SlidingHeaderDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    final double shrinkFactor = (shrinkOffset / (maxExtent - minHeight));
+    final double shrinkFactor = shrinkOffset / (maxExtent - minHeight);
     return OverflowBox(
       maxHeight: maxHeight,
       child: Opacity(

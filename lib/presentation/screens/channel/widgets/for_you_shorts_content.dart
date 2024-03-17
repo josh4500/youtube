@@ -44,12 +44,12 @@ class ForYouShortsContent extends StatelessWidget {
         child: const Column(
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          children: <Widget>[
             Padding(
               padding: EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: <Widget>[
                   Text(
                     'Unreal Engine 🤝 Electric Cars',
                     maxLines: 2,

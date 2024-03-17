@@ -27,15 +27,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/infrastructure/services/internet_connectivity/connectivity_state.dart';
 import 'package:youtube_clone/presentation/widgets/builders/network_listenable_builder.dart';
 
 class AccountOptionTile extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final String? summary;
-  final bool networkRequired;
-  final VoidCallback? onTap;
-
   const AccountOptionTile({
     super.key,
     required this.title,
@@ -44,12 +39,17 @@ class AccountOptionTile extends StatelessWidget {
     this.summary,
     this.onTap,
   });
+  final String title;
+  final IconData icon;
+  final String? summary;
+  final bool networkRequired;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     if (networkRequired) {
       return NetworkListenableBuilder(
-        builder: (context, state) {
+        builder: (BuildContext context, ConnectivityState state) {
           return ListTile(
             leading: Icon(icon),
             contentPadding: const EdgeInsets.symmetric(

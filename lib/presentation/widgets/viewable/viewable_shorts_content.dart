@@ -29,11 +29,6 @@
 import 'package:flutter/material.dart';
 
 class ViewableShortsContent extends StatelessWidget {
-  final double? width;
-  final EdgeInsets? margin;
-  final BorderRadius? borderRadius;
-  final bool showTitle;
-
   const ViewableShortsContent({
     super.key,
     this.width,
@@ -41,6 +36,10 @@ class ViewableShortsContent extends StatelessWidget {
     this.borderRadius,
     this.showTitle = true,
   });
+  final double? width;
+  final EdgeInsets? margin;
+  final BorderRadius? borderRadius;
+  final bool showTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -52,11 +51,11 @@ class ViewableShortsContent extends StatelessWidget {
         borderRadius: borderRadius,
       ),
       child: Stack(
-        children: [
+        children: <Widget>[
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               const Align(
                 alignment: Alignment.topRight,
                 child: Padding(
@@ -75,7 +74,7 @@ class ViewableShortsContent extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     if (showTitle)
                       const Text(
                         'Frame Generation is Game Changing',

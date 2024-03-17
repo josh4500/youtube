@@ -10,6 +10,7 @@ import 'package:youtube_clone/domain/repositories/account_repository.dart';
 import 'package:youtube_clone/domain/repositories/authentication_repository.dart';
 
 import 'core/environment.dart';
+import 'data/data_repository.dart';
 import 'data/local_repository/local_data_repository.dart';
 import 'generated/l10n.dart';
 import 'infrastructure/services/internet_connectivity/internet_connectivity.dart';
@@ -23,15 +24,15 @@ Future<void> main() async {
 Future<void> setup() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
-  final dir = await getApplicationDocumentsDirectory();
-  final appPath = dir.path;
+  final Directory dir = await getApplicationDocumentsDirectory();
+  final String appPath = dir.path;
 
   // Set Hive default directory
   Hive.defaultDirectory = appPath;
 
   // Load default locale
-  final locale = S.delegate.supportedLocales.firstWhere(
-    (locale) {
+  final Locale locale = S.delegate.supportedLocales.firstWhere(
+    (Locale locale) {
       return locale.languageCode.split('_').first == Platform.localeName ||
           locale.languageCode == Platform.localeName;
     },
@@ -41,6 +42,7 @@ Future<void> setup() async {
   await InternetConnectivity.instance.initialize();
 }
 
+// TODO(Josh): Inject repositories
 void setupRepositories() {
   // Initialize services and repository depending on the environment
   // Recommended for infrastructure and Domain
@@ -53,8 +55,8 @@ void setupRepositories() {
       break;
   }
 
-  final localDataRepository = LocalDataRepository();
-  final remoteDataRepository = RemoteDataRepository();
+  final DataRepository localDataRepository = LocalDataRepository();
+  final DataRepository remoteDataRepository = RemoteDataRepository();
 
   remoteDataRepository
     ..registerResource<AccountRepository>(AccountRepository())

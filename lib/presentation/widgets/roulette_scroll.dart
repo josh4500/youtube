@@ -29,11 +29,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class RouletteScroll<T> extends StatefulWidget {
-  final T? initialValue;
-  final List<T> items;
-  final PageController controller;
-  final ValueChanged<T> onPageChange;
-
   const RouletteScroll({
     super.key,
     required this.items,
@@ -42,13 +37,18 @@ class RouletteScroll<T> extends StatefulWidget {
     this.initialValue,
   });
 
+  final T? initialValue;
+  final List<T> items;
+  final PageController controller;
+  final ValueChanged<T> onPageChange;
+
   @override
   State<RouletteScroll<T>> createState() => RouletteScrollState<T>();
 }
 
 class RouletteScrollState<T> extends State<RouletteScroll<T>> {
   bool switcher = true;
-  List<T> effectiveItems = [];
+  List<T> effectiveItems = <T>[];
   late final int _extra = ((widget.items.length + 1) / 2).ceil();
 
   int get addedExtra => _extra - 1;
@@ -65,20 +65,21 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
   T get lastItem => widget.items.last;
   T get firstItem => widget.items.first;
 
-  final currentPageIndex = ValueNotifier(0);
+  final ValueNotifier<int> currentPageIndex = ValueNotifier<int>(0);
 
   @override
   void initState() {
     super.initState();
-    final extraItems = widget.items.getRange(addedExtra, widget.items.length);
-    effectiveItems = [...extraItems, ...widget.items];
-    final initialIndex = widget.items.indexWhere(
-      (element) => element == widget.initialValue,
+    final Iterable<T> extraItems =
+        widget.items.getRange(addedExtra, widget.items.length);
+    effectiveItems = <T>[...extraItems, ...widget.items];
+    final int initialIndex = widget.items.indexWhere(
+      (T element) => element == widget.initialValue,
     );
 
     if (initialIndex >= addedExtra) {
       effectiveItems.addAll(
-        List.generate(_extra, (index) => widget.items[index]),
+        List<T>.generate(_extra, (int index) => widget.items[index]),
       );
     }
 
@@ -89,13 +90,13 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
     beforeLastItem = widget.items[widget.items.length - 2];
     beforeBLastItem = widget.items[widget.items.length - 3];
 
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
       firstTurn = true;
-      final newIndex =
+      final int newIndex =
           initialIndex >= 0 ? addedExtra + initialIndex : addedExtra;
 
       widget.controller.jumpToPage(newIndex);
-      Future.microtask(() => currentPageIndex.value = newIndex);
+      Future<int>.microtask(() => currentPageIndex.value = newIndex);
     });
   }
 
@@ -103,7 +104,7 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
   Widget build(BuildContext context) {
     return Stack(
       alignment: Alignment.center,
-      children: [
+      children: <Widget>[
         Container(
           height: 50,
           width: 80,
@@ -126,23 +127,27 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
               physics: const BouncingScrollPhysics(),
               controller: widget.controller,
               scrollDirection: Axis.vertical,
-              onPageChanged: (pageIndex) {
-                final currentItem = effectiveItems[pageIndex];
+              onPageChanged: (int pageIndex) {
+                final T currentItem = effectiveItems[pageIndex];
                 currentPageIndex.value = pageIndex;
 
                 if (firstTurn) {
-                  final dir = widget.controller.position.userScrollDirection;
-                  final f = dir == ScrollDirection.reverse;
+                  final ScrollDirection dir =
+                      widget.controller.position.userScrollDirection;
+                  final bool f = dir == ScrollDirection.reverse;
 
-                  final a = effectiveItems.last == lastItem && f;
-                  final b = effectiveItems.last == middleItem && f;
-                  final c = effectiveItems.last == lastItem && !f;
-                  final d = effectiveItems.first == firstItem && !f;
+                  final bool a = effectiveItems.last == lastItem && f;
+                  final bool b = effectiveItems.last == middleItem && f;
+                  final bool c = effectiveItems.last == lastItem && !f;
+                  final bool d = effectiveItems.first == firstItem && !f;
                   if (currentItem == beforeMiddleItem && (switcher || f) && a) {
                     effectiveItems.removeRange(0, addedExtra);
 
                     effectiveItems.addAll(
-                      List.generate(_extra, (index) => widget.items[index]),
+                      List<T>.generate(
+                        _extra,
+                        (int index) => widget.items[index],
+                      ),
                     );
                     switcher = !switcher && !f;
 
@@ -154,9 +159,9 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
                       b) {
                     effectiveItems.removeRange(0, addedExtra);
                     effectiveItems.addAll(
-                      List.generate(
-                        (widget.items.length - _extra),
-                        (index) => widget.items[index + _extra],
+                      List<T>.generate(
+                        widget.items.length - _extra,
+                        (int index) => widget.items[index + _extra],
                       ),
                     );
                     switcher = !switcher && !f;
@@ -171,7 +176,10 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
 
                     effectiveItems.insertAll(
                       0,
-                      List.generate(addedExtra, (index) => widget.items[index]),
+                      List<T>.generate(
+                        addedExtra,
+                        (int index) => widget.items[index],
+                      ),
                     );
                     switcher = !switcher && !f;
 
@@ -188,9 +196,9 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
 
                     effectiveItems.insertAll(
                       0,
-                      List.generate(
+                      List<T>.generate(
                         addedExtra,
-                        (index) => widget.items[index + addedExtra],
+                        (int index) => widget.items[index + addedExtra],
                       ),
                     );
                     switcher = !switcher && !f;
@@ -205,7 +213,10 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
 
                     effectiveItems.insertAll(
                       0,
-                      List.generate(addedExtra, (index) => widget.items[index]),
+                      List<T>.generate(
+                        addedExtra,
+                        (int index) => widget.items[index],
+                      ),
                     );
                     switcher = !switcher && !f;
 
@@ -220,9 +231,9 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
 
                     effectiveItems.insertAll(
                       0,
-                      List.generate(
+                      List<T>.generate(
                         addedExtra,
-                        (index) => widget.items[index + addedExtra],
+                        (int index) => widget.items[index + addedExtra],
                       ),
                     );
                     switcher = !switcher && !f;
@@ -242,9 +253,9 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
 
                     effectiveItems.insertAll(
                       0,
-                      List.generate(
+                      List<T>.generate(
                         addedExtra,
-                        (index) => widget.items[index + addedExtra],
+                        (int index) => widget.items[index + addedExtra],
                       ),
                     );
                     switcher = !switcher && !f;
@@ -258,12 +269,12 @@ class RouletteScrollState<T> extends State<RouletteScroll<T>> {
                 }
                 widget.onPageChange(currentItem);
               },
-              itemBuilder: (context, index) {
+              itemBuilder: (BuildContext context, int index) {
                 return Container(
                   alignment: Alignment.center,
                   child: ListenableBuilder(
                     listenable: currentPageIndex,
-                    builder: (context, _) {
+                    builder: (BuildContext context, _) {
                       return Text(
                         effectiveItems[index].toString(),
                         style: currentPageIndex.value != index

@@ -30,13 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class NotificationOption extends StatelessWidget {
-  final String? title;
-  final Alignment? alignment;
-  final Color? backgroundColor;
-  final BorderRadius? borderRadius;
-  final EdgeInsets? padding;
-  final TextStyle? textStyle;
-
   const NotificationOption({
     super.key,
     this.title,
@@ -46,6 +39,13 @@ class NotificationOption extends StatelessWidget {
     this.padding,
     this.textStyle,
   });
+
+  final String? title;
+  final Alignment? alignment;
+  final Color? backgroundColor;
+  final BorderRadius? borderRadius;
+  final EdgeInsets? padding;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +65,9 @@ class NotificationOption extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          children: <Widget>[
             const Icon(Icons.notifications_active),
-            if (title != null) ...[
+            if (title != null) ...<Widget>[
               const SizedBox(width: 4),
               Text(title!, style: textStyle),
             ],

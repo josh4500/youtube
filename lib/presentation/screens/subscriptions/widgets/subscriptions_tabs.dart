@@ -35,13 +35,13 @@ import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 import '../subscriptions_screen.dart';
 
 class SubscriptionsTabs extends StatefulWidget {
-  final ValueNotifier<int?> valueListenable;
-  final ValueChanged<int?> onChange;
   const SubscriptionsTabs({
     super.key,
     required this.onChange,
     required this.valueListenable,
   });
+  final ValueNotifier<int?> valueListenable;
+  final ValueChanged<int?> onChange;
 
   @override
   State<SubscriptionsTabs> createState() => _SubscriptionsTabsState();
@@ -53,8 +53,7 @@ class _SubscriptionsTabsState extends State<SubscriptionsTabs> {
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
+      children: <Widget>[
         Expanded(
           child: ScrollConfiguration(
             behavior: const OverScrollGlowBehavior(
@@ -63,13 +62,18 @@ class _SubscriptionsTabsState extends State<SubscriptionsTabs> {
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              itemBuilder: (context, index) {
-                final key = GlobalObjectKey(index.hashCode);
+              itemBuilder: (BuildContext context, int index) {
+                final GlobalObjectKey<State<StatefulWidget>> key =
+                    GlobalObjectKey(index.hashCode);
                 return ValueListenableBuilder<int?>(
                   key: key,
                   valueListenable: _selectedChannel,
-                  builder: (context, selected, childWidget) {
-                    final opacity =
+                  builder: (
+                    BuildContext context,
+                    int? selected,
+                    Widget? childWidget,
+                  ) {
+                    final double opacity =
                         selected != null && selected != index ? 0.3 : 1.0;
                     return Container(
                       color: selected == index
@@ -83,15 +87,13 @@ class _SubscriptionsTabsState extends State<SubscriptionsTabs> {
                   },
                   child: TappableArea(
                     onPressed: () {
-                      final prevSelected = _selectedChannel.value;
+                      final int? prevSelected = _selectedChannel.value;
                       if (prevSelected == index) {
                         _selectedChannel.value = null;
                       } else {
                         Scrollable.ensureVisible(
                           key.currentContext!,
                           alignment: 0.55,
-                          alignmentPolicy:
-                              ScrollPositionAlignmentPolicy.explicit,
                           curve: Curves.easeInOut,
                         );
                         _selectedChannel.value = index;

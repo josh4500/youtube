@@ -29,16 +29,15 @@
 import 'package:flutter/material.dart';
 
 class AppbarAction extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback? onTap;
-  final void Function(TapDownDetails details)? onTapDown;
-
   const AppbarAction({
     super.key,
     required this.icon,
     this.onTap,
     this.onTapDown,
   });
+  final IconData icon;
+  final VoidCallback? onTap;
+  final void Function(TapDownDetails details)? onTapDown;
 
   @override
   Widget build(BuildContext context) {

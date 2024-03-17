@@ -37,7 +37,7 @@ class ChannelDescLink extends StatelessWidget {
     return const TappableArea(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: Row(
-        children: [
+        children: <Widget>[
           Icon(
             Icons.camera,
             size: 28,
@@ -45,7 +45,7 @@ class ChannelDescLink extends StatelessWidget {
           SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               Text(
                 'Twitter',
                 style: TextStyle(

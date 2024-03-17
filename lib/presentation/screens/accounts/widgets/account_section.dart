@@ -31,11 +31,6 @@ import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 
 class AccountSection extends StatelessWidget {
-  final VoidCallback? onTapChannelInfo;
-  final VoidCallback? onTapSwitchAccount;
-  final VoidCallback? onTapGoogleAccount;
-  final VoidCallback? onTapIncognito;
-
   const AccountSection({
     super.key,
     this.onTapChannelInfo,
@@ -43,20 +38,24 @@ class AccountSection extends StatelessWidget {
     this.onTapGoogleAccount,
     this.onTapIncognito,
   });
+  final VoidCallback? onTapChannelInfo;
+  final VoidCallback? onTapSwitchAccount;
+  final VoidCallback? onTapGoogleAccount;
+  final VoidCallback? onTapIncognito;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Column(
-        children: [
+        children: <Widget>[
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onTapChannelInfo,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               child: Row(
-                children: [
+                children: <Widget>[
                   ClipRRect(
                     borderRadius: BorderRadius.circular(64),
                     child: Image.network(
@@ -69,7 +68,7 @@ class AccountSection extends StatelessWidget {
                   const SizedBox(width: 14),
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: <Widget>[
                       Text(
                         'Josh',
                         style: TextStyle(
@@ -78,7 +77,7 @@ class AccountSection extends StatelessWidget {
                         ),
                       ),
                       Row(
-                        children: [
+                        children: <Widget>[
                           Text(
                             '@josh4500',
                             style: TextStyle(
@@ -111,7 +110,7 @@ class AccountSection extends StatelessWidget {
                             ),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ],
@@ -126,7 +125,7 @@ class AccountSection extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 scrollDirection: Axis.horizontal,
-                children: [
+                children: <Widget>[
                   CustomActionChip(
                     title: 'Switch account',
                     onTap: onTapSwitchAccount,

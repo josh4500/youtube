@@ -33,16 +33,6 @@ import 'over_scroll_glow_behavior.dart';
 import 'tappable_area.dart';
 
 class DynamicTab extends StatefulWidget {
-  final double height;
-  final int initialIndex;
-  final bool useTappable;
-  final List<String> options;
-  final Widget? leading;
-  final double? leadingWidth;
-  final Widget? trailing;
-  final TextStyle? textStyle;
-  final ValueChanged<int>? onChanged;
-
   const DynamicTab({
     super.key,
     this.height = 48.0,
@@ -55,6 +45,15 @@ class DynamicTab extends StatefulWidget {
     required this.initialIndex,
     required this.options,
   });
+  final double height;
+  final int initialIndex;
+  final bool useTappable;
+  final List<String> options;
+  final Widget? leading;
+  final double? leadingWidth;
+  final Widget? trailing;
+  final TextStyle? textStyle;
+  final ValueChanged<int>? onChanged;
 
   @override
   State<DynamicTab> createState() => _DynamicTabState();
@@ -65,7 +64,7 @@ class DynamicTab extends StatefulWidget {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        itemBuilder: (context, _) {
+        itemBuilder: (BuildContext context, _) {
           return Shimmer(
             color: const Color(0xFF272727),
             margin: const EdgeInsets.all(4),
@@ -101,10 +100,10 @@ class _DynamicTabState extends State<DynamicTab> {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        itemBuilder: (context, index) {
+        itemBuilder: (BuildContext context, int index) {
           if (widget.leading != null && index == 0) {
             return Row(
-              children: [
+              children: <Widget>[
                 widget.leading!,
                 SizedBox(width: widget.leadingWidth),
               ],
@@ -113,9 +112,10 @@ class _DynamicTabState extends State<DynamicTab> {
             return widget.trailing!;
           }
           index -= (widget.leading != null ? 1 : 0);
-          final child = ValueListenableBuilder(
+          final ValueListenableBuilder<int> child = ValueListenableBuilder(
             valueListenable: _selectedIndexNotifier,
-            builder: (context, selectedIndex, childWidget) {
+            builder:
+                (BuildContext context, int selectedIndex, Widget? childWidget) {
               return Container(
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(
@@ -151,9 +151,7 @@ class _DynamicTabState extends State<DynamicTab> {
               child: TappableArea(
                 onPressed: () {
                   _selectedIndexNotifier.value = index;
-                  if (widget.onChanged != null) {
-                    widget.onChanged!(index);
-                  }
+                  widget.onChanged?.call(index);
                 },
                 padding: EdgeInsets.zero,
                 borderRadius: BorderRadius.circular(8),
@@ -166,9 +164,7 @@ class _DynamicTabState extends State<DynamicTab> {
               child: GestureDetector(
                 onTap: () {
                   _selectedIndexNotifier.value = index;
-                  if (widget.onChanged != null) {
-                    widget.onChanged!(index);
-                  }
+                  widget.onChanged?.call(index);
                 },
                 child: child,
               ),

@@ -29,8 +29,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
@@ -44,10 +44,10 @@ class HomeFeedScreen extends StatefulWidget {
 }
 
 class _HomeFeedScreenState extends State<HomeFeedScreen> {
-  final _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   /// Play Something notifier
-  final _playSNotifier = ValueNotifier(false);
+  final ValueNotifier<bool> _playSNotifier = ValueNotifier<bool>(false);
 
   @override
   void initState() {
@@ -57,8 +57,9 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
 
   /// Animates size of "Play Something" button depending on the scroll direction
   void _checker() {
-    final direction = _scrollController.position.userScrollDirection;
-    final offset = _scrollController.offset;
+    final ScrollDirection direction =
+        _scrollController.position.userScrollDirection;
+    final double offset = _scrollController.offset;
     if (direction == ScrollDirection.forward && offset <= 100) {
       _playSNotifier.value = true;
     } else if (direction == ScrollDirection.reverse && offset >= 100) {
@@ -77,8 +78,8 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: Consumer(
-        builder: (context, ref, childWidget) {
-          final isPlayerActive = ref.watch(playerOverlayStateProvider);
+        builder: (BuildContext context, WidgetRef ref, Widget? childWidget) {
+          final bool isPlayerActive = ref.watch(playerOverlayStateProvider);
           return Transform.translate(
             offset: isPlayerActive
                 ? const Offset(0, -kMiniPlayerHeight)
@@ -100,18 +101,20 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                 curve: Curves.easeInOutCubic,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
+                  children: <Widget>[
                     const Icon(
                       Icons.play_arrow,
                       color: Colors.black,
                       size: 28,
                     ),
-                    ValueListenableBuilder(
+                    ValueListenableBuilder<bool>(
                       valueListenable: _playSNotifier,
-                      builder: (context, value, _) {
-                        if (!value) return const SizedBox();
+                      builder: (BuildContext context, bool value, _) {
+                        if (!value) {
+                          return const SizedBox();
+                        }
                         return const Row(
-                          children: [
+                          children: <Widget>[
                             SizedBox(width: 8),
                             Text(
                               'Play something',
@@ -136,12 +139,12 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
         behavior: const OverScrollGlowBehavior(enabled: false),
         child: CustomScrollView(
           controller: _scrollController,
-          slivers: [
+          slivers: <Widget>[
             SliverAppBar(
               floating: true,
               automaticallyImplyLeading: false,
               title: const AppLogo(),
-              actions: [
+              actions: <Widget>[
                 AppbarAction(
                   icon: Icons.cast_outlined,
                   onTap: () {},
@@ -171,7 +174,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                           backgroundColor: Colors.white12,
                           icon: const Icon(Icons.assistant_navigation),
                           onTap: () {
-                            // TODO: Opens drawer
+                            // TODO(Josh): Opens drawer
                           },
                         ),
                       ),
@@ -218,7 +221,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
             ),
             SliverToBoxAdapter(
               child: Consumer(
-                builder: (context, ref, _) {
+                builder: (BuildContext context, WidgetRef ref, _) {
                   return ViewableVideoContent(
                     onTap: () async {
                       if (context.orientation.isLandscape) {

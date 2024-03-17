@@ -56,7 +56,7 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
               fontWeight: FontWeight.w400,
             ),
           ),
-          actions: [
+          actions: <Widget>[
             AppbarAction(
               icon: Icons.cast_outlined,
               onTap: () {},
@@ -74,7 +74,7 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
         body: ScrollConfiguration(
           behavior: const OverScrollGlowBehavior(enabled: false),
           child: NestedScrollView(
-            headerSliverBuilder: (context, isInScroll) {
+            headerSliverBuilder: (BuildContext context, bool isInScroll) {
               return <Widget>[
                 SliverToBoxAdapter(
                   child: AccountChannelSection(moreChannel: () {}),
@@ -93,7 +93,7 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
                       tabAlignment: TabAlignment.start,
                       dividerColor: Colors.white,
                       indicatorColor: Colors.white,
-                      tabs: [
+                      tabs: <Widget>[
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 8.0),
                           child: Tab(text: 'Home'),
@@ -109,13 +109,13 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
               ];
             },
             body: TabBarView(
-              children: [
-                Container(), // TODO: Home tab
+              children: <Widget>[
+                Container(), // TODO(Josh): Home tab
                 Builder(
-                  builder: (context) {
+                  builder: (BuildContext context) {
                     return CustomScrollView(
                       key: const PageStorageKey<String>('name'),
-                      slivers: [
+                      slivers: <Widget>[
                         SliverOverlapInjector(
                           handle:
                               NestedScrollView.sliverOverlapAbsorberHandleFor(
@@ -138,7 +138,7 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
                               },
                               child: const Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: [
+                                children: <Widget>[
                                   Icon(Icons.sort),
                                   SizedBox(width: 4),
                                   Text('Sort'),
@@ -154,7 +154,7 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
                         ),
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
-                            (context, index) {
+                            (BuildContext context, int index) {
                               return TappableArea(
                                 onPressed: () {},
                                 child: const Padding(

@@ -74,10 +74,10 @@ class _YourVideosScreenState extends State<YourVideosScreen>
       appBar: AppBar(
         title: AnimatedBuilder(
           animation: animation,
-          builder: (context, child) {
+          builder: (BuildContext context, Widget? child) {
             return Opacity(
               opacity: animation.value,
-              child: child!,
+              child: child,
             );
           },
           child: const Text(
@@ -87,7 +87,7 @@ class _YourVideosScreenState extends State<YourVideosScreen>
             ),
           ),
         ),
-        actions: [
+        actions: <Widget>[
           AppbarAction(
             icon: Icons.cast_outlined,
             onTap: () {},
@@ -98,8 +98,8 @@ class _YourVideosScreenState extends State<YourVideosScreen>
           ),
           AppbarAction(
             icon: Icons.more_vert_outlined,
-            onTapDown: (details) async {
-              final position = details.globalPosition;
+            onTapDown: (TapDownDetails details) async {
+              final Offset position = details.globalPosition;
               await showYourVideosMenu(
                 context,
                 RelativeRect.fromLTRB(position.dx, 0, 0, 0),
@@ -112,7 +112,7 @@ class _YourVideosScreenState extends State<YourVideosScreen>
         behavior: const OverScrollGlowBehavior(color: Colors.black12),
         child: CustomScrollView(
           controller: controller,
-          slivers: [
+          slivers: <Widget>[
             const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(
@@ -135,7 +135,7 @@ class _YourVideosScreenState extends State<YourVideosScreen>
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
+                  children: <Widget>[
                     Container(
                       padding: const EdgeInsets.symmetric(
                         vertical: 5.5,
@@ -172,14 +172,13 @@ class _YourVideosScreenState extends State<YourVideosScreen>
 }
 
 class SomeButton extends StatefulWidget {
-  final bool isSelected;
-  final String title;
-
   const SomeButton({
     super.key,
     this.isSelected = false,
     required this.title,
   });
+  final bool isSelected;
+  final String title;
 
   @override
   State<SomeButton> createState() => _SomeButtonState();

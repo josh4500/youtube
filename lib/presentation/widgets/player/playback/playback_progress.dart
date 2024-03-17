@@ -33,7 +33,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/progress.dart';
 
 /// Default size of the tappable area for seeking playback.
-const defaultPlaybackProgressTapSize = 10.0;
+const double defaultPlaybackProgressTapSize = 10.0;
 
 /// Equivalent value between 0 - 1 of Position and Buffer duration to the full
 /// length duration of the playback
@@ -60,6 +60,25 @@ typedef ProgressValue = (double, double);
 /// ),
 /// ```
 class PlaybackProgress extends StatefulWidget {
+  const PlaybackProgress({
+    super.key,
+    this.tapSize = defaultPlaybackProgressTapSize,
+    this.color = const Color(0xFFFF0000),
+    this.animation,
+    this.bufferAnimation,
+    this.progress,
+    this.start = Progress.zero,
+    this.end = Duration.zero,
+    this.showBuffer = true,
+    this.keyConcepts = const <KeyConcept>[],
+    this.chapters = const <Chapter>[],
+    this.backgroundColor = Colors.white30,
+    this.onTap,
+    this.onDragStart,
+    this.onDragEnd,
+    this.onChangePosition,
+  });
+
   /// Size of the tappable area for seeking playback.
   final double tapSize;
 
@@ -105,34 +124,15 @@ class PlaybackProgress extends StatefulWidget {
   /// Callback triggered when the user changes the playback position (during drag).
   final void Function(Duration position)? onChangePosition;
 
-  const PlaybackProgress({
-    super.key,
-    this.tapSize = defaultPlaybackProgressTapSize,
-    this.color = const Color(0xFFFF0000),
-    this.animation,
-    this.bufferAnimation,
-    this.progress,
-    this.start = Progress.zero,
-    this.end = Duration.zero,
-    this.showBuffer = true,
-    this.keyConcepts = const <KeyConcept>[],
-    this.chapters = const <Chapter>[],
-    this.backgroundColor = Colors.white30,
-    this.onTap,
-    this.onDragStart,
-    this.onDragEnd,
-    this.onChangePosition,
-  });
-
   @override
   State<PlaybackProgress> createState() => _PlaybackProgressState();
 }
 
 class _PlaybackProgressState extends State<PlaybackProgress> {
   Stream<Progress>? progressStream;
-  // TODO: Show use TweenInterval and rename property
+  // TODO(Josh): Show use TweenInterval and rename property
   Animation<double>? thumbAnimation;
-  // TODO: Rename property
+  // TODO(Josh): Rename property
   Animation<Color?>? progressAnimation;
 
   @override
@@ -140,7 +140,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
     super.initState();
     if (widget.animation != null) {
       thumbAnimation = widget.animation!.drive(
-        // TODO: Begin at _indicatorHeight
+        // TODO(Josh): Begin at _indicatorHeight
         Tween<double>(begin: 0, end: 12),
       );
       progressAnimation = widget.animation!.drive(
@@ -154,19 +154,25 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
 
   /// Equivalent value between 0 - 1 of the KeyConcepts duration positions
   List<double> get _keyConceptPositions => widget.keyConcepts
-      .map((e) => e.position.inMicroseconds / widget.end!.inMicroseconds)
+      .map(
+        (KeyConcept e) =>
+            e.position.inMicroseconds / widget.end!.inMicroseconds,
+      )
       .toList();
 
   /// Equivalent value between 0 - 1 of the Chapter duration positions
   List<double> get _chaptersPositions => widget.chapters
-      .map((e) => e.position.inMicroseconds / widget.end!.inMicroseconds)
+      .map(
+        (Chapter e) => e.position.inMicroseconds / widget.end!.inMicroseconds,
+      )
       .toList();
 
   /// Computes playback progress values
   ProgressValue _computeProgressValue(Progress data) {
-    final positionValue =
+    final double positionValue =
         data.position.inSeconds / (widget.end?.inSeconds ?? 0);
-    final bufferValue = data.buffer.inSeconds / (widget.end?.inSeconds ?? 0);
+    final double bufferValue =
+        data.buffer.inSeconds / (widget.end?.inSeconds ?? 0);
     return (positionValue, bufferValue);
   }
 
@@ -175,13 +181,14 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
     Widget indicators = StreamBuilder<Progress>(
       stream: widget.progress,
       initialData: widget.start,
-      builder: (context, snapshot) {
-        final data = _computeProgressValue(snapshot.data ?? Progress.zero);
-        final positionValue = data.$1;
-        final bufferValue = data.$2;
+      builder: (BuildContext context, AsyncSnapshot<Progress> snapshot) {
+        final ProgressValue data =
+            _computeProgressValue(snapshot.data ?? Progress.zero);
+        final double positionValue = data.$1;
+        final double bufferValue = data.$2;
         return Stack(
           clipBehavior: Clip.none,
-          children: [
+          children: <Widget>[
             // Buffering Progress indicator
             if (widget.showBuffer)
               LinearProgressIndicator(
@@ -245,35 +252,37 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
       );
     }
 
-    final thumbIndicator = thumbAnimation != null
+    final AnimatedBuilder? thumbIndicator = thumbAnimation != null
         ? AnimatedBuilder(
             animation: thumbAnimation!,
-            builder: (context, _) {
+            builder: (BuildContext context, _) {
               return AnimatedBuilder(
-                  animation: progressAnimation!,
-                  builder: (context, _) {
-                    return Container(
-                      width: thumbAnimation?.value,
-                      height: thumbAnimation?.value,
-                      decoration: BoxDecoration(
-                        color: progressAnimation!.value,
-                        shape: BoxShape.circle,
-                      ),
-                    );
-                  });
+                animation: progressAnimation!,
+                builder: (BuildContext context, _) {
+                  return Container(
+                    width: thumbAnimation?.value,
+                    height: thumbAnimation?.value,
+                    decoration: BoxDecoration(
+                      color: progressAnimation!.value,
+                      shape: BoxShape.circle,
+                    ),
+                  );
+                },
+              );
             },
           )
         : null;
 
     return LayoutBuilder(
-      builder: (context, constraint) {
+      builder: (BuildContext context, BoxConstraints constraint) {
         return GestureDetector(
-          onTapDown: (details) => _onTapDown(details, constraint.maxWidth),
-          onHorizontalDragStart: (details) =>
+          onTapDown: (TapDownDetails details) =>
+              _onTapDown(details, constraint.maxWidth),
+          onHorizontalDragStart: (DragStartDetails details) =>
               _onHorizontalDragStart(details, constraint.maxWidth),
-          onHorizontalDragUpdate: (details) =>
+          onHorizontalDragUpdate: (DragUpdateDetails details) =>
               _onHorizontalDragUpdate(details, constraint.maxWidth),
-          onHorizontalDragEnd: (details) =>
+          onHorizontalDragEnd: (DragEndDetails details) =>
               _onHorizontalDragEnd(details, constraint.maxWidth),
           child: Container(
             color: Colors.transparent,
@@ -281,7 +290,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
             child: Stack(
               alignment: Alignment.bottomLeft,
               clipBehavior: Clip.none,
-              children: [
+              children: <Widget>[
                 // Stacked Position and Buffer indicators
                 indicators,
                 // Thumb Indicator
@@ -289,13 +298,16 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                   StreamBuilder<Progress>(
                     stream: widget.progress,
                     initialData: widget.start,
-                    builder: (context, snapshot) {
-                      final data = _computeProgressValue(
+                    builder: (
+                      BuildContext context,
+                      AsyncSnapshot<Progress> snapshot,
+                    ) {
+                      final ProgressValue data = _computeProgressValue(
                         snapshot.data ?? Progress.zero,
                       );
-                      final positionValue = data.$1;
+                      final double positionValue = data.$1;
 
-                      // TODO: When begin at _indicatorHeight, animate bottom based on thumbAnimation
+                      // TODO(Josh): When begin at _indicatorHeight, animate bottom based on thumbAnimation
                       return Positioned(
                         bottom: -4,
                         left: clampDouble(
@@ -322,13 +334,11 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
   /// [width]: The width of the widget.
   void _onTapDown(TapDownDetails details, double width) {
     // Get the position in milliseconds relative to the widget width.
-    final positionInMilliseconds =
+    final int positionInMilliseconds =
         _getRelativePosition(details.localPosition.dx, width);
 
     // Call the passed `onTap` callback if available.
-    if (widget.onTap != null) {
-      widget.onTap!(Duration(milliseconds: positionInMilliseconds));
-    }
+    widget.onTap?.call(Duration(milliseconds: positionInMilliseconds));
   }
 
   /// Handles the start of a horizontal drag event and triggers the `onDragStart`
@@ -338,13 +348,11 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
   /// [width]: The width of the widget.
   void _onHorizontalDragStart(DragStartDetails details, double width) {
     // Get the position in milliseconds relative to the widget width.
-    final positionInMilliseconds =
+    final int positionInMilliseconds =
         _getRelativePosition(details.localPosition.dx, width);
 
     // Call the passed `onDragStart` callback if available.
-    if (widget.onDragStart != null) {
-      widget.onDragStart!(Duration(milliseconds: positionInMilliseconds));
-    }
+    widget.onDragStart?.call(Duration(milliseconds: positionInMilliseconds));
   }
 
   /// Handles updates during a horizontal drag event and triggers the
@@ -354,13 +362,12 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
   /// [width]: The width of the widget.
   void _onHorizontalDragUpdate(DragUpdateDetails details, double width) {
     // Get the position in milliseconds relative to the widget width.
-    final positionInMilliseconds =
+    final int positionInMilliseconds =
         _getRelativePosition(details.localPosition.dx, width);
 
     // Call the passed `onChangePosition` callback if available.
-    if (widget.onChangePosition != null) {
-      widget.onChangePosition!(Duration(milliseconds: positionInMilliseconds));
-    }
+    widget.onChangePosition
+        ?.call(Duration(milliseconds: positionInMilliseconds));
   }
 
   /// Handles the end of a horizontal drag event and triggers the `onDragEnd`
@@ -369,9 +376,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
   /// [details]: The details of the drag end event.
   void _onHorizontalDragEnd(DragEndDetails details, double width) {
     // Call the passed `onDragEnd` callback if available.
-    if (widget.onDragEnd != null) {
-      widget.onDragEnd!();
-    }
+    widget.onDragEnd?.call();
   }
 
   /// Calculates the position in milliseconds relative to the widget width.
@@ -392,6 +397,11 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
 /// Creates a custom clipper that generates a path representing progress
 /// through a series of chapters, with visual separation between chapters.
 class ProgressChapterClipper extends CustomClipper<Path> {
+  /// Creates a new ProgressChapterClipper.
+  ///
+  /// [chapters]: A list of chapter progress values.
+  ProgressChapterClipper({super.reclip, required this.chapters});
+
   /// Constant spacing between chapters in the visual representation.
   static const double _space = 2.5;
 
@@ -399,22 +409,17 @@ class ProgressChapterClipper extends CustomClipper<Path> {
   /// (complete).
   final List<double> chapters;
 
-  /// Creates a new ProgressChapterClipper.
-  ///
-  /// [chapters]: A list of chapter progress values.
-  ProgressChapterClipper({super.reclip, required this.chapters});
-
   /// Generates the clipping path based on the provided size and chapter progress.
   @override
   Path getClip(Size size) {
-    final path = Path();
+    final Path path = Path();
 
     // Start path creation at the top-left corner.
     path.moveTo(0, 0);
 
     // Iterate through each chapter to create path segments.
     for (int i = 0; i < chapters.length; i++) {
-      final chapter = chapters[i];
+      final double chapter = chapters[i];
 
       // Draw a horizontal line to the progress point of the current chapter.
       path.lineTo(size.width * chapter, 0);
@@ -430,14 +435,14 @@ class ProgressChapterClipper extends CustomClipper<Path> {
         path.lineTo(0, 0);
       } else {
         // Add a visual gap between chapters using `_space`.
-        final prevChapter = chapters[i - 1];
+        final double prevChapter = chapters[i - 1];
         path.lineTo((size.width * prevChapter) + _space, size.height);
         path.lineTo((size.width * prevChapter) + _space, 0);
       }
 
       if (i != chapters.length - 1) {
         // Move the path to the start of the next chapter, accounting for spacing.
-        final nextChapter = chapters[i + 1];
+        final double nextChapter = chapters[i + 1];
         path.moveTo((size.width * nextChapter) + _space, 0);
       }
     }
@@ -455,6 +460,11 @@ class ProgressChapterClipper extends CustomClipper<Path> {
 
 /// A custom painter that draws circles at positions corresponding to key concept progress.
 class ProgressKeyConceptPainter extends CustomPainter {
+  /// Creates a new ProgressKeyConceptPainter.
+  ///
+  /// [keyConcepts]: A list of key concept progress values.
+  ProgressKeyConceptPainter({super.repaint, required this.keyConcepts});
+
   /// List of key concept progress values, ranging from 0.0 (no progress) to 1.0
   /// (complete).
   final List<double> keyConcepts;
@@ -462,26 +472,21 @@ class ProgressKeyConceptPainter extends CustomPainter {
   /// Constant radius of the circles representing key concepts.
   static const double _radius = 2;
 
-  /// Creates a new ProgressKeyConceptPainter.
-  ///
-  /// [keyConcepts]: A list of key concept progress values.
-  ProgressKeyConceptPainter({super.repaint, required this.keyConcepts});
-
   /// Paints circles on the canvas based on the provided size and key concept progress.
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
+    final Paint paint = Paint()
       ..strokeWidth = 1 // Sets the width of the circle's stroke.
       ..color = Colors.white // Sets the color of the circle to white.
       ..style = PaintingStyle.fill; // Fills the circles with the paint color.
 
     // Loop through each key concept and draw a circle at its corresponding position.
     for (int i = 0; i < keyConcepts.length; i++) {
-      final conceptProgress = keyConcepts[i];
+      final double conceptProgress = keyConcepts[i];
 
       // Calculate the center of the circle based on progress and radius.
-      final centerX = (size.width * conceptProgress) + (_radius / 2);
-      final centerY = size.height / 2;
+      final double centerX = (size.width * conceptProgress) + (_radius / 2);
+      final double centerY = size.height / 2;
 
       // Draw the circle on the canvas.
       canvas.drawCircle(
@@ -497,15 +502,16 @@ class ProgressKeyConceptPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-// TODO: Move to different file
+// TODO(Josh): Move to different file
 
 class KeyConcept {
-  final Duration position;
-
   KeyConcept({required this.position});
+  final Duration position;
 }
 
 class Chapter {
+  Chapter({required this.position});
+
   /// Position represent where the chapter begins.
   ///
   /// No need or use of an end duration because the next chapter beginning will be
@@ -513,6 +519,4 @@ class Chapter {
   ///
   /// If no next chapter, the end of the video will be the end of the chapter
   final Duration position;
-
-  Chapter({required this.position});
 }

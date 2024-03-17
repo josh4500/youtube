@@ -44,8 +44,7 @@ class ShortsContextInfo extends StatelessWidget {
           horizontal: 16,
         ),
         child: const Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
+          children: <Widget>[
             Icon(
               Icons.info_outline_rounded,
               size: 16,

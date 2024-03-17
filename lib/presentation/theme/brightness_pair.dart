@@ -47,12 +47,6 @@
 /// );
 /// ```
 class BrightnessPair<T> {
-  /// Value for light mode.
-  final T light;
-
-  /// Value for dark mode.
-  final T dark;
-
   /// Constructs a BrightnessPair with values for light and dark modes.
   ///
   /// Parameters:
@@ -62,4 +56,10 @@ class BrightnessPair<T> {
     required this.light,
     required this.dark,
   });
+
+  /// Value for light mode.
+  final T light;
+
+  /// Value for dark mode.
+  final T dark;
 }

@@ -41,14 +41,17 @@ class AllSubscriptionsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: FutureBuilder(
-            initialData: false,
-            future: Future.delayed(const Duration(seconds: 2), () => true),
-            builder: (context, snapshot) {
-              if (!snapshot.data!) return const SizedBox();
-              return const Text('All subscriptions');
-            }),
-        actions: [
+        title: FutureBuilder<bool>(
+          initialData: false,
+          future: Future<bool>.delayed(const Duration(seconds: 2), () => true),
+          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+            if (!snapshot.data!) {
+              return const SizedBox();
+            }
+            return const Text('All subscriptions');
+          },
+        ),
+        actions: <Widget>[
           AppbarAction(
             icon: Icons.cast_outlined,
             onTap: () {},
@@ -59,8 +62,8 @@ class AllSubscriptionsScreen extends StatelessWidget {
           ),
           AppbarAction(
             icon: Icons.more_vert,
-            onTapDown: (details) async {
-              final position = details.globalPosition;
+            onTapDown: (TapDownDetails details) async {
+              final Offset position = details.globalPosition;
               await showAllSubscriptionsMenu(
                 context,
                 RelativeRect.fromLTRB(position.dx, 0, 0, 0),
@@ -74,16 +77,16 @@ class AllSubscriptionsScreen extends StatelessWidget {
           enabled: false,
         ),
         child: CustomScrollView(
-          slivers: [
+          slivers: <Widget>[
             const SliverToBoxAdapter(
               child: Row(
-                children: [
+                children: <Widget>[
                   Padding(
                     padding: EdgeInsets.all(8.0),
                     child: TappableArea(
                       padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
                       child: Row(
-                        children: [
+                        children: <Widget>[
                           Text('Most relevant'),
                           SizedBox(width: 4),
                           RotatedBox(
@@ -99,7 +102,7 @@ class AllSubscriptionsScreen extends StatelessWidget {
             ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) {
+                (BuildContext context, int index) {
                   return const SubscriptionTile();
                 },
                 childCount: 20,

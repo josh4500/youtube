@@ -5,6 +5,7 @@ import '../utils.dart';
 import 'async_task.dart';
 
 class AsyncTaskQueue<R, S> {
+  AsyncTaskQueue({this.onDone});
   int _idCounter = 0;
   bool _isLock = false;
 
@@ -13,10 +14,8 @@ class AsyncTaskQueue<R, S> {
   final FutureOr<void> Function(S value)? onDone;
   final Queue<AsyncTask<R, S>> _queue = Queue<AsyncTask<R, S>>();
 
-  AsyncTaskQueue({this.onDone});
-
   void addEvent(R event, AsyncTaskOperation<R, S> operation) {
-    final task = AsyncTask(
+    final AsyncTask<R, S> task = AsyncTask<R, S>(
       id: _idCounter++,
       input: event,
       operation: operation,
@@ -31,8 +30,8 @@ class AsyncTaskQueue<R, S> {
   }
 
   void _doTask(AsyncTask<R, S> task) {
-    final completer = Completer<S>();
-    completer.future.then((value) async {
+    final Completer<S> completer = Completer<S>();
+    completer.future.then((S value) async {
       if (!isTypeVoid() && onDone != null) {
         await onDone!(value);
       }

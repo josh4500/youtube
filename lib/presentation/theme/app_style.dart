@@ -31,7 +31,7 @@ import 'package:flutter/material.dart';
 import 'brightness_pair.dart';
 
 abstract final class AppStyle {
-  static const appBar = BrightnessPair<TextStyle>(
+  static const BrightnessPair<TextStyle> appBar = BrightnessPair<TextStyle>(
     light: TextStyle(
       fontSize: 20,
       color: Color(0xFF0F0F0F),
@@ -42,7 +42,8 @@ abstract final class AppStyle {
     ),
   );
 
-  static const settingsTextButtonTextStyle = BrightnessPair<TextStyle>(
+  static const BrightnessPair<TextStyle> settingsTextButtonTextStyle =
+      BrightnessPair<TextStyle>(
     light: TextStyle(
       color: Color(0xFF065FD4),
       fontWeight: FontWeight.w500,
@@ -53,7 +54,8 @@ abstract final class AppStyle {
     ),
   );
 
-  static final settingsTextButtonStyle = BrightnessPair<ButtonStyle>(
+  static final BrightnessPair<ButtonStyle> settingsTextButtonStyle =
+      BrightnessPair<ButtonStyle>(
     light: ButtonStyle(
       enableFeedback: true,
       overlayColor: MaterialStateProperty.all(const Color(0xFF505065)),

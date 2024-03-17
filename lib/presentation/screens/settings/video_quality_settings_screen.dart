@@ -40,11 +40,10 @@ class VideoQualitySettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final preferences = ref.watch(preferencesProvider);
+    final PreferenceState preferences = ref.watch(preferencesProvider);
     return Material(
-      type: MaterialType.canvas,
       child: SettingsListView(
-        children: [
+        children: <Widget>[
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
             child: Text(
@@ -69,7 +68,7 @@ class VideoQualitySettingsScreen extends ConsumerWidget {
             title: 'Auto (recommend)',
             summary:
                 'Adjust to give you the best experience for your conditions',
-            prefOption: PrefOption(
+            prefOption: PrefOption<VideoQuality>(
               type: PrefOptionType.radio,
               value: VideoQuality.auto,
               groupValue: preferences.videoQualityPreferences.mobile,
@@ -80,7 +79,7 @@ class VideoQualitySettingsScreen extends ConsumerWidget {
           SettingsTile(
             title: 'Higher picture quality',
             summary: 'User more data',
-            prefOption: PrefOption(
+            prefOption: PrefOption<VideoQuality>(
               type: PrefOptionType.radio,
               value: VideoQuality.higher,
               groupValue: preferences.videoQualityPreferences.mobile,
@@ -92,7 +91,7 @@ class VideoQualitySettingsScreen extends ConsumerWidget {
           SettingsTile(
             title: 'Data saver',
             summary: 'Lower quality picture',
-            prefOption: PrefOption(
+            prefOption: PrefOption<VideoQuality>(
               type: PrefOptionType.radio,
               value: VideoQuality.saver,
               groupValue: preferences.videoQualityPreferences.mobile,
@@ -115,7 +114,7 @@ class VideoQualitySettingsScreen extends ConsumerWidget {
             title: 'Auto (recommend)',
             summary:
                 'Adjust to give you the best experience for your conditions',
-            prefOption: PrefOption(
+            prefOption: PrefOption<VideoQuality>(
               type: PrefOptionType.radio,
               value: VideoQuality.auto,
               groupValue: preferences.videoQualityPreferences.wifi,
@@ -126,7 +125,7 @@ class VideoQualitySettingsScreen extends ConsumerWidget {
           SettingsTile(
             title: 'Higher picture quality',
             summary: 'User more data',
-            prefOption: PrefOption(
+            prefOption: PrefOption<VideoQuality>(
               type: PrefOptionType.radio,
               value: VideoQuality.higher,
               groupValue: preferences.videoQualityPreferences.wifi,
@@ -137,7 +136,7 @@ class VideoQualitySettingsScreen extends ConsumerWidget {
           SettingsTile(
             title: 'Data saver',
             summary: 'Lower quality picture',
-            prefOption: PrefOption(
+            prefOption: PrefOption<VideoQuality>(
               type: PrefOptionType.radio,
               value: VideoQuality.saver,
               groupValue: preferences.videoQualityPreferences.wifi,

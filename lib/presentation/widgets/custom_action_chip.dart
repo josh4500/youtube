@@ -29,17 +29,6 @@
 import 'package:flutter/material.dart';
 
 class CustomActionChip extends StatefulWidget {
-  final String? title;
-  final Widget? icon;
-  final Alignment alignment;
-  final EdgeInsets? padding;
-  final EdgeInsets? margin;
-  final BorderRadius? borderRadius;
-  final Color? backgroundColor;
-  final TextStyle? textStyle;
-  final Border? border;
-  final VoidCallback? onTap;
-
   const CustomActionChip({
     super.key,
     this.padding,
@@ -53,6 +42,16 @@ class CustomActionChip extends StatefulWidget {
     this.onTap,
     this.title,
   });
+  final String? title;
+  final Widget? icon;
+  final Alignment alignment;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final BorderRadius? borderRadius;
+  final Color? backgroundColor;
+  final TextStyle? textStyle;
+  final Border? border;
+  final VoidCallback? onTap;
 
   @override
   State<CustomActionChip> createState() => _CustomActionChipState();

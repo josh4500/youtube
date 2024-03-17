@@ -33,15 +33,20 @@ import 'package:youtube_clone/presentation/screens.dart';
 import 'app_routes.dart';
 
 class AppRouter {
-  static final rootKey = GlobalKey<NavigatorState>();
-  static final homeShellRoute = GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> rootKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> homeShellRoute =
+      GlobalKey<NavigatorState>();
 
-  static final routerConfig = GoRouter(
+  static final GoRouter routerConfig = GoRouter(
     navigatorKey: rootKey,
     initialLocation: AppRoutes.home.path,
     routes: <RouteBase>[
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
+        builder: (
+          BuildContext context,
+          GoRouterState state,
+          StatefulNavigationShell navigationShell,
+        ) {
           return HomePage(
             key: state.pageKey,
             child: navigationShell,
@@ -63,7 +68,7 @@ class AppRouter {
             ],
           ),
           StatefulShellBranch(
-            routes: [
+            routes: <RouteBase>[
               GoRoute(
                 name: AppRoutes.shorts.name,
                 path: AppRoutes.shorts.path,
@@ -242,11 +247,16 @@ class AppRouter {
         name: AppRoutes.settings.name,
         path: AppRoutes.settings.path,
         parentNavigatorKey: rootKey,
-        pageBuilder: (context, state) {
+        pageBuilder: (BuildContext context, GoRouterState state) {
           return CustomTransitionPage(
             transitionDuration: const Duration(milliseconds: 200),
             reverseTransitionDuration: const Duration(milliseconds: 200),
-            transitionsBuilder: (context, animation, secAnimation, child) {
+            transitionsBuilder: (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secAnimation,
+              Widget child,
+            ) {
               return SlideTransition(
                 position: animation.drive(
                   Tween<Offset>(
@@ -265,11 +275,16 @@ class AppRouter {
         name: AppRoutes.watchOnTv.name,
         path: AppRoutes.watchOnTv.path,
         parentNavigatorKey: rootKey,
-        pageBuilder: (context, state) {
+        pageBuilder: (BuildContext context, GoRouterState state) {
           return CustomTransitionPage(
             transitionDuration: const Duration(milliseconds: 200),
             reverseTransitionDuration: const Duration(milliseconds: 200),
-            transitionsBuilder: (context, animation, secAnimation, child) {
+            transitionsBuilder: (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secAnimation,
+              Widget child,
+            ) {
               return SlideTransition(
                 position: animation.drive(
                   Tween<Offset>(
@@ -288,11 +303,16 @@ class AppRouter {
         name: AppRoutes.linkTv.name,
         path: AppRoutes.linkTv.path,
         parentNavigatorKey: rootKey,
-        pageBuilder: (context, state) {
+        pageBuilder: (BuildContext context, GoRouterState state) {
           return CustomTransitionPage(
             transitionDuration: const Duration(milliseconds: 200),
             reverseTransitionDuration: const Duration(milliseconds: 200),
-            transitionsBuilder: (context, animation, secAnimation, child) {
+            transitionsBuilder: (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secAnimation,
+              Widget child,
+            ) {
               return SlideTransition(
                 position: animation.drive(
                   Tween<Offset>(
@@ -311,11 +331,16 @@ class AppRouter {
         name: AppRoutes.playerLandscapeScreen.name,
         path: AppRoutes.playerLandscapeScreen.path,
         parentNavigatorKey: rootKey,
-        pageBuilder: (context, state) {
+        pageBuilder: (BuildContext context, GoRouterState state) {
           return CustomTransitionPage(
             transitionDuration: const Duration(milliseconds: 200),
             reverseTransitionDuration: const Duration(milliseconds: 200),
-            transitionsBuilder: (context, animation, secAnimation, child) {
+            transitionsBuilder: (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secAnimation,
+              Widget child,
+            ) {
               return FadeTransition(
                 opacity: animation,
                 child: child,

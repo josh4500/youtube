@@ -38,7 +38,7 @@ class ShortsHistory extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         const Padding(
           padding: EdgeInsets.symmetric(
             vertical: 8.0,
@@ -52,8 +52,7 @@ class ShortsHistory extends StatelessWidget {
             horizontal: 16,
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
+            children: <Widget>[
               Icon(
                 Icons.sort_sharp,
                 size: 40,
@@ -76,7 +75,7 @@ class ShortsHistory extends StatelessWidget {
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.only(left: 16),
-              itemBuilder: (context, index) {
+              itemBuilder: (BuildContext context, int index) {
                 return const PlayableShortsContent(
                   width: 116,
                 );

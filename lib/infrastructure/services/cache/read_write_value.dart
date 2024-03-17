@@ -30,12 +30,6 @@ import 'cache_provider.dart';
 
 /// Read or Write to a value from a [HiveBox].
 class ReadWriteValue<T> {
-  final String key;
-  final T defaultValue;
-  final CacheProvider? provider;
-  final String Function(T input)? encoder;
-  final T? Function(String input)? decoder;
-
   ReadWriteValue(
     this.key,
     this.defaultValue,
@@ -43,8 +37,13 @@ class ReadWriteValue<T> {
     this.encoder,
     this.decoder,
   });
+  final String key;
+  final T defaultValue;
+  final CacheProvider<dynamic>? provider;
+  final String Function(T input)? encoder;
+  final T? Function(String input)? decoder;
 
-  CacheProvider get _provider =>
+  CacheProvider<dynamic> get _provider =>
       provider ?? (throw ArgumentError.notNull('provider'));
 
   /// Get cached value for [key]
@@ -66,14 +65,13 @@ class ReadWriteValue<T> {
 }
 
 class ReadWriteEnum<T extends Enum> extends ReadWriteValue<T> {
-  final List<T> enumValues;
-
   ReadWriteEnum(super.key, super.defaultValue, super.provider, this.enumValues)
       : super(
-          encoder: (enumValue) => enumValue.name,
-          decoder: (name) => enumValues.firstWhere(
-            (element) => element.name == name,
+          encoder: (T enumValue) => enumValue.name,
+          decoder: (String name) => enumValues.firstWhere(
+            (T element) => element.name == name,
             orElse: () => defaultValue,
           ),
         );
+  final List<T> enumValues;
 }

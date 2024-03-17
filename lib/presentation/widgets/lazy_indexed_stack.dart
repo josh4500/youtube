@@ -29,13 +29,6 @@
 import 'package:flutter/material.dart';
 
 class LazyIndexedStack extends StatefulWidget {
-  final AlignmentGeometry alignment;
-  final TextDirection? textDirection;
-  final Clip clipBehavior;
-  final StackFit sizing;
-  final int? index;
-  final List<Widget> children;
-
   const LazyIndexedStack({
     super.key,
     this.alignment = AlignmentDirectional.topStart,
@@ -46,6 +39,13 @@ class LazyIndexedStack extends StatefulWidget {
     this.children = const <Widget>[],
   });
 
+  final AlignmentGeometry alignment;
+  final TextDirection? textDirection;
+  final Clip clipBehavior;
+  final StackFit sizing;
+  final int? index;
+  final List<Widget> children;
+
   @override
   State<LazyIndexedStack> createState() => _LazyIndexedStackState();
 }
@@ -53,15 +53,15 @@ class LazyIndexedStack extends StatefulWidget {
 class _LazyIndexedStackState extends State<LazyIndexedStack> {
   late int _lastIndex = widget.index ?? 0;
   late int index = widget.index ?? 0;
-  final List<Widget> _lazyChildren = [];
-  final Set<int> _addedChildren = {};
+  final List<Widget> _lazyChildren = <Widget>[];
+  final Set<int> _addedChildren = <int>{};
 
   @override
   void initState() {
     super.initState();
     if (widget.children.isNotEmpty) {
       _lazyChildren.addAll(
-        List.generate(widget.children.length, (index) {
+        List<Widget>.generate(widget.children.length, (int index) {
           return const SizedBox();
         }),
       );

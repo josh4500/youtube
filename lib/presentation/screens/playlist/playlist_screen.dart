@@ -41,7 +41,7 @@ class PlaylistScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
+        actions: <Widget>[
           AppbarAction(
             icon: Icons.cast_outlined,
             onTap: () {},
@@ -52,8 +52,8 @@ class PlaylistScreen extends StatelessWidget {
           ),
           AppbarAction(
             icon: Icons.more_vert_outlined,
-            onTapDown: (details) async {
-              final position = details.globalPosition;
+            onTapDown: (TapDownDetails details) async {
+              final Offset position = details.globalPosition;
               await showPlaylistMenu(
                 context,
                 RelativeRect.fromLTRB(position.dx, 0, 0, 0),
@@ -65,7 +65,7 @@ class PlaylistScreen extends StatelessWidget {
       body: ScrollConfiguration(
         behavior: const OverScrollGlowBehavior(color: Colors.black12),
         child: CustomScrollView(
-          slivers: [
+          slivers: <Widget>[
             SliverToBoxAdapter(
               child: Container(
                 height: MediaQuery.sizeOf(context).height * .45,
@@ -73,7 +73,7 @@ class PlaylistScreen extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: AlignmentDirectional.topCenter,
                     end: AlignmentDirectional.bottomCenter,
-                    colors: [
+                    colors: <Color>[
                       Colors.indigoAccent,
                       Colors.indigoAccent,
                       Colors.white38,
@@ -85,7 +85,7 @@ class PlaylistScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: <Widget>[
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
@@ -104,10 +104,10 @@ class PlaylistScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Row(
-                        children: [
+                        children: <Widget>[
                           const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                            children: <Widget>[
                               Text(
                                 'Josh',
                                 style: TextStyle(
@@ -116,20 +116,27 @@ class PlaylistScreen extends StatelessWidget {
                               ),
                               SizedBox(height: 8),
                               Row(
-                                children: [
+                                children: <Widget>[
                                   Text(
                                     '17 videos',
                                     style: TextStyle(
-                                        fontSize: 12, color: Colors.grey),
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
                                   ),
                                   SizedBox(width: 8),
-                                  Icon(Icons.lock,
-                                      size: 13, color: Colors.grey),
+                                  Icon(
+                                    Icons.lock,
+                                    size: 13,
+                                    color: Colors.grey,
+                                  ),
                                   SizedBox(width: 4),
                                   Text(
                                     'Private',
                                     style: TextStyle(
-                                        fontSize: 12, color: Colors.grey),
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -149,7 +156,7 @@ class PlaylistScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       const Row(
-                        children: [
+                        children: <Widget>[
                           Expanded(
                             child: CustomActionChip(
                               alignment: Alignment.center,
@@ -198,12 +205,12 @@ class PlaylistScreen extends StatelessWidget {
             ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) {
+                (BuildContext context, int index) {
                   return ListTile(
                     onTap: () {},
                     contentPadding: const EdgeInsets.symmetric(vertical: 8),
                     title: const Row(
-                      children: [
+                      children: <Widget>[
                         Padding(
                           padding: EdgeInsets.all(2.0),
                           child: Icon(Icons.sort_rounded),
@@ -213,14 +220,14 @@ class PlaylistScreen extends StatelessWidget {
                             width: 180,
                             height: 112,
                           ),
-                        )
+                        ),
                       ],
                     ),
                   );
                 },
                 childCount: 20,
               ),
-            )
+            ),
           ],
         ),
       ),

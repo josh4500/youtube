@@ -33,25 +33,25 @@ import 'shorts_audio_button.dart';
 import 'shorts_context_info.dart';
 
 class ShortsInfoSection extends StatelessWidget {
-  final VoidCallback onTapComment;
   const ShortsInfoSection({super.key, required this.onTapComment});
+  final VoidCallback onTapComment;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         Expanded(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
+            children: <Widget>[
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ...[
+                    children: <Widget>[
+                      ...<Widget>[
                         GestureDetector(
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -65,7 +65,7 @@ class ShortsInfoSection extends StatelessWidget {
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
-                              children: [
+                              children: <Widget>[
                                 Icon(Icons.paid_outlined, size: 14),
                                 SizedBox(width: 4),
                                 Text(
@@ -80,7 +80,7 @@ class ShortsInfoSection extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                       ],
-                      ...[
+                      ...<Widget>[
                         InkWell(
                           onTap: () {},
                           borderRadius: BorderRadius.circular(32),
@@ -96,7 +96,7 @@ class ShortsInfoSection extends StatelessWidget {
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
-                              children: [
+                              children: <Widget>[
                                 Icon(Icons.location_on_outlined, size: 14),
                                 SizedBox(width: 4),
                                 Text('New york'),
@@ -107,7 +107,7 @@ class ShortsInfoSection extends StatelessWidget {
                         const SizedBox(height: 16),
                       ],
                       Row(
-                        children: [
+                        children: <Widget>[
                           const AccountAvatar(size: 32),
                           const SizedBox(width: 8),
                           const Text('@maxymilliano'),
@@ -129,12 +129,12 @@ class ShortsInfoSection extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       const Row(
-                        children: [
+                        children: <Widget>[
                           Icon(Icons.arrow_right_sharp),
                           SizedBox(width: 4),
                           Expanded(
@@ -153,7 +153,7 @@ class ShortsInfoSection extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       const Row(
-                        children: [
+                        children: <Widget>[
                           Icon(Icons.music_note_outlined),
                           SizedBox(width: 8),
                           Text('Original Sound'),
@@ -167,7 +167,7 @@ class ShortsInfoSection extends StatelessWidget {
               const SizedBox(width: 16),
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [
+                children: <Widget>[
                   SomeWidget(
                     title: const Icon(
                       Icons.thumb_up_sharp,
@@ -208,30 +208,29 @@ class ShortsInfoSection extends StatelessWidget {
                     summary: 'Remix',
                     onTap: () {},
                   ),
-                  const ShortsAudioButton()
+                  const ShortsAudioButton(),
                 ],
               ),
             ],
           ),
         ),
         const SizedBox(height: 4),
-        const ShortsContextInfo()
+        const ShortsContextInfo(),
       ],
     );
   }
 }
 
 class SomeWidget extends StatelessWidget {
-  final Widget title;
-  final String summary;
-  final VoidCallback onTap;
-
   const SomeWidget({
     super.key,
     required this.title,
     required this.summary,
     required this.onTap,
   });
+  final Widget title;
+  final String summary;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +244,7 @@ class SomeWidget extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16),
             child: Column(
-              children: [
+              children: <Widget>[
                 title,
                 const SizedBox(height: 8),
                 Text(

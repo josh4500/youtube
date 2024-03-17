@@ -33,20 +33,19 @@ typedef LandscapeBuilder = Widget Function(BuildContext context, Widget? child);
 typedef PortraitBuilder = Widget Function(BuildContext context, Widget? child);
 
 class CustomOrientationBuilder extends StatelessWidget {
-  final LandscapeBuilder onLandscape;
-  final PortraitBuilder onPortrait;
-  final Widget? child;
-
   const CustomOrientationBuilder({
     super.key,
     required this.onLandscape,
     required this.onPortrait,
     this.child,
   });
+  final LandscapeBuilder onLandscape;
+  final PortraitBuilder onPortrait;
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
-    final orientation = DeviceTheme.orientationOf(context);
+    final Orientation orientation = DeviceTheme.orientationOf(context);
     if (orientation == Orientation.landscape) {
       return onLandscape(context, child);
     } else {

@@ -39,10 +39,10 @@ class ShortsCategoryActions extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(28.0),
       child: Column(
-        children: [
+        children: <Widget>[
           const SizedBox(height: kToolbarHeight * 1.2),
           Row(
-            children: [
+            children: <Widget>[
               CustomActionChip(
                 onTap: () => context.goto(AppRoutes.shortsSubscription),
                 padding: const EdgeInsets.symmetric(

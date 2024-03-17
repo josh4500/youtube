@@ -49,11 +49,10 @@ class _AccessibilitySettingsScreenState
     extends ConsumerState<AccessibilitySettingsScreen> {
   @override
   Widget build(BuildContext context) {
-    final preferences = ref.watch(preferencesProvider);
+    final PreferenceState preferences = ref.watch(preferencesProvider);
     return Material(
-      type: MaterialType.canvas,
       child: SettingsListView(
-        children: [
+        children: <Widget>[
           SettingsTile(
             title: 'Accessibility player',
             summary: 'Display accessibility control in the player',
@@ -75,7 +74,7 @@ class _AccessibilitySettingsScreenState
           SettingsTile(
             title: 'Hide player controls',
             summary: 'Never',
-            onGenerateSummary: (pref) {
+            onGenerateSummary: (PrefOption pref) {
               return generateHideDuration(pref.value);
             },
             prefOption: PrefOption(
@@ -91,20 +90,21 @@ class _AccessibilitySettingsScreenState
   }
 
   Future<void> _onChangeHideDuration() async {
-    final hideDurations = [-2, 3, 5, 10, 30, -1];
-    final result = await showDialog<int>(
+    final List<int> hideDurations = <int>[-2, 3, 5, 10, 30, -1];
+    final int? result = await showDialog<int>(
       context: context,
       builder: (_) {
         return SettingsPopupContainer<int>.builder(
           title: 'Hide player controls',
           subtitle: 'Choose when player controls are hidden',
-          itemBuilder: (_, index) {
-            final hideDuration = hideDurations[index];
-            final title = generateHideDuration(hideDuration);
+          itemBuilder: (_, int index) {
+            final int hideDuration = hideDurations[index];
+            final String title = generateHideDuration(hideDuration);
 
             return Consumer(
-              builder: (context, ref, _) {
-                final preferences = ref.watch(preferencesProvider);
+              builder: (BuildContext context, WidgetRef ref, _) {
+                final PreferenceState preferences =
+                    ref.watch(preferencesProvider);
                 return RoundCheckItem<int>(
                   title: title,
                   subtitle: hideDuration == -2
@@ -117,7 +117,7 @@ class _AccessibilitySettingsScreenState
                       : null,
                   value: hideDuration,
                   groupValue: preferences.accessibilityPreferences.hideDuration,
-                  onChange: (value) {
+                  onChange: (int? value) {
                     if (value != null) {
                       context.pop(value);
                     }

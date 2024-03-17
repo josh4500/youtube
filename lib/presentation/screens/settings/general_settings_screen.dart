@@ -54,15 +54,14 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
     with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    final preferences = ref.watch(preferencesProvider);
+    final PreferenceState preferences = ref.watch(preferencesProvider);
     return Material(
-      type: MaterialType.canvas,
       child: SettingsListView(
-        children: [
+        children: <Widget>[
           SettingsTile(
             title: 'Remind me to take a break',
             onGenerateSummary: (_) {
-              final remindForBreak = preferences.remindForBreak;
+              final RemindForBreak remindForBreak = preferences.remindForBreak;
               if (remindForBreak.enabled) {
                 return 'Every ${remindForBreak.frequency.hoursMinutesWords}';
               } else {
@@ -78,7 +77,8 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
                   _onChangeRemindForBreak();
                 }
                 ref.read(preferencesProvider.notifier).changeRemindForBreak(
-                    enabled: !preferences.remindForBreak.enabled);
+                      enabled: !preferences.remindForBreak.enabled,
+                    );
               },
             ),
             onTap: _onChangeRemindForBreak,
@@ -86,13 +86,14 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
           SettingsTile(
             title: 'Remind me when it\'s bedtime',
             onGenerateSummary: (_) {
-              final remindForBedtime = preferences.remindForBedtime;
+              final RemindForBedtime remindForBedtime =
+                  preferences.remindForBedtime;
               if (remindForBedtime.enabled) {
                 if (remindForBedtime.onDeviceBedtime) {
                   return 'When my phone\'s bedtime mode is on';
                 } else {
-                  final start = remindForBedtime.customStartSchedule;
-                  final stop = remindForBedtime.customStopSchedule;
+                  final Duration start = remindForBedtime.customStartSchedule;
+                  final Duration stop = remindForBedtime.customStopSchedule;
                   return '${start.hoursMinutes} - ${stop.hoursMinutes}';
                 }
               } else {
@@ -203,14 +204,15 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
 
   /// Shows a Reminder frequency popup to change remind time settings
   Future<void> _onChangeRemindForBreak() async {
-    final preferences = ref.read(preferencesProvider);
+    final PreferenceState preferences = ref.read(preferencesProvider);
 
     // Set the initial value to the controller
-    final controller = SettingsPopupContainerController(
+    final SettingsPopupContainerController<Duration> controller =
+        SettingsPopupContainerController(
       value: preferences.remindForBreak.frequency,
     );
 
-    final affirmedChanges = await showDialog<Duration>(
+    final Duration? affirmedChanges = await showDialog<Duration>(
       context: context,
       builder: (_) {
         return SettingsPopupContainer<Duration>(
@@ -219,7 +221,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
           density: VisualDensity.compact,
           showAffirmButton: true,
           child: FrequencyPicker(
-            onChange: (frequency) {
+            onChange: (Duration frequency) {
               controller.value = frequency;
             },
             initialDuration: preferences.remindForBreak.frequency,
@@ -238,24 +240,26 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
   }
 
   Future<void> _onChangeRemindForBedtime() async {
-    final preferences = ref.read(preferencesProvider);
+    final PreferenceState preferences = ref.read(preferencesProvider);
     // Controller popup
-    final controller = SettingsPopupContainerController<RemindForBedtime>(
+    final SettingsPopupContainerController<RemindForBedtime> controller =
+        SettingsPopupContainerController<RemindForBedtime>(
       value: preferences.remindForBedtime,
     );
     // State value for popup
     RemindForBedtime remindForBedTimeState = preferences.remindForBedtime;
-    final affirmedChanges = await showDialog<RemindForBedtime>(
+    final RemindForBedtime? affirmedChanges =
+        await showDialog<RemindForBedtime>(
       context: context,
       builder: (_) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (BuildContext context, setState) {
             return SettingsPopupContainer<RemindForBedtime>(
               title: 'Remind me when it\'s bedtime',
               showAffirmButton: true,
               controller: controller,
               child: Column(
-                children: [
+                children: <Widget>[
                   RoundCheckItem<TwoState>(
                     title: 'When my phone\'s bedtime mode is on',
                     value: TwoState.first,
@@ -267,7 +271,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
                     groupValue: remindForBedTimeState.onDeviceBedtime
                         ? TwoState.first
                         : TwoState.second,
-                    onChange: (value) {
+                    onChange: (TwoState? value) {
                       setState(() {
                         remindForBedTimeState = remindForBedTimeState.copyWith(
                           onDeviceBedtime: value == TwoState.first,
@@ -282,7 +286,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
                     groupValue: remindForBedTimeState.onDeviceBedtime
                         ? TwoState.first
                         : TwoState.second,
-                    onChange: (value) {
+                    onChange: (TwoState? value) {
                       setState(() {
                         remindForBedTimeState = remindForBedTimeState.copyWith(
                           onDeviceBedtime: value == TwoState.first,
@@ -295,7 +299,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
                     DateRangePicker(
                       initialStart: remindForBedTimeState.customStartSchedule,
                       initialStop: remindForBedTimeState.customStopSchedule,
-                      onStartChange: (duration) {
+                      onStartChange: (Duration duration) {
                         setState(() {
                           controller.value = remindForBedTimeState =
                               remindForBedTimeState.copyWith(
@@ -303,7 +307,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
                           );
                         });
                       },
-                      onStopChange: (duration) {
+                      onStopChange: (Duration duration) {
                         setState(() {
                           controller.value = remindForBedTimeState =
                               remindForBedTimeState.copyWith(
@@ -319,10 +323,10 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Row(
-                      children: [
+                      children: <Widget>[
                         Checkbox(
                           value: remindForBedTimeState.waitTillFinishVideo,
-                          onChanged: (value) {
+                          onChanged: (bool? value) {
                             setState(() {
                               remindForBedTimeState = remindForBedTimeState
                                   .copyWith(waitTillFinishVideo: value);
@@ -330,7 +334,8 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
                             });
                           },
                         ),
-                        const Text('Wait until I finish video to show reminder')
+                        const Text(
+                            'Wait until I finish video to show reminder'),
                       ],
                     ),
                   ),
@@ -351,28 +356,29 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
   }
 
   Future<void> _onChangeAppearance() async {
-    final result = await showDialog<ThemeMode>(
+    final ThemeMode? result = await showDialog<ThemeMode>(
       context: context,
       builder: (_) {
         return SettingsPopupContainer<ThemeMode>.builder(
           title: 'Appearance',
           capitalizeDismissButtons: true,
-          itemBuilder: (_, index) {
-            final themeMode = ThemeMode.values[index];
-            final title = themeMode.isDark
+          itemBuilder: (_, int index) {
+            final ThemeMode themeMode = ThemeMode.values[index];
+            final String title = themeMode.isDark
                 ? 'Dark theme'
                 : themeMode.isSystem
                     ? 'Use system theme'
                     : 'Light theme';
 
             return Consumer(
-              builder: (context, ref, _) {
-                final preferences = ref.watch(preferencesProvider);
+              builder: (BuildContext context, WidgetRef ref, _) {
+                final PreferenceState preferences =
+                    ref.watch(preferencesProvider);
                 return RoundCheckItem<ThemeMode>(
                   title: title,
                   value: themeMode,
                   groupValue: preferences.themeMode,
-                  onChange: (value) {
+                  onChange: (ThemeMode? value) {
                     if (value != null) {
                       context.pop(value);
                     }
@@ -391,26 +397,28 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
   }
 
   Future<void> _onChangePlaybackInFeeds() async {
-    final result = await showDialog<PlaybackInFeeds>(
+    final PlaybackInFeeds? result = await showDialog<PlaybackInFeeds>(
       context: context,
       builder: (_) {
         return SettingsPopupContainer<PlaybackInFeeds>.builder(
           title: 'Playback in feeds',
-          itemBuilder: (_, index) {
-            final playbackInFeeds = PlaybackInFeeds.values[index];
-            final title = playbackInFeeds == PlaybackInFeeds.alwaysOn
+          itemBuilder: (_, int index) {
+            final PlaybackInFeeds playbackInFeeds =
+                PlaybackInFeeds.values[index];
+            final String title = playbackInFeeds == PlaybackInFeeds.alwaysOn
                 ? 'Always on'
                 : playbackInFeeds == PlaybackInFeeds.wifiOnly
                     ? 'Wi-Fi only'
                     : 'Off';
             return Consumer(
-              builder: (context, ref, _) {
-                final preferences = ref.watch(preferencesProvider);
+              builder: (BuildContext context, WidgetRef ref, _) {
+                final PreferenceState preferences =
+                    ref.watch(preferencesProvider);
                 return RoundCheckItem<PlaybackInFeeds>(
                   title: title,
                   value: playbackInFeeds,
                   groupValue: preferences.playbackInFeeds,
-                  onChange: (value) {
+                  onChange: (PlaybackInFeeds? value) {
                     if (value != null) {
                       context.pop(value);
                     }
@@ -429,21 +437,22 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
   }
 
   Future<void> _onChangeDoubleTapSeek() async {
-    final result = await showDialog<int>(
+    final int? result = await showDialog<int>(
       context: context,
       builder: (_) {
         return SettingsPopupContainer<int>.builder(
           title: 'Double-tap to seek',
-          itemBuilder: (_, index) {
-            final seekSeconds = [5, 10, 15, 20, 30, 60][index];
+          itemBuilder: (_, int index) {
+            final int seekSeconds = <int>[5, 10, 15, 20, 30, 60][index];
             return Consumer(
-              builder: (context, ref, _) {
-                final preferences = ref.watch(preferencesProvider);
+              builder: (BuildContext context, WidgetRef ref, _) {
+                final PreferenceState preferences =
+                    ref.watch(preferencesProvider);
                 return RoundCheckItem<int>(
                   title: '$seekSeconds',
                   value: seekSeconds,
                   groupValue: preferences.doubleTapSeek,
-                  onChange: (value) {
+                  onChange: (int? value) {
                     if (value != null) {
                       context.pop(value);
                     }
@@ -452,7 +461,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
               },
             );
           },
-          itemCount: [5, 10, 15, 20, 30, 60].length,
+          itemCount: <int>[5, 10, 15, 20, 30, 60].length,
         );
       },
     );
@@ -466,25 +475,26 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
   }
 
   Future<void> _onChangeUploads() async {
-    final result = await showDialog<UploadNetwork>(
+    final UploadNetwork? result = await showDialog<UploadNetwork>(
       context: context,
       builder: (_) {
         return SettingsPopupContainer<UploadNetwork>.builder(
           title: 'Uploads',
-          itemBuilder: (_, index) {
-            final uploadNetwork = UploadNetwork.values[index];
-            final title = uploadNetwork == UploadNetwork.onlyWifi
+          itemBuilder: (_, int index) {
+            final UploadNetwork uploadNetwork = UploadNetwork.values[index];
+            final String title = uploadNetwork == UploadNetwork.onlyWifi
                 ? 'Only when on Wi-Fi'
                 : 'On any network';
 
             return Consumer(
-              builder: (context, ref, _) {
-                final preferences = ref.watch(preferencesProvider);
+              builder: (BuildContext context, WidgetRef ref, _) {
+                final PreferenceState preferences =
+                    ref.watch(preferencesProvider);
                 return RoundCheckItem<UploadNetwork>(
                   title: title,
                   value: uploadNetwork,
                   groupValue: preferences.uploadNetwork,
-                  onChange: (value) {
+                  onChange: (UploadNetwork? value) {
                     if (value != null) {
                       context.pop(value);
                     }

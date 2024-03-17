@@ -29,13 +29,13 @@
 import 'package:flutter/material.dart';
 
 class CommentTextFieldPlaceholder extends StatelessWidget {
-  final bool isReply;
   const CommentTextFieldPlaceholder({super.key, this.isReply = false});
+  final bool isReply;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         const Divider(
           thickness: 1.5,
           height: 0,
@@ -46,7 +46,7 @@ class CommentTextFieldPlaceholder extends StatelessWidget {
             horizontal: 8.0,
           ),
           child: Row(
-            children: [
+            children: <Widget>[
               const Padding(
                 padding: EdgeInsets.all(4.0),
                 child: CircleAvatar(

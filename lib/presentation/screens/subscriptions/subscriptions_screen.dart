@@ -60,10 +60,10 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
         ),
         child: CustomScrollView(
           controller: _scrollController,
-          slivers: [
+          slivers: <Widget>[
             SliverAppBar(
               automaticallyImplyLeading: false,
-              actions: [
+              actions: <Widget>[
                 AppbarAction(
                   icon: Icons.cast_outlined,
                   onTap: () {},
@@ -85,24 +85,25 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                       MediaQuery.sizeOf(context).height * 0.05,
                 ),
                 child: Column(
-                  children: [
+                  children: <Widget>[
                     SizedBox(
                       height: MediaQuery.sizeOf(context).width * 0.3,
                       child: SubscriptionsTabs(
                         valueListenable: _selectedChannel,
-                        onChange: (value) {},
+                        onChange: (int? value) {},
                       ),
                     ),
                     const SizedBox(height: 8),
-                    ValueListenableBuilder(
+                    ValueListenableBuilder<int?>(
                       valueListenable: _selectedChannel,
-                      builder: (context, value, childWidget) {
+                      builder: (BuildContext context, int? value,
+                          Widget? childWidget) {
                         if (value != null) {
                           return Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
+                              children: <Widget>[
                                 CustomActionChip(
                                   title: 'View channel',
                                   alignment: Alignment.center,
@@ -151,7 +152,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                           'Shorts',
                           'Continue watching',
                           'Unwatched',
-                          'Post'
+                          'Post',
                         ],
                       ),
                     ),
@@ -166,9 +167,9 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
             const SliverToBoxAdapter(
               child: ViewableGroupShorts(),
             ),
-            ValueListenableBuilder(
+            ValueListenableBuilder<int?>(
               valueListenable: _selectedChannel,
-              builder: (context, value, childWidget) {
+              builder: (BuildContext context, int? value, Widget? childWidget) {
                 if (value != null) {
                   return const SliverFillRemaining();
                 }
@@ -176,7 +177,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
               },
               child: SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) {
+                  (BuildContext context, int index) {
                     return const ViewableVideoContent();
                   },
                   childCount: 20,
@@ -196,13 +197,13 @@ class SubscriptionAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         const SizedBox(height: 16),
         Expanded(
           child: Stack(
-            children: [
+            children: <Widget>[
               LayoutBuilder(
-                builder: (context, c) {
+                builder: (BuildContext context, BoxConstraints c) {
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(c.maxHeight),
                     child: Container(
@@ -227,7 +228,6 @@ class SubscriptionAvatar extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(
                       width: 1.7,
-                      color: Colors.black,
                     ),
                   ),
                 ),

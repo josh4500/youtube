@@ -33,12 +33,11 @@ import 'package:hive/hive.dart';
 import 'cache_provider.dart';
 
 class HiveCacheProvider<E> extends CacheProvider<E> {
-  late final Box<E> _store;
-  final String name;
-
   HiveCacheProvider(this.name) {
     _store = Hive.box(name: name);
   }
+  late final Box<E> _store;
+  final String name;
 
   @override
   bool containsKey(String key) => _store.containsKey(key);
@@ -53,7 +52,7 @@ class HiveCacheProvider<E> extends CacheProvider<E> {
   Iterable<E> get values {
     return _store
         .getAll(_store.keys)
-        .where((element) => element != null)
+        .where((E? element) => element != null)
         .cast();
   }
 

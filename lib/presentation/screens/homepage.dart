@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/core/enums/auth_state.dart';
 
 import '../constants.dart';
 import '../providers.dart';
@@ -36,8 +37,8 @@ import '../screens.dart' show PlayerScreen;
 import '../widgets.dart';
 
 class HomePage extends ConsumerStatefulWidget {
-  final StatefulNavigationShell child;
   const HomePage({super.key, required this.child});
+  final StatefulNavigationShell child;
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
@@ -77,15 +78,15 @@ class _HomePageState extends ConsumerState<HomePage>
   @override
   void didUpdateWidget(covariant HomePage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final index = widget.child.currentIndex;
+    final int index = widget.child.currentIndex;
     if (index == 1) {
       _controller.reverse();
     } else {
       _controller.forward();
     }
 
-    Future(() {
-      final isPlayerActive = ref.read(playerOverlayStateProvider);
+    Future<void>(() {
+      final bool isPlayerActive = ref.read(playerOverlayStateProvider);
       if (oldWidget.child.currentIndex != widget.child.currentIndex) {
         if (isPlayerActive && _controller.value != 1) {
           if (index == 1 && ref.read(playerNotifierProvider).playing) {
@@ -97,12 +98,12 @@ class _HomePageState extends ConsumerState<HomePage>
       }
     });
 
-    // TODO 1: When open new viewable/playable, if
+    // TODO 1(Josh): When open new viewable/playable, if
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(playerOverlayStateProvider, (previous, next) {
+    ref.listen(playerOverlayStateProvider, (bool? previous, bool next) {
       if (next) {
         _controller.forward();
       }
@@ -121,13 +122,15 @@ class _HomePageState extends ConsumerState<HomePage>
           ),
         ),
         body: Stack(
-          children: [
+          children: <Widget>[
             widget.child,
             SlideTransition(
               position: _animation,
               child: Consumer(
-                builder: (context, ref, childWidget) {
-                  final isPlayerActive = ref.watch(playerOverlayStateProvider);
+                builder:
+                    (BuildContext context, WidgetRef ref, Widget? childWidget) {
+                  final bool isPlayerActive =
+                      ref.watch(playerOverlayStateProvider);
                   if (isPlayerActive) {
                     return childWidget!;
                   }
@@ -136,7 +139,7 @@ class _HomePageState extends ConsumerState<HomePage>
                 child: Align(
                   alignment: Alignment.bottomCenter,
                   child: LayoutBuilder(
-                    builder: (context, c) {
+                    builder: (BuildContext context, BoxConstraints c) {
                       return PlayerScreen(
                         height: c.maxHeight,
                       );
@@ -148,8 +151,8 @@ class _HomePageState extends ConsumerState<HomePage>
           ],
         ),
         bottomNavigationBar: Consumer(
-          builder: (context, ref, childWidget) {
-            final isPlayerActive = ref.watch(playerOverlayStateProvider);
+          builder: (BuildContext context, WidgetRef ref, Widget? childWidget) {
+            final bool isPlayerActive = ref.watch(playerOverlayStateProvider);
             return Padding(
               padding: isPlayerActive
                   ? MediaQuery.viewInsetsOf(context)
@@ -159,7 +162,7 @@ class _HomePageState extends ConsumerState<HomePage>
           },
           child: CustomNavigatorBar(
             selectedIndex: widget.child.currentIndex,
-            onChangeIndex: (index) {
+            onChangeIndex: (int index) {
               widget.child.goBranch(
                 index,
                 initialLocation: index == widget.child.currentIndex,
@@ -173,12 +176,6 @@ class _HomePageState extends ConsumerState<HomePage>
 }
 
 class CustomNavigatorBar extends StatefulWidget {
-  final int selectedIndex;
-  final NavigationBarController? controller;
-  final Duration duration;
-  final double height;
-  final ValueChanged<int> onChangeIndex;
-
   const CustomNavigatorBar({
     super.key,
     this.controller,
@@ -187,6 +184,11 @@ class CustomNavigatorBar extends StatefulWidget {
     required this.selectedIndex,
     required this.onChangeIndex,
   });
+  final int selectedIndex;
+  final NavigationBarController? controller;
+  final Duration duration;
+  final double height;
+  final ValueChanged<int> onChangeIndex;
 
   @override
   State<CustomNavigatorBar> createState() => _CustomNavigatorBarState();
@@ -228,19 +230,18 @@ class _CustomNavigatorBarState extends State<CustomNavigatorBar>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
-        children: [
+        children: <Widget>[
           const Divider(height: 0.5),
           SizeTransition(
             sizeFactor: _animation,
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
+              children: <Widget>[
                 IconButton(
                   onPressed: () => widget.onChangeIndex(0),
                   icon: const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                    children: <Widget>[
                       Icon(Icons.home),
                       // Text('Home'),
                     ],
@@ -250,14 +251,14 @@ class _CustomNavigatorBarState extends State<CustomNavigatorBar>
                   onPressed: () => widget.onChangeIndex(1),
                   icon: const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                    children: <Widget>[
                       Icon(Icons.sort),
                       // Text('Short'),
                     ],
                   ),
                 ),
                 AuthStateBuilder(
-                  builder: (context, state) {
+                  builder: (BuildContext context, AuthState state) {
                     if (state.isNotAuthenticated || state.isInIncognito) {
                       return const SizedBox();
                     }
@@ -265,7 +266,7 @@ class _CustomNavigatorBarState extends State<CustomNavigatorBar>
                       onPressed: () {},
                       icon: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                        children: <Widget>[
                           Icon(
                             Icons.add_circle_outline_rounded,
                             size: 32,
@@ -279,24 +280,25 @@ class _CustomNavigatorBarState extends State<CustomNavigatorBar>
                   onPressed: () => widget.onChangeIndex(2),
                   icon: const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                    children: <Widget>[
                       Icon(Icons.subscriptions_outlined),
                       // Text('Subscription'),
                     ],
                   ),
                 ),
                 AuthStateBuilder(
-                  builder: (context, state) {
+                  builder: (BuildContext context, AuthState state) {
                     return IconButton(
                       onPressed: () => widget.onChangeIndex(3),
                       icon: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          state.isInIncognito
-                              ? const Icon(Icons.hourglass_top)
-                              : state.isNotAuthenticated
-                                  ? const Icon(Icons.person_off)
-                                  : const Icon(Icons.person),
+                        children: <Widget>[
+                          if (state.isInIncognito)
+                            const Icon(Icons.hourglass_top)
+                          else
+                            state.isNotAuthenticated
+                                ? const Icon(Icons.person_off)
+                                : const Icon(Icons.person),
                           //const Text('You'),
                         ],
                       ),
@@ -307,7 +309,7 @@ class _CustomNavigatorBarState extends State<CustomNavigatorBar>
             ),
           ),
           AuthStateBuilder(
-            builder: (context, state) {
+            builder: (BuildContext context, AuthState state) {
               if (state.isInIncognito) {
                 return Container(
                   alignment: Alignment.center,

@@ -83,10 +83,10 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
       appBar: AppBar(
         title: AnimatedBuilder(
           animation: animation,
-          builder: (context, child) {
+          builder: (BuildContext context, Widget? child) {
             return Opacity(
               opacity: animation.value,
-              child: child!,
+              child: child,
             );
           },
           child: const Text(
@@ -96,7 +96,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
             ),
           ),
         ),
-        actions: [
+        actions: <Widget>[
           AppbarAction(
             icon: Icons.cast_outlined,
             onTap: () {},
@@ -107,8 +107,8 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
           ),
           AppbarAction(
             icon: Icons.more_vert_outlined,
-            onTapDown: (details) {
-              final position = details.globalPosition;
+            onTapDown: (TapDownDetails details) {
+              final Offset position = details.globalPosition;
               showHistoryMenu(
                 context,
                 RelativeRect.fromLTRB(position.dx, 0, 0, 0),
@@ -123,11 +123,11 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
           behavior: const OverScrollGlowBehavior(enabled: false),
           child: CustomScrollView(
             controller: controller,
-            slivers: [
+            slivers: <Widget>[
               SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     const Padding(
                       padding: EdgeInsets.all(16.0),
                       child: Text(
@@ -150,7 +150,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
               ),
               SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) {
+                  (BuildContext context, int index) {
                     return InkWell(
                       onTap: () {},
                       child: const Padding(
@@ -173,7 +173,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
               ),
               SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) {
+                  (BuildContext context, int index) {
                     return const Padding(
                       padding: EdgeInsets.all(16.0),
                       child: PlayableVideoContent(

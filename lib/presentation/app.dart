@@ -44,8 +44,8 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProviderScope(
       child: Consumer(
-        builder: (context, ref, _) {
-          final preferences = ref.watch(preferencesProvider);
+        builder: (BuildContext context, WidgetRef ref, _) {
+          final PreferenceState preferences = ref.watch(preferencesProvider);
           return DeviceTheme.fromView(
             view: View.of(context),
             child: MaterialApp.router(
@@ -56,7 +56,7 @@ class App extends StatelessWidget {
                 reverseCurve: Curves.easeOutCubic,
               ),
               debugShowCheckedModeBanner: false,
-              localizationsDelegates: const [
+              localizationsDelegates: const <LocalizationsDelegate>[
                 S.delegate,
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
@@ -68,7 +68,7 @@ class App extends StatelessWidget {
               darkTheme: AppTheme.dark,
               themeMode: preferences.themeMode,
               themeAnimationCurve: Curves.easeIn,
-              builder: (context, child) {
+              builder: (BuildContext context, Widget? child) {
                 return ErrorOverlay(
                   child: child!,
                 );

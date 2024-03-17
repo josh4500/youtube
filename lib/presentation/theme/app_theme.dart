@@ -60,20 +60,20 @@ abstract final class AppTheme {
       horizontalTitleGap: 0,
       minVerticalPadding: 0,
     ),
-    extensions: [
+    extensions: <ThemeExtension>[
       _lightAppColors,
       _lightAppStyles,
     ],
   );
 
-  static final _lightAppColors = AppColorsExtension(
+  static final AppColorsExtension _lightAppColors = AppColorsExtension(
     primary: AppPalette.primary.light,
     background: AppPalette.backgroundColor.light,
     settingsPopupBackgroundColor: AppPalette.settingsPopupBackgroundColor.light,
     shimmer: AppPalette.shimmerColor.light,
   );
 
-  static final _lightAppStyles = AppStylesExtension(
+  static final AppStylesExtension _lightAppStyles = AppStylesExtension(
     appBarTextStyle: AppStyle.appBar.light,
     settingsTextButtonStyle: AppStyle.settingsTextButtonStyle.light,
     settingsTextButtonTextStyle: AppStyle.settingsTextButtonTextStyle.light,
@@ -108,20 +108,20 @@ abstract final class AppTheme {
     ),
     dividerColor: const Color(0xFF3F3F3F),
   ).copyWith(
-    extensions: [
+    extensions: <ThemeExtension>[
       _darkAppColors,
       _darkAppStyles,
     ],
   );
 
-  static final _darkAppColors = AppColorsExtension(
+  static final AppColorsExtension _darkAppColors = AppColorsExtension(
     primary: AppPalette.primary.dark,
     background: AppPalette.backgroundColor.dark,
     settingsPopupBackgroundColor: AppPalette.settingsPopupBackgroundColor.dark,
     shimmer: AppPalette.shimmerColor.dark,
   );
 
-  static final _darkAppStyles = AppStylesExtension(
+  static final AppStylesExtension _darkAppStyles = AppStylesExtension(
     appBarTextStyle: AppStyle.appBar.dark,
     settingsTextButtonStyle: AppStyle.settingsTextButtonStyle.dark,
     settingsTextButtonTextStyle: AppStyle.settingsTextButtonTextStyle.dark,

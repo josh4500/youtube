@@ -2,13 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/theme/app_theme.dart';
 
 class Shimmer extends StatelessWidget {
-  final Color? color;
-  final EdgeInsets? margin;
-  final BorderRadius? borderRadius;
-  final BoxShape? shape;
-  final double? width;
-  final double? height;
-
   const Shimmer({
     super.key,
     this.color,
@@ -19,9 +12,16 @@ class Shimmer extends StatelessWidget {
     this.height,
   });
 
+  final Color? color;
+  final EdgeInsets? margin;
+  final BorderRadius? borderRadius;
+  final BoxShape? shape;
+  final double? width;
+  final double? height;
+
   @override
   Widget build(BuildContext context) {
-    final shimmerColor = context.theme.appColors.shimmer;
+    final Color shimmerColor = context.theme.appColors.shimmer;
     return Container(
       width: width,
       height: height,

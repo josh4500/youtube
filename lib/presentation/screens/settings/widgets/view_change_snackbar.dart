@@ -29,10 +29,9 @@
 import 'package:flutter/material.dart';
 
 class ViewChangeSnackbar extends StatelessWidget {
+  const ViewChangeSnackbar({super.key, required this.title, this.onView});
   final String title;
   final VoidCallback? onView;
-
-  const ViewChangeSnackbar({super.key, required this.title, this.onView});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +45,7 @@ class ViewChangeSnackbar extends StatelessWidget {
             color: Colors.white,
           ),
           child: Row(
-            children: [
+            children: <Widget>[
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -58,10 +57,10 @@ class ViewChangeSnackbar extends StatelessWidget {
                   ),
                 ),
               ),
-              if (onView != null) ...[
+              if (onView != null) ...<Widget>[
                 const SizedBox(width: 20),
                 TextButton(onPressed: onView, child: const Text('View')),
-              ]
+              ],
             ],
           ),
         ),

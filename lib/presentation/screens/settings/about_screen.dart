@@ -37,9 +37,8 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      type: MaterialType.canvas,
       child: SettingsListView(
-        children: [
+        children: <Widget>[
           SettingsTile(
             title: 'Help',
             summary: 'Find answers to your YouTube questions here',

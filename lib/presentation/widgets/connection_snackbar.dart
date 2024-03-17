@@ -34,6 +34,14 @@ import 'package:youtube_clone/infrastructure/services/internet_connectivity/inte
 import '../../infrastructure/services/internet_connectivity/connectivity_state.dart';
 
 class ConnectionSnackbar extends StatefulWidget {
+  const ConnectionSnackbar({
+    super.key,
+    this.autoHide = false,
+    this.labelSwitchDuration = const Duration(milliseconds: 500),
+    this.duration = const Duration(milliseconds: 300),
+    this.hideDuration = const Duration(seconds: 5),
+  });
+
   /// Whether connection state should auto hide
   final bool autoHide;
 
@@ -45,14 +53,6 @@ class ConnectionSnackbar extends StatefulWidget {
   final Duration hideDuration;
 
   final Duration labelSwitchDuration;
-
-  const ConnectionSnackbar({
-    super.key,
-    this.autoHide = false,
-    this.labelSwitchDuration = const Duration(milliseconds: 500),
-    this.duration = const Duration(milliseconds: 300),
-    this.hideDuration = const Duration(seconds: 5),
-  });
 
   @override
   State<ConnectionSnackbar> createState() => _ConnectionSnackbarState();
@@ -82,17 +82,19 @@ class _ConnectionSnackbarState extends State<ConnectionSnackbar>
       curve: Curves.fastOutSlowIn,
     );
 
-    _connectivityState = ValueNotifier(InternetConnectivity.instance.state);
+    _connectivityState = ValueNotifier<ConnectivityState>(
+      InternetConnectivity.instance.state,
+    );
 
     _connectivityStream = InternetConnectivity.instance.onStateChange.listen(
-      (state) async {
+      (ConnectivityState state) async {
         _connectivityState.value = state;
 
         if (widget.autoHide && state.isConnected && !_wasConnected) {
           _wasConnected = true;
 
-          await Future.delayed(widget.labelSwitchDuration, slideUp);
-          await Future.delayed(widget.hideDuration, slideDown);
+          await Future<void>.delayed(widget.labelSwitchDuration, slideUp);
+          await Future<void>.delayed(widget.hideDuration, slideDown);
         } else if (state.isNotConnected) {
           _wasConnected = false;
           await slideUp();
@@ -140,7 +142,8 @@ class _ConnectionSnackbarState extends State<ConnectionSnackbar>
       sizeFactor: _animation,
       child: ValueListenableBuilder<ConnectivityState>(
         valueListenable: _connectivityState,
-        builder: (context, state, child) {
+        builder:
+            (BuildContext context, ConnectivityState state, Widget? child) {
           return AnimatedContainer(
             width: double.infinity,
             alignment: Alignment.center,

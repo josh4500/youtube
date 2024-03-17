@@ -40,11 +40,11 @@ enum DeviceType {
   /// iPad device.
   ipad;
 
-  // TODO: Consider adding more device types based on the actual use case.
+  // TODO(Josh): Consider adding more device types based on the actual use case.
 
   /// Gets the current device type based on the platform.
   static DeviceType get byPlatform {
-    // TODO: Implement a better way to determine the current platform.
+    // TODO(Josh): Implement a better way to determine the current platform.
     // This placeholder always returns Android for demonstration purposes.
     return android;
   }

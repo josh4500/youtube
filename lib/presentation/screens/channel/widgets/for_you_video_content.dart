@@ -49,12 +49,12 @@ class ForYouVideoContent extends StatelessWidget {
           width: 350,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               Expanded(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Stack(
-                    children: [
+                    children: <Widget>[
                       ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: Container(
@@ -85,7 +85,7 @@ class ForYouVideoContent extends StatelessWidget {
                     fontSize: 12,
                     color: Colors.grey,
                   ),
-                  children: [
+                  children: <InlineSpan>[
                     TextSpan(text: '  '),
                     TextSpan(text: '1 month ago'),
                   ],

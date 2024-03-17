@@ -28,16 +28,18 @@
 
 import 'package:youtube_clone/presentation/theme/relative_size.dart';
 
-import 'size_triad.dart';
 import 'orientation_pair.dart';
+import 'size_triad.dart';
 
 abstract final class AppSizing {
-  static final testProperty = SizeTriad<OrientationPair<double>>.double(
+  static final SizeTriad<OrientationPair<double>> testProperty =
+      SizeTriad<OrientationPair<double>>.double(
     const OrientationPair<double>(landscape: 120, portrait: 120),
     const OrientationPair<double>(landscape: 120, portrait: 120),
   );
 
-  static final settingsTileSize = SizeTriad.single(
+  static final SizeTriad<OrientationPair<RelativeSizing>> settingsTileSize =
+      SizeTriad.single(
     const OrientationPair<RelativeSizing>(
       landscape: RelativeSizing(wRatio: 0.41),
       portrait: RelativeSizing(wRatio: 1),

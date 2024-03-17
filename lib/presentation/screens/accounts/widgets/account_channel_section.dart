@@ -33,23 +33,22 @@ import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class AccountChannelSection extends StatelessWidget {
-  final VoidCallback moreChannel;
-
   const AccountChannelSection({
     super.key,
     required this.moreChannel,
   });
+  final VoidCallback moreChannel;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Column(
-        children: [
+        children: <Widget>[
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
             child: Row(
-              children: [
+              children: <Widget>[
                 ClipRRect(
                   borderRadius: BorderRadius.circular(64),
                   child: Image.network(
@@ -62,7 +61,7 @@ class AccountChannelSection extends StatelessWidget {
                 const SizedBox(width: 14),
                 const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     Text(
                       'Josh',
                       style: TextStyle(
@@ -102,7 +101,7 @@ class AccountChannelSection extends StatelessWidget {
                 horizontal: 8.0,
               ),
               child: Row(
-                children: [
+                children: <Widget>[
                   Text(
                     'More about this channel',
                     style: TextStyle(
@@ -114,7 +113,7 @@ class AccountChannelSection extends StatelessWidget {
                   Icon(
                     Icons.chevron_right,
                     color: Colors.grey,
-                  )
+                  ),
                 ],
               ),
             ),
@@ -123,7 +122,7 @@ class AccountChannelSection extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.0),
             child: Row(
-              children: [
+              children: <Widget>[
                 Expanded(
                   child: CustomActionChip(
                     alignment: Alignment.center,
@@ -156,7 +155,7 @@ class AccountChannelSection extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

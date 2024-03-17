@@ -31,12 +31,6 @@ import 'package:flutter/widgets.dart';
 /// A generic class representing a pair of values, one for landscape orientation
 /// and another for portrait orientation.
 class OrientationPair<T> {
-  /// The value associated with the landscape orientation.
-  final T landscape;
-
-  /// The value associated with the portrait orientation.
-  final T portrait;
-
   /// Creates an [OrientationPair] instance with values for both landscape and portrait orientations.
   ///
   /// The [landscape] and [portrait] parameters must be provided and cannot be null.
@@ -44,6 +38,12 @@ class OrientationPair<T> {
     required this.landscape,
     required this.portrait,
   });
+
+  /// The value associated with the landscape orientation.
+  final T landscape;
+
+  /// The value associated with the portrait orientation.
+  final T portrait;
 
   /// Resolves the appropriate value based on the given [Orientation].
   ///

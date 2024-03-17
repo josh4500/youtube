@@ -42,14 +42,14 @@ class ChannelSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         Padding(
           padding: const EdgeInsets.symmetric(
             vertical: 2,
             horizontal: 16.0,
           ),
           child: Column(
-            children: [
+            children: <Widget>[
               Container(
                 height: 96,
                 decoration: BoxDecoration(
@@ -59,14 +59,14 @@ class ChannelSection extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Row(
-                children: [
+                children: <Widget>[
                   const AccountAvatar(size: 88),
                   const SizedBox(width: 8),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: <Widget>[
                       const Row(
-                        children: [
+                        children: <Widget>[
                           Text(
                             'Marques Brownlee',
                             style: TextStyle(
@@ -91,7 +91,7 @@ class ChannelSection extends StatelessWidget {
                         text: const TextSpan(
                           text: '18M subscribers',
                           style: TextStyle(fontSize: 12, color: Colors.grey),
-                          children: [
+                          children: <InlineSpan>[
                             TextSpan(text: '  '),
                             TextSpan(text: '1.6k videos'),
                           ],
@@ -117,7 +117,7 @@ class ChannelSection extends StatelessWidget {
             horizontal: 16.0,
           ),
           child: const Row(
-            children: [
+            children: <Widget>[
               Flexible(
                 child: Text(
                   'MKBHD Quality Tech Videos | YouTube | Geek | Consumer Electronics | Tech Head | Internet Personality!',
@@ -137,7 +137,7 @@ class ChannelSection extends StatelessWidget {
         const TappableArea(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16.0),
           child: Row(
-            children: [
+            children: <Widget>[
               Text(
                 'twitter.com/MKBHD and 4 more links',
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
@@ -148,7 +148,7 @@ class ChannelSection extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
           child: Row(
-            children: [
+            children: <Widget>[
               Expanded(
                 child: NotificationOption(
                   title: 'Subscribe',

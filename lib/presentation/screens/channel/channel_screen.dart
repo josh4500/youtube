@@ -58,19 +58,19 @@ class _ChannelScreenState extends State<ChannelScreen> {
       'Home',
       'Videos',
       'Shorts',
-      'Releases', // TODO: DO impl
+      'Releases', // TODO(Josh): DO impl
       'Live',
       'Podcasts',
-      'Playlists', // TODO: DO impl
+      'Playlists', // TODO(Josh): DO impl
       'Community',
-      'Products', // TODO: Do impl
+      'Products', // TODO(Josh): Do impl
     ];
     return DefaultTabController(
       length: tabs.length,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Marques Brownlee'),
-          actions: [
+          actions: <Widget>[
             AppbarAction(
               icon: Icons.cast_outlined,
               onTap: () {},
@@ -98,7 +98,6 @@ class _ChannelScreenState extends State<ChannelScreen> {
                     context,
                   ),
                   sliver: SliverAppBar(
-                    primary: true,
                     automaticallyImplyLeading: false,
                     floating: true,
                     pinned: true,
@@ -115,11 +114,11 @@ class _ChannelScreenState extends State<ChannelScreen> {
               ];
             },
             body: TabBarView(
-              children: tabs.map((tabName) {
+              children: tabs.map((String tabName) {
                 return Builder(
-                  builder: (context) {
+                  builder: (BuildContext context) {
                     return CustomScrollView(
-                      slivers: [
+                      slivers: <Widget>[
                         SliverOverlapInjector(
                           handle:
                               NestedScrollView.sliverOverlapAbsorberHandleFor(
@@ -145,14 +144,14 @@ class _ChannelScreenState extends State<ChannelScreen> {
   }
 
   List<Widget> _buildHome() {
-    return [
+    return <Widget>[
       ..._buildFeaturedVideo(),
       SliverToBoxAdapter(
         child: SizedBox(
           height: 336,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
@@ -167,7 +166,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  itemBuilder: (context, index) {
+                  itemBuilder: (BuildContext context, int index) {
                     if (index == 2) {
                       return ForYouContent(
                         content: VideoViewModel(),
@@ -199,10 +198,10 @@ class _ChannelScreenState extends State<ChannelScreen> {
   }
 
   List<Widget> _buildFeaturedVideo() {
-    return [
+    return <Widget>[
       const SliverToBoxAdapter(
         child: Column(
-          children: [
+          children: <Widget>[
             ViewableVideoContent(),
             Divider(thickness: 1.5),
           ],
@@ -212,13 +211,13 @@ class _ChannelScreenState extends State<ChannelScreen> {
   }
 
   List<Widget> _buildFeaturedSection({required String title, String? summary}) {
-    return [
+    return <Widget>[
       SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               Text(
                 title,
                 style: const TextStyle(
@@ -226,7 +225,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              if (summary != null) ...[
+              if (summary != null) ...<Widget>[
                 const SizedBox(height: 8),
                 Text(
                   summary,
@@ -242,7 +241,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
       if (title == 'Shorts')
         SliverGrid(
           delegate: SliverChildBuilderDelegate(
-            (context, index) {
+            (BuildContext context, int index) {
               return const ViewableShortsContent(
                 showTitle: false,
               );
@@ -259,7 +258,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
       else
         SliverList(
           delegate: SliverChildBuilderDelegate(
-            (context, index) {
+            (BuildContext context, int index) {
               return const TappableArea(
                 padding: EdgeInsets.symmetric(
                   vertical: 8.0,
@@ -290,7 +289,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
   }
 
   List<Widget> _buildVideos() {
-    return [
+    return <Widget>[
       const SliverToBoxAdapter(
         child: Padding(
           padding: EdgeInsets.all(8.0),
@@ -298,7 +297,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
             height: 45,
             child: DynamicTab(
               initialIndex: 0,
-              options: ['Latest', 'Popular', 'Oldest'],
+              options: <String>['Latest', 'Popular', 'Oldest'],
               textStyle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -309,7 +308,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
       ),
       SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+          (BuildContext context, int index) {
             return const TappableArea(
               padding: EdgeInsets.symmetric(
                 vertical: 8.0,
@@ -328,7 +327,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
   }
 
   List<Widget> _buildShorts() {
-    return [
+    return <Widget>[
       const SliverToBoxAdapter(
         child: Padding(
           padding: EdgeInsets.all(8.0),
@@ -336,7 +335,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
             height: 45,
             child: DynamicTab(
               initialIndex: 0,
-              options: ['Latest', 'Popular'],
+              options: <String>['Latest', 'Popular'],
               textStyle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -347,7 +346,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
       ),
       SliverGrid(
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+          (BuildContext context, int index) {
             return const ViewableShortsContent(
               showTitle: false,
             );
@@ -365,13 +364,13 @@ class _ChannelScreenState extends State<ChannelScreen> {
   }
 
   List<Widget> _buildLives() {
-    return [
+    return <Widget>[
       const SliverToBoxAdapter(
         child: SizedBox(height: 8),
       ),
       SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+          (BuildContext context, int index) {
             return const TappableArea(
               padding: EdgeInsets.symmetric(
                 vertical: 8.0,
@@ -390,13 +389,13 @@ class _ChannelScreenState extends State<ChannelScreen> {
   }
 
   List<Widget> _buildPlaylists() {
-    return [
+    return <Widget>[
       const SliverToBoxAdapter(
         child: SizedBox(height: 8),
       ),
       SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+          (BuildContext context, int index) {
             return const TappableArea(
               padding: EdgeInsets.symmetric(
                 vertical: 8.0,
@@ -417,13 +416,13 @@ class _ChannelScreenState extends State<ChannelScreen> {
   }
 
   List<Widget> _buildCommunity() {
-    return [
+    return <Widget>[
       const SliverToBoxAdapter(
         child: SizedBox(height: 8),
       ),
       SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+          (BuildContext context, int index) {
             return const ViewablePostContent();
           },
           childCount: 10,

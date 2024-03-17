@@ -33,8 +33,8 @@ import 'package:youtube_clone/presentation/view_models/content/content_view_mode
 import 'package:youtube_clone/presentation/view_models/content/shorts_view_model.dart';
 
 class ForYouContent extends StatelessWidget {
-  final ContentViewModel content;
   const ForYouContent({super.key, required this.content});
+  final ContentViewModel content;
 
   @override
   Widget build(BuildContext context) {

@@ -30,16 +30,15 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 
 class SettingsListView extends StatefulWidget {
-  final List<Widget> children;
-
   const SettingsListView({super.key, required this.children});
+  final List<Widget> children;
 
   @override
   State<SettingsListView> createState() => _SettingsListViewState();
 }
 
 class _SettingsListViewState extends State<SettingsListView> {
-  final scrollController = ScrollController();
+  final ScrollController scrollController = ScrollController();
 
   @override
   void dispose() {

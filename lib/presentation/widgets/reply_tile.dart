@@ -34,12 +34,12 @@ class ReplyTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               const SizedBox(width: 60),
               const CircleAvatar(
                 backgroundColor: Colors.grey,
@@ -51,13 +51,13 @@ class ReplyTile extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: <Widget>[
                       Row(
-                        children: [
+                        children: <Widget>[
                           RichText(
                             text: const TextSpan(
                               text: '@BussyBoyBonanza',
-                              children: [
+                              children: <InlineSpan>[
                                 TextSpan(text: ' · '),
                                 TextSpan(text: '7mo ago'),
                               ],
@@ -75,7 +75,7 @@ class ReplyTile extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       const Row(
-                        children: [
+                        children: <Widget>[
                           Icon(
                             Icons.thumb_up_outlined,
                             size: 14,

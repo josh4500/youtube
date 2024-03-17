@@ -29,12 +29,6 @@
 import 'package:flutter/material.dart';
 
 class RoundCheckItem<T> extends StatelessWidget {
-  final String title;
-  final Widget? subtitle;
-  final T? groupValue;
-  final T value;
-  final ValueChanged<T?>? onChange;
-
   const RoundCheckItem({
     super.key,
     required this.title,
@@ -43,6 +37,11 @@ class RoundCheckItem<T> extends StatelessWidget {
     required this.value,
     this.onChange,
   });
+  final String title;
+  final Widget? subtitle;
+  final T? groupValue;
+  final T value;
+  final ValueChanged<T?>? onChange;
 
   @override
   Widget build(BuildContext context) {

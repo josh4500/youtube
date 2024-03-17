@@ -37,7 +37,7 @@ class AddNewPlaylist extends StatelessWidget {
       width: 160,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+        children: <Widget>[
           Container(
             alignment: Alignment.center,
             padding: const EdgeInsets.all(16),

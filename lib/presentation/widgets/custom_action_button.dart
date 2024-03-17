@@ -30,18 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class CustomActionButton extends StatelessWidget {
-  final String? title;
-  final Widget? icon;
-  final double? leadingWidth;
-  final Alignment alignment;
-  final EdgeInsets? padding;
-  final EdgeInsets? margin;
-  final BorderRadius? borderRadius;
-  final Color? backgroundColor;
-  final TextStyle? textStyle;
-  final Border? border;
-  final VoidCallback? onTap;
-
   const CustomActionButton({
     super.key,
     this.padding,
@@ -56,6 +44,17 @@ class CustomActionButton extends StatelessWidget {
     this.onTap,
     this.title,
   });
+  final String? title;
+  final Widget? icon;
+  final double? leadingWidth;
+  final Alignment alignment;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final BorderRadius? borderRadius;
+  final Color? backgroundColor;
+  final TextStyle? textStyle;
+  final Border? border;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +78,8 @@ class CustomActionButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null) ...[
+            children: <Widget>[
+              if (icon != null) ...<Widget>[
                 icon!,
                 if (title != null) const SizedBox(width: 5),
               ],
@@ -92,7 +91,7 @@ class CustomActionButton extends StatelessWidget {
                       const TextStyle(
                         fontSize: 12,
                       ),
-                )
+                ),
             ],
           ),
         ),

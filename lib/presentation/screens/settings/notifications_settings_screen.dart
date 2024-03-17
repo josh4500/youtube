@@ -38,9 +38,8 @@ class NotificationsSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      type: MaterialType.canvas,
       child: SettingsListView(
-        children: [
+        children: <Widget>[
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(

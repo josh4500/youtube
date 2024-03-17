@@ -37,7 +37,7 @@ Future<T?> showYourVideosMenu<T>(
   return showMenu<T>(
     context: context,
     position: position,
-    items: [
+    items: <PopupMenuEntry<T>>[
       PopupMenuItem(
         onTap: () {
           context.goto(AppRoutes.watchOnTv);

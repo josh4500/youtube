@@ -30,25 +30,24 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets/roulette_scroll.dart';
 
 class FrequencyPicker extends StatefulWidget {
-  final ValueChanged<Duration> onChange;
-  final Duration initialDuration;
-
   const FrequencyPicker({
     super.key,
     required this.onChange,
     required this.initialDuration,
   });
+  final ValueChanged<Duration> onChange;
+  final Duration initialDuration;
 
   @override
   State<FrequencyPicker> createState() => _FrequencyPickerState();
 }
 
 class _FrequencyPickerState extends State<FrequencyPicker> {
-  final _hourController = PageController(
+  final PageController _hourController = PageController(
     viewportFraction: 0.33,
     initialPage: 4,
   );
-  final _minuteController = PageController(
+  final PageController _minuteController = PageController(
     viewportFraction: 0.33,
     initialPage: 4,
   );
@@ -86,24 +85,24 @@ class _FrequencyPickerState extends State<FrequencyPicker> {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
+        children: <Widget>[
           const SizedBox(height: 16),
           Flexible(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
+              children: <Widget>[
                 Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
+                  children: <Widget>[
                     const Text('Hours'),
                     const SizedBox(height: 5),
                     Expanded(
                       child: RouletteScroll<int>(
                         // Items are generated between 0 to 23 hours
-                        items: List.generate(24, (index) => index),
+                        items: List.generate(24, (int index) => index),
                         initialValue: _hourDuration.inHours,
                         controller: _hourController,
-                        onPageChange: (hourValue) {
+                        onPageChange: (int hourValue) {
                           _hourDuration = Duration(hours: hourValue);
                           widget.onChange(_hourDuration + _minuteDuration);
                         },
@@ -113,16 +112,16 @@ class _FrequencyPickerState extends State<FrequencyPicker> {
                 ),
                 Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
+                  children: <Widget>[
                     const Text('Minutes'),
                     const SizedBox(height: 5),
                     Expanded(
                       child: RouletteScroll<int>(
                         // Items are generated between 5 to 55 minutes
-                        items: List.generate(12, (index) => index * 5),
+                        items: List.generate(12, (int index) => index * 5),
                         controller: _minuteController,
                         initialValue: _minuteDuration.inMinutes,
-                        onPageChange: (minuteValue) {
+                        onPageChange: (int minuteValue) {
                           _minuteDuration = Duration(minutes: minuteValue);
                           widget.onChange(_hourDuration + _minuteDuration);
                         },

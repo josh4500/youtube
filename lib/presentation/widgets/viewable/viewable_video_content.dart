@@ -34,19 +34,18 @@ import '../account_avatar.dart';
 import '../player/playback/playback_view.dart';
 
 class ViewableVideoContent extends StatelessWidget {
-  final VoidCallback? onTap;
-
   const ViewableVideoContent({super.key, this.onTap});
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: [
+      children: <Widget>[
         TappableArea(
           onPressed: onTap,
           padding: const EdgeInsets.only(bottom: 12),
           child: Column(
-            children: [
+            children: <Widget>[
               SizedBox(
                 height: 227,
                 width: double.infinity,
@@ -63,12 +62,12 @@ class ViewableVideoContent extends StatelessWidget {
                 ),
               ),
               Column(
-                children: [
+                children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children: <Widget>[
                         const SizedBox(width: 44),
                         Flexible(
                           child: Padding(
@@ -78,7 +77,7 @@ class ViewableVideoContent extends StatelessWidget {
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                              children: <Widget>[
                                 const Text(
                                   'Japan stocks: a minute\'s silence, then a slide | REUTERS',
                                   style: TextStyle(
@@ -88,11 +87,11 @@ class ViewableVideoContent extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 6),
                                 Row(
-                                  children: [
+                                  children: <Widget>[
                                     RichText(
                                       text: const TextSpan(
                                         text: 'REUTERS',
-                                        children: [
+                                        children: <InlineSpan>[
                                           TextSpan(text: ' · '),
                                           TextSpan(text: '309 views'),
                                           TextSpan(text: ' · '),
@@ -120,7 +119,7 @@ class ViewableVideoContent extends StatelessWidget {
                             width: 32,
                             height: 24,
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -164,7 +163,7 @@ class ViewableVideoContent extends StatelessWidget {
 
   static Widget shimmer() {
     return Column(
-      children: [
+      children: <Widget>[
         const Shimmer(
           height: 227,
           width: double.infinity,
@@ -173,13 +172,13 @@ class ViewableVideoContent extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               const Shimmer(width: 36, height: 36, shape: BoxShape.circle),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     Shimmer(
                       width: double.infinity,
                       height: 16,
@@ -200,10 +199,10 @@ class ViewableVideoContent extends StatelessWidget {
                     const SizedBox(height: 12),
                   ],
                 ),
-              )
+              ),
             ],
           ),
-        )
+        ),
       ],
     );
   }

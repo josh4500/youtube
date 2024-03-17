@@ -58,8 +58,8 @@ import 'widgets/video_description_section.dart';
 import 'widgets/video_description_sheet.dart';
 
 class PlayerScreen extends ConsumerStatefulWidget {
-  final double height;
   const PlayerScreen({super.key, required this.height});
+  final double height;
 
   @override
   ConsumerState<PlayerScreen> createState() => _PlayerScreenState();
@@ -70,20 +70,22 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   final GlobalKey _interactivePlayerKey = GlobalKey();
   final GlobalKey _portraitPlayerKey = GlobalKey();
 
-  final _infoScrollController = ScrollController();
-  final _infoScrollPhysics = const CustomScrollableScrollPhysics(
+  final ScrollController _infoScrollController = ScrollController();
+  final CustomScrollableScrollPhysics _infoScrollPhysics =
+      const CustomScrollableScrollPhysics(
     parent: AlwaysScrollableScrollPhysics(),
     tag: 'info',
   );
 
-  final _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
   late final AnimationController _zoomPanAnimationController;
 
   late final AnimationController _infoOpacityController;
-  late final Animation _infoOpacityAnimation;
+  late final Animation<double> _infoOpacityAnimation;
 
   late final AnimationController _draggableOpacityController;
-  late final Animation _draggableOpacityAnimation;
+  late final Animation<double> _draggableOpacityAnimation;
 
   late final ValueNotifier<double> additionalHeightNotifier;
 
@@ -103,15 +105,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   double get videoViewHeight {
-    // TODO: Determine value from Video Size either avg or max height
+    // TODO(Josh): Determine value from Video Size either avg or max height
     return avgVideoViewPortHeight;
   }
 
-  // TODO: Compute bool value
+  // TODO(Josh): Compute bool value
   bool get expandedMode => false;
 
   double get maxAdditionalHeight {
-    return (screenHeight * (1 - avgVideoViewPortHeight) / 1.5);
+    return screenHeight * (1 - avgVideoViewPortHeight) / 1.5;
   }
 
   double get additionalHeight => additionalHeightNotifier.value;
@@ -157,12 +159,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       curve: Curves.easeIn,
     );
 
-    additionalHeightNotifier = ValueNotifier<double>(clampDouble(
-      ((screenHeight * (1 - avgVideoViewPortHeight)) -
-          (screenHeight * (1 - videoViewHeight))),
-      0,
-      maxAdditionalHeight,
-    ));
+    additionalHeightNotifier = ValueNotifier<double>(
+      clampDouble(
+        (screenHeight * (1 - avgVideoViewPortHeight)) -
+            (screenHeight * (1 - videoViewHeight)),
+        0,
+        maxAdditionalHeight,
+      ),
+    );
 
     // Added a callback to animate info opacity when additional heights changes
     // (i.e when player going in or out of expanded mode)
@@ -172,7 +176,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       double opacityValue;
       if (expandedMode) {
         opacityValue =
-            (additionalHeight / (screenHeight - (heightRatio * screenHeight)));
+            additionalHeight / (screenHeight - (heightRatio * screenHeight));
         _draggableOpacityController.value = opacityValue;
       } else {
         opacityValue = additionalHeight / maxAdditionalHeight;
@@ -188,7 +192,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     widthNotifier = ValueNotifier<double>(1);
 
     sizeAnimation = CurvedAnimation(
-      parent: Animation.fromValueListenable(heightNotifier),
+      parent: Animation<double>.fromValueListenable(heightNotifier),
       curve: const Interval(minVideoViewPortHeight, 1),
     );
 
@@ -198,7 +202,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     heightNotifier.addListener(() {
       _recomputeDraggableHeight(heightNotifier.value);
-      final opacityValue = (1 - (heightNotifier.value - 0.45) / (1 - 0.45));
+      final double opacityValue =
+          1 - (heightNotifier.value - 0.45) / (1 - 0.45);
 
       _draggableOpacityController.value = opacityValue;
       if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
@@ -207,7 +212,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     });
 
     _transformationController.addListener(() {
-      final scale = _transformationController.value.getMaxScaleOnAxis();
+      final double scale = _transformationController.value.getMaxScaleOnAxis();
 
       if (scale != minPlayerScale) {
         _activeZoomPanning = true;
@@ -217,7 +222,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     });
 
     _descDraggableController.addListener(() {
-      final size = _descDraggableController.size;
+      final double size = _descDraggableController.size;
       if (size == 0 && heightNotifier.value != minVideoViewPortHeight) {
         _descIsOpened = false;
       }
@@ -226,7 +231,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     });
 
     _commentDraggableController.addListener(() {
-      final size = _commentDraggableController.size;
+      final double size = _commentDraggableController.size;
       if (size == 0 && heightNotifier.value != minVideoViewPortHeight) {
         _commentIsOpened = false;
       }
@@ -235,7 +240,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     });
 
     _chaptersDraggableController.addListener(() {
-      final size = _chaptersDraggableController.size;
+      final double size = _chaptersDraggableController.size;
       if (size == 0 && heightNotifier.value != minVideoViewPortHeight) {
         _chaptersIsOpened = false;
       }
@@ -243,14 +248,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _checkDraggableSizeToPause(size);
     });
 
-    Future(() async {
-      final playerRepo = ref.read(playerRepositoryProvider);
+    Future<void>(() async {
+      final PlayerRepository playerRepo = ref.read(playerRepositoryProvider);
 
       playerRepo.openVideo(); // Opens and play video
 
       // Listens to PlayerSignal events related to description and comments
       // Events are usually sent from PlayerLandscapeScreen
-      _subscription = playerRepo.playerSignalStream.listen((signal) {
+      _subscription =
+          playerRepo.playerSignalStream.listen((PlayerSignal signal) {
         if (signal == PlayerSignal.openDescription) {
           _openDescSheet(); // Opens description sheet in this screen
         } else if (signal == PlayerSignal.closeDescription) {
@@ -266,7 +272,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         } else if (signal == PlayerSignal.enterExpanded) {
           SystemChrome.setEnabledSystemUIMode(
             SystemUiMode.immersive,
-            overlays: [],
+            overlays: <SystemUiOverlay>[],
           );
         } else if (signal == PlayerSignal.exitExpanded) {
           SystemChrome.setEnabledSystemUIMode(
@@ -354,7 +360,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _commentDraggableController.jumpTo(0);
       } else {
         _commentDraggableController.jumpTo(
-          clampDouble(value - minVideoViewPortHeight, 0, (1 - heightRatio)),
+          clampDouble(value - minVideoViewPortHeight, 0, 1 - heightRatio),
         );
       }
     }
@@ -363,7 +369,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _descDraggableController.jumpTo(0);
       } else {
         _descDraggableController.jumpTo(
-          clampDouble(value - minVideoViewPortHeight, 0, (1 - heightRatio)),
+          clampDouble(value - minVideoViewPortHeight, 0, 1 - heightRatio),
         );
       }
     }
@@ -373,7 +379,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _descDraggableController.jumpTo(0);
       } else {
         _descDraggableController.jumpTo(
-          clampDouble(value - minVideoViewPortHeight, 0, (1 - heightRatio)),
+          clampDouble(value - minVideoViewPortHeight, 0, 1 - heightRatio),
         );
       }
     }
@@ -385,7 +391,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   ///   - scaleFactor: The scaling factor to be applied based on the swipe gesture.
   void _swipeZoomPan(double scaleFactor) {
     // Retrieve the last scale value from the transformation controller
-    final lastScaleValue = _transformationController.value.getMaxScaleOnAxis();
+    final double lastScaleValue =
+        _transformationController.value.getMaxScaleOnAxis();
 
     // Check if the last scale value is below a certain threshold
     if (lastScaleValue <= minPlayerScale + 0.5) {
@@ -397,7 +404,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       );
 
       // Create a new identity matrix and apply scaling
-      final updatedMatrix = Matrix4.identity();
+      final Matrix4 updatedMatrix = Matrix4.identity();
       updatedMatrix.scale(minPlayerScale * scaleFactor);
 
       // Update the transformation controller with the new matrix
@@ -408,7 +415,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Reverses the zoom and pan effect using an animation.
   Future<void> _reverseZoomPan() async {
     // Create a Matrix4Tween for the animation
-    final tween = Matrix4Tween(
+    final Animation<Matrix4> tween = Matrix4Tween(
       begin: _transformationController.value,
       end: Matrix4.identity(),
     ).animate(_zoomPanAnimationController);
@@ -437,12 +444,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Hides the player controls and save state whether control will be temporary
   /// hidden.
   void _hideControls([bool force = false]) {
-    var hide = ref.read(playerRepositoryProvider).playerViewState.showControls;
+    final bool hide =
+        ref.read(playerRepositoryProvider).playerViewState.showControls;
     if (hide || force) {
       _controlWasTempHidden = true && !force;
       ref
           .read(playerRepositoryProvider)
-          .sendPlayerSignal([PlayerSignal.hideControls]);
+          .sendPlayerSignal(<PlayerSignal>[PlayerSignal.hideControls]);
     }
   }
 
@@ -451,7 +459,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _controlWasTempHidden = false;
       ref
           .read(playerRepositoryProvider)
-          .sendPlayerSignal([PlayerSignal.showControls]);
+          .sendPlayerSignal(<PlayerSignal>[PlayerSignal.showControls]);
     }
   }
 
@@ -462,12 +470,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       // If visible, send a signal to hide controls
       ref
           .read(playerRepositoryProvider)
-          .sendPlayerSignal([PlayerSignal.hideControls]);
+          .sendPlayerSignal(<PlayerSignal>[PlayerSignal.hideControls]);
     } else {
       // If not visible, send a signal to show controls
       ref
           .read(playerRepositoryProvider)
-          .sendPlayerSignal([PlayerSignal.showControls]);
+          .sendPlayerSignal(<PlayerSignal>[PlayerSignal.showControls]);
     }
   }
 
@@ -480,7 +488,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     // Maximizes player
     if (widthNotifier.value != 1 && heightNotifier.value != 1) {
-      ref.read(playerRepositoryProvider).sendPlayerSignal([
+      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
         PlayerSignal.maximize,
         PlayerSignal.showPlaybackProgress,
       ]);
@@ -490,12 +498,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       widthNotifier.value = 1;
 
       if (ref.read(playerNotifierProvider).ended) {
-        ref.read(playerRepositoryProvider).sendPlayerSignal([
+        ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.showControls,
           PlayerSignal.hidePlaybackProgress,
         ]);
       }
-      // TODO: Check why _isSeeking is not released after ended seeking
+      // TODO(Josh): Check why _isSeeking is not released after ended seeking
       _isSeeking = false;
       _preventPlayerDragDown = false;
       _preventPlayerDragUp = false;
@@ -545,14 +553,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         marginNotifier.value = clampDouble(
           marginNotifier.value + details.delta.dy,
           0,
-          (screenHeight - (screenHeight * heightRatio)),
+          screenHeight - (screenHeight * heightRatio),
         );
       } else if (!_preventPlayerDragUp) {
         // If not preventing drag up, adjust additionalHeightNotifier
         additionalHeightNotifier.value = clampDouble(
           additionalHeightNotifier.value + details.delta.dy,
           0,
-          (screenHeight - (screenHeight * heightRatio)),
+          screenHeight - (screenHeight * heightRatio),
         );
       }
     } else {
@@ -564,7 +572,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
             marginNotifier.value = clampDouble(
               marginNotifier.value + details.delta.dy,
               0,
-              (screenHeight - (screenHeight * heightRatio)),
+              screenHeight - (screenHeight * heightRatio),
             );
           }
         } else {
@@ -610,7 +618,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       );
       ref
           .read(playerRepositoryProvider)
-          .sendPlayerSignal([PlayerSignal.hidePlaybackProgress]);
+          .sendPlayerSignal(<PlayerSignal>[PlayerSignal.hidePlaybackProgress]);
     } else {
       // Hide controls before showing zoom pan
       _hideControls();
@@ -637,8 +645,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _hideControls();
 
     // If preventing player drag up or down, return without further processing
-    if (details.delta.dy > 0 && _preventPlayerDragUp) return;
-    if (details.delta.dy < 0 && _preventPlayerDragDown) return;
+    if (details.delta.dy > 0 && _preventPlayerDragUp) {
+      return;
+    }
+    if (details.delta.dy < 0 && _preventPlayerDragDown) {
+      return;
+    }
 
     // Determine the drag behavior based on the player's state
     if (_expanded) {
@@ -661,11 +673,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       if (additionalHeight > maxAdditionalHeight) {
         ref
             .read(playerRepositoryProvider)
-            .sendPlayerSignal([PlayerSignal.enterExpanded]);
+            .sendPlayerSignal(<PlayerSignal>[PlayerSignal.enterExpanded]);
         additionalHeightNotifier.value =
             screenHeight - (screenHeight * heightRatio);
       } else {
-        ref.read(playerRepositoryProvider).sendPlayerSignal([
+        ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.exitExpanded,
           PlayerSignal.showPlaybackProgress,
         ]);
@@ -678,7 +690,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
       if (marginNotifier.value >
           (screenHeight - (screenHeight * heightRatio)) / 4) {
-        ref.read(playerRepositoryProvider).sendPlayerSignal([
+        ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.exitExpanded,
           PlayerSignal.showPlaybackProgress,
         ]);
@@ -694,8 +706,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _infoScrollPhysics.canScroll(true);
     } else {
       if (_isPlayerDraggingDown ?? false) {
-        final latestHeightVal = heightNotifier.value;
-        final velocityY = details.velocity.pixelsPerSecond.dy;
+        final double latestHeightVal = heightNotifier.value;
+        final double velocityY = details.velocity.pixelsPerSecond.dy;
 
         if (latestHeightVal >= 0.5) {
           heightNotifier.value = velocityY >= 200 ? minVideoViewPortHeight : 1;
@@ -711,12 +723,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       }
 
       if (widthNotifier.value == minVideoViewPortWidth) {
-        ref.read(playerRepositoryProvider).sendPlayerSignal([
+        ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.minimize,
           PlayerSignal.hidePlaybackProgress,
         ]);
       } else {
-        ref.read(playerRepositoryProvider).sendPlayerSignal([
+        ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.maximize,
           PlayerSignal.showPlaybackProgress,
         ]);
@@ -725,13 +737,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _infoScrollPhysics.canScroll(true);
 
       if (_activeZoomPanning) {
-        final velocityY = details.velocity.pixelsPerSecond.dy;
-        if (velocityY < -200) _openFullscreenPlayer();
+        final double velocityY = details.velocity.pixelsPerSecond.dy;
+        if (velocityY < -200) {
+          _openFullscreenPlayer();
+        }
       }
     }
 
     // Reversing zoom due to swiping up
-    final lastScaleValue = _transformationController.value.getMaxScaleOnAxis();
+    final double lastScaleValue =
+        _transformationController.value.getMaxScaleOnAxis();
     if (lastScaleValue <= minPlayerScale + 0.5 && lastScaleValue > 1.0) {
       if (lastScaleValue == minPlayerScale + 0.5) {
         _openFullscreenPlayer();
@@ -741,7 +756,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     // Shows controls if it was temporary hidden and avoids showing controls
     // when player is minimized
-    if (!_isMinimized) _showControls();
+    if (!_isMinimized) {
+      _showControls();
+    }
   }
 
   void _onDragInfo(PointerMoveEvent event) {
@@ -756,9 +773,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         );
         if (additionalHeight > 0) {
           // Hides the playback progress while animating "to" expanded view
-          ref
-              .read(playerRepositoryProvider)
-              .sendPlayerSignal([PlayerSignal.hidePlaybackProgress]);
+          ref.read(playerRepositoryProvider).sendPlayerSignal(
+              <PlayerSignal>[PlayerSignal.hidePlaybackProgress]);
 
           _hideControls();
         }
@@ -777,18 +793,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   void _onDragInfoUp(PointerUpEvent event) {
     if (additionalHeight > 0 && _allowInfoDrag) {
       if (additionalHeight > maxAdditionalHeight) {
-        ref.read(playerRepositoryProvider).sendPlayerSignal([
+        ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.enterExpanded,
         ]);
         additionalHeightNotifier.value =
             screenHeight - (screenHeight * heightRatio);
       } else {
         if (expandedMode) {
-          // TODO: Handle expanded mode
+          // TODO(Josh): Handle expanded mode
         } else {
           additionalHeightNotifier.value = 0;
 
-          ref.read(playerRepositoryProvider).sendPlayerSignal([
+          ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
             PlayerSignal.exitExpanded,
             PlayerSignal.showPlaybackProgress,
           ]);
@@ -796,7 +812,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         }
       }
     } else if (_allowInfoDrag && additionalHeight == 0) {
-      ref.read(playerRepositoryProvider).sendPlayerSignal([
+      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
         PlayerSignal.exitExpanded,
         PlayerSignal.showPlaybackProgress,
       ]);
@@ -811,23 +827,26 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   // Video Comment Sheet
   bool _commentIsOpened = false;
-  final _showCommentDraggable = ValueNotifier(false);
-  final _commentDraggableController = DraggableScrollableController();
-  final _replyIsOpenedNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _showCommentDraggable = ValueNotifier<bool>(false);
+  final DraggableScrollableController _commentDraggableController =
+      DraggableScrollableController();
+  final ValueNotifier<bool> _replyIsOpenedNotifier = ValueNotifier<bool>(false);
 
   /// Callback to open Comments draggable sheets
   Future<void> _openCommentSheet() async {
     _commentIsOpened = true;
-    final wait = !_showCommentDraggable.value;
+    final bool wait = !_showCommentDraggable.value;
     _showCommentDraggable.value = true;
 
-    if (wait) await Future.delayed(const Duration(milliseconds: 150));
+    if (wait) {
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+    }
     if (videoViewHeight != heightRatio && additionalHeight > 0) {
       additionalHeightNotifier.value = 0;
     }
 
     _commentDraggableController.animateTo(
-      (1 - heightRatio),
+      1 - heightRatio,
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeInCubic,
     );
@@ -850,21 +869,24 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   // Video Description Sheet
   bool _descIsOpened = false;
-  final _showDescDraggable = ValueNotifier(false);
-  final _descDraggableController = DraggableScrollableController();
-  final _transcriptNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _showDescDraggable = ValueNotifier<bool>(false);
+  final DraggableScrollableController _descDraggableController =
+      DraggableScrollableController();
+  final ValueNotifier<bool> _transcriptNotifier = ValueNotifier<bool>(false);
 
   Future<void> _openDescSheet() async {
     _descIsOpened = true;
-    final wait = !_showCommentDraggable.value;
+    final bool wait = !_showCommentDraggable.value;
     _showDescDraggable.value = true;
 
-    if (wait) await Future.delayed(const Duration(milliseconds: 150));
+    if (wait) {
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+    }
     if (videoViewHeight != heightRatio && additionalHeight > 0) {
       additionalHeightNotifier.value = 0;
     }
     _descDraggableController.animateTo(
-      (1 - heightRatio),
+      1 - heightRatio,
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeInCubic,
     );
@@ -886,24 +908,27 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   // Video Chapter
   bool _chaptersIsOpened = false;
-  final _showChaptersDraggable = ValueNotifier(false);
-  final _chaptersDraggableController = DraggableScrollableController();
+  final ValueNotifier<bool> _showChaptersDraggable = ValueNotifier<bool>(false);
+  final DraggableScrollableController _chaptersDraggableController =
+      DraggableScrollableController();
 
   Future<void> _openChaptersSheet() async {
     _chaptersIsOpened = true;
-    final wait = !_showChaptersDraggable.value;
+    final bool wait = !_showChaptersDraggable.value;
     _showChaptersDraggable.value = true;
 
-    if (wait) await Future.delayed(const Duration(milliseconds: 150));
+    if (wait) {
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+    }
 
-    // TODO: Check for expanded mode
+    // TODO(Josh): Check for expanded mode
     // Changes the additional heights to zero on Expanded mode
     if (videoViewHeight != heightRatio && additionalHeight > 0) {
       additionalHeightNotifier.value = 0;
     }
 
     _chaptersDraggableController.animateTo(
-      (1 - heightRatio),
+      1 - heightRatio,
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeInCubic,
     );
@@ -918,16 +943,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     );
   }
 
-  // TODO: Check if to use similar methods for Comments and Description
+  // TODO(Josh): Check if to use similar methods for Comments and Description
   void _closeChapterSheetSignal() {
     ref.read(playerRepositoryProvider).sendPlayerSignal(
-      [PlayerSignal.closeChapters],
+      <PlayerSignal>[PlayerSignal.closeChapters],
     );
   }
 
-  // TODO: Will add Membership sheet too
+  // TODO(Josh): Will add Membership sheet too
 
-  // TODO: Rename
+  // TODO(Josh): Rename
   bool _onScrollDynamicTab(ScrollNotification notification) {
     // Prevents info to be dragged down while scrolling in DynamicTab
     if (notification.depth >= 1) {
@@ -942,11 +967,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   @override
   Widget build(BuildContext context) {
-    final interactivePlayerView = PlayerComponentsWrapper(
+    final PlayerComponentsWrapper interactivePlayerView =
+        PlayerComponentsWrapper(
       key: _interactivePlayerKey,
-      handleNotification: (notification) {
+      handleNotification: (PlayerNotification notification) {
         if (notification is MinimizePlayerNotification) {
-          ref.read(playerRepositoryProvider).sendPlayerSignal([
+          ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
             PlayerSignal.minimize,
             PlayerSignal.hideControls,
             PlayerSignal.hidePlaybackProgress,
@@ -958,7 +984,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           additionalHeightNotifier.value = screenHeight * (1 - heightRatio);
           ref
               .read(playerRepositoryProvider)
-              .sendPlayerSignal([PlayerSignal.enterExpanded]);
+              .sendPlayerSignal(<PlayerSignal>[PlayerSignal.enterExpanded]);
         } else if (notification is DeExpandPlayerNotification) {
           if (expandedMode) {
             additionalHeightNotifier.value = maxAdditionalHeight;
@@ -966,14 +992,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
             additionalHeightNotifier.value = 0;
           }
           _hideControls();
-          ref.read(playerRepositoryProvider).sendPlayerSignal([
+          ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
             PlayerSignal.exitExpanded,
             PlayerSignal.showPlaybackProgress,
           ]);
         } else if (notification is EnterFullscreenPlayerNotification) {
           _openFullscreenPlayer();
         } else if (notification is SettingsPlayerNotification) {
-          // TODO: Open settings
+          // TODO(Josh): Open settings
         } else if (notification is SeekStartPlayerNotification) {
           _preventPlayerDragUp = true;
           _preventPlayerDragDown = true;
@@ -986,9 +1012,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       },
       child: ListenableBuilder(
         listenable: _transformationController,
-        builder: (context, childWidget) {
+        builder: (BuildContext context, Widget? childWidget) {
           return InteractiveViewer(
-            constrained: true,
             minScale: minPlayerScale,
             maxScale: maxPlayerScale,
             alignment: Alignment.center,
@@ -999,7 +1024,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         child: Hero(
           tag: 'player',
           child: ProviderScope(
-            overrides: [
+            overrides: <Override>[
               playerSizingProvider.overrideWithValue(
                 PlayerSizing(
                   minHeight: minVideoViewPortHeight,
@@ -1015,32 +1040,32 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       ),
     );
 
-    final playerRepo = ref.read(playerRepositoryProvider);
-    final miniPlayerProgress = PlaybackProgress(
+    final PlayerRepository playerRepo = ref.read(playerRepositoryProvider);
+    final PlaybackProgress miniPlayerProgress = PlaybackProgress(
       progress: playerRepo.videoProgressStream,
-      // TODO: Revisit this code
+      // TODO(Josh): Revisit this code
       start: playerRepo.currentVideoProgress ?? Progress.zero,
-      // TODO: Get ready value
+      // TODO(Josh): Get ready value
       end: const Duration(minutes: 1),
       showBuffer: false,
       backgroundColor: Colors.transparent,
     );
 
-    final infoScrollview = ScrollConfiguration(
+    final ScrollConfiguration infoScrollview = ScrollConfiguration(
       behavior: const NoOverScrollGlowBehavior(),
       child: NotificationListener<ScrollNotification>(
         onNotification: _onScrollDynamicTab,
         child: CustomScrollView(
           physics: _infoScrollPhysics,
           controller: _infoScrollController,
-          slivers: [
+          slivers: <Widget>[
             SliverToBoxAdapter(
               child: Stack(
                 clipBehavior: Clip.none,
-                children: [
+                children: <Widget>[
                   const PlayerAmbient(),
                   Column(
-                    children: [
+                    children: <Widget>[
                       VideoDescriptionSection(onTap: _openDescSheet),
                       const VideoChannelSection(),
                       const VideoContext(),
@@ -1082,7 +1107,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
             //     ),
             //   ),
             // ),
-            // TODO: Remove test
+            // TODO(Josh): Remove test
             const SliverToBoxAdapter(child: ViewableVideoContent()),
             const SliverToBoxAdapter(child: ViewableVideoContent()),
             const SliverToBoxAdapter(child: ViewableVideoContent()),
@@ -1094,9 +1119,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       ),
     );
 
-    return ValueListenableBuilder(
+    return ValueListenableBuilder<double>(
       valueListenable: heightNotifier,
-      builder: (context, value, childWidget) {
+      builder: (BuildContext context, double value, Widget? childWidget) {
         return SizedBox(
           key: _portraitPlayerKey,
           height: screenHeight * heightNotifier.value,
@@ -1109,16 +1134,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         child: Stack(
           alignment: Alignment.bottomCenter,
           clipBehavior: Clip.none,
-          children: [
+          children: <Widget>[
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ValueListenableBuilder(
+              children: <Widget>[
+                ValueListenableBuilder<double>(
                   valueListenable: heightNotifier,
-                  builder: (context, heightValue, miniPlayer) {
-                    return ValueListenableBuilder(
+                  builder: (BuildContext context, double heightValue,
+                      Widget? miniPlayer) {
+                    return ValueListenableBuilder<double>(
                       valueListenable: additionalHeightNotifier,
-                      builder: (context, addHeightValue, childWidget) {
+                      builder: (BuildContext context, double addHeightValue,
+                          Widget? childWidget) {
                         return SizedBox(
                           height: heightNotifier.value < 1
                               ? null
@@ -1128,12 +1155,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                             onVerticalDragUpdate: _onDragPlayer,
                             onVerticalDragEnd: _onDragPlayerEnd,
                             behavior: HitTestBehavior.opaque,
-                            child: ValueListenableBuilder(
+                            child: ValueListenableBuilder<double>(
                               valueListenable: widthNotifier,
-                              builder: (context, widthValue, _) {
+                              builder:
+                                  (BuildContext context, double widthValue, _) {
                                 return Stack(
                                   clipBehavior: Clip.none,
-                                  children: [
+                                  children: <Widget>[
                                     Align(
                                       alignment: Alignment.topRight,
                                       child: MiniPlayer(
@@ -1145,9 +1173,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                     ),
                                     Align(
                                       alignment: Alignment.centerLeft,
-                                      child: ValueListenableBuilder(
+                                      child: ValueListenableBuilder<double>(
                                         valueListenable: marginNotifier,
-                                        builder: (context, marginValue, _) {
+                                        builder: (BuildContext context,
+                                            double marginValue, _) {
                                           return Container(
                                             margin: EdgeInsets.only(
                                               top: marginValue,
@@ -1191,14 +1220,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                     );
                   },
                 ),
-                // TODO: Create custom column and overlap first child on top of second
+                // TODO(Josh): Create custom column and overlap first child on top of second
                 Flexible(
                   child: Listener(
                     onPointerMove: _onDragInfo,
                     onPointerUp: _onDragInfoUp,
                     child: AnimatedBuilder(
                       animation: _infoOpacityAnimation,
-                      builder: (context, childWidget) {
+                      builder: (BuildContext context, Widget? childWidget) {
                         return Opacity(
                           opacity: _infoOpacityAnimation.value,
                           child: childWidget,
@@ -1210,23 +1239,24 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                 ),
               ],
             ),
-            ValueListenableBuilder(
+            ValueListenableBuilder<bool>(
               valueListenable: _showCommentDraggable,
-              builder: (context, show, childWidget) {
-                if (!show) return const SizedBox();
+              builder: (BuildContext context, bool show, Widget? childWidget) {
+                if (!show) {
+                  return const SizedBox();
+                }
                 return DraggableScrollableSheet(
                   snap: true,
                   minChildSize: 0,
-                  maxChildSize: 1,
                   initialChildSize: 0,
-                  snapSizes: const [0.0, (1 - avgVideoViewPortHeight)],
+                  snapSizes: const <double>[0.0, (1 - avgVideoViewPortHeight)],
                   shouldCloseOnMinExtent: false,
                   controller: _commentDraggableController,
                   snapAnimationDuration: const Duration(milliseconds: 300),
-                  builder: (context, controller) {
+                  builder: (BuildContext context, ScrollController controller) {
                     return AnimatedBuilder(
                       animation: _draggableOpacityAnimation,
-                      builder: (_, childWidget) {
+                      builder: (_, Widget? childWidget) {
                         return Opacity(
                           opacity: _draggableOpacityAnimation.value,
                           child: childWidget,
@@ -1244,13 +1274,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                 );
               },
             ),
-            ValueListenableBuilder(
+            ValueListenableBuilder<bool>(
               valueListenable: _showDescDraggable,
-              builder: (context, show, childWidget) {
-                if (!show) return const SizedBox();
+              builder: (BuildContext context, bool show, Widget? childWidget) {
+                if (!show) {
+                  return const SizedBox();
+                }
                 return AnimatedBuilder(
                   animation: _draggableOpacityAnimation,
-                  builder: (_, childWidget) {
+                  builder: (_, Widget? childWidget) {
                     return Opacity(
                       opacity: _draggableOpacityAnimation.value,
                       child: childWidget,
@@ -1259,13 +1291,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                   child: DraggableScrollableSheet(
                     snap: true,
                     minChildSize: 0,
-                    maxChildSize: 1,
                     initialChildSize: 0,
-                    snapSizes: const [0.0, (1 - avgVideoViewPortHeight)],
+                    snapSizes: const <double>[
+                      0.0,
+                      (1 - avgVideoViewPortHeight)
+                    ],
                     shouldCloseOnMinExtent: false,
                     controller: _descDraggableController,
                     snapAnimationDuration: const Duration(milliseconds: 300),
-                    builder: (context, controller) {
+                    builder:
+                        (BuildContext context, ScrollController controller) {
                       return VideoDescriptionSheet(
                         controller: controller,
                         closeDescription: _closeDescSheet,
@@ -1277,13 +1312,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                 );
               },
             ),
-            ValueListenableBuilder(
+            ValueListenableBuilder<bool>(
               valueListenable: _showChaptersDraggable,
-              builder: (context, show, childWidget) {
-                if (!show) return const SizedBox();
+              builder: (BuildContext context, bool show, Widget? childWidget) {
+                if (!show) {
+                  return const SizedBox();
+                }
                 return AnimatedBuilder(
                   animation: _draggableOpacityAnimation,
-                  builder: (_, childWidget) {
+                  builder: (_, Widget? childWidget) {
                     return Opacity(
                       opacity: _draggableOpacityAnimation.value,
                       child: childWidget,
@@ -1292,13 +1329,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                   child: DraggableScrollableSheet(
                     snap: true,
                     minChildSize: 0,
-                    maxChildSize: 1,
                     initialChildSize: 0,
-                    snapSizes: const [0.0, (1 - avgVideoViewPortHeight)],
+                    snapSizes: const <double>[
+                      0.0,
+                      (1 - avgVideoViewPortHeight)
+                    ],
                     shouldCloseOnMinExtent: false,
                     controller: _chaptersDraggableController,
                     snapAnimationDuration: const Duration(milliseconds: 300),
-                    builder: (context, controller) {
+                    builder:
+                        (BuildContext context, ScrollController controller) {
                       return VideoChaptersSheet(
                         controller: controller,
                         closeChapter: _closeChapterSheetSignal,

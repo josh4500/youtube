@@ -38,9 +38,8 @@ class DataSavingSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      type: MaterialType.canvas,
       child: SettingsListView(
-        children: [
+        children: <Widget>[
           SettingsTile(
             title: 'Data Saving mode',
             summary: 'Automatically adjusts settings to save mobile data',

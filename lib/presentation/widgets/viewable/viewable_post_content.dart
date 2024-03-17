@@ -36,7 +36,7 @@ class ViewablePostContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         const Divider(thickness: 1.5, height: 0),
         Padding(
           padding: const EdgeInsets.only(
@@ -45,7 +45,7 @@ class ViewablePostContent extends StatelessWidget {
             bottom: 8.0,
           ),
           child: Row(
-            children: [
+            children: <Widget>[
               const Padding(
                 padding: EdgeInsets.all(6.0),
                 child: AccountAvatar(),
@@ -55,7 +55,7 @@ class ViewablePostContent extends StatelessWidget {
                   padding: EdgeInsets.all(6.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: <Widget>[
                       Text(
                         'ByteByteGo',
                         style: TextStyle(
@@ -103,7 +103,7 @@ class ViewablePostContent extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.all(16.0),
           child: Row(
-            children: [
+            children: <Widget>[
               Icon(Icons.thumb_up_outlined),
               SizedBox(width: 8),
               Text('104'),
@@ -115,7 +115,7 @@ class ViewablePostContent extends StatelessWidget {
               Text('2'),
             ],
           ),
-        )
+        ),
       ],
     );
   }

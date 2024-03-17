@@ -27,10 +27,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class RouteInfo {
+  RouteInfo({required this.name, required this.path});
   final String name;
   final String path;
-
-  RouteInfo({required this.name, required this.path});
 
   RouteInfo withPrefixParent(RouteInfo parent) {
     return RouteInfo(
@@ -41,25 +40,25 @@ class RouteInfo {
 }
 
 class AppRoutes {
-  static final dashboard = RouteInfo(
+  static final RouteInfo dashboard = RouteInfo(
     name: 'Dashboard',
     path: '/',
   );
 
-  static final home = RouteInfo(
+  static final RouteInfo home = RouteInfo(
     name: 'home',
     path: '/home',
   );
 
-  static final shorts = RouteInfo(
+  static final RouteInfo shorts = RouteInfo(
     name: 'shorts',
     path: '/shorts',
   );
-  static final shortsSubscription = RouteInfo(
+  static final RouteInfo shortsSubscription = RouteInfo(
     name: 'shorts subscription',
     path: '/shorts/subscription',
   );
-  static final shortsLive = RouteInfo(
+  static final RouteInfo shortsLive = RouteInfo(
     name: 'live subscription',
     path: '/shorts/live',
   );
@@ -69,12 +68,12 @@ class AppRoutes {
   /// Channel
   ///
   ///
-  static final channel = RouteInfo(
+  static final RouteInfo channel = RouteInfo(
     name: 'channel',
     path: 'channel',
   );
 
-  static final channelDescription = RouteInfo(
+  static final RouteInfo channelDescription = RouteInfo(
     name: 'channel description',
     path: 'channel/description',
   );
@@ -85,12 +84,12 @@ class AppRoutes {
   ///
   ///
 
-  static final subscriptions = RouteInfo(
+  static final RouteInfo subscriptions = RouteInfo(
     name: 'subscriptions',
     path: '/subscriptions',
   );
 
-  static final allSubscriptions = RouteInfo(
+  static final RouteInfo allSubscriptions = RouteInfo(
     name: 'all subscriptions',
     path: 'subscriptions/all',
   );
@@ -101,35 +100,35 @@ class AppRoutes {
   ///
   ///
 
-  static final accounts = RouteInfo(
+  static final RouteInfo accounts = RouteInfo(
     name: 'accounts',
     path: '/accounts',
   );
-  static final accountChannel = RouteInfo(
+  static final RouteInfo accountChannel = RouteInfo(
     name: 'accounts channel',
     path: 'accounts/channel',
   );
-  static final watchHistory = RouteInfo(
+  static final RouteInfo watchHistory = RouteInfo(
     name: 'watch history',
     path: 'accounts/watch-history',
   );
-  static final accountPlaylists = RouteInfo(
+  static final RouteInfo accountPlaylists = RouteInfo(
     name: 'account playlists',
     path: 'accounts/playlists',
   );
-  static final yourClips = RouteInfo(
+  static final RouteInfo yourClips = RouteInfo(
     name: 'account clips',
     path: 'accounts/clips',
   );
-  static final yourMovies = RouteInfo(
+  static final RouteInfo yourMovies = RouteInfo(
     name: 'account movies',
     path: 'accounts/movies',
   );
-  static final yourVideos = RouteInfo(
+  static final RouteInfo yourVideos = RouteInfo(
     name: 'account videos',
     path: 'accounts/videos',
   );
-  static final downloads = RouteInfo(
+  static final RouteInfo downloads = RouteInfo(
     name: 'account downloads',
     path: 'accounts/downloads',
   );
@@ -140,7 +139,7 @@ class AppRoutes {
   ///
   ///
 
-  static final playlist = RouteInfo(
+  static final RouteInfo playlist = RouteInfo(
     name: 'playlist',
     path: 'playlist',
   );
@@ -150,11 +149,11 @@ class AppRoutes {
   /// Watch on TV
   ///
   ///
-  static final watchOnTv = RouteInfo(
+  static final RouteInfo watchOnTv = RouteInfo(
     name: 'watchOnTv',
     path: '/watchOnTv',
   );
-  static final linkTv = RouteInfo(
+  static final RouteInfo linkTv = RouteInfo(
     name: 'linkTv',
     path: '/linkTv',
   );
@@ -164,7 +163,7 @@ class AppRoutes {
   /// Settings
   ///
   ///
-  static final settings = RouteInfo(
+  static final RouteInfo settings = RouteInfo(
     name: 'settings',
     path: '/settings',
   );
@@ -173,7 +172,7 @@ class AppRoutes {
   /// Player
   ///
 
-  static final playerLandscapeScreen = RouteInfo(
+  static final RouteInfo playerLandscapeScreen = RouteInfo(
     name: 'player',
     path: '/player/landscape',
   );

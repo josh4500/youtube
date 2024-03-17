@@ -43,7 +43,7 @@ class DownloadsScreen extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        actions: [
+        actions: <Widget>[
           AppbarAction(
             icon: Icons.cast_outlined,
             onTap: () {},
@@ -54,8 +54,8 @@ class DownloadsScreen extends StatelessWidget {
           ),
           AppbarAction(
             icon: Icons.more_vert_outlined,
-            onTapDown: (details) {
-              final position = details.globalPosition;
+            onTapDown: (TapDownDetails details) {
+              final Offset position = details.globalPosition;
             },
           ),
         ],

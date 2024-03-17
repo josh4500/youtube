@@ -39,29 +39,30 @@ class AutoPlaySettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final preferences = ref.watch(preferencesProvider);
+    final PreferenceState preferences = ref.watch(preferencesProvider);
     return Material(
-      type: MaterialType.canvas,
       child: SettingsListView(
-        children: [
+        children: <Widget>[
           SettingsTile(
             title: 'Autoplay next video',
             summary: 'When you finish a video, another plays automatically',
             onTap: () {},
           ),
           SettingsTile(
-              title: 'Mobile phone/tablet',
-              prefOption: PrefOption(
-                  type: PrefOptionType.toggle,
-                  value: preferences.autoplay,
-                  onToggle: () {
-                    ref.read(preferencesProvider.notifier).autoPlay =
-                        !preferences.autoplay;
-                  }),
-              onTap: () {
+            title: 'Mobile phone/tablet',
+            prefOption: PrefOption(
+              type: PrefOptionType.toggle,
+              value: preferences.autoplay,
+              onToggle: () {
                 ref.read(preferencesProvider.notifier).autoPlay =
                     !preferences.autoplay;
-              }),
+              },
+            ),
+            onTap: () {
+              ref.read(preferencesProvider.notifier).autoPlay =
+                  !preferences.autoplay;
+            },
+          ),
         ],
       ),
     );

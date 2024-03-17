@@ -29,25 +29,15 @@
 import 'package:flutter/material.dart';
 
 class StackedPosition {
+  StackedPosition({this.top, this.bottom, this.left, this.right});
+
   final double? top;
   final double? bottom;
   final double? left;
   final double? right;
-
-  StackedPosition({this.top, this.bottom, this.left, this.right});
 }
 
 class TappableArea extends StatefulWidget {
-  final Widget child;
-  final HitTestBehavior? behavior;
-  final EdgeInsets padding;
-  final Alignment stackedAlignment;
-  final StackedPosition? stackedPosition;
-  final Widget? stackedChild;
-  final BorderRadius? borderRadius;
-  final VoidCallback? onPressed;
-  final VoidCallback? onLongPress;
-
   const TappableArea({
     super.key,
     this.padding = const EdgeInsets.symmetric(
@@ -63,6 +53,15 @@ class TappableArea extends StatefulWidget {
     this.onPressed,
     this.onLongPress,
   });
+  final Widget child;
+  final HitTestBehavior? behavior;
+  final EdgeInsets padding;
+  final Alignment stackedAlignment;
+  final StackedPosition? stackedPosition;
+  final Widget? stackedChild;
+  final BorderRadius? borderRadius;
+  final VoidCallback? onPressed;
+  final VoidCallback? onLongPress;
 
   @override
   State<TappableArea> createState() => _TappableAreaState();
@@ -122,7 +121,7 @@ class _TappableAreaState extends State<TappableArea>
       ),
     );
 
-    _controller.addStatusListener((status) {
+    _controller.addStatusListener((AnimationStatus status) {
       if (status == AnimationStatus.reverse) {
         _reversing = true;
       } else if (status == AnimationStatus.completed) {
@@ -142,7 +141,7 @@ class _TappableAreaState extends State<TappableArea>
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: [
+      children: <Widget>[
         GestureDetector(
           behavior: widget.behavior,
           onTap: widget.onPressed,
@@ -152,7 +151,7 @@ class _TappableAreaState extends State<TappableArea>
           onTapCancel: () async => await _controller.reverse(),
           child: AnimatedBuilder(
             animation: _backgroundAnimation,
-            builder: (context, backgroundChild) {
+            builder: (BuildContext context, Widget? backgroundChild) {
               return DecoratedBox(
                 decoration: BoxDecoration(
                   // Border animation will show only when reversing
@@ -160,7 +159,7 @@ class _TappableAreaState extends State<TappableArea>
                   color: _backgroundAnimation.value,
                   borderRadius: widget.borderRadius ?? BorderRadius.circular(2),
                 ),
-                child: backgroundChild!,
+                child: backgroundChild,
               );
             },
             child: Padding(

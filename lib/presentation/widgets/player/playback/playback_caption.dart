@@ -31,7 +31,7 @@ import 'package:flutter/material.dart';
 class PlaybackCaption extends StatelessWidget {
   const PlaybackCaption({super.key});
 
-  // TODO: Use CustomPainter or Use RoundedText package
+  // TODO(Josh): Use CustomPainter or Use RoundedText package
   @override
   Widget build(BuildContext context) {
     return Container(

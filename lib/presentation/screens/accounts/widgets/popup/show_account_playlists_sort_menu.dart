@@ -34,8 +34,8 @@ Future<T?> showAccountPlaylistsSortMenu<T>(
 ) async {
   return showMenu<T>(
     context: context,
-    position: const RelativeRect.fromLTRB(0, 0, 0, 0),
-    items: [
+    position: RelativeRect.fill,
+    items: <PopupMenuEntry<T>>[
       PopupMenuItem(
         child: TappableArea(
           onPressed: () {},

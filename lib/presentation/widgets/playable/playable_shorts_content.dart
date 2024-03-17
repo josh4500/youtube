@@ -29,16 +29,15 @@
 import 'package:flutter/material.dart';
 
 class PlayableShortsContent extends StatelessWidget {
-  final double? width;
-  final double? height;
-  final VoidCallback? onTap;
-
   const PlayableShortsContent({
     super.key,
     this.width,
     this.height,
     this.onTap,
   });
+  final double? width;
+  final double? height;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +58,7 @@ class PlayableShortsContent extends StatelessWidget {
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+            children: <Widget>[
               const Align(
                 alignment: Alignment.topRight,
                 child: Icon(

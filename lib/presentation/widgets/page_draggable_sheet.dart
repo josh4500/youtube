@@ -9,6 +9,25 @@ import 'over_scroll_glow_behavior.dart';
 import 'persistent_header_delegate.dart';
 
 class PageDraggableSheet extends StatefulWidget {
+  const PageDraggableSheet({
+    super.key,
+    required this.title,
+    this.subtitle,
+    required this.scrollTag,
+    this.borderRadius = BorderRadius.zero,
+    required this.controller,
+    required this.onClose,
+    required this.showDragIndicator,
+    required this.draggableController,
+    required this.contentBuilder,
+    this.dynamicTab,
+    required this.baseHeight,
+    this.dynamicTabShowOffset = 100,
+    this.actions = const <Widget>[],
+    this.overlayChildren = const <PageDraggableOverlayChild>[],
+    this.onOpenOverlayChild,
+  });
+
   final String scrollTag;
   final String title;
   final String? subtitle;
@@ -28,25 +47,6 @@ class PageDraggableSheet extends StatefulWidget {
   final DynamicTab? dynamicTab;
   final double dynamicTabShowOffset;
   final double baseHeight;
-
-  const PageDraggableSheet({
-    super.key,
-    required this.title,
-    this.subtitle,
-    required this.scrollTag,
-    this.borderRadius = BorderRadius.zero,
-    required this.controller,
-    required this.onClose,
-    required this.showDragIndicator,
-    required this.draggableController,
-    required this.contentBuilder,
-    this.dynamicTab,
-    required this.baseHeight,
-    this.dynamicTabShowOffset = 100,
-    this.actions = const <Widget>[],
-    this.overlayChildren = const <PageDraggableOverlayChild>[],
-    this.onOpenOverlayChild,
-  });
 
   @override
   State<PageDraggableSheet> createState() => _PageDraggableSheetState();
@@ -71,7 +71,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
     _dynamicTabNotifier = ValueNotifier<bool>(widget.dynamicTab != null);
 
     for (int i = 0; i < widget.overlayChildren.length; i++) {
-      final overlayChild = widget.overlayChildren[i];
+      final PageDraggableOverlayChild overlayChild = widget.overlayChildren[i];
       overlayChild.controller.addListener(() => _onOpenOverlayChild(i));
     }
 
@@ -82,7 +82,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
   }
 
   Future<void> _onOpenOverlayChild(int index) async {
-    final opened = widget.overlayChildren[index].controller.isOpened;
+    final bool opened = widget.overlayChildren[index].controller.isOpened;
     if (widget.dynamicTab != null) {
       if (opened) {
         _overlayChildOpenCount += 1;
@@ -99,7 +99,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
           _overlayChildIndex = null;
         } else {}
 
-        _overlayChildQueue.removeWhere((val) => val == index);
+        _overlayChildQueue.removeWhere((int val) => val == index);
         if (_innerListController.offset < 100) {
           _dynamicTabNotifier.value = true;
         }
@@ -118,7 +118,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
   @override
   void dispose() {
     _innerListController.dispose();
-    for (final overlayChild in widget.overlayChildren) {
+    for (final PageDraggableOverlayChild overlayChild
+        in widget.overlayChildren) {
       overlayChild.controller.dispose();
     }
     super.dispose();
@@ -129,7 +130,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
       if (_innerListController.offset == 0 && !_overlayAnyChildIsOpened) {
         _changeDraggableSize(_innerListPhysics, event);
       } else if (_overlayAnyChildIsOpened && _overlayChildIndex != null) {
-        final controller =
+        final PageDraggableOverlayChildController controller =
             widget.overlayChildren[_overlayChildIndex!].controller;
         if (controller._scrollController.offset == 0 && controller.isOpened) {
           _changeDraggableSize(controller._scrollPhysics, event);
@@ -142,11 +143,11 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
     CustomScrollableScrollPhysics scrollPhysics,
     PointerMoveEvent event,
   ) {
-    final yDist = event.delta.dy;
-    final height = MediaQuery.sizeOf(context).height;
-    final size = widget.draggableController!.size;
+    final double yDist = event.delta.dy;
+    final double height = MediaQuery.sizeOf(context).height;
+    final double size = widget.draggableController!.size;
 
-    final newSize = event.delta.dy < 0 && size <= widget.baseHeight
+    final double newSize = event.delta.dy < 0 && size <= widget.baseHeight
         ? clampDouble(size - (yDist / height), 0, widget.baseHeight)
         : clampDouble(size - (yDist / height), 0, 1);
     if (newSize >= widget.baseHeight) {
@@ -166,7 +167,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
               .canScroll(true);
         }
       }
-      final size = widget.draggableController!.size;
+      final double size = widget.draggableController!.size;
       if ((size != 0.0 || size != widget.baseHeight) && size != 1) {
         widget.draggableController!.animateTo(
           size < widget.baseHeight / 2 ? 0.0 : widget.baseHeight,
@@ -179,7 +180,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
 
   void _closeSheet() {
     if (_overlayAnyChildIsOpened) {
-      for (var element in widget.overlayChildren) {
+      for (final PageDraggableOverlayChild element in widget.overlayChildren) {
         element.controller.close();
       }
     }
@@ -196,11 +197,15 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
           behavior: const NoOverScrollGlowBehavior(),
           child: CustomScrollView(
             controller: widget.controller,
-            slivers: [
-              ValueListenableBuilder(
+            slivers: <Widget>[
+              ValueListenableBuilder<bool>(
                 valueListenable: _dynamicTabNotifier,
-                builder: (context, showDynamicTabs, childWidget) {
-                  // TODO: Fix pointer being recognized in scrollable below SliverPersistentHeader
+                builder: (
+                  BuildContext context,
+                  bool showDynamicTabs,
+                  Widget? childWidget,
+                ) {
+                  // TODO(Josh): Fix pointer being recognized in scrollable below SliverPersistentHeader
                   return SliverPersistentHeader(
                     pinned: true,
                     floating: true,
@@ -210,7 +215,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
                       child: Material(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
-                          children: [
+                          children: <Widget>[
                             if (widget.showDragIndicator)
                               Container(
                                 height: 4,
@@ -226,9 +231,9 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
                             const SizedBox(height: 4),
                             childWidget!,
                             const SizedBox(height: 18),
-                            if (showDynamicTabs) ...[
+                            if (showDynamicTabs) ...<Widget>[
                               Column(
-                                children: [
+                                children: <Widget>[
                                   SizedBox(
                                     height: 40,
                                     child: widget.dynamicTab,
@@ -249,9 +254,9 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
                     horizontal: 12.0,
                   ),
                   child: Stack(
-                    children: [
+                    children: <Widget>[
                       Row(
-                        children: [
+                        children: <Widget>[
                           Text(
                             widget.title,
                             style: const TextStyle(
@@ -280,27 +285,27 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
                           ),
                         ],
                       ),
-                      for (final overlayChild in widget.overlayChildren)
+                      for (final PageDraggableOverlayChild overlayChild
+                          in widget.overlayChildren)
                         _OverlayChildTitle(controller: overlayChild.controller),
                     ],
                   ),
                 ),
               ),
               SliverFillRemaining(
-                hasScrollBody: true,
-                fillOverscroll: false,
                 child: Listener(
                   onPointerMove: _onPointerMoveOnSheetContent,
                   onPointerUp: _onPointerLeaveOnSheetContent,
                   child: Stack(
                     alignment: Alignment.bottomCenter,
-                    children: [
+                    children: <Widget>[
                       widget.contentBuilder(
                         context,
                         _innerListController,
                         _innerListPhysics,
                       ),
-                      for (final overlayChild in widget.overlayChildren)
+                      for (final PageDraggableOverlayChild overlayChild
+                          in widget.overlayChildren)
                         overlayChild,
                     ],
                   ),
@@ -315,18 +320,17 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
 }
 
 class PageDraggableOverlayChild extends StatefulWidget {
+  const PageDraggableOverlayChild({
+    super.key,
+    required this.controller,
+    required this.builder,
+  });
   final PageDraggableOverlayChildController controller;
   final Widget Function(
     BuildContext context,
     ScrollController controller,
     CustomScrollableScrollPhysics scrollPhysics,
   ) builder;
-
-  const PageDraggableOverlayChild({
-    super.key,
-    required this.controller,
-    required this.builder,
-  });
 
   @override
   State<PageDraggableOverlayChild> createState() =>
@@ -348,7 +352,7 @@ class _PageDraggableOverlayChildState extends State<PageDraggableOverlayChild>
     );
     slideAnimation = Tween<Offset>(
       begin: const Offset(1, 0),
-      end: const Offset(0, 0),
+      end: Offset.zero,
     ).animate(controller);
     widget.controller.addListener(() {
       if (widget.controller.isOpened) {
@@ -383,16 +387,16 @@ class _PageDraggableOverlayChildState extends State<PageDraggableOverlayChild>
 }
 
 class PageDraggableOverlayChildController extends ChangeNotifier {
-  final String title;
-  final _scrollController = ScrollController();
-  final _scrollPhysics = const CustomScrollableScrollPhysics(tag: 'innerchild');
-
-  bool _isOpened = false;
-  bool get isOpened => _isOpened;
-
   PageDraggableOverlayChildController({
     required this.title,
   });
+  final String title;
+  final ScrollController _scrollController = ScrollController();
+  final CustomScrollableScrollPhysics _scrollPhysics =
+      const CustomScrollableScrollPhysics(tag: 'innerChild');
+
+  bool _isOpened = false;
+  bool get isOpened => _isOpened;
 
   void open() {
     _isOpened = true;
@@ -406,9 +410,8 @@ class PageDraggableOverlayChildController extends ChangeNotifier {
 }
 
 class _OverlayChildTitle extends StatefulWidget {
-  final PageDraggableOverlayChildController controller;
-
   const _OverlayChildTitle({required this.controller});
+  final PageDraggableOverlayChildController controller;
 
   @override
   State<_OverlayChildTitle> createState() => _OverlayChildTitleState();
@@ -433,7 +436,7 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
     );
     slideAnimation = Tween<Offset>(
       begin: const Offset(1, 0),
-      end: const Offset(0, 0),
+      end: Offset.zero,
     ).animate(controller);
 
     widget.controller.addListener(() {
@@ -460,7 +463,7 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
         child: Material(
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: [
+            children: <Widget>[
               InkWell(
                 borderRadius: BorderRadius.circular(32),
                 onTap: widget.controller.close,

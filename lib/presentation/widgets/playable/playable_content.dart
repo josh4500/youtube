@@ -29,13 +29,6 @@
 import 'package:flutter/material.dart';
 
 class PlayableContent extends StatelessWidget {
-  final bool isPlaylist;
-  final Axis direction;
-
-  // TODO: rename width and height
-  final double? width;
-  final double? height;
-
   const PlayableContent({
     super.key,
     this.width,
@@ -43,19 +36,25 @@ class PlayableContent extends StatelessWidget {
     this.isPlaylist = false,
     this.direction = Axis.vertical,
   });
+  final bool isPlaylist;
+  final Axis direction;
+
+  // TODO(Josh): rename width and height
+  final double? width;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
     return Flex(
       direction: direction,
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         SizedBox(
           width: width,
           height: height,
           child: Column(
-            children: [
-              if (isPlaylist) ...[
+            children: <Widget>[
+              if (isPlaylist) ...<Widget>[
                 Container(
                   height: 4,
                   margin: const EdgeInsets.symmetric(
@@ -76,7 +75,7 @@ class PlayableContent extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: Stack(
                     alignment: Alignment.bottomRight,
-                    children: [
+                    children: <Widget>[
                       Container(
                         color: Colors.white38,
                       ),
@@ -96,7 +95,7 @@ class PlayableContent extends StatelessWidget {
                           ),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: [
+                            children: <Widget>[
                               Icon(
                                 Icons.playlist_play,
                                 size: 18,
@@ -129,11 +128,11 @@ class PlayableContent extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: <Widget>[
                 const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: <Widget>[
                       Text(
                         'CNC',
                         maxLines: 2,

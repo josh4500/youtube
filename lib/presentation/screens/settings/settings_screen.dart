@@ -37,6 +37,7 @@ import 'package:youtube_clone/presentation/screens/settings/video_quality_settin
 import 'package:youtube_clone/presentation/screens/settings/widgets/settings_popup_container.dart';
 import 'package:youtube_clone/presentation/screens/settings/widgets/settings_tile.dart';
 import 'package:youtube_clone/presentation/theme/app_theme.dart';
+import 'package:youtube_clone/presentation/theme/relative_size.dart';
 import 'package:youtube_clone/presentation/widgets/lazy_indexed_stack.dart';
 
 import '../../../generated/l10n.dart';
@@ -61,7 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _mostRecentSettingScreen = 1;
   String _currentSettingsTitle = 'Settings';
 
-  final List<Widget> _settingsPages = const [
+  final List<Widget> _settingsPages = const <Widget>[
     GeneralSettingsScreen(),
     DataSavingSettingsScreen(),
     AutoPlaySettingsScreen(),
@@ -173,9 +174,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final settingsTileSize = DeviceTheme.of(context).settingsTileSize;
-    final settingsList = SettingsListView(
-      children: [
+    final RelativeSizing settingsTileSize =
+        DeviceTheme.of(context).settingsTileSize;
+    final SettingsListView settingsList = SettingsListView(
+      children: <Widget>[
         SettingsTile(
           title: S.current.general,
           onTap: () => _showSettingsPrefScreen(S.current.general),
@@ -275,26 +277,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     return PopScope(
       canPop: false,
-      onPopInvoked: (canPop) => _onNavigateBack(),
+      onPopInvoked: (bool canPop) => _onNavigateBack(),
       child: Scaffold(
         appBar: AppBar(
           leading: BackButton(onPressed: _onNavigateBack),
           title: Text(_currentSettingsTitle),
         ),
         body: CustomOrientationBuilder(
-          onPortrait: (_, child) {
+          onPortrait: (_, Widget? child) {
             return LazyIndexedStack(
               index: _currentSettingScreen,
-              children: [
+              children: <Widget>[
                 settingsList,
                 ..._settingsPages,
               ],
             );
           },
-          onLandscape: (_, child) {
+          onLandscape: (_, Widget? child) {
             return Row(
               mainAxisSize: MainAxisSize.min,
-              children: [
+              children: <Widget>[
                 SizedBox(
                   width: settingsTileSize.widthValueOf(_),
                   child: settingsList,
@@ -304,7 +306,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     index: _mostRecentSettingScreen - 1,
                     children: _settingsPages,
                   ),
-                )
+                ),
               ],
             );
           },

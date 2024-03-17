@@ -31,19 +31,6 @@ import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/theme/app_theme.dart';
 
 class SettingsPopupContainer<T> extends StatelessWidget {
-  final String title;
-  final String? subtitle;
-  final Widget? action;
-  final bool showTitle;
-  final VisualDensity? density;
-  final Alignment alignment;
-  final SettingsPopupContainerController<T>? controller;
-  final bool showDismissButtons;
-  final bool showAffirmButton;
-  final bool capitalizeDismissButtons;
-  final ValueChanged<T?>? onAffirm;
-  final Widget child;
-
   const SettingsPopupContainer({
     super.key,
     this.action,
@@ -82,7 +69,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
       child: Scrollbar(
         child: ListView.builder(
           shrinkWrap: true,
-          itemBuilder: (context, index) {
+          itemBuilder: (BuildContext context, int index) {
             return itemBuilder!(context, index);
           },
           itemCount: itemCount,
@@ -90,12 +77,24 @@ class SettingsPopupContainer<T> extends StatelessWidget {
       ),
     );
   }
+  final String title;
+  final String? subtitle;
+  final Widget? action;
+  final bool showTitle;
+  final VisualDensity? density;
+  final Alignment alignment;
+  final SettingsPopupContainerController<T>? controller;
+  final bool showDismissButtons;
+  final bool showAffirmButton;
+  final bool capitalizeDismissButtons;
+  final ValueChanged<T?>? onAffirm;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final effectiveController =
+    final SettingsPopupContainerController<T> effectiveController =
         controller ?? SettingsPopupContainerController();
-    final width = density == null
+    final double width = density == null
         ? MediaQuery.sizeOf(context).width * 0.85
         : density == VisualDensity.compact
             ? MediaQuery.sizeOf(context).width * 0.5
@@ -114,11 +113,11 @@ class SettingsPopupContainer<T> extends StatelessWidget {
           ),
           child: ListenableBuilder(
             listenable: effectiveController,
-            builder: (context, _) {
+            builder: (BuildContext context, _) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: <Widget>[
                   if (showTitle)
                     Padding(
                       padding:
@@ -127,10 +126,10 @@ class SettingsPopupContainer<T> extends StatelessWidget {
                         crossAxisAlignment: density == VisualDensity.compact
                             ? CrossAxisAlignment.center
                             : CrossAxisAlignment.start,
-                        children: [
+                        children: <Widget>[
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
+                            children: <Widget>[
                               Text(
                                 title,
                                 style: const TextStyle(fontSize: 18),
@@ -138,7 +137,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
                               if (action != null) action!,
                             ],
                           ),
-                          if (subtitle != null) ...[
+                          if (subtitle != null) ...<Widget>[
                             const SizedBox(height: 16),
                             Text(
                               subtitle!,
@@ -162,7 +161,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
+                        children: <Widget>[
                           TextButton(
                             onPressed: context.pop,
                             style:

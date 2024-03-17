@@ -32,18 +32,17 @@ import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dar
 import 'package:youtube_clone/presentation/widgets/player/playback/playback_progress.dart';
 
 import '../../widgets/appbar_action.dart';
-import 'widgets/shorts_comments_bottom_sheet.dart';
 import 'widgets/shorts_category_actions.dart';
+import 'widgets/shorts_comments_bottom_sheet.dart';
 
 class ShortsScreen extends StatefulWidget {
-  final bool isSubscription;
-  final bool isLive;
-
   const ShortsScreen({
     super.key,
     this.isSubscription = false,
     this.isLive = false,
   });
+  final bool isSubscription;
+  final bool isLive;
 
   @override
   State<ShortsScreen> createState() => _ShortsScreenState();
@@ -56,7 +55,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
   );
 
   int _currentIndex = 0;
-  final _isPaused = ValueNotifier(false);
+  final ValueNotifier<bool> _isPaused = ValueNotifier<bool>(false);
   bool get _isMainScreen => !widget.isSubscription && !widget.isLive;
   bool get _isSubscriptionScreen => widget.isSubscription;
   bool get _isLiveScreen => widget.isLive;
@@ -65,10 +64,12 @@ class _ShortsScreenState extends State<ShortsScreen> {
   final ValueNotifier<bool> _replyIsOpenedNotifier = ValueNotifier<bool>(false);
 
   bool _commentOpened = false;
-  final _draggableController = DraggableScrollableController();
+  final DraggableScrollableController _draggableController =
+      DraggableScrollableController();
 
-  final ValueNotifier<double> playerBottomPadding = ValueNotifier(0);
-  final ValueNotifier<ScrollPhysics> physicsNotifier = ValueNotifier(
+  final ValueNotifier<double> playerBottomPadding = ValueNotifier<double>(0);
+  final ValueNotifier<ScrollPhysics> physicsNotifier =
+      ValueNotifier<ScrollPhysics>(
     const AlwaysScrollableScrollPhysics(),
   );
 
@@ -116,7 +117,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
   }
 
   void _scrollPhysicsCallback() {
-    final size = _draggableController.size;
+    final double size = _draggableController.size;
     if (size > 0) {
       physicsNotifier.value = const NeverScrollableScrollPhysics();
     } else {
@@ -125,9 +126,9 @@ class _ShortsScreenState extends State<ShortsScreen> {
   }
 
   void _resizeCallBack() {
-    final size = _draggableController.size;
-    final screenHeight = MediaQuery.sizeOf(context).height - 8;
-    final calc = (screenHeight * size) - (kToolbarHeight + 12);
+    final double size = _draggableController.size;
+    final double screenHeight = MediaQuery.sizeOf(context).height - 8;
+    final double calc = (screenHeight * size) - (kToolbarHeight + 12);
 
     if (calc <= screenHeight) {
       playerBottomPadding.value = calc <= 0 ? 0 : calc;
@@ -147,7 +148,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: [
+      children: <Widget>[
         SafeArea(
           bottom: false,
           child: Scaffold(
@@ -167,7 +168,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
                 ),
               ),
               backgroundColor: Colors.transparent,
-              actions: const [
+              actions: const <Widget>[
                 AppbarAction(
                   icon: Icons.search,
                 ),
@@ -180,10 +181,10 @@ class _ShortsScreenState extends State<ShortsScreen> {
               ],
             ),
             body: Stack(
-              children: [
+              children: <Widget>[
                 ScrollConfiguration(
                   behavior: const OverScrollGlowBehavior(enabled: false),
-                  child: NotificationListener(
+                  child: NotificationListener<ScrollNotification>(
                     onNotification: (ScrollNotification notification) {
                       if (notification is ScrollEndNotification) {
                         _progressVisibilityNotifier.value = true;
@@ -192,17 +193,18 @@ class _ShortsScreenState extends State<ShortsScreen> {
                       }
                       return false;
                     },
-                    child: ValueListenableBuilder(
+                    child: ValueListenableBuilder<ScrollPhysics>(
                       valueListenable: physicsNotifier,
-                      builder: (context, physics, _) {
+                      builder:
+                          (BuildContext context, ScrollPhysics physics, _) {
                         return PageView.builder(
                           physics: physics,
                           scrollDirection: Axis.vertical,
-                          itemBuilder: (context, index) {
+                          itemBuilder: (BuildContext context, int index) {
                             return Stack(
-                              children: [
+                              children: <Widget>[
                                 Column(
-                                  children: [
+                                  children: <Widget>[
                                     Expanded(
                                       child: GestureDetector(
                                         onTap: _pausePlay,
@@ -214,15 +216,15 @@ class _ShortsScreenState extends State<ShortsScreen> {
                                                 : _isLiveScreen
                                                     ? 'https://dummyimage.com/360x700/11101e/fff.jpg'
                                                     : 'https://dummyimage.com/360x700/c7b01e/fff.jpg',
-                                            alignment: Alignment.center,
                                             fit: BoxFit.fitHeight,
                                           ),
                                         ),
                                       ),
                                     ),
-                                    ValueListenableBuilder(
+                                    ValueListenableBuilder<double>(
                                       valueListenable: playerBottomPadding,
-                                      builder: (context, value, _) {
+                                      builder: (BuildContext context,
+                                          double value, _) {
                                         return SizedBox(
                                           height: value,
                                           width: double.infinity,
@@ -239,7 +241,8 @@ class _ShortsScreenState extends State<ShortsScreen> {
                                 ),
                                 ListenableBuilder(
                                   listenable: _isPaused,
-                                  builder: (context, childWidget) {
+                                  builder: (BuildContext context,
+                                      Widget? childWidget) {
                                     if (_showCategoryActions &&
                                         index == _currentIndex) {
                                       return childWidget!;
@@ -264,7 +267,8 @@ class _ShortsScreenState extends State<ShortsScreen> {
                   alignment: Alignment.bottomCenter,
                   child: ValueListenableBuilder<bool>(
                     valueListenable: _progressVisibilityNotifier,
-                    builder: (context, visible, childWidget) {
+                    builder: (BuildContext context, bool visible,
+                        Widget? childWidget) {
                       return Visibility(
                         visible: visible,
                         child: childWidget!,
@@ -282,13 +286,12 @@ class _ShortsScreenState extends State<ShortsScreen> {
         DraggableScrollableSheet(
           snap: true,
           minChildSize: 0,
-          maxChildSize: 1,
           initialChildSize: 0,
-          snapSizes: const [0.0, 0.68],
+          snapSizes: const <double>[0.0, 0.68],
           shouldCloseOnMinExtent: false,
           controller: _draggableController,
           snapAnimationDuration: const Duration(milliseconds: 300),
-          builder: (context, controller) {
+          builder: (BuildContext context, ScrollController controller) {
             return ShortsCommentsBottomSheet(
               controller: controller,
               replyNotifier: _replyIsOpenedNotifier,

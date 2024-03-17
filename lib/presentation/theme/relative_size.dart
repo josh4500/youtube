@@ -30,12 +30,6 @@ import 'package:flutter/widgets.dart';
 
 /// A utility class for handling relative sizing in Flutter.
 class RelativeSizing {
-  /// Width ratio to be used for relative sizing.
-  final double? wRatio;
-
-  /// Height ratio to be used for relative sizing.
-  final double? hRatio;
-
   /// Creates a [RelativeSizing] instance with the specified width and height ratios.
   ///
   /// If both [wRatio] and [hRatio] are null, the resulting size will be (0,0).
@@ -44,6 +38,12 @@ class RelativeSizing {
     this.wRatio,
     this.hRatio,
   });
+
+  /// Width ratio to be used for relative sizing.
+  final double? wRatio;
+
+  /// Height ratio to be used for relative sizing.
+  final double? hRatio;
 
   /// Computes the size based on the specified [BuildContext].
   ///
@@ -106,34 +106,3 @@ class RelativeSizing {
     return hRatio * MediaQuery.of(context).size.height;
   }
 }
-
-// TODO: Finish implementation
-// class RelativeConstraintSizing {
-//   final double wMinRatio;
-//   final double wMaxSize;
-//   final double hMinRatio;
-//   final double hMaxSize;
-//
-//   RelativeConstraintSizing({
-//     this.wMinRatio = 0,
-//     this.wMaxSize = 0,
-//     this.hMinRatio = 0,
-//     this.hMaxSize = 0,
-//   });
-//
-//   Size _valueOf(BuildContext context) {
-//     return Size(
-//       wMinRatio * MediaQuery.of(context).size.width,
-//       hMinRatio * MediaQuery.of(context).size.height,
-//     );
-//   }
-//
-//   double heightValueOf(BuildContext context) {
-//     return _valueOf(context).height;
-//   }
-//
-//   double widthValueOf(BuildContext context) {
-//     return _valueOf(context).width;
-//   }
-// }
-//

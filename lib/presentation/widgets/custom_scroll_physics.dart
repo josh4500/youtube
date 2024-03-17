@@ -29,9 +29,10 @@
 import 'package:flutter/widgets.dart';
 
 class CustomScrollableScrollPhysics extends ScrollPhysics {
-  static final Map<String, bool> _shouldScroll = {};
-  final String tag;
   const CustomScrollableScrollPhysics({super.parent, required this.tag});
+
+  static final Map<String, bool> _shouldScroll = <String, bool>{};
+  final String tag;
 
   @override
   CustomScrollableScrollPhysics applyTo(ScrollPhysics? ancestor) {

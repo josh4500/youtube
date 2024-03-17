@@ -74,10 +74,10 @@ class _YourMoviesScreenState extends State<YourMoviesScreen>
       appBar: AppBar(
         title: AnimatedBuilder(
           animation: animation,
-          builder: (context, child) {
+          builder: (BuildContext context, Widget? child) {
             return Opacity(
               opacity: animation.value,
-              child: child!,
+              child: child,
             );
           },
           child: const Text(
@@ -87,7 +87,7 @@ class _YourMoviesScreenState extends State<YourMoviesScreen>
             ),
           ),
         ),
-        actions: [
+        actions: <Widget>[
           AppbarAction(
             icon: Icons.cast_outlined,
             onTap: () {},
@@ -98,8 +98,8 @@ class _YourMoviesScreenState extends State<YourMoviesScreen>
           ),
           AppbarAction(
             icon: Icons.more_vert_outlined,
-            onTapDown: (details) async {
-              final position = details.globalPosition;
+            onTapDown: (TapDownDetails details) async {
+              final Offset position = details.globalPosition;
               await showYourMoviesMenu(
                 context,
                 RelativeRect.fromLTRB(position.dx, 0, 0, 0),
@@ -114,7 +114,7 @@ class _YourMoviesScreenState extends State<YourMoviesScreen>
         ),
         child: CustomScrollView(
           controller: controller,
-          slivers: const [
+          slivers: const <Widget>[
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(
@@ -122,7 +122,7 @@ class _YourMoviesScreenState extends State<YourMoviesScreen>
                   horizontal: 16,
                 ),
                 child: Row(
-                  children: [
+                  children: <Widget>[
                     Icon(
                       Icons.movie_sharp,
                       size: 36,
@@ -142,7 +142,7 @@ class _YourMoviesScreenState extends State<YourMoviesScreen>
             SliverToBoxAdapter(child: SizedBox(height: 128)),
             SliverFillRemaining(
               child: Column(
-                children: [
+                children: <Widget>[
                   Spacer(flex: 2),
                   Text(
                     'You don\'t have any purchases',
@@ -160,10 +160,10 @@ class _YourMoviesScreenState extends State<YourMoviesScreen>
                       color: Colors.grey,
                     ),
                   ),
-                  Spacer(flex: 1),
+                  Spacer(),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

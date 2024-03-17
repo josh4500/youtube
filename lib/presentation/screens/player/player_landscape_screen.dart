@@ -29,13 +29,10 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/video_comment_sheet.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/video_description_sheet.dart';
 import 'package:youtube_clone/presentation/widgets/custom_scroll_physics.dart';
@@ -59,12 +56,14 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
     with TickerProviderStateMixin {
   final GlobalKey _interactivePlayerKey = GlobalKey();
 
-  final _infoScrollController = ScrollController();
-  final _infoScrollPhysics = const CustomScrollableScrollPhysics(
+  final ScrollController _infoScrollController = ScrollController();
+  final CustomScrollableScrollPhysics _infoScrollPhysics =
+      const CustomScrollableScrollPhysics(
     tag: 'info-landscape',
   );
 
-  final _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
 
   bool _preventPlayerDragUp = true;
   bool _preventPlayerDragDown = true;
@@ -79,12 +78,12 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
   double get screenWidth => MediaQuery.sizeOf(context).width;
 
   bool _descIsOpened = false;
-  final _transcriptionNotifier = ValueNotifier(false);
+  final ValueNotifier<bool> _transcriptionNotifier = ValueNotifier<bool>(false);
   late final AnimationController _descController;
   late final Animation<double> _descAnimation;
 
   bool _commentIsOpened = false;
-  final _replyNotifier = ValueNotifier(false);
+  final ValueNotifier<bool> _replyNotifier = ValueNotifier<bool>(false);
   late final AnimationController _commentController;
   late final Animation<double> _commentAnimation;
 
@@ -101,12 +100,12 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0),
+      begin: Offset.zero,
       end: const Offset(0, .05),
     ).animate(_viewController);
 
     _scaleAnimation = _viewController.drive(
-      Tween(begin: 1, end: 0.95),
+      Tween<double>(begin: 1, end: 0.95),
     );
 
     _descController = AnimationController(
@@ -133,16 +132,17 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
       reverseCurve: Curves.bounceInOut,
     );
 
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
       ref.read(playerRepositoryProvider).sendPlayerSignal(
-        [PlayerSignal.enterFullscreen],
+        <PlayerSignal>[PlayerSignal.enterFullscreen],
       );
     });
 
-    Future(() async {
+    Future<void>(() async {
       await setLandscapeMode();
-      final playerRepo = ref.read(playerRepositoryProvider);
-      _subscription = playerRepo.playerSignalStream.listen((signal) {
+      final PlayerRepository playerRepo = ref.read(playerRepositoryProvider);
+      _subscription =
+          playerRepo.playerSignalStream.listen((PlayerSignal signal) {
         if (signal == PlayerSignal.openDescription) {
           _openDesc(); // Opens description in this screen
         } else if (signal == PlayerSignal.openComments) {
@@ -166,7 +166,7 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
   }
 
   void _closeDesc() {
-    ref.read(playerRepositoryProvider).sendPlayerSignal([
+    ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
       PlayerSignal.hideControls,
       PlayerSignal.closeDescription,
     ]);
@@ -179,7 +179,7 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
   }
 
   void _closeComment() {
-    ref.read(playerRepositoryProvider).sendPlayerSignal([
+    ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
       PlayerSignal.hideControls,
       PlayerSignal.closeComments,
     ]);
@@ -193,12 +193,12 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
       // If visible, send a signal to hide controls
       ref
           .read(playerRepositoryProvider)
-          .sendPlayerSignal([PlayerSignal.hideControls]);
+          .sendPlayerSignal(<PlayerSignal>[PlayerSignal.hideControls]);
     } else {
       // If not visible, send a signal to show controls
       ref
           .read(playerRepositoryProvider)
-          .sendPlayerSignal([PlayerSignal.showControls]);
+          .sendPlayerSignal(<PlayerSignal>[PlayerSignal.showControls]);
     }
   }
 
@@ -225,13 +225,13 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
   }
 
   Future<void> setLandscapeMode() async {
-    await SystemChrome.setPreferredOrientations([
+    await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
     await SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.immersiveSticky,
-      overlays: [],
+      overlays: <SystemUiOverlay>[],
     );
   }
 
@@ -248,13 +248,13 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
   void _hideControls() {
     ref
         .read(playerRepositoryProvider)
-        .sendPlayerSignal([PlayerSignal.hideControls]);
+        .sendPlayerSignal(<PlayerSignal>[PlayerSignal.hideControls]);
   }
 
   /// Closes the player in fullscreen mode by sending a player signal
   Future<void> _closeFullscreenPlayer() async {
     ref.read(playerRepositoryProvider).sendPlayerSignal(
-      [PlayerSignal.exitFullscreen],
+      <PlayerSignal>[PlayerSignal.exitFullscreen],
     );
     await resetOrientation();
     if (mounted) {
@@ -264,13 +264,14 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final interactivePlayerView = PlayerComponentsWrapper(
+    final PlayerComponentsWrapper interactivePlayerView =
+        PlayerComponentsWrapper(
       key: _interactivePlayerKey,
-      handleNotification: (notification) {
+      handleNotification: (PlayerNotification notification) {
         if (notification is ExitFullscreenPlayerNotification) {
           _closeFullscreenPlayer();
         } else if (notification is SettingsPlayerNotification) {
-          // TODO: Open settings
+          // TODO(Josh): Open settings
         } else if (notification is SeekStartPlayerNotification) {
           _preventPlayerDragUp = true;
           _preventPlayerDragDown = true;
@@ -283,9 +284,8 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
       },
       child: ListenableBuilder(
         listenable: _transformationController,
-        builder: (context, childWidget) {
+        builder: (BuildContext context, Widget? childWidget) {
           return InteractiveViewer(
-            constrained: true,
             minScale: minPlayerScale,
             maxScale: maxPlayerScale,
             alignment: Alignment.center,
@@ -296,7 +296,7 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
         child: Hero(
           tag: 'player',
           child: ProviderScope(
-            overrides: [
+            overrides: <Override>[
               playerSizingProvider.overrideWithValue(
                 PlayerSizing(
                   minHeight: 1,
@@ -318,11 +318,11 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
         child: ScaleTransition(
           scale: _scaleAnimation,
           child: Row(
-            children: [
+            children: <Widget>[
               Expanded(
                 child: Stack(
                   fit: StackFit.expand,
-                  children: [
+                  children: <Widget>[
                     GestureDetector(
                       onTap: _onTapPlayer,
                       onVerticalDragUpdate: _onDragPlayer,
@@ -334,7 +334,7 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
                 ),
               ),
               Row(
-                children: [
+                children: <Widget>[
                   SizeTransition(
                     sizeFactor: _descAnimation,
                     axis: Axis.horizontal,

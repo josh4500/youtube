@@ -30,21 +30,21 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-// TODO: Use clipper to create if channel is live
+// TODO(Josh): Use clipper to create if channel is live
 class AccountAvatar extends StatelessWidget {
+  const AccountAvatar({super.key, this.size, this.onTap});
   final double? size;
   final VoidCallback? onTap;
-  const AccountAvatar({super.key, this.size, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    bool hasLive = Random().nextBool();
+    final bool hasLive = Random().nextBool();
     return GestureDetector(
       onTap: onTap,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
-        children: [
+        children: <Widget>[
           Container(
             width: size ?? 50,
             height: size ?? 50,
@@ -87,7 +87,7 @@ class AccountAvatar extends StatelessWidget {
 class LiveCustomPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
+    final Paint paint = Paint()
       ..strokeWidth = 2
       ..color = const Color(0xFFFF0000)
       ..style = PaintingStyle.stroke;

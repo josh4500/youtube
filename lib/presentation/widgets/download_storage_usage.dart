@@ -36,20 +36,20 @@ class DownloadStorageUsage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
-        children: [
+        children: <Widget>[
           const LinearProgressIndicator(
             backgroundColor: Colors.grey,
             value: 0,
-            valueColor: AlwaysStoppedAnimation(Colors.blue),
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
             minHeight: 12,
           ),
           const SizedBox(height: 2),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+            children: <Widget>[
               Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [
+                children: <Widget>[
                   Container(
                     height: 12,
                     width: 12,
@@ -59,12 +59,12 @@ class DownloadStorageUsage extends StatelessWidget {
                   const Text(
                     'O MB used',
                     style: TextStyle(fontSize: 12),
-                  )
+                  ),
                 ],
               ),
               Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [
+                children: <Widget>[
                   const Text(
                     '4.5 GB free',
                     style: TextStyle(fontSize: 12),
@@ -78,7 +78,7 @@ class DownloadStorageUsage extends StatelessWidget {
                 ],
               ),
             ],
-          )
+          ),
         ],
       ),
     );

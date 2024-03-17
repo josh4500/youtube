@@ -30,24 +30,23 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets/clip_thumb_clipper.dart';
 
 class PlayableClipContent extends StatelessWidget {
-  // TODO: rename width and height
-  final double? width;
-  final double? height;
-
   const PlayableClipContent({
     super.key,
     this.width,
     this.height,
   });
+  // TODO(Josh): rename width and height
+  final double? width;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         Stack(
           alignment: Alignment.bottomRight,
-          children: [
+          children: <Widget>[
             ClipPath(
               clipper: ClipThumbClipper(),
               child: Container(
@@ -71,7 +70,7 @@ class PlayableClipContent extends StatelessWidget {
               ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [
+                children: <Widget>[
                   Icon(
                     Icons.content_cut_outlined,
                     size: 13,
@@ -93,11 +92,11 @@ class PlayableClipContent extends StatelessWidget {
         const Flexible(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: <Widget>[
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     Text(
                       'Lazy loading',
                       maxLines: 3,

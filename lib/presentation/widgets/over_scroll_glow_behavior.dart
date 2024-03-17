@@ -29,13 +29,13 @@
 import 'package:flutter/material.dart';
 
 class OverScrollGlowBehavior extends ScrollBehavior {
-  final Color color;
-  final bool enabled;
-
   const OverScrollGlowBehavior({
     this.color = Colors.transparent,
     this.enabled = true,
   });
+
+  final Color color;
+  final bool enabled;
 
   @override
   Widget buildOverscrollIndicator(

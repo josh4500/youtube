@@ -32,16 +32,6 @@ import '../../custom_action_chip.dart';
 import '../../over_scroll_glow_behavior.dart';
 
 class ViewableGroupContent extends StatelessWidget {
-  final String title;
-  final double? width;
-  final double? height;
-  final EdgeInsets? padding;
-  final Axis direction;
-  final ScrollPhysics? physics;
-  final VoidCallback? onTap;
-  final Widget Function(BuildContext context, int index) itemBuilder;
-  final int? itemCount;
-
   const ViewableGroupContent({
     super.key,
     required this.title,
@@ -54,13 +44,22 @@ class ViewableGroupContent extends StatelessWidget {
     this.onTap,
     this.itemCount,
   });
+  final String title;
+  final double? width;
+  final double? height;
+  final EdgeInsets? padding;
+  final Axis direction;
+  final ScrollPhysics? physics;
+  final VoidCallback? onTap;
+  final Widget Function(BuildContext context, int index) itemBuilder;
+  final int? itemCount;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         Stack(
-          children: [
+          children: <Widget>[
             ListTile(
               title: Text(
                 title,

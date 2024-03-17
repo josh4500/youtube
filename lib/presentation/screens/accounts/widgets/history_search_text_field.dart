@@ -29,10 +29,9 @@
 import 'package:flutter/material.dart';
 
 class HistorySearchTextField extends StatefulWidget {
+  const HistorySearchTextField({super.key, this.controller, this.focusNode});
   final TextEditingController? controller;
   final FocusNode? focusNode;
-
-  const HistorySearchTextField({super.key, this.controller, this.focusNode});
 
   @override
   State<HistorySearchTextField> createState() => _HistorySearchTextFieldState();
@@ -85,7 +84,7 @@ class _HistorySearchTextFieldState extends State<HistorySearchTextField>
       padding: const EdgeInsets.only(left: 16),
       color: const Color(0xff2c2c2c),
       child: Row(
-        children: [
+        children: <Widget>[
           const Padding(
             padding: EdgeInsets.all(8.0),
             child: Icon(Icons.search),
@@ -103,12 +102,12 @@ class _HistorySearchTextFieldState extends State<HistorySearchTextField>
           ),
           ListenableBuilder(
             listenable: _effectiveController,
-            builder: (context, child) {
+            builder: (BuildContext context, Widget? child) {
               return AnimatedOpacity(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInCubic,
                 opacity: _effectiveController.text.isNotEmpty ? 1 : 0,
-                child: child!,
+                child: child,
               );
             },
             child: IconButton(
@@ -122,7 +121,6 @@ class _HistorySearchTextFieldState extends State<HistorySearchTextField>
           SizeTransition(
             sizeFactor: _animation,
             axis: Axis.horizontal,
-            axisAlignment: 0,
             child: ColoredBox(
               color: Colors.white12,
               child: TextButton(
@@ -138,7 +136,7 @@ class _HistorySearchTextFieldState extends State<HistorySearchTextField>
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

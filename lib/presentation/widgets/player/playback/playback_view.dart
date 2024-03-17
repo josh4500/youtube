@@ -33,8 +33,8 @@ import 'package:youtube_clone/presentation/widgets/player/playback/playback_dura
 import 'playback_progress.dart';
 
 class PlaybackView extends StatefulWidget {
-  final Widget placeholder;
   const PlaybackView({super.key, required this.placeholder});
+  final Widget placeholder;
 
   @override
   State<PlaybackView> createState() => _PlaybackViewState();
@@ -49,12 +49,12 @@ class _PlaybackViewState extends State<PlaybackView> {
   Widget build(BuildContext context) {
     return Stack(
       alignment: Alignment.topRight,
-      children: [
+      children: <Widget>[
         widget.placeholder,
         Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_showPlaybackControls) ...[
+          children: <Widget>[
+            if (_showPlaybackControls) ...<Widget>[
               IconButton(
                 onPressed: () {},
                 icon: const Icon(Icons.volume_off),
@@ -65,7 +65,7 @@ class _PlaybackViewState extends State<PlaybackView> {
               ),
             ],
             const Spacer(),
-            const PlaybackDuration()
+            const PlaybackDuration(),
           ],
         ),
         if (_showPlaybackControls && _showCaptions)

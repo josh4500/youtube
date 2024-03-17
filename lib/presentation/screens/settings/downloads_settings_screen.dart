@@ -50,11 +50,10 @@ class _DownloadsSettingsScreenState
     extends ConsumerState<DownloadsSettingsScreen> {
   @override
   Widget build(BuildContext context) {
-    final preferences = ref.watch(preferencesProvider);
+    final PreferenceState preferences = ref.watch(preferencesProvider);
     return Material(
-      type: MaterialType.canvas,
       child: SettingsListView(
-        children: [
+        children: <Widget>[
           const Padding(
             padding: EdgeInsets.all(16),
             child: Text(
@@ -67,7 +66,7 @@ class _DownloadsSettingsScreenState
           ),
           SettingsTile(
             title: 'Download quality',
-            onGenerateSummary: (pref) {
+            onGenerateSummary: (PrefOption pref) {
               return generateDownloadQualityTitle(pref.value);
             },
             prefOption: PrefOption<int>(
@@ -122,7 +121,7 @@ class _DownloadsSettingsScreenState
   }
 
   void _changeWifiOnly() {
-    final wifiOnly =
+    final bool wifiOnly =
         !ref.read(preferencesProvider).downloadPreferences.wifiOnly;
     ref
         .read(preferencesProvider.notifier)
@@ -130,7 +129,7 @@ class _DownloadsSettingsScreenState
   }
 
   void _changeRecommend() {
-    final recommend =
+    final bool recommend =
         !ref.read(preferencesProvider).downloadPreferences.recommend;
     ref
         .read(preferencesProvider.notifier)
@@ -138,24 +137,25 @@ class _DownloadsSettingsScreenState
   }
 
   Future<void> _onChangeDownloadQuality() async {
-    final qualities = [0, 1080, 720, 360, 144];
-    final result = await showDialog<int>(
+    final List<int> qualities = <int>[0, 1080, 720, 360, 144];
+    final int? result = await showDialog<int>(
       context: context,
       builder: (_) {
         return SettingsPopupContainer<int>.builder(
           title: 'Download quality',
-          itemBuilder: (_, index) {
-            final quality = qualities[index];
-            final title = generateDownloadQualityTitle(quality);
+          itemBuilder: (_, int index) {
+            final int quality = qualities[index];
+            final String title = generateDownloadQualityTitle(quality);
 
             return Consumer(
-              builder: (context, ref, _) {
-                final preferences = ref.watch(preferencesProvider);
+              builder: (BuildContext context, WidgetRef ref, _) {
+                final PreferenceState preferences =
+                    ref.watch(preferencesProvider);
                 return RoundCheckItem<int>(
                   title: title,
                   value: quality,
                   groupValue: preferences.downloadPreferences.quality,
-                  onChange: (value) {
+                  onChange: (int? value) {
                     if (value != null) {
                       context.pop(value);
                     }

@@ -30,10 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class CommentTile extends StatelessWidget {
-  final bool showReplies;
-  final VoidCallback? openReply;
-  final Color? backgroundColor;
-
   const CommentTile({
     super.key,
     this.showReplies = true,
@@ -41,12 +37,16 @@ class CommentTile extends StatelessWidget {
     this.backgroundColor,
   });
 
+  final bool showReplies;
+  final VoidCallback? openReply;
+  final Color? backgroundColor;
+
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
       color: backgroundColor ?? Colors.transparent,
       child: Column(
-        children: [
+        children: <Widget>[
           TappableArea(
             onPressed: openReply,
             padding: const EdgeInsets.all(16),
@@ -64,7 +64,7 @@ class CommentTile extends StatelessWidget {
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: <Widget>[
                 const CircleAvatar(
                   backgroundColor: Colors.grey,
                   maxRadius: 16,
@@ -75,13 +75,13 @@ class CommentTile extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 2.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children: <Widget>[
                         Row(
-                          children: [
+                          children: <Widget>[
                             RichText(
                               text: const TextSpan(
                                 text: '@BussyBoyBonanza',
-                                children: [
+                                children: <InlineSpan>[
                                   TextSpan(text: ' · '),
                                   TextSpan(text: '7mo ago'),
                                 ],
@@ -99,7 +99,7 @@ class CommentTile extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         const Row(
-                          children: [
+                          children: <Widget>[
                             Icon(
                               Icons.thumb_up_outlined,
                               size: 14,
@@ -131,10 +131,10 @@ class CommentTile extends StatelessWidget {
               ],
             ),
           ),
-          if (showReplies) ...[
+          if (showReplies) ...<Widget>[
             const SizedBox(height: 8),
             Row(
-              children: [
+              children: <Widget>[
                 const SizedBox(width: 52),
                 TappableArea(
                   onPressed: openReply,

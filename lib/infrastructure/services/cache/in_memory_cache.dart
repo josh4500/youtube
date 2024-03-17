@@ -31,21 +31,22 @@ import 'dart:async';
 import 'cache_provider.dart';
 
 class InMemoryCache<E> extends CacheProvider<E> {
-  static final Map<String, Map<String, dynamic>> _generalStore = {};
+  InMemoryCache(this.name) {
+    _generalStore[name] ??= <String, Map<String, dynamic>>{};
+  }
+  static final Map<String, Map<String, dynamic>> _generalStore =
+      <String, Map<String, dynamic>>{};
   Map<String, E> get _store => _generalStore[name]!.cast<String, E>();
 
   final String name;
-  final _controller = StreamController<(String, E)>.broadcast();
-
-  InMemoryCache(this.name) {
-    _generalStore[name] ??= {};
-  }
+  final StreamController<(String, E)> _controller =
+      StreamController<(String, E)>.broadcast();
 
   @override
   Stream<E> watchKey(String key) {
     return _controller.stream
-        .where((event) => event.$1 == key)
-        .map((event) => event.$2);
+        .where(((String, E) event) => event.$1 == key)
+        .map(((String, E) event) => event.$2);
   }
 
   @override

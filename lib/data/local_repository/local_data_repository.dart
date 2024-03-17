@@ -5,12 +5,12 @@ import '../data_repository.dart';
 class LocalDataRepository extends DataRepository {
   @override
   void registerResource<T extends DataResource>(T resource) {
-    // TODO: implement registerResource
+    // TODO(Josh): implement registerResource
   }
 
   @override
   T use<T extends DataResource>() {
-    // TODO: implement use
+    // TODO(Josh): implement use
     throw UnimplementedError();
   }
 }

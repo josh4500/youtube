@@ -32,11 +32,6 @@ import 'package:youtube_clone/presentation/screens/settings/widgets/settings_pop
 import 'package:youtube_clone/presentation/widgets/roulette_scroll.dart';
 
 class DateRangePicker extends StatefulWidget {
-  final Duration? initialStart;
-  final Duration? initialStop;
-  final ValueChanged<Duration> onStartChange;
-  final ValueChanged<Duration> onStopChange;
-
   const DateRangePicker({
     super.key,
     required this.onStartChange,
@@ -44,6 +39,10 @@ class DateRangePicker extends StatefulWidget {
     this.initialStart,
     this.initialStop,
   });
+  final Duration? initialStart;
+  final Duration? initialStop;
+  final ValueChanged<Duration> onStartChange;
+  final ValueChanged<Duration> onStopChange;
 
   @override
   State<DateRangePicker> createState() => _DateRangePickerState();
@@ -53,17 +52,17 @@ class _DateRangePickerState extends State<DateRangePicker> {
   late Duration startDuration = widget.initialStart ?? Duration.zero;
   late Duration stopDuration = widget.initialStop ?? Duration.zero;
 
-  final startController = PageController(
+  final PageController startController = PageController(
     viewportFraction: 0.33,
     initialPage: 4,
   );
-  final stopController = PageController(
+  final PageController stopController = PageController(
     viewportFraction: 0.33,
     initialPage: 4,
   );
-  final List<String> timeList = List.generate(
+  final List<String> timeList = List<String>.generate(
     24 * 4,
-    (index) {
+    (int index) {
       return Duration(minutes: index * 15).hoursMinutes;
     },
   );
@@ -81,14 +80,14 @@ class _DateRangePickerState extends State<DateRangePicker> {
     return Padding(
       padding: const EdgeInsets.all(8.0) + const EdgeInsets.only(left: 40.0),
       child: Column(
-        children: [
+        children: <Widget>[
           InkWell(
             onTap: _showStartStop,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                children: <Widget>[
                   const Text('Start time'),
                   Text(
                     '${startDuration.hourPart.toString().padLeft(2, '0')}:${startDuration.minutesPart.toString().padLeft(2, '0')}',
@@ -104,7 +103,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                children: <Widget>[
                   const Text('Stop time'),
                   Text(
                     '${stopDuration.hourPart.toString().padLeft(2, '0')}:${stopDuration.minutesPart.toString().padLeft(2, '0')}',
@@ -119,10 +118,11 @@ class _DateRangePickerState extends State<DateRangePicker> {
   }
 
   void _showStartStop([bool start = true]) async {
-    final controller = SettingsPopupContainerController(
+    final SettingsPopupContainerController<Duration> controller =
+        SettingsPopupContainerController<Duration>(
       value: start ? startDuration : stopDuration,
     );
-    final duration = await showDialog(
+    final Duration? duration = await showDialog(
       context: context,
       builder: (_) {
         return SettingsPopupContainer<Duration>(
@@ -141,9 +141,9 @@ class _DateRangePickerState extends State<DateRangePicker> {
               initialValue: start
                   ? startDuration.hoursMinutes
                   : stopDuration.hoursMinutes,
-              onPageChange: (hourMinute) {
-                final index = timeList.indexWhere(
-                  (element) => element == hourMinute,
+              onPageChange: (String hourMinute) {
+                final int index = timeList.indexWhere(
+                  (String element) => element == hourMinute,
                 );
                 controller.value = Duration(minutes: index * 15);
               },
@@ -155,11 +155,11 @@ class _DateRangePickerState extends State<DateRangePicker> {
 
     if (duration != null) {
       if (start) {
-        startDuration = duration!;
-        widget.onStartChange(duration!);
+        startDuration = duration;
+        widget.onStartChange(duration);
       } else {
-        stopDuration = duration!;
-        widget.onStopChange(duration!);
+        stopDuration = duration;
+        widget.onStopChange(duration);
       }
       setState(() {});
     }

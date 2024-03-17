@@ -38,9 +38,8 @@ class PrivacySettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      type: MaterialType.canvas,
       child: SettingsListView(
-        children: [
+        children: <Widget>[
           SettingsTile(
             title: 'Google Ads Settings',
             summary: 'Manage your ads settings from your google Ads Settings',

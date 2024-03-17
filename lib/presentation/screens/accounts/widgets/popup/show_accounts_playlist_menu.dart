@@ -37,7 +37,7 @@ Future<T?> showAccountsPlaylistMenu<T>(
   return showMenu<T>(
     context: context,
     position: position,
-    items: [
+    items: <PopupMenuEntry<T>>[
       const PopupMenuItem(
         child: Text('Create new playlist'),
       ),

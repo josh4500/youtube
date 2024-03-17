@@ -48,7 +48,7 @@ class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
   final TextEditingController textEditingController = TextEditingController();
 
   late final AnimationController opacityController;
-  late final Animation animation;
+  late final Animation<double> animation;
 
   @override
   void initState() {
@@ -82,10 +82,10 @@ class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
       appBar: AppBar(
         title: AnimatedBuilder(
           animation: animation,
-          builder: (context, child) {
+          builder: (BuildContext context, Widget? child) {
             return Opacity(
               opacity: animation.value,
-              child: child!,
+              child: child,
             );
           },
           child: const Text(
@@ -95,7 +95,7 @@ class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
             ),
           ),
         ),
-        actions: [
+        actions: <Widget>[
           AppbarAction(
             icon: Icons.cast_outlined,
             onTap: () {},
@@ -106,8 +106,8 @@ class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
           ),
           AppbarAction(
             icon: Icons.more_vert_outlined,
-            onTapDown: (details) async {
-              final position = details.globalPosition;
+            onTapDown: (TapDownDetails details) async {
+              final Offset position = details.globalPosition;
               await showAccountsPlaylistMenu(
                 context,
                 RelativeRect.fromLTRB(position.dx, 0, 0, 0),
@@ -122,11 +122,11 @@ class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
           behavior: const OverScrollGlowBehavior(enabled: false),
           child: CustomScrollView(
             controller: controller,
-            slivers: [
+            slivers: <Widget>[
               const SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     Padding(
                       padding: EdgeInsets.symmetric(
                         vertical: 8,
@@ -149,13 +149,13 @@ class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
                       child: OptionButton(
                         title: 'A-Z',
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
               SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) {
+                  (BuildContext context, int index) {
                     return TappableArea(
                       onPressed: () {},
                       padding: const EdgeInsets.symmetric(

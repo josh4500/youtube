@@ -41,7 +41,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Marques Brownlee'),
-        actions: [
+        actions: <Widget>[
           AppbarAction(
             icon: Icons.cast_outlined,
             onTap: () {},
@@ -59,13 +59,13 @@ class ChannelDescriptionScreen extends StatelessWidget {
       body: const ScrollConfiguration(
         behavior: OverScrollGlowBehavior(enabled: false),
         child: CustomScrollView(
-          slivers: [
+          slivers: <Widget>[
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     Text(
                       'Description',
                       style: TextStyle(
@@ -87,7 +87,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
                 padding: EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     Text(
                       'Links',
                       style: TextStyle(
@@ -110,7 +110,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
                 padding: EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     Text(
                       'More info',
                       style: TextStyle(
@@ -122,7 +122,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
                     TappableArea(
                       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                       child: Row(
-                        children: [
+                        children: <Widget>[
                           Icon(
                             Icons.circle_outlined,
                             size: 28,
@@ -140,7 +140,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Row(
-                        children: [
+                        children: <Widget>[
                           Icon(
                             Icons.no_accounts_rounded,
                             size: 28,
@@ -155,7 +155,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Row(
-                        children: [
+                        children: <Widget>[
                           Icon(
                             Icons.info_outline_rounded,
                             size: 28,
@@ -170,7 +170,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Row(
-                        children: [
+                        children: <Widget>[
                           Icon(
                             Icons.trending_up,
                             size: 28,

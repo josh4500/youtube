@@ -29,16 +29,16 @@
 import 'package:flutter/material.dart';
 
 class ClipThumbClipper extends CustomClipper<Path> {
-  static const count = 24;
+  static const int count = 24;
 
   @override
   Path getClip(Size size) {
-    double height = size.height;
-    double width = size.width;
+    final double height = size.height;
+    final double width = size.width;
 
-    final mover = (height / count);
+    final double mover = height / count;
 
-    var path = Path();
+    final Path path = Path();
     // Left side
     path.moveTo(0, 0);
     for (int i = 1; i < count + 1; i++) {
@@ -61,6 +61,5 @@ class ClipThumbClipper extends CustomClipper<Path> {
 }
 
 extension EvenExtension on int {
-  bool get isEven => this % 2 == 0;
   bool get isOdd => this % 2 != 0;
 }

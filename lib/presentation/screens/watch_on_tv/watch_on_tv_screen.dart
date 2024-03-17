@@ -43,7 +43,7 @@ class WatchOnTvScreen extends StatelessWidget {
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: <Widget>[
           Container(
             padding: const EdgeInsets.symmetric(
               vertical: 24,
@@ -67,7 +67,7 @@ class WatchOnTvScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: <Widget>[
                   const Text('Link with TV code'),
                   const SizedBox(height: 16),
                   const Text(

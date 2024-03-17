@@ -29,24 +29,23 @@
 import 'package:flutter/material.dart';
 
 class PlayableVideoContent extends StatelessWidget {
-  // TODO: rename width and height
-  final double? width;
-  final double? height;
-
   const PlayableVideoContent({
     super.key,
     this.width,
     this.height,
   });
+  // TODO(Josh): rename width and height
+  final double? width;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: <Widget>[
         Stack(
           alignment: Alignment.bottomRight,
-          children: [
+          children: <Widget>[
             Container(
               width: width,
               height: height,
@@ -85,11 +84,11 @@ class PlayableVideoContent extends StatelessWidget {
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: <Widget>[
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: <Widget>[
                       Text(
                         'I found the BEST One Piece cast clips from their socials',
                         maxLines: 3,

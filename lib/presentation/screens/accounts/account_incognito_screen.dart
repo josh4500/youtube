@@ -34,10 +34,10 @@ class AccountIncognitoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         Expanded(
           child: Column(
-            children: [
+            children: <Widget>[
               const SizedBox(height: 8),
               Expanded(
                 child: Container(
@@ -71,7 +71,7 @@ class AccountIncognitoScreen extends StatelessWidget {
         ),
         const Expanded(
           child: Column(
-            children: [
+            children: <Widget>[
               if (false) Center(child: CircularProgressIndicator()),
             ],
           ),
