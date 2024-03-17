@@ -14,7 +14,6 @@ linter:
     - avoid_redundant_argument_values
     - avoid_returning_null_for_void
     - avoid_returning_this
-    - avoid_setters_without_getters
     - avoid_shadowing_type_parameters
     - avoid_single_cascade_in_expression_statements
     - avoid_slow_async_io

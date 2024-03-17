@@ -32,10 +32,9 @@ import 'cache_provider.dart';
 
 class InMemoryCache<E> extends CacheProvider<E> {
   InMemoryCache(this.name) {
-    _generalStore[name] ??= <String, Map<String, dynamic>>{};
+    _generalStore[name] ??= {};
   }
-  static final Map<String, Map<String, dynamic>> _generalStore =
-      <String, Map<String, dynamic>>{};
+  static final Map<String, Map<String, dynamic>> _generalStore = {};
   Map<String, E> get _store => _generalStore[name]!.cast<String, E>();
 
   final String name;
@@ -44,9 +43,11 @@ class InMemoryCache<E> extends CacheProvider<E> {
 
   @override
   Stream<E> watchKey(String key) {
-    return _controller.stream
-        .where(((String, E) event) => event.$1 == key)
-        .map(((String, E) event) => event.$2);
+    return _controller.stream.where(((String, E) event) => event.$1 == key).map(
+      ((String, E) event) {
+        return event.$2;
+      },
+    );
   }
 
   @override

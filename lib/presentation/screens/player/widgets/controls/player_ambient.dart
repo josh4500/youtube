@@ -1,14 +1,20 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/preferences.dart';
 
-class PlayerAmbient extends StatelessWidget {
+class PlayerAmbient extends ConsumerWidget {
   const PlayerAmbient({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // TODO: Finish ambient
-    // return const SizedBox();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool ambientMode = ref.watch(
+      preferencesProvider.select((PreferenceState value) => value.ambientMode),
+    );
+    if (!ambientMode) {
+      return const SizedBox();
+    }
     return Container(
       height: 100,
       decoration: BoxDecoration(

@@ -29,7 +29,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/src/notifier.dart';
 import 'package:youtube_clone/core/enums/settings_enums.dart';
 import 'package:youtube_clone/infrastructure/services/cache/hive_cache_provider.dart';
@@ -39,6 +38,12 @@ import '../infrastructure/services/cache/read_write_value.dart';
 class Preferences extends Notifier<PreferenceState> {
   /// Dynamic Preference [HiveCacheProvider]
   final HiveCacheProvider _prefBox = HiveCacheProvider('preferences');
+
+  late final ReadWriteValue<bool> _ambientMode = ReadWriteValue<bool>(
+    'ambientMode',
+    false,
+    _prefBox,
+  );
 
   late final ReadWriteEnum<ThemeMode> _themeMode = ReadWriteEnum<ThemeMode>(
     'themeMode',
@@ -52,7 +57,7 @@ class Preferences extends Notifier<PreferenceState> {
     const Locale('en'),
     _prefBox,
     encoder: (Locale locale) => locale.languageCode,
-    decoder: (String languageCode) => Locale(languageCode),
+    decoder: Locale.new,
   );
 
   late final ReadWriteValue<RemindForBreak> _remindForBreak =
@@ -61,7 +66,7 @@ class Preferences extends Notifier<PreferenceState> {
     RemindForBreak.defaultPref,
     _prefBox,
     encoder: (RemindForBreak value) => value.toJson(),
-    decoder: (String value) => RemindForBreak.fromJson(value),
+    decoder: RemindForBreak.fromJson,
   );
 
   late final ReadWriteValue<RemindForBedtime> _remindForBedtime =
@@ -70,7 +75,7 @@ class Preferences extends Notifier<PreferenceState> {
     RemindForBedtime.defaultPref,
     _prefBox,
     encoder: (RemindForBedtime value) => value.toJson(),
-    decoder: (String value) => RemindForBedtime.fromJson(value),
+    decoder: RemindForBedtime.fromJson,
   );
 
   late final ReadWriteEnum<PlaybackInFeeds> _playbackInFeeds =
@@ -98,7 +103,7 @@ class Preferences extends Notifier<PreferenceState> {
     const Locale('en'),
     _prefBox,
     encoder: (Locale locale) => locale.languageCode,
-    decoder: (String languageCode) => Locale(languageCode),
+    decoder: Locale.new,
   );
 
   late final ReadWriteValue<bool> _restrictedMode = ReadWriteValue<bool>(
@@ -141,7 +146,7 @@ class Preferences extends Notifier<PreferenceState> {
     DataSavingPreferences.defaultPref,
     _prefBox,
     encoder: (DataSavingPreferences pref) => pref.toJson(),
-    decoder: (String prefJson) => DataSavingPreferences.fromJson(prefJson),
+    decoder: DataSavingPreferences.fromJson,
   );
 
   late final ReadWriteValue<VideoQualityPreferences> _videoQuality =
@@ -150,7 +155,7 @@ class Preferences extends Notifier<PreferenceState> {
     VideoQualityPreferences.defaultPref,
     _prefBox,
     encoder: (VideoQualityPreferences pref) => pref.toJson(),
-    decoder: (String prefJson) => VideoQualityPreferences.fromJson(prefJson),
+    decoder: VideoQualityPreferences.fromJson,
   );
 
   late final ReadWriteValue<DownloadPreferences> _downloads =
@@ -159,7 +164,7 @@ class Preferences extends Notifier<PreferenceState> {
     DownloadPreferences.defaultPref,
     _prefBox,
     encoder: (DownloadPreferences pref) => pref.toJson(),
-    decoder: (String prefJson) => DownloadPreferences.fromJson(prefJson),
+    decoder: DownloadPreferences.fromJson,
   );
 
   late final ReadWriteValue<AccessibilityPreferences> _accessibility =
@@ -168,7 +173,7 @@ class Preferences extends Notifier<PreferenceState> {
     AccessibilityPreferences.defaultPref,
     _prefBox,
     encoder: (AccessibilityPreferences pref) => pref.toJson(),
-    decoder: (String prefJson) => AccessibilityPreferences.fromJson(prefJson),
+    decoder: AccessibilityPreferences.fromJson,
   );
 
   set autoPlay(bool autoPlay) {
@@ -215,6 +220,11 @@ class Preferences extends Notifier<PreferenceState> {
   set locale(Locale locale) {
     _locale.value = locale;
     state = state.copyWith(locale: locale);
+  }
+
+  set ambientMode(bool value) {
+    _ambientMode.value = value;
+    state = state.copyWith(ambientMode: value);
   }
 
   void changeRemindForBreak({Duration? frequency, bool? enabled}) {
@@ -280,6 +290,7 @@ class Preferences extends Notifier<PreferenceState> {
   @override
   PreferenceState build() {
     return PreferenceState(
+      ambientMode: _ambientMode.value,
       themeMode: _themeMode.value,
       locale: _locale.value,
       remindForBreak: _remindForBreak.value,
@@ -300,6 +311,7 @@ class Preferences extends Notifier<PreferenceState> {
 
 class PreferenceState {
   PreferenceState({
+    required this.ambientMode,
     required this.themeMode,
     required this.locale,
     required this.remindForBreak,
@@ -315,6 +327,7 @@ class PreferenceState {
     required this.accessibilityPreferences,
     required this.autoplay,
   });
+  final bool ambientMode;
   final ThemeMode themeMode;
   final Locale locale;
   final RemindForBreak remindForBreak;
@@ -332,6 +345,7 @@ class PreferenceState {
   final bool autoplay;
 
   PreferenceState copyWith({
+    bool? ambientMode,
     ThemeMode? themeMode,
     Locale? locale,
     RemindForBreak? remindForBreak,
@@ -348,6 +362,7 @@ class PreferenceState {
     bool? autoplay,
   }) {
     return PreferenceState(
+      ambientMode: ambientMode ?? this.ambientMode,
       themeMode: themeMode ?? this.themeMode,
       locale: locale ?? this.locale,
       remindForBreak: remindForBreak ?? this.remindForBreak,
@@ -682,5 +697,5 @@ extension IsDarkExtension on ThemeMode {
 
 final NotifierProviderImpl<Preferences, PreferenceState> preferencesProvider =
     NotifierProvider<Preferences, PreferenceState>(
-  () => Preferences(),
+  Preferences.new,
 );
