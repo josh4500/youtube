@@ -355,32 +355,36 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Callback to change Draggable heights when the Player height changes (via [heightNotifier])
   void _recomputeDraggableHeight(double value) {
+    final double newSizeValue = clampDouble(
+      (value - minVideoViewPortHeight) - (value * 0.135),
+      0,
+      1 - heightRatio,
+    );
+
+    // Changes Comment Draggable height
     if (_commentIsOpened) {
       if (heightNotifier.value == minVideoViewPortHeight) {
         _commentDraggableController.jumpTo(0);
       } else {
-        _commentDraggableController.jumpTo(
-          clampDouble(value - minVideoViewPortHeight, 0, 1 - heightRatio),
-        );
+        _commentDraggableController.jumpTo(newSizeValue);
       }
     }
+
+    // Changes Description Draggable height
     if (_descIsOpened) {
       if (heightNotifier.value == minVideoViewPortHeight) {
         _descDraggableController.jumpTo(0);
       } else {
-        _descDraggableController.jumpTo(
-          clampDouble(value - minVideoViewPortHeight, 0, 1 - heightRatio),
-        );
+        _descDraggableController.jumpTo(newSizeValue);
       }
     }
 
+    // Changes Chapters Draggable height
     if (_chaptersIsOpened) {
       if (heightNotifier.value == minVideoViewPortHeight) {
         _descDraggableController.jumpTo(0);
       } else {
-        _descDraggableController.jumpTo(
-          clampDouble(value - minVideoViewPortHeight, 0, 1 - heightRatio),
-        );
+        _descDraggableController.jumpTo(newSizeValue);
       }
     }
   }
@@ -774,7 +778,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         if (additionalHeight > 0) {
           // Hides the playback progress while animating "to" expanded view
           ref.read(playerRepositoryProvider).sendPlayerSignal(
-              <PlayerSignal>[PlayerSignal.hidePlaybackProgress]);
+            <PlayerSignal>[PlayerSignal.hidePlaybackProgress],
+          );
 
           _hideControls();
         }
@@ -1140,12 +1145,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
               children: <Widget>[
                 ValueListenableBuilder<double>(
                   valueListenable: heightNotifier,
-                  builder: (BuildContext context, double heightValue,
-                      Widget? miniPlayer) {
+                  builder: (
+                    BuildContext context,
+                    double heightValue,
+                    Widget? miniPlayer,
+                  ) {
                     return ValueListenableBuilder<double>(
                       valueListenable: additionalHeightNotifier,
-                      builder: (BuildContext context, double addHeightValue,
-                          Widget? childWidget) {
+                      builder: (
+                        BuildContext context,
+                        double addHeightValue,
+                        Widget? childWidget,
+                      ) {
                         return SizedBox(
                           height: heightNotifier.value < 1
                               ? null
@@ -1175,8 +1186,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                       alignment: Alignment.centerLeft,
                                       child: ValueListenableBuilder<double>(
                                         valueListenable: marginNotifier,
-                                        builder: (BuildContext context,
-                                            double marginValue, _) {
+                                        builder: (
+                                          BuildContext context,
+                                          double marginValue,
+                                          _,
+                                        ) {
                                           return Container(
                                             margin: EdgeInsets.only(
                                               top: marginValue,
@@ -1294,7 +1308,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                     initialChildSize: 0,
                     snapSizes: const <double>[
                       0.0,
-                      (1 - avgVideoViewPortHeight)
+                      (1 - avgVideoViewPortHeight),
                     ],
                     shouldCloseOnMinExtent: false,
                     controller: _descDraggableController,
@@ -1332,7 +1346,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                     initialChildSize: 0,
                     snapSizes: const <double>[
                       0.0,
-                      (1 - avgVideoViewPortHeight)
+                      (1 - avgVideoViewPortHeight),
                     ],
                     shouldCloseOnMinExtent: false,
                     controller: _chaptersDraggableController,
