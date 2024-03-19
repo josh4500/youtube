@@ -46,6 +46,7 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage>
     with TickerProviderStateMixin {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   late final AnimationController _controller;
   late final Animation<Offset> _animation;
 
@@ -98,7 +99,7 @@ class _HomePageState extends ConsumerState<HomePage>
       }
     });
 
-    // TODO 1(Josh): When open new viewable/playable, if
+    // TODO(Josh): When open new viewable/playable, if
   }
 
   @override
@@ -111,15 +112,12 @@ class _HomePageState extends ConsumerState<HomePage>
     return SafeArea(
       bottom: false,
       child: Scaffold(
+        key: _scaffoldKey,
         extendBody: true,
         resizeToAvoidBottomInset: false,
         drawerEnableOpenDragGesture: false,
-        drawer: Drawer(
-          child: ListView(
-            children: const <Widget>[
-              AppLogo(),
-            ],
-          ),
+        drawer: const Drawer(
+          child: HomeDrawer(),
         ),
         body: Stack(
           children: <Widget>[
@@ -171,6 +169,24 @@ class _HomePageState extends ConsumerState<HomePage>
           ),
         ),
       ),
+    );
+  }
+}
+
+class HomeDrawer extends StatelessWidget {
+  const HomeDrawer({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: const <Widget>[
+        Padding(
+          padding: EdgeInsets.all(12.0),
+          child: AppLogo(),
+        ),
+      ],
     );
   }
 }
