@@ -27,10 +27,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 final class Progress {
+  const Progress({required this.buffer, required this.position});
+
   final Duration buffer;
   final Duration position;
-
-  const Progress({required this.buffer, required this.position});
 
   static const Progress zero = Progress(
     buffer: Duration.zero,

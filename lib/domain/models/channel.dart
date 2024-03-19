@@ -26,14 +26,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-class Channel {
-  final String id;
-  final String name;
-  final int subscribers;
+import 'account.dart';
 
+class Channel extends Account {
   const Channel({
-    required this.id,
-    required this.name,
     required this.subscribers,
+    required super.id,
+    required super.name,
+    required super.email,
+    required super.username,
   });
+  final int subscribers;
 }

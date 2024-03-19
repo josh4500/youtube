@@ -32,7 +32,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:youtube_clone/core/progress.dart';
+import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/core/utils/progress.dart';
 import 'package:youtube_clone/infrastructure/services/cache/in_memory_cache.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';

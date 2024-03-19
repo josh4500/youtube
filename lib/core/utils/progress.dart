@@ -1,7 +1,7 @@
 import 'package:media_kit/media_kit.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../progress.dart';
+import '../../presentation/view_models/progress.dart';
 
 extension ProgressStreamExtension on PlayerStream {
   Stream<Progress> get progress {

@@ -27,13 +27,6 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class Account {
-  final String id;
-  final String? avatar;
-  final bool? hasChannel;
-  final String name;
-  final String username;
-  final String email;
-
   const Account({
     required this.id,
     this.avatar,
@@ -42,4 +35,11 @@ class Account {
     required this.username,
     required this.email,
   });
+
+  final String id;
+  final String? avatar;
+  final bool? hasChannel;
+  final String name;
+  final String username;
+  final String email;
 }

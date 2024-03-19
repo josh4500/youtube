@@ -28,4 +28,4 @@
 
 import 'dart:ui';
 
-const defaultLocale = Locale('en');
+const kDefaultLocale = Locale('en');

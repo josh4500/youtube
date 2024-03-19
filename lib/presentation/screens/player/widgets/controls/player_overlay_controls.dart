@@ -33,7 +33,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/constants/constants.dart';
-import 'package:youtube_clone/core/progress.dart';
+import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/constants/values.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
