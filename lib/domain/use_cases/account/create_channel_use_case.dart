@@ -1,3 +1,6 @@
 import 'package:youtube_clone/data/data_resource_use_case.dart';
 
-class CreateChannelUseCase extends DataResourceUseCase {}
+class CreateChannelUseCase extends DataResourceUseCase {
+  @override
+  List<Dependency> get dependencies => [];
+}

@@ -30,8 +30,8 @@ import 'package:flutter/foundation.dart';
 
 @immutable
 abstract class Identifier<T> {
-  final T value;
   const Identifier({required this.value});
+  final T value;
 
   @override
   bool operator ==(Object other) =>
