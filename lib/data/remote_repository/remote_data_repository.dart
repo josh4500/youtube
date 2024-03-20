@@ -35,6 +35,7 @@ class RemoteDataRepository extends DataRepository {
   U getUseCase<U extends DataResourceUseCase>() {
     final Object? useCase = _useCaseStore[U];
 
+    // TODO(Josh): Throw appropriate exception
     if (useCase == null) throw ArgumentError();
 
     useCase as U;
