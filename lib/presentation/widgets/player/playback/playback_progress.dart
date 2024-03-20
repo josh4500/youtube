@@ -72,6 +72,7 @@ class PlaybackProgress extends StatefulWidget {
     this.showBuffer = true,
     this.keyConcepts = const <KeyConcept>[],
     this.chapters = const <Chapter>[],
+    this.replayed = const <Replayed>[],
     this.backgroundColor = Colors.white30,
     this.onTap,
     this.onDragStart,
@@ -106,11 +107,14 @@ class PlaybackProgress extends StatefulWidget {
   /// Whether to show the buffer indicator.
   final bool showBuffer;
 
-  /// List of key concepts and their positions within the playback duration.
+  /// List of [KeyConcept] and their positions within the playback duration.
   final List<KeyConcept> keyConcepts;
 
-  /// List of chapters and their positions within the playback duration.
+  /// List of [Chapter] and their positions within the playback duration.
   final List<Chapter> chapters;
+
+  /// List of [Replayed] positions
+  final List<Replayed> replayed;
 
   /// Callback triggered when the user taps on the progress indicator.
   final void Function(Duration position)? onTap;
@@ -128,22 +132,40 @@ class PlaybackProgress extends StatefulWidget {
   State<PlaybackProgress> createState() => _PlaybackProgressState();
 }
 
-class _PlaybackProgressState extends State<PlaybackProgress> {
+class _PlaybackProgressState extends State<PlaybackProgress>
+    with SingleTickerProviderStateMixin {
   Stream<Progress>? progressStream;
-  // TODO(Josh): Show use TweenInterval and rename property
-  Animation<double>? thumbAnimation;
-  // TODO(Josh): Rename property
-  Animation<Color?>? progressAnimation;
+
+  Animation<double>? _thumbSizeAnimation;
+
+  /// Animation value for progress track
+  Animation<Color?>? _trackColorAnimation;
+
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      value: 0.8,
+      lowerBound: 0.8,
+      duration: const Duration(milliseconds: 175),
+      reverseDuration: const Duration(milliseconds: 125),
+    );
+
+    _scaleAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.bounceIn,
+      reverseCurve: Curves.easeOutCubic,
+    );
+
     if (widget.animation != null) {
-      thumbAnimation = widget.animation!.drive(
-        // TODO(Josh): Begin at _indicatorHeight
-        Tween<double>(begin: 0, end: 12),
+      _thumbSizeAnimation = widget.animation!.drive(
+        Tween<double>(begin: _indicatorHeight, end: 14),
       );
-      progressAnimation = widget.animation!.drive(
+      _trackColorAnimation = widget.animation!.drive(
         ColorTween(begin: Colors.white70, end: const Color(0xFFFF0000)),
       );
     }
@@ -201,12 +223,12 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                 backgroundColor: Colors.transparent,
               ),
             // Player position Indicator
-            if (progressAnimation != null)
+            if (_trackColorAnimation != null)
               AnimatedBuilder(
-                animation: progressAnimation!,
+                animation: _trackColorAnimation!,
                 builder: (_, __) {
                   return LinearProgressIndicator(
-                    color: progressAnimation!.value ?? widget.color,
+                    color: _trackColorAnimation!.value ?? widget.color,
                     value: positionValue.isNaN || positionValue.isInfinite
                         ? 0
                         : positionValue,
@@ -252,19 +274,22 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
       );
     }
 
-    final AnimatedBuilder? thumbIndicator = thumbAnimation != null
+    final AnimatedBuilder? thumbIndicator = _thumbSizeAnimation != null
         ? AnimatedBuilder(
-            animation: thumbAnimation!,
+            animation: _thumbSizeAnimation!,
             builder: (BuildContext context, _) {
               return AnimatedBuilder(
-                animation: progressAnimation!,
+                animation: _trackColorAnimation!,
                 builder: (BuildContext context, _) {
-                  return Container(
-                    width: thumbAnimation?.value,
-                    height: thumbAnimation?.value,
-                    decoration: BoxDecoration(
-                      color: progressAnimation!.value,
-                      shape: BoxShape.circle,
+                  return ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: Container(
+                      width: _thumbSizeAnimation?.value,
+                      height: _thumbSizeAnimation?.value,
+                      decoration: BoxDecoration(
+                        color: _trackColorAnimation!.value,
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   );
                 },
@@ -278,6 +303,8 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
         return GestureDetector(
           onTapDown: (TapDownDetails details) =>
               _onTapDown(details, constraint.maxWidth),
+          onTapCancel: _scaleOut,
+          onTapUp: (TapUpDetails details) => _scaleOut(),
           onHorizontalDragStart: (DragStartDetails details) =>
               _onHorizontalDragStart(details, constraint.maxWidth),
           onHorizontalDragUpdate: (DragUpdateDetails details) =>
@@ -294,7 +321,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                 // Stacked Position and Buffer indicators
                 indicators,
                 // Thumb Indicator
-                if (thumbAnimation != null)
+                if (_thumbSizeAnimation != null)
                   StreamBuilder<Progress>(
                     stream: widget.progress,
                     initialData: widget.start,
@@ -307,9 +334,9 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
                       );
                       final double positionValue = data.$1;
 
-                      // TODO(Josh): When begin at _indicatorHeight, animate bottom based on thumbAnimation
+                      // TODO(Josh): When begin at _indicatorHeight, animate bottom based on _thumbSizeAnimation
                       return Positioned(
-                        bottom: -4,
+                        bottom: -6,
                         left: clampDouble(
                           (positionValue * constraint.maxWidth) - 4,
                           0,
@@ -327,6 +354,14 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
     );
   }
 
+  void _scaleIn() {
+    _controller.forward();
+  }
+
+  void _scaleOut() {
+    _controller.reverse();
+  }
+
   /// Handles tap down event on the widget and triggers the `onTap` callback
   /// if provided.
   ///
@@ -339,6 +374,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
 
     // Call the passed `onTap` callback if available.
     widget.onTap?.call(Duration(milliseconds: positionInMilliseconds));
+    _scaleIn();
   }
 
   /// Handles the start of a horizontal drag event and triggers the `onDragStart`
@@ -353,6 +389,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
 
     // Call the passed `onDragStart` callback if available.
     widget.onDragStart?.call(Duration(milliseconds: positionInMilliseconds));
+    _scaleIn();
   }
 
   /// Handles updates during a horizontal drag event and triggers the
@@ -377,6 +414,7 @@ class _PlaybackProgressState extends State<PlaybackProgress> {
   void _onHorizontalDragEnd(DragEndDetails details, double width) {
     // Call the passed `onDragEnd` callback if available.
     widget.onDragEnd?.call();
+    _scaleOut();
   }
 
   /// Calculates the position in milliseconds relative to the widget width.
@@ -502,8 +540,20 @@ class ProgressKeyConceptPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-// TODO(Josh): Move to different file
+class ProgressReplayedPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // TODO(Josh): implement paint
+  }
 
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    // TODO(Josh): implement shouldRepaint
+    throw UnimplementedError();
+  }
+}
+
+// TODO(Josh): Move to different file
 class KeyConcept {
   KeyConcept({required this.position});
   final Duration position;
@@ -518,5 +568,11 @@ class Chapter {
   /// the end of the current chapter.
   ///
   /// If no next chapter, the end of the video will be the end of the chapter
+  final Duration position;
+}
+
+class Replayed {
+  Replayed({required this.position});
+
   final Duration position;
 }
