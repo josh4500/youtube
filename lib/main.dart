@@ -54,7 +54,16 @@ void setupRepositories() {
 
   final DataRepository remoteDataRepository = RemoteDataRepository();
   final GrpcResourceClient grpcResourceClient = GrpcResourceClient();
+  // TODO(Josh): Create a static class that has methods to assign local and remote data repository
+  // like assignRemote(...) or assignLocal(...).
 
+  // (This might seem confusing though). May need rework
+  // Can be used like DataRepository.remote.use<AccountRepository>() in other Repository
+  // Note: Limit/reduce dependencies between DataSources, that should be the work of backend or client use cases.
+  // DataSources should be discrete
+
+  // Note: DataResource instance is not recommended for use in Provider repositories,
+  // UseCases should be usd instead
   remoteDataRepository
     ..registerResource<AccountRepository>(
       AccountRepository(grpcResourceClient),

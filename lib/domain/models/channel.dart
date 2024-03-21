@@ -29,12 +29,7 @@
 import 'account.dart';
 
 class Channel extends Account {
-  const Channel({
-    required this.subscribers,
-    required super.id,
-    required super.name,
-    required super.email,
-    required super.username,
-  });
+  Channel({required this.subscribers});
+
   final int subscribers;
 }
