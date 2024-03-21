@@ -32,18 +32,17 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
-import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/player/player_components_wrapper.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
+import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../constants.dart';
+import '../../providers.dart';
 import '../../view_models/playback/player_sizing.dart';
 import 'widgets/controls/player_ambient.dart';
 import 'widgets/player/mini_player.dart';
@@ -80,6 +79,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   final TransformationController _transformationController =
       TransformationController();
   late final AnimationController _zoomPanAnimationController;
+
+  late final AnimationController _playerDismissController;
+  late final Animation<double> _playerFadeAnimation;
+  late final Animation<Offset> _playerSlideAnimation;
 
   late final AnimationController _infoOpacityController;
   late final Animation<double> _infoOpacityAnimation;
@@ -134,6 +137,23 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   @override
   void initState() {
     super.initState();
+    _playerDismissController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 125),
+    );
+
+    _playerFadeAnimation = ReverseAnimation(
+      CurvedAnimation(
+        parent: _playerDismissController,
+        curve: Curves.easeInCubic,
+      ),
+    );
+
+    _playerSlideAnimation = Tween(
+      begin: Offset.zero,
+      end: const Offset(0, 1),
+    ).animate(_playerDismissController);
+
     _zoomPanAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
@@ -313,6 +333,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Indicates whether active zoom panning is in progress.
   bool _activeZoomPanning = false;
+
+  /// Indicates whether player can be dismissed/closed by swiping down
+  bool _preventPlayerDismiss = true;
+
+  /// Indicates whether player dismissing
+  bool _isDismissing = false;
+
+  /// Indicates whether pointer has been released since resizing player screen
+  bool _releasedPlayerPointer = true;
 
   /// Indicates the direction of player dragging. True if dragging down, otherwise null.
   bool? _isPlayerDraggingDown;
@@ -606,6 +635,24 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     // Determine the drag direction (down or not)
     _isPlayerDraggingDown ??= details.delta.dy > 0;
 
+    if (!_preventPlayerDismiss) {
+      if (details.delta.dy > 0 &&
+          heightNotifier.value == minVideoViewPortHeight) {
+        // Ensures that the first drag down by the from [minVideoViewPortHeight]
+        // will be dismissing player if user pointer was recently released
+        _isDismissing = true && _releasedPlayerPointer;
+      }
+
+      if (_isDismissing) {
+        final val =
+            details.delta.dy * 1.2 / (minVideoViewPortHeight * screenHeight);
+        _playerDismissController.value += val;
+        return;
+      }
+    }
+    // Player has not released pointer
+    _releasedPlayerPointer = false;
+
     // If dragging down
     if (_isPlayerDraggingDown ?? false) {
       // Adjust height and width based on the drag delta
@@ -620,9 +667,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         minVideoViewPortWidth,
         1,
       );
-      ref
-          .read(playerRepositoryProvider)
-          .sendPlayerSignal(<PlayerSignal>[PlayerSignal.hidePlaybackProgress]);
     } else {
       // Hide controls before showing zoom pan
       _hideControls();
@@ -667,6 +711,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   Future<void> _onDragPlayerEnd(DragEndDetails details) async {
+    _releasedPlayerPointer = true;
     if (!_isSeeking) {
       _preventPlayerDragUp = false;
       _preventPlayerDragDown = false;
@@ -709,6 +754,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       marginNotifier.value = 0;
       _infoScrollPhysics.canScroll(true);
     } else {
+      // Set to false because the user pointer events will no longer be updated
+      _isDismissing = false;
+
       if (_isPlayerDraggingDown ?? false) {
         final double latestHeightVal = heightNotifier.value;
         final double velocityY = details.velocity.pixelsPerSecond.dy;
@@ -722,8 +770,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         }
       }
 
-      if (heightNotifier.value == 1) {
+      if (heightNotifier.value > minVideoViewPortHeight) {
         _isPlayerDraggingDown = null;
+        _preventPlayerDismiss = true;
+      } else {
+        _preventPlayerDismiss = false;
+      }
+
+      if (_playerDismissController.value >= 0.7) {
+        _playerDismissController.value = 1;
+        ref.read(playerRepositoryProvider).closePlayerScreen();
+      } else {
+        _playerDismissController.value = 0;
       }
 
       if (widthNotifier.value == minVideoViewPortWidth) {
@@ -984,6 +1042,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           ]);
           heightNotifier.value = minVideoViewPortHeight;
           widthNotifier.value = minVideoViewPortWidth;
+          _preventPlayerDismiss = false;
         } else if (notification is ExpandPlayerNotification) {
           _hideControls();
           additionalHeightNotifier.value = screenHeight * (1 - heightRatio);
@@ -1082,36 +1141,35 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                 ],
               ),
             ),
-            // SliverPersistentHeader(
-            //   pinned: true,
-            //   floating: false,
-            //   delegate: FadingSliverPersistentHeaderDelegate(
-            //     height: 48,
-            //     child: const Material(
-            //       child: Column(
-            //         children: [
-            //           Spacer(),
-            //           SizedBox(
-            //             height: 40,
-            //             child: DynamicTab(
-            //               initialIndex: 0,
-            //               leadingWidth: 8,
-            //               options: <String>[
-            //                 'All',
-            //                 'Something',
-            //                 'Related',
-            //                 'Recently uploaded',
-            //                 'Watched',
-            //               ],
-            //             ),
-            //           ),
-            //           Spacer(),
-            //           Divider(height: 0, thickness: 1.5),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: FadingSliverPersistentHeaderDelegate(
+                height: 48,
+                child: const Material(
+                  child: Column(
+                    children: [
+                      Spacer(),
+                      SizedBox(
+                        height: 40,
+                        child: DynamicTab(
+                          initialIndex: 0,
+                          leadingWidth: 8,
+                          options: <String>[
+                            'All',
+                            'Something',
+                            'Related',
+                            'Recently uploaded',
+                            'Watched',
+                          ],
+                        ),
+                      ),
+                      Spacer(),
+                      Divider(height: 0, thickness: 1.5),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             // TODO(Josh): Remove test
             const SliverToBoxAdapter(child: ViewableVideoContent()),
             const SliverToBoxAdapter(child: ViewableVideoContent()),
@@ -1127,11 +1185,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     return ValueListenableBuilder<double>(
       valueListenable: heightNotifier,
       builder: (BuildContext context, double value, Widget? childWidget) {
-        return SizedBox(
-          key: _portraitPlayerKey,
-          height: screenHeight * heightNotifier.value,
-          width: double.infinity,
-          child: childWidget,
+        return SlideTransition(
+          position: _playerSlideAnimation,
+          child: FadeTransition(
+            opacity: _playerFadeAnimation,
+            child: SizedBox(
+              key: _portraitPlayerKey,
+              height: screenHeight * heightNotifier.value,
+              width: double.infinity,
+              child: childWidget,
+            ),
+          ),
         );
       },
       child: Material(

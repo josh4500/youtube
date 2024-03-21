@@ -49,6 +49,7 @@ export 'widgets/marquee.dart';
 export 'widgets/notification_option.dart';
 export 'widgets/option_button.dart';
 export 'widgets/over_scroll_glow_behavior.dart';
+export 'widgets/persistent_header_delegate.dart';
 
 export 'widgets/playable/playable_clip_content.dart';
 export 'widgets/playable/playable_content.dart';
