@@ -30,8 +30,6 @@ abstract class Account {}
 
 class GuestAccount extends Account {}
 
-class IncognitoAccount extends Account {}
-
 class UserAccount extends Account {
   UserAccount({required this.id, required this.name, required this.username});
 
