@@ -221,14 +221,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
 
     heightNotifier.addListener(() {
-      _recomputeDraggableHeight(heightNotifier.value);
-      final double opacityValue =
-          1 - (heightNotifier.value - 0.45) / (1 - 0.45);
-
-      _draggableOpacityController.value = opacityValue;
-      if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
-        _infoOpacityController.value = opacityValue;
-      }
+      _recomputeDraggableOpacityAndHeight(heightNotifier.value);
     });
 
     _transformationController.addListener(() {
@@ -383,13 +376,24 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   /// Callback to change Draggable heights when the Player height changes (via [heightNotifier])
-  void _recomputeDraggableHeight(double value) {
+  void _recomputeDraggableOpacityAndHeight(double value) {
     final double newSizeValue = clampDouble(
       (value - minVideoViewPortHeight) - (value * 0.135),
       0,
       1 - heightRatio,
     );
 
+    /***************************** Opacity Changes *****************************/
+    final double opacityValue = 1 - (heightNotifier.value - 0.45) / (1 - 0.45);
+    // Changes info opacity when neither of the draggable sheet are opened
+    if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
+      _infoOpacityController.value = opacityValue;
+    } else {
+      // Changes the opacity level of all draggable sheets
+      _draggableOpacityController.value = opacityValue;
+    }
+
+    /***************************** Height Changes *****************************/
     // Changes Comment Draggable height
     if (_commentIsOpened) {
       if (heightNotifier.value == minVideoViewPortHeight) {
