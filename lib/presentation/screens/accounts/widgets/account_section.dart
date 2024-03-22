@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 
@@ -52,21 +53,13 @@ class AccountSection extends StatelessWidget {
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onTapChannelInfo,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               child: Row(
                 children: <Widget>[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(64),
-                    child: Image.network(
-                      'https://ui-avatars.com/api/?background=3d3d3d&color=fff',
-                      height: 84,
-                      width: 84,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  const Column(
+                  AccountAvatar(size: 84),
+                  SizedBox(width: 14),
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
