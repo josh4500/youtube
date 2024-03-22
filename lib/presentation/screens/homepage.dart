@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
+import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 
 import '../constants.dart';
 import '../providers.dart';
@@ -47,24 +48,24 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage>
     with TickerProviderStateMixin {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  late final AnimationController _controller;
-  late final Animation<Offset> _animation;
+  late final AnimationController _overlayPlayerController;
+  late final Animation<Offset> _overlayPlayerAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _overlayPlayerController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 350),
       animationBehavior: AnimationBehavior.preserve,
     );
 
-    _animation = Tween<Offset>(
+    _overlayPlayerAnimation = Tween<Offset>(
       begin: const Offset(0, kMiniPlayerHeight),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(
-        parent: _controller,
+        parent: _overlayPlayerController,
         curve: Curves.easeOutCubic,
         reverseCurve: Curves.easeInCubic,
       ),
@@ -81,39 +82,36 @@ class _HomePageState extends ConsumerState<HomePage>
     super.didUpdateWidget(oldWidget);
     final int index = widget.child.currentIndex;
     if (index == 1) {
-      _controller.reverse();
+      _overlayPlayerController.reverse();
     } else {
-      _controller.forward();
+      _overlayPlayerController.forward();
     }
 
     Future<void>(() {
       final bool isPlayerActive = ref.read(playerOverlayStateProvider);
       if (oldWidget.child.currentIndex != widget.child.currentIndex) {
-        if (isPlayerActive && _controller.value != 1) {
-          if (index == 1 && ref.read(playerNotifierProvider).playing) {
-            ref.read(playerRepositoryProvider).minimizeAndPauseVideo();
-          } else {
+        if (isPlayerActive && _overlayPlayerController.value != 1) {
+          if (index == 1 && ref.read(playerNotifierProvider).ended) {
             ref.read(playerRepositoryProvider).minimize();
+          } else {
+            ref.read(playerRepositoryProvider).minimizeAndPauseVideo();
           }
         }
       }
     });
-
-    // TODO(Josh): When open new viewable/playable, if
   }
 
   @override
   Widget build(BuildContext context) {
     ref.listen(playerOverlayStateProvider, (bool? previous, bool next) {
       if (next) {
-        _controller.forward();
+        _overlayPlayerController.forward();
       }
     });
     return SafeArea(
       bottom: false,
       child: Scaffold(
         key: _scaffoldKey,
-        extendBody: true,
         resizeToAvoidBottomInset: false,
         drawerEnableOpenDragGesture: false,
         drawer: const Drawer(
@@ -123,13 +121,14 @@ class _HomePageState extends ConsumerState<HomePage>
           children: <Widget>[
             widget.child,
             SlideTransition(
-              position: _animation,
+              position: _overlayPlayerAnimation,
               child: Consumer(
-                builder:
-                    (BuildContext context, WidgetRef ref, Widget? childWidget) {
-                  final bool isPlayerActive =
-                      ref.watch(playerOverlayStateProvider);
-                  if (isPlayerActive) {
+                builder: (
+                  BuildContext context,
+                  WidgetRef ref,
+                  Widget? childWidget,
+                ) {
+                  if (ref.watch(playerOverlayStateProvider)) {
                     return childWidget!;
                   }
                   return const SizedBox();
@@ -180,37 +179,37 @@ class HomeDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: const <Widget>[
-        Padding(
-          padding: EdgeInsets.all(12.0),
-          child: AppLogo(),
-        ),
-      ],
+    return Material(
+      child: ListView(
+        children: const <Widget>[
+          Padding(
+            padding: EdgeInsets.all(12.0),
+            child: AppLogo(),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class CustomNavigatorBar extends StatefulWidget {
+class CustomNavigatorBar extends ConsumerStatefulWidget {
   const CustomNavigatorBar({
     super.key,
-    this.controller,
     this.height = 100,
     this.duration = const Duration(milliseconds: 200),
     required this.selectedIndex,
     required this.onChangeIndex,
   });
   final int selectedIndex;
-  final NavigationBarController? controller;
   final Duration duration;
   final double height;
   final ValueChanged<int> onChangeIndex;
 
   @override
-  State<CustomNavigatorBar> createState() => _CustomNavigatorBarState();
+  ConsumerState<CustomNavigatorBar> createState() => _CustomNavigatorBarState();
 }
 
-class _CustomNavigatorBarState extends State<CustomNavigatorBar>
+class _CustomNavigatorBarState extends ConsumerState<CustomNavigatorBar>
     with TickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
@@ -222,7 +221,7 @@ class _CustomNavigatorBarState extends State<CustomNavigatorBar>
     _controller = AnimationController(
       vsync: this,
       duration: widget.duration,
-      value: 0,
+      value: 1,
       animationBehavior: AnimationBehavior.preserve,
     );
 
@@ -241,110 +240,118 @@ class _CustomNavigatorBarState extends State<CustomNavigatorBar>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      constraints: BoxConstraints(maxHeight: widget.height),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          const Divider(height: 0.5),
-          SizeTransition(
-            sizeFactor: _animation,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                IconButton(
-                  onPressed: () => widget.onChangeIndex(0),
-                  icon: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(Icons.home),
-                      // Text('Home'),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => widget.onChangeIndex(1),
-                  icon: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(Icons.sort),
-                      // Text('Short'),
-                    ],
-                  ),
-                ),
-                AuthStateBuilder(
-                  builder: (BuildContext context, AuthState state) {
-                    if (state.isNotAuthenticated || state.isInIncognito) {
-                      return const SizedBox();
-                    }
-                    return IconButton(
-                      onPressed: () {},
-                      icon: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Icon(
-                            Icons.add_circle_outline_rounded,
-                            size: 32,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                IconButton(
-                  onPressed: () => widget.onChangeIndex(2),
-                  icon: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(Icons.subscriptions_outlined),
-                      // Text('Subscription'),
-                    ],
-                  ),
-                ),
-                AuthStateBuilder(
-                  builder: (BuildContext context, AuthState state) {
-                    return IconButton(
-                      onPressed: () => widget.onChangeIndex(3),
-                      icon: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          if (state.isInIncognito)
-                            const Icon(Icons.hourglass_top)
-                          else
-                            state.isNotAuthenticated
-                                ? const Icon(Icons.person_off)
-                                : const Icon(Icons.person),
-                          //const Text('You'),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          AuthStateBuilder(
-            builder: (BuildContext context, AuthState state) {
-              if (state.isInIncognito) {
-                return Container(
-                  alignment: Alignment.center,
-                  color: Colors.grey,
-                  child: const Text(
-                    'You\'re incognito',
-                    style: TextStyle(
-                      fontSize: 12,
+    ref.listen(
+      homeRepositoryProvider,
+      (_, next) {
+        _controller.value = next.navBarPos;
+      },
+    );
+
+    return Material(
+      child: Container(
+        constraints: BoxConstraints(maxHeight: widget.height),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            const Divider(height: 0.5),
+            SizeTransition(
+              axisAlignment: -1,
+              sizeFactor: _animation,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () => widget.onChangeIndex(0),
+                    icon: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.home),
+                        // Text('Home'),
+                      ],
                     ),
                   ),
-                );
-              }
-              return const ConnectionSnackbar(autoHide: true);
-            },
-          ),
-        ],
+                  IconButton(
+                    onPressed: () => widget.onChangeIndex(1),
+                    icon: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.sort),
+                        // Text('Short'),
+                      ],
+                    ),
+                  ),
+                  AuthStateBuilder(
+                    builder: (BuildContext context, AuthState state) {
+                      if (state.isNotAuthenticated || state.isInIncognito) {
+                        return const SizedBox();
+                      }
+                      return IconButton(
+                        onPressed: () {},
+                        icon: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(
+                              Icons.add_circle_outline_rounded,
+                              size: 32,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    onPressed: () => widget.onChangeIndex(2),
+                    icon: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.subscriptions_outlined),
+                        // Text('Subscription'),
+                      ],
+                    ),
+                  ),
+                  AuthStateBuilder(
+                    builder: (BuildContext context, AuthState state) {
+                      return IconButton(
+                        onPressed: () => widget.onChangeIndex(3),
+                        icon: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            if (state.isInIncognito)
+                              const Icon(Icons.hourglass_top)
+                            else
+                              state.isNotAuthenticated
+                                  ? const Icon(Icons.person_off)
+                                  : const Icon(Icons.person),
+                            //const Text('You'),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            AuthStateBuilder(
+              builder: (BuildContext context, AuthState state) {
+                if (state.isInIncognito) {
+                  return Container(
+                    alignment: Alignment.center,
+                    color: Colors.grey,
+                    child: const Text(
+                      'You\'re incognito',
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                  );
+                }
+                return const ConnectionSnackbar(autoHide: true);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
-class NavigationBarController extends ChangeNotifier {}

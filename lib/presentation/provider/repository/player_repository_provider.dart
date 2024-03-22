@@ -191,8 +191,8 @@ class PlayerRepository {
     );
   }
 
-  Future<void> playVideo() async => await _videoPlayer.play();
-  Future<void> pauseVideo() async => await _videoPlayer.pause();
+  Future<void> playVideo() async => _videoPlayer.play();
+  Future<void> pauseVideo() async => _videoPlayer.pause();
   Future<void> seekTo(Duration position) async {
     await _videoPlayer.seek(position);
     if (position < currentVideoDuration) {

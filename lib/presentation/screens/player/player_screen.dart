@@ -33,6 +33,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
+import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
@@ -221,6 +222,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
 
     heightNotifier.addListener(() {
+      _showHideNavigationBar(heightNotifier.value);
       _recomputeDraggableOpacityAndHeight(heightNotifier.value);
     });
 
@@ -373,6 +375,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _infoOpacityController.value =
           clampDouble(size / (1 - heightRatio), 0, 1);
     }
+  }
+
+  // TODO(Josh): investigate when minimized, swipe zooms in playerview
+
+  /// Callback to show or hide home screen navigation bar
+  void _showHideNavigationBar(double value) {
+    ref.read(homeRepositoryProvider).updateNavBarPosition(
+          value.normalize(minVideoViewPortHeight, 1).invertByOne,
+        );
   }
 
   /// Callback to change Draggable heights when the Player height changes (via [heightNotifier])

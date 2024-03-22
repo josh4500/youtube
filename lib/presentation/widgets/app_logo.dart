@@ -5,6 +5,7 @@ class AppLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO(Josh): Show Youtube or Premium logo
     return const Row(
       children: <Widget>[
         Text(
