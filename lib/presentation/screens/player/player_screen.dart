@@ -135,6 +135,23 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         curve: Curves.easeInCubic,
       ).transform(widthNotifier.value).invertByOne;
 
+  // Video Comment Sheet
+  bool _commentIsOpened = false;
+  final _showCommentDraggable = ValueNotifier<bool>(false);
+  final _replyIsOpenedNotifier = ValueNotifier<bool>(false);
+  final _commentDraggableController = DraggableScrollableController();
+
+  // Video Description Sheet
+  bool _descIsOpened = false;
+  final _showDescDraggable = ValueNotifier<bool>(false);
+  final _transcriptNotifier = ValueNotifier<bool>(false);
+  final _descDraggableController = DraggableScrollableController();
+
+  // Video Chapter Sheet
+  bool _chaptersIsOpened = false;
+  final _showChaptersDraggable = ValueNotifier<bool>(false);
+  final _chaptersDraggableController = DraggableScrollableController();
+
   @override
   void initState() {
     super.initState();
@@ -901,13 +918,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _showControls();
   }
 
-  // Video Comment Sheet
-  bool _commentIsOpened = false;
-  final ValueNotifier<bool> _showCommentDraggable = ValueNotifier<bool>(false);
-  final DraggableScrollableController _commentDraggableController =
-      DraggableScrollableController();
-  final ValueNotifier<bool> _replyIsOpenedNotifier = ValueNotifier<bool>(false);
-
   /// Callback to open Comments draggable sheets
   Future<void> _openCommentSheet() async {
     _commentIsOpened = true;
@@ -943,13 +953,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     );
   }
 
-  // Video Description Sheet
-  bool _descIsOpened = false;
-  final ValueNotifier<bool> _showDescDraggable = ValueNotifier<bool>(false);
-  final DraggableScrollableController _descDraggableController =
-      DraggableScrollableController();
-  final ValueNotifier<bool> _transcriptNotifier = ValueNotifier<bool>(false);
-
   Future<void> _openDescSheet() async {
     _descIsOpened = true;
     final bool wait = !_showCommentDraggable.value;
@@ -981,12 +984,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       curve: Curves.easeOutCubic,
     );
   }
-
-  // Video Chapter
-  bool _chaptersIsOpened = false;
-  final ValueNotifier<bool> _showChaptersDraggable = ValueNotifier<bool>(false);
-  final DraggableScrollableController _chaptersDraggableController =
-      DraggableScrollableController();
 
   Future<void> _openChaptersSheet() async {
     _chaptersIsOpened = true;
@@ -1028,8 +1025,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   // TODO(Josh): Will add Membership sheet too
 
-  // TODO(Josh): Rename
-  bool _onScrollDynamicTab(ScrollNotification notification) {
+  /// Callback for when scroll notifications are received in info section
+  bool _onScrollInfoScrollNotification(ScrollNotification notification) {
     // Prevents info to be dragged down while scrolling in DynamicTab
     if (notification.depth >= 1) {
       if (notification is ScrollStartNotification) {
@@ -1134,7 +1131,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     final ScrollConfiguration infoScrollview = ScrollConfiguration(
       behavior: const NoOverScrollGlowBehavior(),
       child: NotificationListener<ScrollNotification>(
-        onNotification: _onScrollDynamicTab,
+        onNotification: _onScrollInfoScrollNotification,
         child: CustomScrollView(
           physics: _infoScrollPhysics,
           controller: _infoScrollController,
