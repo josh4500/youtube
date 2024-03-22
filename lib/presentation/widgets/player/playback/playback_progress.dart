@@ -192,9 +192,9 @@ class _PlaybackProgressState extends State<PlaybackProgress>
   /// Computes playback progress values
   ProgressValue _computeProgressValue(Progress data) {
     final double positionValue =
-        data.position.inSeconds / (widget.end?.inSeconds ?? 0);
+        data.position.inMicroseconds / (widget.end?.inMicroseconds ?? 0);
     final double bufferValue =
-        data.buffer.inSeconds / (widget.end?.inSeconds ?? 0);
+        data.buffer.inMicroseconds / (widget.end?.inMicroseconds ?? 0);
     return (positionValue, bufferValue);
   }
 
@@ -204,8 +204,7 @@ class _PlaybackProgressState extends State<PlaybackProgress>
       stream: widget.progress,
       initialData: widget.start,
       builder: (BuildContext context, AsyncSnapshot<Progress> snapshot) {
-        final ProgressValue data =
-            _computeProgressValue(snapshot.data ?? Progress.zero);
+        final data = _computeProgressValue(snapshot.data ?? Progress.zero);
         final double positionValue = data.$1;
         final double bufferValue = data.$2;
         return Stack(
