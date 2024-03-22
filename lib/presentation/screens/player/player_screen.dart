@@ -281,6 +281,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     });
 
     Future<void>(() async {
+      // Initial changes
+      _showHideNavigationBar(heightNotifier.value);
+
       final PlayerRepository playerRepo = ref.read(playerRepositoryProvider);
 
       playerRepo.openVideo(); // Opens and play video
