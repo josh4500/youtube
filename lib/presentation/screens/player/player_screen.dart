@@ -377,8 +377,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
   }
 
-  // TODO(Josh): investigate when minimized, swipe zooms in playerview
-
   /// Callback to show or hide home screen navigation bar
   void _showHideNavigationBar(double value) {
     ref.read(homeRepositoryProvider).updateNavBarPosition(
@@ -1055,9 +1053,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
             PlayerSignal.hideControls,
             PlayerSignal.hidePlaybackProgress,
           ]);
+          // Note: Do not remove
+          // We set to true to emulate player was dragged down to minimize
+          _isPlayerDraggingDown = true;
+          _preventPlayerDismiss = false;
           heightNotifier.value = minVideoViewPortHeight;
           widthNotifier.value = minVideoViewPortWidth;
-          _preventPlayerDismiss = false;
         } else if (notification is ExpandPlayerNotification) {
           _hideControls();
           additionalHeightNotifier.value = screenHeight * (1 - heightRatio);
