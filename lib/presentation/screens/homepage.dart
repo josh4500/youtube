@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 
 import '../constants.dart';
 import '../providers.dart';
@@ -46,7 +47,6 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage>
     with TickerProviderStateMixin {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
   late final AnimationController _overlayPlayerController;
   late final Animation<Offset> _overlayPlayerAnimation;
 
@@ -107,15 +107,14 @@ class _HomePageState extends ConsumerState<HomePage>
         _overlayPlayerController.forward();
       }
     });
+    final scaffoldKey = ref.read(homeRepositoryProvider).scaffoldKey;
     return SafeArea(
       bottom: false,
       child: Scaffold(
-        key: _scaffoldKey,
+        key: scaffoldKey,
         resizeToAvoidBottomInset: false,
         drawerEnableOpenDragGesture: false,
-        drawer: const Drawer(
-          child: HomeDrawer(),
-        ),
+        drawer: HomeDrawer(homeContext: context),
         body: Stack(
           children: <Widget>[
             widget.child,

@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
@@ -169,12 +170,16 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                       leadingWidth: 7.5,
                       leading: Padding(
                         padding: const EdgeInsets.all(4.0),
-                        child: CustomActionChip(
-                          borderRadius: BorderRadius.circular(4),
-                          backgroundColor: Colors.white12,
-                          icon: const Icon(Icons.assistant_navigation),
-                          onTap: () {
-                            // TODO(Josh): Opens drawer
+                        child: Consumer(
+                          builder: (context, ref, child) {
+                            return CustomActionChip(
+                              borderRadius: BorderRadius.circular(4),
+                              backgroundColor: Colors.white12,
+                              icon: const Icon(Icons.assistant_navigation),
+                              onTap: () {
+                                ref.read(homeRepositoryProvider).openDrawer();
+                              },
+                            );
                           },
                         ),
                       ),
