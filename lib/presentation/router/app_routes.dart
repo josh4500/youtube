@@ -55,35 +55,35 @@ class AppRoutes {
   );
   static final RouteInfo fashionAndBeauty = RouteInfo(
     name: 'Fashion and Beauty',
-    path: '/home/f_and_b',
+    path: 'home/f_and_b',
   );
   static final RouteInfo gaming = RouteInfo(
     name: 'Gaming',
-    path: '/home/gaming',
+    path: 'home/gaming',
   );
   static final RouteInfo learning = RouteInfo(
     name: 'Learning',
-    path: '/home/learning',
+    path: 'home/learning',
   );
   static final RouteInfo live = RouteInfo(
     name: 'Live',
-    path: '/home/live',
+    path: 'home/live',
   );
   static final RouteInfo music = RouteInfo(
     name: 'Music',
-    path: '/home/music',
+    path: 'home/music',
   );
   static final RouteInfo news = RouteInfo(
     name: 'News',
-    path: '/home/news',
+    path: 'home/news',
   );
   static final RouteInfo sports = RouteInfo(
     name: 'Sports',
-    path: '/home/sports',
+    path: 'home/sports',
   );
   static final RouteInfo trending = RouteInfo(
     name: 'Trending',
-    path: '/home/trending',
+    path: 'home/trending',
   );
 
   static final RouteInfo shorts = RouteInfo(
