@@ -64,6 +64,64 @@ class AppRouter {
                     key: state.pageKey,
                   );
                 },
+                routes: [
+                  GoRoute(
+                    name: AppRoutes.trending.name,
+                    path: AppRoutes.trending.path,
+                    builder: (BuildContext context, GoRouterState state) {
+                      return const TrendingScreen();
+                    },
+                  ),
+                  GoRoute(
+                    name: AppRoutes.music.name,
+                    path: AppRoutes.music.path,
+                    builder: (BuildContext context, GoRouterState state) {
+                      return const MusicScreen();
+                    },
+                  ),
+                  GoRoute(
+                    name: AppRoutes.live.name,
+                    path: AppRoutes.live.path,
+                    builder: (BuildContext context, GoRouterState state) {
+                      return const LiveScreen();
+                    },
+                  ),
+                  GoRoute(
+                    name: AppRoutes.gaming.name,
+                    path: AppRoutes.gaming.path,
+                    builder: (BuildContext context, GoRouterState state) {
+                      return const GamingScreen();
+                    },
+                  ),
+                  GoRoute(
+                    name: AppRoutes.news.name,
+                    path: AppRoutes.news.path,
+                    builder: (BuildContext context, GoRouterState state) {
+                      return const NewsScreen();
+                    },
+                  ),
+                  GoRoute(
+                    name: AppRoutes.sports.name,
+                    path: AppRoutes.sports.path,
+                    builder: (BuildContext context, GoRouterState state) {
+                      return const SportsScreen();
+                    },
+                  ),
+                  GoRoute(
+                    name: AppRoutes.fashionAndBeauty.name,
+                    path: AppRoutes.fashionAndBeauty.path,
+                    builder: (BuildContext context, GoRouterState state) {
+                      return const FashionAndBeautyScreen();
+                    },
+                  ),
+                  GoRoute(
+                    name: AppRoutes.learning.name,
+                    path: AppRoutes.learning.path,
+                    builder: (BuildContext context, GoRouterState state) {
+                      return const LearningScreen();
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -261,7 +319,7 @@ class AppRouter {
                 position: animation.drive(
                   Tween<Offset>(
                     begin: const Offset(1, 0),
-                    end: const Offset(0, 0),
+                    end: Offset.zero,
                   ),
                 ),
                 child: child,
@@ -289,7 +347,7 @@ class AppRouter {
                 position: animation.drive(
                   Tween<Offset>(
                     begin: const Offset(1, 0),
-                    end: const Offset(0, 0),
+                    end: Offset.zero,
                   ),
                 ),
                 child: child,
@@ -317,7 +375,7 @@ class AppRouter {
                 position: animation.drive(
                   Tween<Offset>(
                     begin: const Offset(1, 0),
-                    end: const Offset(0, 0),
+                    end: Offset.zero,
                   ),
                 ),
                 child: child,

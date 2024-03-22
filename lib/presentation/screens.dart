@@ -43,7 +43,15 @@ export 'screens/channel/channel_description_screen.dart';
 export 'screens/channel/channel_screen.dart';
 
 // Home
+export 'screens/home/fashion_and_beauty_screen.dart';
+export 'screens/home/gaming_screen.dart';
 export 'screens/home/home_feed_screen.dart';
+export 'screens/home/learning_screen.dart';
+export 'screens/home/live_screen.dart';
+export 'screens/home/music_screen.dart';
+export 'screens/home/news_screen.dart';
+export 'screens/home/sports_screen.dart';
+export 'screens/home/trending_screen.dart';
 export 'screens/homepage.dart';
 
 // Player
