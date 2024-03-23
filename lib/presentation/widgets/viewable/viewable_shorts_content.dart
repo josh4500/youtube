@@ -49,6 +49,10 @@ class ViewableShortsContent extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white12,
         borderRadius: borderRadius,
+        image: const DecorationImage(
+          image: NetworkImage('https://picsum.photos/400/900'),
+          fit: BoxFit.cover,
+        ),
       ),
       child: Stack(
         children: <Widget>[

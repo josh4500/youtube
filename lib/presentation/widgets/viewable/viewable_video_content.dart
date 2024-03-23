@@ -79,7 +79,7 @@ class ViewableVideoContent extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 const Text(
-                                  'Japan stocks: a minute\'s silence, then a slide | REUTERS',
+                                  'Future, Metro BoomIn - Like That (Official Audio)',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFFF1F1F1),
@@ -90,12 +90,12 @@ class ViewableVideoContent extends StatelessWidget {
                                   children: <Widget>[
                                     RichText(
                                       text: const TextSpan(
-                                        text: 'REUTERS',
+                                        text: 'Future',
                                         children: <InlineSpan>[
                                           TextSpan(text: ' · '),
-                                          TextSpan(text: '309 views'),
+                                          TextSpan(text: '1.8M views'),
                                           TextSpan(text: ' · '),
-                                          TextSpan(text: '1 hour ago'),
+                                          TextSpan(text: '1 day ago'),
                                         ],
                                         style: TextStyle(
                                           color: Color(0xFFAAAAAA),
@@ -105,7 +105,7 @@ class ViewableVideoContent extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 6),
+                                const SizedBox(height: 4),
                               ],
                             ),
                           ),
@@ -130,7 +130,7 @@ class ViewableVideoContent extends StatelessWidget {
         ),
         const Positioned(
           left: 8,
-          bottom: 32,
+          top: 227,
           child: Padding(
             padding: EdgeInsets.symmetric(
               vertical: 12.0,
@@ -141,7 +141,7 @@ class ViewableVideoContent extends StatelessWidget {
         ),
         Positioned(
           right: 9.5,
-          bottom: 48,
+          top: 227,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 6.0),
             child: InkWell(

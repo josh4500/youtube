@@ -25,13 +25,336 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-import 'package:flutter/material.dart';
+import 'dart:ui';
 
-class TrendingScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
+
+class TrendingScreen extends StatefulWidget {
   const TrendingScreen({super.key});
 
   @override
+  State<TrendingScreen> createState() => _TrendingScreenState();
+}
+
+class _TrendingScreenState extends State<TrendingScreen>
+    with SingleTickerProviderStateMixin {
+  final ScrollController scrollController = ScrollController();
+  late final AnimationController opacityController;
+  late final Animation animation;
+
+  @override
+  void initState() {
+    super.initState();
+    opacityController = AnimationController(
+      vsync: this,
+      value: 0,
+      duration: const Duration(milliseconds: 150),
+    );
+    animation = CurvedAnimation(parent: opacityController, curve: Curves.ease);
+    scrollController.addListener(() {
+      if (scrollController.offset <= 60) {
+        opacityController.value = scrollController.offset / 60;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    opacityController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    final List<String> tabs = <String>['Now', 'Music', 'Gaming', 'Movies'];
+    return DefaultTabController(
+      length: tabs.length,
+      child: Scaffold(
+        appBar: AppBar(
+          title: AnimatedBuilder(
+            animation: animation,
+            builder: (BuildContext context, Widget? child) {
+              return Opacity(
+                opacity: animation.value,
+                child: child,
+              );
+            },
+            child: const Text(
+              'Trending',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            AppbarAction(
+              icon: Icons.cast_outlined,
+              onTap: () {},
+            ),
+            AppbarAction(
+              icon: Icons.search,
+              onTap: () {},
+            ),
+            AppbarAction(
+              icon: Icons.more_vert_outlined,
+              onTap: () {},
+            ),
+          ],
+        ),
+        body: ScrollConfiguration(
+          behavior: const OverScrollGlowBehavior(enabled: false),
+          child: NestedScrollView(
+            controller: scrollController,
+            headerSliverBuilder: (BuildContext context, bool isScrolled) {
+              return <Widget>[
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.0,
+                      vertical: 8,
+                    ),
+                    child: Text(
+                      'Trending',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                SliverOverlapAbsorber(
+                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                    context,
+                  ),
+                  sliver: SliverPersistentHeader(
+                    floating: true,
+                    pinned: true,
+                    delegate: PersistentHeaderDelegate(
+                      maxHeight: 50,
+                      minHeight: 50,
+                      child: Material(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TabBar(
+                              isScrollable: true,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              indicatorPadding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              tabAlignment: TabAlignment.start,
+                              dividerColor: Colors.white,
+                              indicatorColor: Colors.white,
+                              enableFeedback: true,
+                              indicatorWeight: 2.5,
+                              tabs: tabs
+                                  .map((String name) => Tab(text: name))
+                                  .toList(),
+                            ),
+                            const Divider(height: .75, thickness: 1),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ];
+            },
+            body: TabBarView(
+              children: tabs.map((String tabName) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return CustomScrollView(
+                      slivers: <Widget>[
+                        SliverOverlapInjector(
+                          handle:
+                              NestedScrollView.sliverOverlapAbsorberHandleFor(
+                            context,
+                          ),
+                        ),
+                        if (tabName == 'Now') ..._buildNow(context),
+                        if (tabName == 'Music') ..._buildMusic(context),
+                        if (tabName == 'Gaming') ..._buildGaming(context),
+                        if (tabName == 'Movies') ..._buildMovies(context),
+                      ],
+                    );
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildNow(BuildContext context) {
+    return <Widget>[
+      const SliverToBoxAdapter(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 14,
+              ),
+              child: Text(
+                'Trending videos',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Divider(height: 0, thickness: 1.5),
+          ],
+        ),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableGroupShorts(
+          title: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 14,
+            ),
+            child: Text(
+              'Trending shorts',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+    ];
+  }
+
+  List<Widget> _buildMusic(BuildContext context) {
+    return <Widget>[
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+    ];
+  }
+
+  List<Widget> _buildGaming(BuildContext context) {
+    return <Widget>[
+      const SliverToBoxAdapter(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 14,
+              ),
+              child: Text(
+                'Trending videos',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Divider(height: 0, thickness: 1.5),
+          ],
+        ),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+    ];
+  }
+
+  List<Widget> _buildMovies(BuildContext context) {
+    return <Widget>[
+      const SliverToBoxAdapter(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 14,
+              ),
+              child: Text(
+                'Trending videos',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Divider(height: 0, thickness: 1.5),
+          ],
+        ),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+      const SliverToBoxAdapter(
+        child: ViewableVideoContent(),
+      ),
+    ];
   }
 }

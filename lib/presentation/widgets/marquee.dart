@@ -29,16 +29,20 @@
 import 'package:flutter/material.dart';
 
 class Marquee extends StatefulWidget {
-  final String text;
-  final Duration duration;
-  final AxisDirection direction;
-
   const Marquee({
     super.key,
-    required this.text,
+    required this.child,
     this.duration = const Duration(seconds: 5),
-    this.direction = AxisDirection.left,
+    this.axisDirection = AxisDirection.left,
+    this.clipBehavior = Clip.hardEdge,
+    this.cacheExtent,
   });
+
+  final Widget child;
+  final Duration duration;
+  final AxisDirection axisDirection;
+  final double? cacheExtent;
+  final Clip clipBehavior;
 
   @override
   State<Marquee> createState() => _MarqueeState();
@@ -65,11 +69,6 @@ class _MarqueeState extends State<Marquee> {
     super.activate();
   }
 
-  // Called when a dependency of this State object changes.
-  // For example, if the previous call to build referenced an InheritedWidget
-  // that later changed, the framework would call this method to notify this object
-  // about the change. This method is also called immediately after initState.
-  // It is safe to call BuildContext.dependOnInheritedWidgetOfExactType from this method.
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

@@ -27,12 +27,139 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-class FashionAndBeautyScreen extends StatelessWidget {
+class FashionAndBeautyScreen extends StatefulWidget {
   const FashionAndBeautyScreen({super.key});
 
   @override
+  State<FashionAndBeautyScreen> createState() => _FashionAndBeautyScreenState();
+}
+
+class _FashionAndBeautyScreenState extends State<FashionAndBeautyScreen>
+    with SingleTickerProviderStateMixin {
+  final ScrollController scrollController = ScrollController();
+  late final AnimationController opacityController;
+  late final Animation animation;
+
+  @override
+  void initState() {
+    super.initState();
+    opacityController = AnimationController(
+      vsync: this,
+      value: 0,
+      duration: const Duration(milliseconds: 150),
+    );
+    animation = CurvedAnimation(parent: opacityController, curve: Curves.ease);
+    scrollController.addListener(() {
+      if (scrollController.offset <= 60) {
+        opacityController.value = scrollController.offset / 60;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    opacityController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return Scaffold(
+      appBar: AppBar(
+        title: AnimatedBuilder(
+          animation: animation,
+          builder: (BuildContext context, Widget? child) {
+            return Opacity(
+              opacity: animation.value,
+              child: child,
+            );
+          },
+          child: const Text(
+            'Fashion & Beauty',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        actions: <Widget>[
+          AppbarAction(
+            icon: Icons.cast_outlined,
+            onTap: () {},
+          ),
+          AppbarAction(
+            icon: Icons.search,
+            onTap: () {},
+          ),
+          AppbarAction(
+            icon: Icons.more_vert_outlined,
+            onTap: () {},
+          ),
+        ],
+      ),
+      body: ScrollConfiguration(
+        behavior: const OverScrollGlowBehavior(enabled: false),
+        child: CustomScrollView(
+          controller: scrollController,
+          slivers: <Widget>[
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12.0,
+                  vertical: 4,
+                ),
+                child: Text(
+                  'Fashion & Beauty',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: ViewableGroupContent(
+                title:
+                    'Womenswear Paris Fashion\nWeek®️ Fall/Winter 2024-2025 by FHCM',
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                direction: Axis.vertical,
+                itemBuilder: (BuildContext context, int index) {
+                  return const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: PlayableVideoContent(
+                      width: 160,
+                      height: 90,
+                    ),
+                  );
+                },
+                itemCount: 4,
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: ViewableGroupContent(
+                title:
+                    'Milan Fashion Week Fw 2024/2025 presented by Camera Nazionale della Modal',
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                direction: Axis.vertical,
+                itemBuilder: (BuildContext context, int index) {
+                  return const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: PlayableVideoContent(
+                      width: 160,
+                      height: 90,
+                    ),
+                  );
+                },
+                itemCount: 4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

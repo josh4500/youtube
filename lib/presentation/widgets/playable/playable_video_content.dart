@@ -33,87 +33,103 @@ class PlayableVideoContent extends StatelessWidget {
     super.key,
     this.width,
     this.height,
+    this.direction = Axis.horizontal,
+    this.margin,
   });
+  final Axis direction;
+  final EdgeInsets? margin;
+
   // TODO(Josh): rename width and height
   final double? width;
   final double? height;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Stack(
-          alignment: Alignment.bottomRight,
-          children: <Widget>[
-            Container(
-              width: width,
-              height: height,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                vertical: 2,
-                horizontal: 4,
-              ),
-              margin: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 6,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.black87,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text(
-                '6:54',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(width: 16),
-        Flexible(
-          child: SizedBox(
-            width: width,
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        'I found the BEST One Piece cast clips from their socials',
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Mobile Academy',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        '11k Views',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    ],
+    return Container(
+      margin: margin,
+      child: Flex(
+        direction: direction,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Stack(
+            alignment: Alignment.bottomRight,
+            children: <Widget>[
+              Container(
+                width: width,
+                height: height,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  image: const DecorationImage(
+                    image: NetworkImage('https://picsum.photos/300/300'),
+                    fit: BoxFit.cover,
                   ),
                 ),
-                SizedBox(width: 8),
-                Icon(Icons.more_vert_outlined),
-              ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 2,
+                  horizontal: 4,
+                ),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  '6:54',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (direction == Axis.vertical)
+            const SizedBox(height: 8)
+          else
+            const SizedBox(width: 12),
+          Flexible(
+            child: SizedBox(
+              width: direction == Axis.vertical ? width : null,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'I found the BEST One Piece cast clips from their socials',
+                          maxLines: direction == Axis.horizontal ? 3 : 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        const Text(
+                          'Mobile Academy',
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 2),
+                        const Text(
+                          '11k Views',
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.more_vert_outlined, size: 14),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
+import 'package:youtube_clone/presentation/router/app_router.dart';
+import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class HomeDrawer extends StatelessWidget {
@@ -17,50 +21,62 @@ class HomeDrawer extends StatelessWidget {
         children: [
           Expanded(
             child: ListView(
-              children: const <Widget>[
-                Padding(
+              children: <Widget>[
+                const Padding(
                   padding: EdgeInsets.all(12.0),
                   child: AppLogo(),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 HomeDrawerItem(
                   title: 'Trending',
-                  icon: Icon(Icons.sports_volleyball),
+                  icon: const Icon(Icons.sports_volleyball),
+                  onTap: () => homeContext.goto(AppRoutes.trending),
                 ),
                 HomeDrawerItem(
                   title: 'Music',
-                  icon: Icon(Icons.music_note_outlined),
+                  icon: const Icon(Icons.music_note_outlined),
+                  onTap: () => homeContext.goto(AppRoutes.music),
                 ),
                 HomeDrawerItem(
                   title: 'Live',
-                  icon: Icon(Icons.live_tv_outlined),
+                  icon: const Icon(Icons.live_tv_outlined),
+                  onTap: () => homeContext.goto(AppRoutes.live),
                 ),
                 HomeDrawerItem(
                   title: 'Gaming',
-                  icon: Icon(Icons.games_outlined),
+                  icon: const Icon(Icons.games_outlined),
+                  onTap: () => homeContext.goto(AppRoutes.gaming),
                 ),
                 HomeDrawerItem(
                   title: 'News',
-                  icon: Icon(Icons.newspaper_outlined),
+                  icon: const Icon(Icons.newspaper_outlined),
+                  onTap: () => homeContext.goto(AppRoutes.news),
                 ),
                 HomeDrawerItem(
                   title: 'Sports',
-                  icon: Icon(Icons.wind_power),
+                  icon: const Icon(Icons.wind_power),
+                  onTap: () => homeContext.goto(AppRoutes.sports),
                 ),
                 HomeDrawerItem(
-                  title: 'Fashion',
-                  icon: Icon(Icons.font_download_outlined),
+                  title: 'Learning',
+                  icon: const Icon(Icons.lightbulb_outline_rounded),
+                  onTap: () => homeContext.goto(AppRoutes.learning),
                 ),
-                Divider(height: 8, thickness: 1),
                 HomeDrawerItem(
+                  title: 'Fashion And Beauty',
+                  icon: const Icon(Icons.font_download_outlined),
+                  onTap: () => homeContext.goto(AppRoutes.fashionAndBeauty),
+                ),
+                const Divider(height: 12, thickness: 1),
+                const HomeDrawerItem(
                   title: 'Youtube Premium',
                   icon: Icon(Icons.play_arrow, color: Colors.red),
                 ),
-                HomeDrawerItem(
+                const HomeDrawerItem(
                   title: 'Youtube Music',
                   icon: Icon(Icons.play_arrow, color: Colors.red),
                 ),
-                HomeDrawerItem(
+                const HomeDrawerItem(
                   title: 'Youtube kids',
                   icon: Icon(Icons.play_arrow, color: Colors.red),
                 ),
@@ -68,10 +84,10 @@ class HomeDrawer extends StatelessWidget {
             ),
           ),
           const Padding(
-            padding: EdgeInsets.all(4.0),
+            padding: EdgeInsets.all(8.0),
             child: Text(
               'Privacy Policy · Terms of Service',
-              style: TextStyle(fontSize: 11, color: Colors.white38),
+              style: TextStyle(fontSize: 12, color: Colors.white60),
             ),
           ),
         ],
@@ -80,7 +96,7 @@ class HomeDrawer extends StatelessWidget {
   }
 }
 
-class HomeDrawerItem extends StatelessWidget {
+class HomeDrawerItem extends ConsumerWidget {
   const HomeDrawerItem({
     super.key,
     required this.title,
@@ -93,9 +109,14 @@ class HomeDrawerItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return TappableArea(
-      onPressed: onTap,
+      onPressed: () {
+        if (onTap != null) {
+          ref.read(homeRepositoryProvider).closeDrawer();
+          onTap?.call();
+        }
+      },
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 24),
       child: Row(
         children: [

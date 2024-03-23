@@ -31,6 +31,8 @@ import 'package:flutter/material.dart';
 import '../../custom_action_chip.dart';
 import '../../over_scroll_glow_behavior.dart';
 
+// TODO(Josh): Rename. This is confusing in comparison between Playable and Viewable
+// TODO(Josh): *Refactor This can hold a Playable or Viewable because of it builder
 class ViewableGroupContent extends StatelessWidget {
   const ViewableGroupContent({
     super.key,
@@ -39,6 +41,7 @@ class ViewableGroupContent extends StatelessWidget {
     this.height,
     this.physics,
     this.padding,
+    this.shrinkWrap = false,
     this.direction = Axis.horizontal,
     required this.itemBuilder,
     this.onTap,
@@ -50,6 +53,7 @@ class ViewableGroupContent extends StatelessWidget {
   final EdgeInsets? padding;
   final Axis direction;
   final ScrollPhysics? physics;
+  final bool shrinkWrap;
   final VoidCallback? onTap;
   final Widget Function(BuildContext context, int index) itemBuilder;
   final int? itemCount;
@@ -61,11 +65,21 @@ class ViewableGroupContent extends StatelessWidget {
         Stack(
           children: <Widget>[
             ListTile(
-              title: Text(
-                title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w500),
+              title: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 80),
+                ],
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 20,
@@ -107,6 +121,7 @@ class ViewableGroupContent extends StatelessWidget {
                   const EdgeInsets.symmetric(
                     horizontal: 10,
                   ),
+              shrinkWrap: shrinkWrap,
               itemCount: itemCount,
               itemBuilder: itemBuilder,
               scrollDirection: direction,
