@@ -29,8 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
-import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class AccountChannelSection extends StatelessWidget {
   const AccountChannelSection({
@@ -45,21 +44,13 @@ class AccountChannelSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Column(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
             child: Row(
               children: <Widget>[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(64),
-                  child: Image.network(
-                    'https://ui-avatars.com/api/?background=3d3d3d&color=fff',
-                    height: 86,
-                    width: 86,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                const Column(
+                AccountAvatar(size: 86),
+                SizedBox(width: 14),
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
