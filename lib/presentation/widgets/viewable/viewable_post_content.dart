@@ -35,6 +35,7 @@ class ViewablePostContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO(Josh): Be able to hide more button
     return Column(
       children: <Widget>[
         const Divider(thickness: 1.5, height: 0),

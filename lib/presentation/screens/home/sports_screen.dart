@@ -26,12 +26,106 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
+
+import 'widgets/sports_slides.dart';
 
 class SportsScreen extends StatelessWidget {
   const SportsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: const Text(
+          'Sports',
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        actions: <Widget>[
+          AppbarAction(
+            icon: Icons.cast_outlined,
+            onTap: () {},
+          ),
+          AppbarAction(
+            icon: Icons.search,
+            onTap: () {},
+          ),
+          AppbarAction(
+            icon: Icons.more_vert_outlined,
+            onTap: () {},
+          ),
+        ],
+      ),
+      body: ScrollConfiguration(
+        behavior: const OverScrollGlowBehavior(enabled: false),
+        child: CustomScrollView(
+          slivers: [
+            const SliverToBoxAdapter(child: SportSlides()),
+            const SliverToBoxAdapter(
+                child: ChannelSubscribeTile(
+              title: 'Sports',
+            )),
+            SliverToBoxAdapter(
+              child: GroupedViewBuilder(
+                title: 'Live',
+                height: 300,
+                onTap: () {},
+                itemBuilder: (BuildContext context, int index) {
+                  return const PlayableVideoContent(
+                    width: 288,
+                    height: 165,
+                    margin: EdgeInsets.only(right: 12),
+                    direction: Axis.vertical,
+                  );
+                },
+                itemCount: 10,
+              ),
+            ),
+            const SliverToBoxAdapter(child: ViewableVideoContent()),
+            const SliverToBoxAdapter(child: ViewableVideoContent()),
+            const SliverToBoxAdapter(child: Divider(height: 0, thickness: 1.5)),
+            SliverToBoxAdapter(
+              child: GroupedViewBuilder(
+                title: 'Highlights',
+                height: 300,
+                onTap: () {},
+                itemBuilder: (BuildContext context, int index) {
+                  return const PlayableVideoContent(
+                    width: 288,
+                    height: 165,
+                    margin: EdgeInsets.only(right: 12),
+                    direction: Axis.vertical,
+                  );
+                },
+                itemCount: 10,
+              ),
+            ),
+            const SliverToBoxAdapter(child: ViewableVideoContent()),
+            const SliverToBoxAdapter(child: ViewableVideoContent()),
+            const SliverToBoxAdapter(child: Divider(height: 0, thickness: 1.5)),
+            SliverToBoxAdapter(
+              child: GroupedViewBuilder(
+                title: 'Top Stories',
+                height: 300,
+                onTap: () {},
+                itemBuilder: (BuildContext context, int index) {
+                  return const PlayableVideoContent(
+                    width: 288,
+                    height: 165,
+                    margin: EdgeInsets.only(right: 12),
+                    direction: Axis.vertical,
+                  );
+                },
+                itemCount: 10,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

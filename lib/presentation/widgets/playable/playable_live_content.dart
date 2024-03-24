@@ -47,6 +47,7 @@ class PlayableLiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Add bool to hide live/duration indicator
     // TODO: Can be completed or upcoming or currently live
     return Container(
       margin: margin,

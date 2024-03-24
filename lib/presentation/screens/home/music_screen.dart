@@ -25,13 +25,124 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/screens/home/widgets/sports_slides.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class MusicScreen extends StatelessWidget {
   const MusicScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    final List<String> tabs = <String>['Home', 'Community'];
+    return DefaultTabController(
+      length: tabs.length,
+      child: Scaffold(
+        body: ScrollConfiguration(
+          behavior: const OverScrollGlowBehavior(enabled: false),
+          child: NestedScrollView(
+            headerSliverBuilder: (BuildContext context, bool isScrolled) {
+              return <Widget>[
+                SliverAppBar(
+                  backgroundColor: Colors.transparent,
+                  title: const Text(
+                    'Music',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  actions: <Widget>[
+                    AppbarAction(
+                      icon: Icons.search,
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+                SliverOverlapAbsorber(
+                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                    context,
+                  ),
+                  sliver: SliverPersistentHeader(
+                    floating: true,
+                    pinned: true,
+                    delegate: PersistentHeaderDelegate(
+                      maxHeight: 50,
+                      minHeight: 50,
+                      child: Material(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TabBar(
+                              isScrollable: true,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              indicatorPadding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              tabAlignment: TabAlignment.start,
+                              dividerColor: Colors.white,
+                              indicatorColor: Colors.white,
+                              enableFeedback: true,
+                              indicatorWeight: 2.5,
+                              tabs: tabs
+                                  .map((String name) => Tab(text: name))
+                                  .toList(),
+                            ),
+                            const Divider(height: .75, thickness: 1),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ];
+            },
+            body: TabBarView(
+              children: tabs.map((String tabName) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return CustomScrollView(
+                      slivers: <Widget>[
+                        SliverOverlapInjector(
+                          handle:
+                              NestedScrollView.sliverOverlapAbsorberHandleFor(
+                            context,
+                          ),
+                        ),
+                        if (tabName == 'Home') ..._buildHome(context),
+                        if (tabName == 'Community') ..._buildCommunity(context),
+                      ],
+                    );
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildHome(BuildContext context) {
+    return [
+      const SliverToBoxAdapter(child: SportSlides()),
+      const SliverToBoxAdapter(
+        child: ChannelSubscribeTile(title: 'Music'),
+      ),
+      const SliverToBoxAdapter(child: SportSlides()),
+    ];
+  }
+
+  List<Widget> _buildCommunity(BuildContext context) {
+    return [
+      const SliverToBoxAdapter(child: ViewablePostContent()),
+      const SliverToBoxAdapter(child: ViewablePostContent()),
+      const SliverToBoxAdapter(child: ViewablePostContent()),
+      const SliverToBoxAdapter(child: ViewablePostContent()),
+      const SliverToBoxAdapter(child: ViewablePostContent()),
+      const SliverToBoxAdapter(child: ViewablePostContent()),
+    ];
   }
 }

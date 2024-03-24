@@ -28,15 +28,14 @@
 
 import 'package:flutter/material.dart';
 
-import '../../custom_action_chip.dart';
-import '../../over_scroll_glow_behavior.dart';
+import 'custom_action_chip.dart';
+import 'over_scroll_glow_behavior.dart';
 
-// TODO(Josh): Rename. This is confusing in comparison between Playable and Viewable
-// TODO(Josh): *Refactor This can hold a Playable or Viewable because of it builder
-class ViewableGroupContent extends StatelessWidget {
-  const ViewableGroupContent({
+class GroupedViewBuilder extends StatelessWidget {
+  const GroupedViewBuilder({
     super.key,
     required this.title,
+    this.subtitle,
     this.width,
     this.height,
     this.physics,
@@ -47,7 +46,9 @@ class ViewableGroupContent extends StatelessWidget {
     this.onTap,
     this.itemCount,
   });
+
   final String title;
+  final String? subtitle;
   final double? width;
   final double? height;
   final EdgeInsets? padding;
@@ -57,7 +58,7 @@ class ViewableGroupContent extends StatelessWidget {
   final VoidCallback? onTap;
   final Widget Function(BuildContext context, int index) itemBuilder;
   final int? itemCount;
-
+  // TODO(Josh): Add useTappable property for the title tile
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -84,6 +85,12 @@ class ViewableGroupContent extends StatelessWidget {
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 20,
               ),
+              subtitle: subtitle != null
+                  ? Text(
+                      subtitle!,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    )
+                  : null,
               onTap: onTap,
             ),
             Positioned(

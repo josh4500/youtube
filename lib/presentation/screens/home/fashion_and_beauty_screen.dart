@@ -120,7 +120,7 @@ class _FashionAndBeautyScreenState extends State<FashionAndBeautyScreen>
               ),
             ),
             SliverToBoxAdapter(
-              child: ViewableGroupContent(
+              child: GroupedViewBuilder(
                 title:
                     'Womenswear Paris Fashion\nWeek®️ Fall/Winter 2024-2025 by FHCM',
                 shrinkWrap: true,
@@ -139,7 +139,7 @@ class _FashionAndBeautyScreenState extends State<FashionAndBeautyScreen>
               ),
             ),
             SliverToBoxAdapter(
-              child: ViewableGroupContent(
+              child: GroupedViewBuilder(
                 title:
                     'Milan Fashion Week Fw 2024/2025 presented by Camera Nazionale della Modal',
                 shrinkWrap: true,

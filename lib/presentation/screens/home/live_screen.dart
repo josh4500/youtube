@@ -119,7 +119,7 @@ class _LiveScreenState extends State<LiveScreen>
               ),
             ),
             SliverToBoxAdapter(
-              child: ViewableGroupContent(
+              child: GroupedViewBuilder(
                 title: 'Featured Live Stream',
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -138,7 +138,7 @@ class _LiveScreenState extends State<LiveScreen>
               ),
             ),
             SliverToBoxAdapter(
-              child: ViewableGroupContent(
+              child: GroupedViewBuilder(
                 title: 'Live Now - News',
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

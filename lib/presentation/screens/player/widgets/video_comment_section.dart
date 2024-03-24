@@ -29,13 +29,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'video_highlighted_comment.dart';
 
 class VideoCommentSection extends ConsumerStatefulWidget {
-  final VoidCallback? onTap;
   const VideoCommentSection({super.key, this.onTap});
+  final VoidCallback? onTap;
 
   @override
   ConsumerState<VideoCommentSection> createState() =>
@@ -44,7 +44,7 @@ class VideoCommentSection extends ConsumerStatefulWidget {
 
 class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
   int currentPage = 0;
-  final _pageController = PageController(initialPage: 0);
+  final _pageController = PageController();
 
   @override
   void dispose() {
@@ -57,7 +57,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
     final isRestrictedMode = ref.watch(
       preferencesProvider.select((value) => value.restrictedMode),
     );
-    // TODO: Check for isLiveVideo
+    // TODO(Josh): Check for isLiveVideo
     const isDisabled = false;
     const isLiveVideo = true;
     const showHighlighted = true;
@@ -102,31 +102,10 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
               if (isLiveVideo && !isRestrictedMode)
                 ListenableBuilder(
                   listenable: _pageController,
-                  builder: (context, _) {
-                    return Row(
-                      children: [
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: currentPage == 0
-                                ? Colors.white
-                                : Colors.white12,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: currentPage != 0
-                                ? Colors.white
-                                : Colors.white12,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ],
+                  builder: (BuildContext context, Widget? child) {
+                    return SlidesIndicator(
+                      pageCount: 2,
+                      currentPage: currentPage,
                     );
                   },
                 ),
@@ -161,7 +140,6 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
 
     if (!isRestrictedMode) {
       return Container(
-        clipBehavior: Clip.none,
         margin: const EdgeInsets.symmetric(
           vertical: 12,
           horizontal: 12,

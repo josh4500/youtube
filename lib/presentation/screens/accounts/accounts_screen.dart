@@ -40,7 +40,7 @@ import '../../widgets/appbar_action.dart';
 import '../../widgets/playable/playable_content.dart';
 import '../../widgets/playlist/add_new_playlist.dart';
 import '../../widgets/tappable_area.dart';
-import '../../widgets/viewable/group/viewable_group_contents.dart';
+import '../../widgets/grouped_view_builder.dart';
 
 class AccountsScreen extends StatelessWidget {
   const AccountsScreen({super.key});
@@ -88,7 +88,7 @@ class AccountsScreen extends StatelessWidget {
               SliverList(
                 delegate: SliverChildListDelegate(
                   <Widget>[
-                    ViewableGroupContent(
+                    GroupedViewBuilder(
                       title: 'History',
                       height: MediaQuery.sizeOf(context).height * 0.23,
                       onTap: () => context.goto(AppRoutes.watchHistory),
@@ -103,7 +103,7 @@ class AccountsScreen extends StatelessWidget {
                       },
                       itemCount: 3,
                     ),
-                    ViewableGroupContent(
+                    GroupedViewBuilder(
                       title: 'Playlist',
                       height: MediaQuery.sizeOf(context).height * 0.23,
                       onTap: () => context.goto(AppRoutes.accountPlaylists),
