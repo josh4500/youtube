@@ -153,7 +153,10 @@ class _ChannelScreenState extends State<ChannelScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               const Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 12,
+                ),
                 child: Text(
                   'For You',
                   style: TextStyle(

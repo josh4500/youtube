@@ -35,10 +35,10 @@ class ViewableGroupShorts extends StatelessWidget {
   // TODO: Add how the different layouts should be built
   const ViewableGroupShorts({
     super.key,
-    this.title,
+    required this.title,
     this.layout = ViewableGroupLayout.list,
   });
-  final Widget? title;
+  final Widget title;
   final ViewableGroupLayout layout;
 
   @override
@@ -49,27 +49,7 @@ class ViewableGroupShorts extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Divider(thickness: 1.5, height: 0),
-        title ??
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.adb_sharp,
-                    size: 36,
-                    color: Colors.red,
-                  ),
-                  SizedBox(width: 16),
-                  Text(
-                    'Shorts',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+        title,
         SizedBox(
           height: 300,
           child: ListView.builder(

@@ -46,7 +46,7 @@ class ChannelSection extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(
             vertical: 2,
-            horizontal: 16.0,
+            horizontal: 12.0,
           ),
           child: Column(
             children: <Widget>[
@@ -114,7 +114,7 @@ class ChannelSection extends StatelessWidget {
           },
           padding: const EdgeInsets.symmetric(
             vertical: 8,
-            horizontal: 16.0,
+            horizontal: 12.0,
           ),
           child: const Row(
             children: <Widget>[
@@ -135,7 +135,7 @@ class ChannelSection extends StatelessWidget {
           ),
         ),
         const TappableArea(
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16.0),
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12.0),
           child: Row(
             children: <Widget>[
               Text(
@@ -146,39 +146,60 @@ class ChannelSection extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: NotificationOption(
-                  title: 'Subscribe',
-                  alignment: Alignment.center,
-                  backgroundColor: Colors.white12,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 16,
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
+          child: Column(
+            children: [
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: NotificationOption(
+                      title: 'Subscribed',
+                      alignment: Alignment.center,
+                      backgroundColor: Colors.white12,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 12,
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      borderRadius: BorderRadius.circular(32),
+                    ),
                   ),
-                  textStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: CustomActionChip(
+                      title: 'Join',
+                      alignment: Alignment.center,
+                      backgroundColor: Colors.white12,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 12,
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      borderRadius: BorderRadius.circular(32),
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(32),
-                ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: CustomActionChip(
-                  title: 'Join',
-                  alignment: Alignment.center,
-                  backgroundColor: Colors.white12,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  textStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  borderRadius: BorderRadius.circular(32),
+              const SizedBox(height: 12),
+              CustomActionChip(
+                title: 'Visit store',
+                alignment: Alignment.center,
+                backgroundColor: Colors.white12,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 12,
                 ),
+                textStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                borderRadius: BorderRadius.circular(32),
               ),
             ],
           ),

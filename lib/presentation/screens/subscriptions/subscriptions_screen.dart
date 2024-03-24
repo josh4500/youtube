@@ -165,7 +165,28 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
               child: ViewablePostContent(),
             ),
             const SliverToBoxAdapter(
-              child: ViewableGroupShorts(),
+              child: ViewableGroupShorts(
+                title: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.adb_sharp,
+                        size: 36,
+                        color: Colors.red,
+                      ),
+                      SizedBox(width: 16),
+                      Text(
+                        'Shorts',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
             ValueListenableBuilder<int?>(
               valueListenable: _selectedChannel,
