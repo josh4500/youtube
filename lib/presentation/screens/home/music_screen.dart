@@ -25,9 +25,8 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/screens/home/widgets/sports_slides.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class MusicScreen extends StatelessWidget {
@@ -127,11 +126,11 @@ class MusicScreen extends StatelessWidget {
 
   List<Widget> _buildHome(BuildContext context) {
     return [
-      const SliverToBoxAdapter(child: SportSlides()),
+      const SliverToBoxAdapter(child: ViewableContentSlides()),
       const SliverToBoxAdapter(
         child: ChannelSubscribeTile(title: 'Music'),
       ),
-      const SliverToBoxAdapter(child: SportSlides()),
+      const SliverToBoxAdapter(child: ViewableContentSlides()),
     ];
   }
 

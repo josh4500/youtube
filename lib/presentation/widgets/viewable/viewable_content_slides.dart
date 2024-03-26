@@ -1,16 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets.dart';
+import '../over_scroll_glow_behavior.dart';
+import '../slides_indicator.dart';
 
-class SportSlides extends StatefulWidget {
-  const SportSlides({super.key});
+class ViewableContentSlides extends StatefulWidget {
+  const ViewableContentSlides({super.key});
 
   @override
-  State<SportSlides> createState() => _SportSlidesState();
+  State<ViewableContentSlides> createState() => _ViewableContentSlidesState();
 }
 
-class _SportSlidesState extends State<SportSlides> {
+class _ViewableContentSlidesState extends State<ViewableContentSlides> {
   int _currentPage = 0;
   final PageController _pageController = PageController();
   bool _enablePreviewMode = true;

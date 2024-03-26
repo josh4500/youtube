@@ -28,8 +28,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import 'widgets/sports_slides.dart';
-
 class SportsScreen extends StatelessWidget {
   const SportsScreen({super.key});
 
@@ -64,7 +62,7 @@ class SportsScreen extends StatelessWidget {
         behavior: const OverScrollGlowBehavior(enabled: false),
         child: CustomScrollView(
           slivers: [
-            const SliverToBoxAdapter(child: SportSlides()),
+            const SliverToBoxAdapter(child: ViewableContentSlides()),
             const SliverToBoxAdapter(
                 child: ChannelSubscribeTile(
               title: 'Sports',
