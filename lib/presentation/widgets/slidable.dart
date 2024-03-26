@@ -41,10 +41,10 @@ import 'custom_action_chip.dart';
 ///
 /// A trailing `icon` can be provided to be displayed behind the child widget
 /// when it's slid away.
-
 class Slidable extends StatefulWidget {
   const Slidable({
     super.key,
+    this.sharedSlidableState,
     this.backgroundColor = Colors.white,
     this.maxOffset = 0.5,
     this.extraOffset = 0.1,
@@ -54,6 +54,8 @@ class Slidable extends StatefulWidget {
     this.icon,
     required this.child,
   });
+
+  final SharedSlidableState? sharedSlidableState;
 
   /// Animation duration
   final Duration duration;
@@ -117,6 +119,18 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
         reverseCurve: Curves.easeInToLinear,
       ),
     );
+
+    widget.sharedSlidableState?.addListener(_sharedStateListener);
+  }
+
+  void _sharedStateListener() {
+    final key = widget.key;
+    if (key != null && key is ValueKey) {
+      if (widget.sharedSlidableState?.value != key.value) {
+        _extraSlideController.reverse();
+        _slideController.reverse();
+      }
+    }
   }
 
   @override
@@ -145,6 +159,13 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
           reverseCurve: Curves.easeInToLinear,
         ),
       );
+    }
+
+    if (oldWidget.sharedSlidableState == null) {
+      widget.sharedSlidableState?.addListener(_sharedStateListener);
+    }
+    if (widget.sharedSlidableState == null) {
+      oldWidget.sharedSlidableState?.removeListener(_sharedStateListener);
     }
   }
 
@@ -211,6 +232,11 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
   /// Updates the animation value during dragging, adjusting it based on the
   /// direction and constraints.
   void _onDragUpdate(DragUpdateDetails details, BoxConstraints constraints) {
+    final key = widget.key;
+    if (key != null && key is ValueKey) {
+      widget.sharedSlidableState?.value = key.value;
+    }
+
     _slideController.value = clampDouble(
       _slideController.value +
           (_getDirectionOffset(details.delta) /
@@ -327,4 +353,8 @@ Alignment axisDirectionToCenterAlignment(AxisDirection direction) {
     case AxisDirection.down:
       return Alignment.bottomCenter;
   }
+}
+
+class SharedSlidableState<T> extends ValueNotifier<T> {
+  SharedSlidableState(super.value);
 }
