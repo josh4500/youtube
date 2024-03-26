@@ -41,45 +41,46 @@ class PlayableShortsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: width,
-          margin: const EdgeInsets.all(4),
-          padding: const EdgeInsets.symmetric(
-            vertical: 8,
-            horizontal: 4,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: width,
+        margin: const EdgeInsets.all(4),
+        padding: const EdgeInsets.symmetric(
+          vertical: 8,
+          horizontal: 4,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          image: const DecorationImage(
+            image: NetworkImage('https://picsum.photos/250/300'),
+            fit: BoxFit.cover,
           ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.white12,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              const Align(
-                alignment: Alignment.topRight,
-                child: Icon(
-                  Icons.more_vert_sharp,
-                  size: 14,
-                ),
+          color: Colors.white12,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            const Align(
+              alignment: Alignment.topRight,
+              child: Icon(
+                Icons.more_vert_sharp,
+                size: 14,
               ),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                child: const Text(
-                  'mappa animators making',
-                  maxLines: 2,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              child: const Text(
+                'mappa animators making',
+                maxLines: 2,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

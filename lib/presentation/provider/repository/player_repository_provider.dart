@@ -104,34 +104,6 @@ enum PlayerLock {
 }
 
 class PlayerRepository {
-  final Ref _ref;
-
-  final _positionMemory = InMemoryCache<Progress>('PositionMemory');
-
-  final _videoPlayer = Player();
-  late final _videoController = VideoController(_videoPlayer);
-  VideoController get videoController => _videoController;
-
-  late final Stream<Progress> _videoPlayerProgressStream;
-
-  Duration get currentVideoDuration => _videoPlayer.state.duration;
-  Duration get currentVideoPosition => _videoPlayer.state.position;
-  Progress? get currentVideoProgress => _positionMemory.read('video');
-  Stream<Duration> get positionStream => _videoPlayer.stream.position;
-
-  final _playerSignalController = StreamController<PlayerSignal>.broadcast();
-  Stream<PlayerSignal> get playerSignalStream => _playerSignalController.stream;
-
-  final _progressController = StreamController<Progress>.broadcast();
-  Stream<Progress> get videoProgressStream => _progressController.stream;
-
-  // TODO: May use a Riverpod provider (It may deprecate the use of playerNotifierProvider)
-  final Set<PlayerViewState> _playerViewState = <PlayerViewState>{};
-  Set<PlayerViewState> get playerViewState => _playerViewState;
-
-  // TODO: May use a Riverpod provider
-  final Set<PlayerLock> _lock = <PlayerLock>{};
-
   PlayerRepository({required Ref ref}) : _ref = ref {
     _videoPlayerProgressStream = _videoPlayer.stream.progress;
 
@@ -168,8 +140,35 @@ class PlayerRepository {
       }
     });
   }
+  final Ref _ref;
 
-  // TODO: Should be able open video
+  final _positionMemory = InMemoryCache<Progress>('PositionMemory');
+
+  final _videoPlayer = Player();
+  late final _videoController = VideoController(_videoPlayer);
+  VideoController get videoController => _videoController;
+
+  late final Stream<Progress> _videoPlayerProgressStream;
+
+  Duration get currentVideoDuration => _videoPlayer.state.duration;
+  Duration get currentVideoPosition => _videoPlayer.state.position;
+  Progress? get currentVideoProgress => _positionMemory.read('video');
+  Stream<Duration> get positionStream => _videoPlayer.stream.position;
+
+  final _playerSignalController = StreamController<PlayerSignal>.broadcast();
+  Stream<PlayerSignal> get playerSignalStream => _playerSignalController.stream;
+
+  final _progressController = StreamController<Progress>.broadcast();
+  Stream<Progress> get videoProgressStream => _progressController.stream;
+
+  // TODO(Josh): May use a Riverpod provider (It may deprecate the use of playerNotifierProvider)
+  final Set<PlayerViewState> _playerViewState = <PlayerViewState>{};
+  Set<PlayerViewState> get playerViewState => _playerViewState;
+
+  // TODO(Josh): May use a Riverpod provider
+  final Set<PlayerLock> _lock = <PlayerLock>{};
+
+  // TODO(Josh): Should be able open video
   void openPlayerScreen() {
     _ref.read(_playerOverlayStateProvider.notifier).state = true;
   }
@@ -187,7 +186,6 @@ class PlayerRepository {
       Media(
         'https://user-images.githubusercontent.com/28951144/229373695-22f88f13-d18f-4288-9bf1-c3e078d83722.mp4',
       ),
-      play: true,
     );
   }
 
@@ -290,7 +288,7 @@ class PlayerRepository {
         case PlayerSignal.closeChapters:
           _playerViewState.remove(PlayerViewState.visibleChapters);
         default:
-          break;
+          return;
       }
       _playerSignalController.sink.add(signal);
     }

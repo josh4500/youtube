@@ -26,7 +26,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -46,6 +45,8 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
   final ScrollController controller = ScrollController();
   final FocusNode focusNode = FocusNode();
   final TextEditingController textEditingController = TextEditingController();
+  final SharedSlidableState<int?> sharedSlidableState =
+      SharedSlidableState<int?>(null);
 
   late final AnimationController opacityController;
   late final Animation animation;
@@ -73,6 +74,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
     focusNode.dispose();
     opacityController.dispose();
     textEditingController.dispose();
+    sharedSlidableState.dispose();
     super.dispose();
   }
 
@@ -150,10 +152,19 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return const PlayableVideoContent(
-                      width: 180,
-                      height: 104,
-                      margin: EdgeInsets.all(12.0),
+                    return Slidable(
+                      maxOffset: 0.3,
+                      key: ValueKey(-index),
+                      sharedSlidableState: sharedSlidableState,
+                      icon: const Icon(Icons.delete, color: Colors.black),
+                      child: InkWell(
+                        onTap: () {},
+                        child: const PlayableVideoContent(
+                          width: 180,
+                          height: 104,
+                          margin: EdgeInsets.all(12.0),
+                        ),
+                      ),
                     );
                   },
                   childCount: 1,
@@ -166,7 +177,9 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
                     return Slidable(
+                      key: ValueKey(index),
                       maxOffset: 0.3,
+                      sharedSlidableState: sharedSlidableState,
                       icon: const Icon(Icons.delete, color: Colors.black),
                       child: InkWell(
                         onTap: () {},
