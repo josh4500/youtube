@@ -42,7 +42,7 @@ class ShortsHistory extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.symmetric(
             vertical: 8.0,
-            horizontal: 16,
+            horizontal: 12,
           ),
           child: Text('Today'),
         ),
@@ -74,7 +74,7 @@ class ShortsHistory extends StatelessWidget {
             behavior: const OverScrollGlowBehavior(enabled: false),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.only(left: 16),
+              padding: const EdgeInsets.only(left: 8),
               itemBuilder: (BuildContext context, int index) {
                 return const PlayableShortsContent(
                   width: 116,

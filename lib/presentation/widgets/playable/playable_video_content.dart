@@ -96,34 +96,46 @@ class PlayableVideoContent extends StatelessWidget {
           Flexible(
             child: SizedBox(
               width: direction == Axis.vertical ? width : null,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'I found the BEST One Piece cast clips from their socials',
-                          maxLines: direction == Axis.horizontal ? 3 : 2,
-                          overflow: TextOverflow.ellipsis,
+              child: Stack(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              'I found the BEST One Piece cast clips from their socials',
+                              maxLines: direction == Axis.horizontal ? 3 : 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            const Text(
+                              'Mobile Academy',
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                            const SizedBox(height: 2),
+                            const Text(
+                              '11k Views',
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 2),
-                        const Text(
-                          'Mobile Academy',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 2),
-                        const Text(
-                          '11k Views',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                      ],
+                      ),
+                      const SizedBox(width: 22),
+                    ],
+                  ),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: InkWell(
+                      onTap: () {},
+                      child: const Icon(Icons.more_vert_outlined, size: 14),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.more_vert_outlined, size: 14),
                 ],
               ),
             ),

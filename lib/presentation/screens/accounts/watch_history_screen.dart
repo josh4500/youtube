@@ -27,10 +27,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../widgets/appbar_action.dart';
-import '../../widgets/over_scroll_glow_behavior.dart';
-import '../../widgets/playable/playable_video_content.dart';
 import 'widgets/history_search_text_field.dart';
 import 'widgets/popup/show_history_menu.dart';
 import 'widgets/shorts_history.dart';
@@ -151,18 +149,10 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return InkWell(
-                      onTap: () {},
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 12,
-                          horizontal: 16,
-                        ),
-                        child: PlayableVideoContent(
-                          width: 180,
-                          height: 104,
-                        ),
-                      ),
+                    return const PlayableVideoContent(
+                      width: 180,
+                      height: 104,
+                      margin: EdgeInsets.all(12.0),
                     );
                   },
                   childCount: 1,
@@ -174,11 +164,20 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: PlayableVideoContent(
-                        width: 180,
-                        height: 104,
+                    return const Slidable(
+                      maxOffset: 0.3,
+                      icon: Icon(
+                        Icons.delete,
+                        color: Colors.black,
+                      ),
+                      child: Material(
+                        child: TappableArea(
+                          padding: EdgeInsets.all(12.0),
+                          child: PlayableVideoContent(
+                            width: 180,
+                            height: 104,
+                          ),
+                        ),
                       ),
                     );
                   },
