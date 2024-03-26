@@ -230,7 +230,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     widthNotifier = ValueNotifier<double>(1);
 
     sizeAnimation = CurvedAnimation(
-      parent: Animation<double>.fromValueListenable(heightNotifier),
+      parent: Animation<double>.fromValueListenable(
+        heightNotifier,
+        transformer: (v) => v.clamp(0.5, 1),
+      ),
       curve: const Interval(minVideoViewPortHeight, 1),
     );
 
@@ -416,7 +419,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     final double opacityValue = 1 - (heightNotifier.value - 0.45) / (1 - 0.45);
     // Changes info opacity when neither of the draggable sheet are opened
     if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
-      _infoOpacityController.value = opacityValue;
+      _infoOpacityController.value = (opacityValue - .225).clamp(0, 1);
     } else {
       // Changes the opacity level of all draggable sheets
       _draggableOpacityController.value = opacityValue;
@@ -678,7 +681,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
       if (_isDismissing) {
         final val =
-            details.delta.dy * 1.2 / (minVideoViewPortHeight * screenHeight);
+            details.delta.dy * 1.3 / (minVideoViewPortHeight * screenHeight);
         _playerDismissController.value += val;
         return;
       }
@@ -1043,8 +1046,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   @override
   Widget build(BuildContext context) {
-    final PlayerComponentsWrapper interactivePlayerView =
-        PlayerComponentsWrapper(
+    final interactivePlayerView = PlayerComponentsWrapper(
       key: _interactivePlayerKey,
       handleNotification: (PlayerNotification notification) {
         if (notification is MinimizePlayerNotification) {
@@ -1200,14 +1202,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     return ValueListenableBuilder<double>(
       valueListenable: heightNotifier,
-      builder: (BuildContext context, double value, Widget? childWidget) {
+      builder: (BuildContext context, double heightValue, Widget? childWidget) {
         return SlideTransition(
           position: _playerSlideAnimation,
           child: FadeTransition(
             opacity: _playerFadeAnimation,
             child: SizedBox(
               key: _portraitPlayerKey,
-              height: screenHeight * heightNotifier.value,
+              height: screenHeight * heightValue,
               width: double.infinity,
               child: childWidget,
             ),
