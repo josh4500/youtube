@@ -45,13 +45,13 @@ class Slidable extends StatefulWidget {
   const Slidable({
     super.key,
     this.sharedSlidableState,
-    this.backgroundColor = Colors.white,
+    this.backgroundColor = Colors.white10,
     this.maxOffset = 0.5,
     this.extraOffset = 0.1,
     this.duration = const Duration(milliseconds: 900),
     this.reverseDuration = const Duration(milliseconds: 250),
+    this.items = const <SlidableItem>[],
     this.direction = AxisDirection.left,
-    this.icon,
     required this.child,
   });
 
@@ -66,6 +66,8 @@ class Slidable extends StatefulWidget {
   /// The background color of the sliding area. Defaults to white.
   final Color backgroundColor;
 
+  final List<SlidableItem> items;
+
   /// The maximum offset the child can be slid in the specified direction as a percentage
   /// of the parent's size. Defaults to 0.5 (50%).
   final double maxOffset;
@@ -74,9 +76,6 @@ class Slidable extends StatefulWidget {
 
   /// The direction in which the child can be slid. Defaults to AxisDirection.left.
   final AxisDirection direction;
-
-  /// An optional icon to be displayed behind the child widget when slid away.
-  final Widget? icon;
 
   /// The child widget to be wrapped in the Slidable.
   final Widget child;
@@ -261,7 +260,7 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return ColoredBox(
-          color: Colors.white10,
+          color: widget.backgroundColor,
           child: Stack(
             children: <Widget>[
               Positioned.fill(
@@ -271,12 +270,23 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
                   ),
                   child: SizedBox(
                     width: constraints.maxWidth * widget.maxOffset,
-                    child: CustomActionChip(
-                      onTapCancel: _slideController.reverse,
-                      alignment: Alignment.center,
-                      backgroundColor: widget.backgroundColor,
-                      borderRadius: BorderRadius.zero,
-                      icon: widget.icon,
+                    child: Row(
+                      children: List<Widget>.generate(
+                        widget.items.length,
+                        (index) {
+                          final item = widget.items[index];
+                          return Expanded(
+                            child: CustomActionChip(
+                              icon: item.icon,
+                              onTap: item.onTap,
+                              alignment: item.alignment,
+                              backgroundColor: item.backgroundColor,
+                              onTapCancel: _slideController.reverse,
+                              borderRadius: BorderRadius.zero,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -357,4 +367,18 @@ Alignment axisDirectionToCenterAlignment(AxisDirection direction) {
 
 class SharedSlidableState<T> extends ValueNotifier<T> {
   SharedSlidableState(super.value);
+}
+
+class SlidableItem {
+  const SlidableItem({
+    this.backgroundColor = Colors.white,
+    this.alignment = Alignment.center,
+    this.onTap,
+    this.icon,
+  });
+
+  final Color backgroundColor;
+  final Alignment alignment;
+  final VoidCallback? onTap;
+  final Widget? icon;
 }

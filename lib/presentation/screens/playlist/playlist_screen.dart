@@ -212,10 +212,11 @@ class PlaylistScreen extends StatelessWidget {
                     padding: EdgeInsets.all(4.0),
                     child: Slidable(
                       maxOffset: 0.3,
-                      icon: Icon(
-                        Icons.delete,
-                        color: Colors.black,
-                      ),
+                      items: [
+                        SlidableItem(
+                          icon: Icon(Icons.delete, color: Colors.black),
+                        ),
+                      ],
                       child: Row(
                         children: <Widget>[
                           Icon(Icons.sort_rounded),

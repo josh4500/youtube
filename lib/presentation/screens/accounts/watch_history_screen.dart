@@ -156,7 +156,11 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                       maxOffset: 0.3,
                       key: ValueKey(-index),
                       sharedSlidableState: sharedSlidableState,
-                      icon: const Icon(Icons.delete, color: Colors.black),
+                      items: const <SlidableItem>[
+                        SlidableItem(
+                          icon: Icon(Icons.delete, color: Colors.black),
+                        ),
+                      ],
                       child: InkWell(
                         onTap: () {},
                         child: const PlayableVideoContent(
@@ -180,7 +184,11 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                       key: ValueKey(index),
                       maxOffset: 0.3,
                       sharedSlidableState: sharedSlidableState,
-                      icon: const Icon(Icons.delete, color: Colors.black),
+                      items: const <SlidableItem>[
+                        SlidableItem(
+                          icon: Icon(Icons.delete, color: Colors.black),
+                        ),
+                      ],
                       child: InkWell(
                         onTap: () {},
                         child: const PlayableVideoContent(
