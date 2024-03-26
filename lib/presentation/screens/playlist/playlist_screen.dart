@@ -26,7 +26,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/playable/playable_video_content.dart';
@@ -206,22 +208,29 @@ class PlaylistScreen extends StatelessWidget {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
-                  return ListTile(
-                    onTap: () {},
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                    title: const Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.all(2.0),
-                          child: Icon(Icons.sort_rounded),
-                        ),
-                        Expanded(
-                          child: PlayableVideoContent(
-                            width: 180,
-                            height: 112,
+                  return const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: Slidable(
+                      maxOffset: 0.3,
+                      icon: Icon(
+                        Icons.delete,
+                        color: Colors.black,
+                      ),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.sort_rounded),
+                          Expanded(
+                            child: PlayableVideoContent(
+                              width: 180,
+                              height: 112,
+                              margin: EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 8,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 },

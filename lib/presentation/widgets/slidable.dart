@@ -29,6 +29,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'custom_action_chip.dart';
 
 /// A widget that allows a child to slide horizontally or vertically with a draggable area.
 ///
@@ -46,10 +47,19 @@ class Slidable extends StatefulWidget {
     super.key,
     this.backgroundColor = Colors.white,
     this.maxOffset = 0.5,
+    this.extraOffset = 0.1,
+    this.duration = const Duration(milliseconds: 900),
+    this.reverseDuration = const Duration(milliseconds: 250),
     this.direction = AxisDirection.left,
     this.icon,
     required this.child,
   });
+
+  /// Animation duration
+  final Duration duration;
+
+  /// Animation reverse duration
+  final Duration reverseDuration;
 
   /// The background color of the sliding area. Defaults to white.
   final Color backgroundColor;
@@ -57,6 +67,8 @@ class Slidable extends StatefulWidget {
   /// The maximum offset the child can be slid in the specified direction as a percentage
   /// of the parent's size. Defaults to 0.5 (50%).
   final double maxOffset;
+
+  final double extraOffset;
 
   /// The direction in which the child can be slid. Defaults to AxisDirection.left.
   final AxisDirection direction;
@@ -71,46 +83,79 @@ class Slidable extends StatefulWidget {
   State<Slidable> createState() => _SlidableState();
 }
 
-class _SlidableState extends State<Slidable>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
+class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
+  late final AnimationController _slideController;
+  late final AnimationController _extraSlideController;
   late Animation<Offset> _animation;
+  late Animation<Offset> _extraSlideAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
+    _slideController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
+      duration: widget.duration,
+      reverseDuration: widget.reverseDuration,
+      animationBehavior: AnimationBehavior.preserve,
+    );
+    _extraSlideController = AnimationController(
+      vsync: this,
+      duration: widget.duration,
+      reverseDuration: widget.reverseDuration,
       animationBehavior: AnimationBehavior.preserve,
     );
     _animation = _createAnimationValue();
+
+    _extraSlideAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: _getEndOffset(widget.extraOffset),
+    ).animate(
+      CurvedAnimation(
+        parent: _extraSlideController,
+        curve: Curves.linear,
+        reverseCurve: Curves.easeInToLinear,
+      ),
+    );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _slideController.dispose();
+    _extraSlideController.dispose();
     super.dispose();
   }
 
   @override
   void didUpdateWidget(covariant Slidable oldWidget) {
+    super.didUpdateWidget(oldWidget);
     if (oldWidget.maxOffset != widget.maxOffset ||
         oldWidget.direction != widget.direction) {
       _animation = _createAnimationValue();
     }
-    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.extraOffset != widget.extraOffset) {
+      _extraSlideAnimation = Tween<Offset>(
+        begin: Offset.zero,
+        end: _getEndOffset(widget.extraOffset),
+      ).animate(
+        CurvedAnimation(
+          parent: _extraSlideController,
+          curve: Curves.linear,
+          reverseCurve: Curves.easeInToLinear,
+        ),
+      );
+    }
   }
 
   /// Creates an animation for sliding the child widget with linear curves.
   Animation<Offset> _createAnimationValue() {
     return Tween<Offset>(
       begin: Offset.zero,
-      end: _getEndOffset(),
+      end: _getEndOffset(widget.maxOffset),
     ).animate(
       CurvedAnimation(
-        parent: _controller,
+        parent: _slideController,
         curve: Curves.linear,
         reverseCurve: Curves.linear,
       ),
@@ -119,17 +164,17 @@ class _SlidableState extends State<Slidable>
 
   /// Calculates the end offset for the animation based on the direction and max
   /// offset.
-  Offset _getEndOffset() {
+  Offset _getEndOffset(double maxDirectionOffset) {
     return Offset(
       widget.direction.isLeft
-          ? -widget.maxOffset
+          ? -maxDirectionOffset
           : widget.direction.isRight
-              ? widget.maxOffset
+              ? maxDirectionOffset
               : 0,
       widget.direction.isUp
-          ? -widget.maxOffset
+          ? -maxDirectionOffset
           : widget.direction.isDown
-              ? widget.maxOffset
+              ? maxDirectionOffset
               : 0,
     );
   }
@@ -155,65 +200,91 @@ class _SlidableState extends State<Slidable>
   /// Handles the end of the drag gesture, deciding whether to complete or cancel
   /// the slide.
   void _onEndDrag(DragEndDetails details) {
-    if (_controller.value >= 0.5) {
-      _controller.forward();
+    if (_slideController.value >= 0.5) {
+      _slideController.forward();
     } else {
-      _controller.reverse();
+      _slideController.reverse();
     }
+    _extraSlideController.reverse();
   }
 
   /// Updates the animation value during dragging, adjusting it based on the
   /// direction and constraints.
   void _onDragUpdate(DragUpdateDetails details, BoxConstraints constraints) {
-    _controller.value = clampDouble(
-      _controller.value +
+    _slideController.value = clampDouble(
+      _slideController.value +
           (_getDirectionOffset(details.delta) /
               (_getDirectionSie(constraints) * widget.maxOffset)),
       0,
       1,
     );
+
+    if (_slideController.value == 1) {
+      _extraSlideController.value = clampDouble(
+        _extraSlideController.value +
+            (_getDirectionOffset(details.delta) /
+                (_getDirectionSie(constraints) * widget.maxOffset)),
+        0,
+        1,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        return Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: Align(
-                alignment: axisDirectionToCenterAlignment(
-                  flipAxisDirection(widget.direction),
-                ),
-                child: Container(
-                  alignment: Alignment.center,
-                  width: constraints.maxWidth * widget.maxOffset,
-                  color: widget.backgroundColor,
-                  child: widget.icon,
+        return ColoredBox(
+          color: Colors.white10,
+          child: Stack(
+            children: <Widget>[
+              Positioned.fill(
+                child: Align(
+                  alignment: axisDirectionToCenterAlignment(
+                    flipAxisDirection(widget.direction),
+                  ),
+                  child: SizedBox(
+                    width: constraints.maxWidth * widget.maxOffset,
+                    child: CustomActionChip(
+                      onTapCancel: _slideController.reverse,
+                      alignment: Alignment.center,
+                      backgroundColor: widget.backgroundColor,
+                      borderRadius: BorderRadius.zero,
+                      icon: widget.icon,
+                    ),
+                  ),
                 ),
               ),
-            ),
-            GestureDetector(
-              onVerticalDragEnd:
-                  widget.direction.isVertical ? _onEndDrag : null,
-              onVerticalDragUpdate: widget.direction.isVertical
-                  ? (DragUpdateDetails details) {
-                      _onDragUpdate(details, constraints);
-                    }
-                  : null,
-              onHorizontalDragUpdate: widget.direction.isHorizontal
-                  ? (DragUpdateDetails details) {
-                      _onDragUpdate(details, constraints);
-                    }
-                  : null,
-              onHorizontalDragEnd:
-                  widget.direction.isHorizontal ? _onEndDrag : null,
-              child: SlideTransition(
-                position: _animation,
-                child: widget.child,
+              GestureDetector(
+                onVerticalDragEnd:
+                    widget.direction.isVertical ? _onEndDrag : null,
+                onVerticalDragUpdate: widget.direction.isVertical
+                    ? (DragUpdateDetails details) {
+                        _onDragUpdate(details, constraints);
+                      }
+                    : null,
+                onHorizontalDragUpdate: widget.direction.isHorizontal
+                    ? (DragUpdateDetails details) {
+                        _onDragUpdate(details, constraints);
+                      }
+                    : null,
+                onHorizontalDragEnd:
+                    widget.direction.isHorizontal ? _onEndDrag : null,
+                child: widget.extraOffset == 0
+                    ? SlideTransition(
+                        position: _animation,
+                        child: widget.child,
+                      )
+                    : SlideTransition(
+                        position: _extraSlideAnimation,
+                        child: SlideTransition(
+                          position: _animation,
+                          child: widget.child,
+                        ),
+                      ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );

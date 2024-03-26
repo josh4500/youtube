@@ -26,6 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -164,18 +165,17 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return const Slidable(
+                    return Slidable(
                       maxOffset: 0.3,
-                      icon: Icon(
-                        Icons.delete,
-                        color: Colors.black,
-                      ),
-                      child: Material(
-                        child: TappableArea(
-                          padding: EdgeInsets.all(12.0),
-                          child: PlayableVideoContent(
-                            width: 180,
-                            height: 104,
+                      icon: const Icon(Icons.delete, color: Colors.black),
+                      child: InkWell(
+                        onTap: () {},
+                        child: const PlayableVideoContent(
+                          width: 180,
+                          height: 104,
+                          margin: EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 12,
                           ),
                         ),
                       ),
