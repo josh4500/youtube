@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/option_button.dart';
 import 'package:youtube_clone/presentation/widgets/playable/playable_content.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
@@ -101,11 +102,11 @@ class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.search,
+            icon: YTIcons.search_outlined,
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.more_vert_outlined,
+            icon: YTIcons.more_vert_outlined,
             onTapDown: (TapDownDetails details) async {
               final Offset position = details.globalPosition;
               await showAccountsPlaylistMenu(

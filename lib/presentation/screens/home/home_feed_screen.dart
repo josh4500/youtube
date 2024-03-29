@@ -34,7 +34,7 @@ import 'package:youtube_clone/presentation/provider/repository/home_repository_p
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
-import 'package:youtube_clone/presentation/theme/device_theme.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class HomeFeedScreen extends StatefulWidget {
@@ -77,65 +77,70 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final historyOff = 0 == 0;
     return Scaffold(
-      floatingActionButton: Consumer(
-        builder: (BuildContext context, WidgetRef ref, Widget? childWidget) {
-          final bool isPlayerActive = ref.watch(playerOverlayStateProvider);
-          return Transform.translate(
-            offset: isPlayerActive
-                ? const Offset(0, -kMiniPlayerHeight)
-                : Offset.zero,
-            child: RawMaterialButton(
-              elevation: 0,
-              fillColor: Colors.white,
-              padding: const EdgeInsets.all(16.0),
-              constraints: const BoxConstraints(
-                minWidth: 44.0,
-                minHeight: 36.0,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              onPressed: () {},
-              child: AnimatedSize(
-                duration: const Duration(milliseconds: 150),
-                curve: Curves.easeInOutCubic,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const Icon(
-                      Icons.play_arrow,
-                      color: Colors.black,
-                      size: 28,
+      floatingActionButton: historyOff
+          ? const SizedBox()
+          : Consumer(
+              builder:
+                  (BuildContext context, WidgetRef ref, Widget? childWidget) {
+                final bool isPlayerActive =
+                    ref.watch(playerOverlayStateProvider);
+                return Transform.translate(
+                  offset: isPlayerActive
+                      ? const Offset(0, -kMiniPlayerHeight)
+                      : Offset.zero,
+                  child: RawMaterialButton(
+                    elevation: 0,
+                    fillColor: Colors.white,
+                    padding: const EdgeInsets.all(16.0),
+                    constraints: const BoxConstraints(
+                      minWidth: 44.0,
+                      minHeight: 36.0,
                     ),
-                    ValueListenableBuilder<bool>(
-                      valueListenable: _playSNotifier,
-                      builder: (BuildContext context, bool value, _) {
-                        if (!value) {
-                          return const SizedBox();
-                        }
-                        return const Row(
-                          children: <Widget>[
-                            SizedBox(width: 8),
-                            Text(
-                              'Play something',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ],
-                ),
-              ),
+                    onPressed: () {},
+                    child: AnimatedSize(
+                      duration: const Duration(milliseconds: 150),
+                      curve: Curves.easeInOutCubic,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const Icon(
+                            Icons.play_arrow,
+                            color: Colors.black,
+                            size: 28,
+                          ),
+                          ValueListenableBuilder<bool>(
+                            valueListenable: _playSNotifier,
+                            builder: (BuildContext context, bool value, _) {
+                              if (!value) {
+                                return const SizedBox();
+                              }
+                              return const Row(
+                                children: <Widget>[
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Play something',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
       body: ScrollConfiguration(
         behavior: const OverScrollGlowBehavior(enabled: false),
         child: CustomScrollView(
@@ -144,111 +149,246 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
             SliverAppBar(
               floating: true,
               automaticallyImplyLeading: false,
-              title: const AppLogo(),
+              leadingWidth: 120,
+              leading: const AppLogo(),
               actions: <Widget>[
                 AppbarAction(
                   icon: Icons.cast_outlined,
                   onTap: () {},
                 ),
                 AppbarAction(
-                  icon: Icons.notifications_outlined,
+                  icon: YTIcons.notification_outlined,
                   onTap: () {},
                 ),
                 AppbarAction(
-                  icon: Icons.search,
+                  icon: YTIcons.search_outlined,
                   onTap: () {},
                 ),
               ],
-              bottom: PreferredSize(
-                preferredSize: Size(MediaQuery.sizeOf(context).width, 48),
-                child: SizedBox(
-                  height: 48,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: DynamicTab(
-                      initialIndex: 0,
-                      leadingWidth: 7.5,
-                      leading: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Consumer(
-                          builder: (context, ref, child) {
-                            return CustomActionChip(
-                              borderRadius: BorderRadius.circular(4),
-                              backgroundColor: Colors.white12,
-                              icon: const Icon(Icons.assistant_navigation),
-                              onTap: () {
-                                ref.read(homeRepositoryProvider).openDrawer();
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                      trailing: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TappableArea(
-                          onPressed: () {},
-                          padding: const EdgeInsets.all(4.0),
-                          child: const Text(
-                            'Send feedback',
-                            style: TextStyle(
-                              color: Colors.blueAccent,
+              bottom: historyOff == false
+                  ? PreferredSize(
+                      preferredSize: Size(MediaQuery.sizeOf(context).width, 48),
+                      child: SizedBox(
+                        height: 48,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: DynamicTab(
+                            initialIndex: 0,
+                            leadingWidth: 7.5,
+                            leading: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Consumer(
+                                builder: (context, ref, child) {
+                                  return CustomActionChip(
+                                    borderRadius: BorderRadius.circular(4),
+                                    backgroundColor: Colors.white12,
+                                    icon: const Icon(YTIcons.discover_outlined),
+                                    onTap: () {
+                                      ref
+                                          .read(homeRepositoryProvider)
+                                          .openDrawer();
+                                    },
+                                  );
+                                },
+                              ),
                             ),
+                            trailing: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TappableArea(
+                                onPressed: () {},
+                                padding: const EdgeInsets.all(4.0),
+                                child: const Text(
+                                  'Send feedback',
+                                  style: TextStyle(
+                                    color: Colors.blueAccent,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            options: const <String>[
+                              'All',
+                              'Music',
+                              'Debates',
+                              'News',
+                              'Computer programing',
+                              'Apple',
+                              'Mixes',
+                              'Manga',
+                              'Podcasts',
+                              'Stewie Griffin',
+                              'Gaming',
+                              'Electrical Engineering',
+                              'Physics',
+                              'Live',
+                              'Sketch comedy',
+                              'Courts',
+                              'AI',
+                              'Machines',
+                              'Recently uploaded',
+                              'Posts',
+                              'New to you',
+                            ],
                           ),
                         ),
                       ),
-                      options: const <String>[
-                        'All',
-                        'Music',
-                        'Debates',
-                        'News',
-                        'Computer programing',
-                        'Apple',
-                        'Mixes',
-                        'Manga',
-                        'Podcasts',
-                        'Stewie Griffin',
-                        'Gaming',
-                        'Electrical Engineering',
-                        'Physics',
-                        'Live',
-                        'Sketch comedy',
-                        'Courts',
-                        'AI',
-                        'Machines',
-                        'Recently uploaded',
-                        'Posts',
-                        'New to you',
-                      ],
-                    ),
-                  ),
+                    )
+                  : null,
+            ),
+            if (historyOff)
+              const SliverToBoxAdapter(
+                child: HomeFeedHistoryOff(),
+              )
+            else
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return Consumer(
+                      builder: (context, ref, child) {
+                        return ViewableVideoContent(
+                          onTap: () async {
+                            if (context.orientation.isLandscape) {
+                              await context
+                                  .goto(AppRoutes.playerLandscapeScreen);
+                            }
+                            ref
+                                .read(playerRepositoryProvider)
+                                .openPlayerScreen();
+                          },
+                        );
+                      },
+                    );
+                  },
+                  childCount: 10,
                 ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: Consumer(
-                builder: (BuildContext context, WidgetRef ref, _) {
-                  return ViewableVideoContent(
-                    onTap: () async {
-                      if (context.orientation.isLandscape) {
-                        await context.goto(AppRoutes.playerLandscapeScreen);
-                      }
-                      ref.read(playerRepositoryProvider).openPlayerScreen();
-                    },
-                  );
-                },
-              ),
-            ),
-            const SliverToBoxAdapter(
-              child: ViewableVideoContent(),
-            ),
-            const SliverToBoxAdapter(
-              child: ViewableVideoContent(),
-            ),
-            const SliverToBoxAdapter(
-              child: ViewableVideoContent(),
-            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class HomeFeedHistoryOff extends StatelessWidget {
+  const HomeFeedHistoryOff({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Column(
+        children: [
+          const SizedBox(height: 12),
+          Image.asset(
+            AssetsPath.logo92,
+            height: 86,
+            fit: BoxFit.fitHeight,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              children: [
+                Consumer(
+                  builder: (context, ref, child) {
+                    return CustomActionButton(
+                      backgroundColor: Colors.white10,
+                      padding: const EdgeInsets.all(10),
+                      borderRadius: BorderRadius.circular(24),
+                      useTappable: false,
+                      icon: const Icon(
+                        YTIcons.discover_outlined,
+                        size: 20,
+                      ),
+                      onTap: ref.read(homeRepositoryProvider).openDrawer,
+                    );
+                  },
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: CustomActionButton(
+                    title: 'Search YouTube',
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.white30,
+                    ),
+                    backgroundColor: Colors.white10,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 16,
+                    ),
+                    useTappable: false,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                CustomActionButton(
+                  backgroundColor: Colors.white10,
+                  padding: const EdgeInsets.all(10),
+                  borderRadius: BorderRadius.circular(24),
+                  useTappable: false,
+                  icon: const Icon(YTIcons.mic_outlined, size: 20),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 32),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.075),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: 18),
+                const Text(
+                  'Your watch history is off',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                RichText(
+                  text: const TextSpan(
+                    text:
+                        'You can change setting at any time to get the latest videos tailored to you. ',
+                    children: [
+                      TextSpan(
+                        text: 'Learn more',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ],
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white60,
+                    ),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                CustomActionButton(
+                  title: 'Update Setting',
+                  backgroundColor: Colors.white.withOpacity(0.08),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 12,
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  alignment: Alignment.center,
+                  useTappable: false,
+                  textStyle: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

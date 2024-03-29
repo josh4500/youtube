@@ -28,7 +28,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_watermark.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/infographics/video_channel_watermark.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -62,7 +62,7 @@ class PlayerComponentsWrapper extends StatelessWidget {
         children: [
           child,
           // Shows video channel watermark image in fullscreen mode
-          const PlayerWatermark(),
+          const VideoChannelWatermark(),
           const Positioned.fill(
             child: PlayerOverlayControls(),
           ),

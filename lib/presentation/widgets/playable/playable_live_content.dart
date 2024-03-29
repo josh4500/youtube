@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class PlayableLiveContent extends StatelessWidget {
   const PlayableLiveContent({
@@ -159,7 +160,7 @@ class PlayableLiveContent extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(Icons.more_vert_outlined, size: 14),
+                  const Icon(YTIcons.more_vert_outlined, size: 14),
                 ],
               ),
             ),

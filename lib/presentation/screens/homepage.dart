@@ -108,62 +108,59 @@ class _HomePageState extends ConsumerState<HomePage>
       }
     });
     final scaffoldKey = ref.read(homeRepositoryProvider).scaffoldKey;
-    return SafeArea(
-      bottom: false,
-      child: Scaffold(
-        key: scaffoldKey,
-        resizeToAvoidBottomInset: false,
-        drawerEnableOpenDragGesture: false,
-        drawer: HomeDrawer(homeContext: context),
-        body: Stack(
-          children: <Widget>[
-            widget.child,
-            SlideTransition(
-              position: _overlayPlayerAnimation,
-              child: Consumer(
-                builder: (
-                  BuildContext context,
-                  WidgetRef ref,
-                  Widget? childWidget,
-                ) {
-                  if (ref.watch(playerOverlayStateProvider)) {
-                    return childWidget!;
-                  }
-                  return const SizedBox();
-                },
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: LayoutBuilder(
-                    builder: (BuildContext context, BoxConstraints c) {
-                      return PlayerScreen(
-                        height: c.maxHeight,
-                      );
-                    },
-                  ),
+    return Scaffold(
+      key: scaffoldKey,
+      resizeToAvoidBottomInset: false,
+      drawerEnableOpenDragGesture: false,
+      drawer: HomeDrawer(homeContext: context),
+      body: Stack(
+        children: <Widget>[
+          widget.child,
+          SlideTransition(
+            position: _overlayPlayerAnimation,
+            child: Consumer(
+              builder: (
+                BuildContext context,
+                WidgetRef ref,
+                Widget? childWidget,
+              ) {
+                if (ref.watch(playerOverlayStateProvider)) {
+                  return childWidget!;
+                }
+                return const SizedBox();
+              },
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints c) {
+                    return PlayerScreen(
+                      height: c.maxHeight,
+                    );
+                  },
                 ),
               ),
             ),
-          ],
-        ),
-        bottomNavigationBar: Consumer(
-          builder: (BuildContext context, WidgetRef ref, Widget? childWidget) {
-            final bool isPlayerActive = ref.watch(playerOverlayStateProvider);
-            return Padding(
-              padding: isPlayerActive
-                  ? MediaQuery.viewInsetsOf(context)
-                  : EdgeInsets.zero,
-              child: childWidget,
+          ),
+        ],
+      ),
+      bottomNavigationBar: Consumer(
+        builder: (BuildContext context, WidgetRef ref, Widget? childWidget) {
+          final bool isPlayerActive = ref.watch(playerOverlayStateProvider);
+          return Padding(
+            padding: isPlayerActive
+                ? MediaQuery.viewInsetsOf(context)
+                : EdgeInsets.zero,
+            child: childWidget,
+          );
+        },
+        child: HomeNavigatorBar(
+          selectedIndex: widget.child.currentIndex,
+          onChangeIndex: (int index) {
+            widget.child.goBranch(
+              index,
+              initialLocation: index == widget.child.currentIndex,
             );
           },
-          child: HomeNavigatorBar(
-            selectedIndex: widget.child.currentIndex,
-            onChangeIndex: (int index) {
-              widget.child.goBranch(
-                index,
-                initialLocation: index == widget.child.currentIndex,
-              );
-            },
-          ),
         ),
       ),
     );

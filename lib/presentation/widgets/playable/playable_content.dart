@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class PlayableContent extends StatelessWidget {
   const PlayableContent({
@@ -113,7 +114,7 @@ class PlayableContent extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
                                 Icon(
-                                  Icons.playlist_play,
+                                  YTIcons.playlists_outlined,
                                   size: 18,
                                 ),
                                 SizedBox(width: 2),
@@ -166,7 +167,7 @@ class PlayableContent extends StatelessWidget {
                     const SizedBox(height: 8)
                   else
                     const SizedBox(width: 8),
-                  const Icon(Icons.more_vert_outlined, size: 14),
+                  const Icon(YTIcons.more_vert_outlined, size: 14),
                 ],
               ),
             ),

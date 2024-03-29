@@ -60,7 +60,7 @@ class ChannelSection extends StatelessWidget {
               const SizedBox(height: 8),
               Row(
                 children: <Widget>[
-                  const AccountAvatar(size: 88),
+                  const AccountAvatar(size: 88, name: 'John Jackson'),
                   const SizedBox(width: 8),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

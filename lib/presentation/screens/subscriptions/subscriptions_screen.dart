@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/screens/subscriptions/widgets/subscriptions_tabs.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/dynamic_tab.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
@@ -69,11 +70,11 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                   onTap: () {},
                 ),
                 AppbarAction(
-                  icon: Icons.notifications_outlined,
+                  icon: YTIcons.notification_outlined,
                   onTap: () {},
                 ),
                 AppbarAction(
-                  icon: Icons.search,
+                  icon: YTIcons.search_outlined,
                   onTap: () {},
                 ),
               ],
@@ -96,8 +97,11 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                     const SizedBox(height: 8),
                     ValueListenableBuilder<int?>(
                       valueListenable: _selectedChannel,
-                      builder: (BuildContext context, int? value,
-                          Widget? childWidget) {
+                      builder: (
+                        BuildContext context,
+                        int? value,
+                        Widget? childWidget,
+                      ) {
                         if (value != null) {
                           return Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -171,11 +175,11 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.adb_sharp,
+                        YTIcons.shorts_filled,
                         size: 36,
                         color: Colors.red,
                       ),
-                      SizedBox(width: 16),
+                      SizedBox(width: 12),
                       Text(
                         'Shorts',
                         style: TextStyle(

@@ -26,8 +26,16 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter/widgets.dart';
 import 'package:youtube_clone/presentation/screens/shorts/widgets/shorts_info_section.dart';
+import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
+import 'package:youtube_clone/presentation/widgets/custom_action_button.dart';
+import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
+import 'package:youtube_clone/presentation/widgets/custom_backbutton.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/player/playback/playback_progress.dart';
 
@@ -155,129 +163,143 @@ class _ShortsScreenState extends State<ShortsScreen> {
             backgroundColor: Colors.black,
             extendBodyBehindAppBar: true,
             resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              title: Text(
-                _isSubscriptionScreen
-                    ? 'Subscriptions'
-                    : _isLiveScreen
-                        ? 'Live'
-                        : 'Shorts',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              backgroundColor: Colors.transparent,
-              actions: const <Widget>[
-                AppbarAction(
-                  icon: Icons.search,
-                ),
-                AppbarAction(
-                  icon: Icons.camera_alt_outlined,
-                ),
-                AppbarAction(
-                  icon: Icons.more_vert_sharp,
-                ),
-              ],
-            ),
-            body: Stack(
-              children: <Widget>[
-                ScrollConfiguration(
-                  behavior: const OverScrollGlowBehavior(enabled: false),
-                  child: NotificationListener<ScrollNotification>(
-                    onNotification: (ScrollNotification notification) {
-                      if (notification is ScrollEndNotification) {
-                        _progressVisibilityNotifier.value = true;
-                      } else if (notification is ScrollUpdateNotification) {
-                        _progressVisibilityNotifier.value = false;
-                      }
-                      return false;
-                    },
-                    child: ValueListenableBuilder<ScrollPhysics>(
-                      valueListenable: physicsNotifier,
-                      builder:
-                          (BuildContext context, ScrollPhysics physics, _) {
-                        return PageView.builder(
-                          physics: physics,
-                          scrollDirection: Axis.vertical,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Stack(
-                              children: <Widget>[
-                                Column(
+            appBar: true
+                ? null
+                : AppBar(
+                    title: Text(
+                      _isSubscriptionScreen
+                          ? 'Subscriptions'
+                          : _isLiveScreen
+                              ? 'Live'
+                              : 'Shorts',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    backgroundColor: Colors.transparent,
+                    actions: const <Widget>[
+                      AppbarAction(
+                        icon: YTIcons.search_outlined,
+                      ),
+                      AppbarAction(
+                        icon: Icons.camera_alt_outlined,
+                      ),
+                      AppbarAction(
+                        icon: YTIcons.more_vert_outlined,
+                      ),
+                    ],
+                  ),
+            body: Builder(
+              builder: (context) {
+                if (true) {
+                  return const ShortsHistoryOff();
+                }
+                return Stack(
+                  children: <Widget>[
+                    ScrollConfiguration(
+                      behavior: const OverScrollGlowBehavior(enabled: false),
+                      child: NotificationListener<ScrollNotification>(
+                        onNotification: (ScrollNotification notification) {
+                          if (notification is ScrollEndNotification) {
+                            _progressVisibilityNotifier.value = true;
+                          } else if (notification is ScrollUpdateNotification) {
+                            _progressVisibilityNotifier.value = false;
+                          }
+                          return false;
+                        },
+                        child: ValueListenableBuilder<ScrollPhysics>(
+                          valueListenable: physicsNotifier,
+                          builder: (
+                            BuildContext context,
+                            ScrollPhysics physics,
+                            Widget? childWidget,
+                          ) {
+                            return PageView.builder(
+                              physics: physics,
+                              scrollDirection: Axis.vertical,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Stack(
                                   children: <Widget>[
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: _pausePlay,
-                                        child: SizedBox(
-                                          width: double.infinity,
-                                          child: Image.network(
-                                            _isSubscriptionScreen
-                                                ? 'https://dummyimage.com/360x700/17b00f/fff.jpg'
-                                                : _isLiveScreen
-                                                    ? 'https://dummyimage.com/360x700/11101e/fff.jpg'
-                                                    : 'https://dummyimage.com/360x700/c7b01e/fff.jpg',
-                                            fit: BoxFit.fitHeight,
+                                    Column(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: _pausePlay,
+                                            child: ShortsPlayerView(
+                                              isSubscriptionScreen:
+                                                  _isSubscriptionScreen,
+                                              isLiveScreen: _isLiveScreen,
+                                            ),
                                           ),
                                         ),
+                                        ValueListenableBuilder<double>(
+                                          valueListenable: playerBottomPadding,
+                                          builder: (
+                                            BuildContext context,
+                                            double value,
+                                            _,
+                                          ) {
+                                            return SizedBox(
+                                              height: value,
+                                              width: double.infinity,
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: ShortsInfoSection(
+                                        onTapComment: _openCommentSheet,
                                       ),
                                     ),
-                                    ValueListenableBuilder<double>(
-                                      valueListenable: playerBottomPadding,
-                                      builder: (BuildContext context,
-                                          double value, _) {
-                                        return SizedBox(
-                                          height: value,
-                                          width: double.infinity,
-                                        );
+                                    ListenableBuilder(
+                                      listenable: _isPaused,
+                                      builder: (
+                                        BuildContext context,
+                                        Widget? childWidget,
+                                      ) {
+                                        if (_showCategoryActions &&
+                                            index == _currentIndex) {
+                                          return childWidget!;
+                                        }
+                                        return const SizedBox();
                                       },
+                                      child: const ShortsCategoryActions(),
                                     ),
                                   ],
-                                ),
-                                Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: ShortsInfoSection(
-                                    onTapComment: _openCommentSheet,
-                                  ),
-                                ),
-                                ListenableBuilder(
-                                  listenable: _isPaused,
-                                  builder: (BuildContext context,
-                                      Widget? childWidget) {
-                                    if (_showCategoryActions &&
-                                        index == _currentIndex) {
-                                      return childWidget!;
-                                    }
-                                    return const SizedBox();
-                                  },
-                                  child: const ShortsCategoryActions(),
-                                ),
-                              ],
+                                );
+                              },
+                              onPageChanged: _onPageIndexChange,
+                              itemCount: 20,
                             );
                           },
-                          onPageChanged: _onPageIndexChange,
-                          itemCount: 20,
-                        );
-                      },
+                        ),
+                      ),
                     ),
-                  ),
-                ),
 
-                // Playback progress bar
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: ValueListenableBuilder<bool>(
-                    valueListenable: _progressVisibilityNotifier,
-                    builder: (BuildContext context, bool visible,
-                        Widget? childWidget) {
-                      return Visibility(
-                        visible: visible,
-                        child: childWidget!,
-                      );
-                    },
-                    child: const PlaybackProgress(),
-                  ),
-                ),
-              ],
+                    // Playback progress bar
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: ValueListenableBuilder<bool>(
+                        valueListenable: _progressVisibilityNotifier,
+                        builder: (
+                          BuildContext context,
+                          bool visible,
+                          Widget? childWidget,
+                        ) {
+                          return Visibility(
+                            visible: visible,
+                            child: childWidget!,
+                          );
+                        },
+                        child: const PlaybackProgress(),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -301,6 +323,95 @@ class _ShortsScreenState extends State<ShortsScreen> {
           },
         ),
       ],
+    );
+  }
+}
+
+class ShortsPlayerView extends StatelessWidget {
+  const ShortsPlayerView({
+    super.key,
+    required bool isSubscriptionScreen,
+    required bool isLiveScreen,
+  })  : _isSubscriptionScreen = isSubscriptionScreen,
+        _isLiveScreen = isLiveScreen;
+
+  // TODO(Josh): Will be provider vlues
+  final bool _isSubscriptionScreen;
+  final bool _isLiveScreen;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color(0xFF656565),
+        image: DecorationImage(
+          image: _isSubscriptionScreen
+              ? const NetworkImage(
+                  'https://picsum.photos/360/700',
+                )
+              : _isLiveScreen
+                  ? const NetworkImage(
+                      'https://picsum.photos/400/800',
+                    )
+                  : const NetworkImage(
+                      'https://picsum.photos/444/800',
+                    ),
+          fit: BoxFit.fitHeight,
+        ),
+      ),
+    );
+  }
+}
+
+class ShortsHistoryOff extends StatelessWidget {
+  const ShortsHistoryOff({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 22),
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: () {},
+              child: const Icon(YTIcons.search_outlined, size: 36),
+            ),
+          ),
+          const Spacer(),
+          const Text(
+            'Shorts recommendation are off',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 22),
+          const Text(
+            'Your watch history is off, and we rely on watch history to tailor your Shorts feed. You can change your setting at any time, or try searching for Shorts instead. Learn more.',
+            style: TextStyle(fontSize: 14),
+          ),
+          const SizedBox(height: 24),
+          CustomActionChip(
+            title: 'Update setting',
+            padding: const EdgeInsets.all(12),
+            borderRadius: BorderRadius.circular(24),
+            backgroundColor: Colors.white,
+            alignment: Alignment.center,
+            textStyle: const TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+            onTap: () {},
+          ),
+          const SizedBox(height: 18),
+        ],
+      ),
     );
   }
 }

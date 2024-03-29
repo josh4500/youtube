@@ -52,7 +52,7 @@ class SubscriptionTile extends StatelessWidget {
           },
           child: const Row(
             children: <Widget>[
-              AccountAvatar(),
+              AccountAvatar(name: 'John Jackson'),
               SizedBox(width: 16),
               Text(
                 'Life Uncontained',

@@ -13,6 +13,7 @@ class PageDraggableSheet extends StatefulWidget {
     super.key,
     required this.title,
     this.subtitle,
+    this.dragDownDismiss = false,
     required this.scrollTag,
     this.borderRadius = BorderRadius.zero,
     required this.controller,
@@ -29,6 +30,7 @@ class PageDraggableSheet extends StatefulWidget {
   });
 
   final String scrollTag;
+  final bool dragDownDismiss;
   final String title;
   final String? subtitle;
   final BorderRadius borderRadius;
@@ -52,7 +54,8 @@ class PageDraggableSheet extends StatefulWidget {
   State<PageDraggableSheet> createState() => _PageDraggableSheetState();
 }
 
-class _PageDraggableSheetState extends State<PageDraggableSheet> {
+class _PageDraggableSheetState extends State<PageDraggableSheet>
+    with SingleTickerProviderStateMixin {
   final Queue<int> _overlayChildQueue = Queue<int>();
   int? _overlayChildIndex;
   int _overlayChildOpenCount = 0;
@@ -60,7 +63,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
 
   late final ScrollController _innerListController;
   late final CustomScrollableScrollPhysics _innerListPhysics;
-  late final ValueNotifier<bool> _dynamicTabNotifier;
+  late final AnimationController _dynamicTabHideController;
+  late final Animation<double> _dynamicTabHideAnimation;
 
   @override
   void initState() {
@@ -68,17 +72,21 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
 
     _innerListController = ScrollController();
     _innerListPhysics = CustomScrollableScrollPhysics(tag: widget.scrollTag);
-    _dynamicTabNotifier = ValueNotifier<bool>(widget.dynamicTab != null);
 
     for (int i = 0; i < widget.overlayChildren.length; i++) {
       final PageDraggableOverlayChild overlayChild = widget.overlayChildren[i];
       overlayChild.controller.addListener(() => _onOpenOverlayChild(i));
     }
 
-    // Adds listener to hide DynamicTabs if available
-    if (widget.dynamicTab != null) {
-      _innerListController.addListener(_onHideDynamicTabsCallback);
-    }
+    _dynamicTabHideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+
+    _dynamicTabHideAnimation = CurvedAnimation(
+      parent: _dynamicTabHideController,
+      curve: Curves.linear,
+    );
   }
 
   Future<void> _onOpenOverlayChild(int index) async {
@@ -86,7 +94,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
     if (widget.dynamicTab != null) {
       if (opened) {
         _overlayChildOpenCount += 1;
-        _dynamicTabNotifier.value = false;
+        _dynamicTabHideController.reverse();
         _overlayAnyChildIsOpened = true;
         _overlayChildIndex = index;
         _overlayChildQueue.add(index);
@@ -101,17 +109,17 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
 
         _overlayChildQueue.removeWhere((int val) => val == index);
         if (_innerListController.offset < 100) {
-          _dynamicTabNotifier.value = true;
+          _dynamicTabHideController.forward();
         }
       }
     }
   }
 
-  Future<void> _onHideDynamicTabsCallback() async {
-    if (_innerListController.offset >= 100) {
-      _dynamicTabNotifier.value = false;
+  Future<void> _onHideDynamicTabsCallback(double offset) async {
+    if (offset >= 100) {
+      _dynamicTabHideController.reverse();
     } else {
-      _dynamicTabNotifier.value = true;
+      _dynamicTabHideController.forward();
     }
   }
 
@@ -198,97 +206,90 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
           child: CustomScrollView(
             controller: widget.controller,
             slivers: <Widget>[
-              ValueListenableBuilder<bool>(
-                valueListenable: _dynamicTabNotifier,
-                builder: (
-                  BuildContext context,
-                  bool showDynamicTabs,
-                  Widget? childWidget,
-                ) {
-                  // TODO(Josh): Fix pointer being recognized in scrollable below SliverPersistentHeader
-                  return SliverPersistentHeader(
-                    pinned: true,
-                    floating: true,
-                    delegate: PersistentHeaderDelegate(
-                      minHeight: 66,
-                      maxHeight: showDynamicTabs ? 111 : 66,
-                      child: Material(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            if (widget.showDragIndicator)
-                              Container(
-                                height: 4,
-                                width: 45,
-                                margin: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(32),
-                                ),
-                              )
-                            else
-                              const SizedBox(height: 16),
-                            const SizedBox(height: 4),
-                            childWidget!,
-                            const SizedBox(height: 18),
-                            if (showDynamicTabs) ...<Widget>[
-                              Column(
+              SliverPersistentHeader(
+                pinned: true,
+                floating: true,
+                delegate: PersistentHeaderDelegate(
+                  minHeight: 66,
+                  maxHeight: 111,
+                  child: Material(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        if (widget.showDragIndicator)
+                          Container(
+                            height: 4,
+                            width: 45,
+                            margin: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                          )
+                        else
+                          const SizedBox(height: 16),
+                        const SizedBox(height: 4),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12.0,
+                          ),
+                          child: Stack(
+                            children: <Widget>[
+                              Row(
                                 children: <Widget>[
-                                  SizedBox(
-                                    height: 40,
-                                    child: widget.dynamicTab,
+                                  Text(
+                                    widget.title,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(width: 12),
+                                  if (widget.subtitle != null)
+                                    Text(
+                                      widget.subtitle!,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  const Spacer(),
+                                  const SizedBox(width: 12),
+                                  ...widget.actions,
+                                  const SizedBox(width: 12),
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(32),
+                                    onTap: _closeSheet,
+                                    child: const Icon(Icons.close),
+                                  ),
                                 ],
                               ),
+                              for (final PageDraggableOverlayChild overlayChild
+                                  in widget.overlayChildren)
+                                _OverlayChildTitle(
+                                  controller: overlayChild.controller,
+                                ),
                             ],
-                            const Divider(thickness: 1.1, height: 0),
-                          ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 18),
+                        if (widget.dynamicTab != null)
+                          SizeTransition(
+                            sizeFactor: _dynamicTabHideAnimation,
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 40,
+                                  child: widget.dynamicTab,
+                                ),
+                                const SizedBox(height: 4),
+                              ],
+                            ),
+                          ),
+                        const Divider(thickness: 1.1, height: 0),
+                      ],
                     ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12.0,
-                  ),
-                  child: Stack(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Text(
-                            widget.title,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          if (widget.subtitle != null)
-                            Text(
-                              widget.subtitle!,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          const Spacer(),
-                          const SizedBox(width: 12),
-                          ...widget.actions,
-                          const SizedBox(width: 12),
-                          InkWell(
-                            borderRadius: BorderRadius.circular(32),
-                            onTap: _closeSheet,
-                            child: const Icon(Icons.close),
-                          ),
-                        ],
-                      ),
-                      for (final PageDraggableOverlayChild overlayChild
-                          in widget.overlayChildren)
-                        _OverlayChildTitle(controller: overlayChild.controller),
-                    ],
                   ),
                 ),
               ),
@@ -299,10 +300,20 @@ class _PageDraggableSheetState extends State<PageDraggableSheet> {
                   child: Stack(
                     alignment: Alignment.bottomCenter,
                     children: <Widget>[
-                      widget.contentBuilder(
-                        context,
-                        _innerListController,
-                        _innerListPhysics,
+                      NotificationListener<ScrollNotification>(
+                        onNotification: (ScrollNotification notification) {
+                          if (notification is ScrollEndNotification) {
+                            _onHideDynamicTabsCallback(
+                              notification.metrics.pixels,
+                            );
+                          }
+                          return false;
+                        },
+                        child: widget.contentBuilder(
+                          context,
+                          _innerListController,
+                          _innerListPhysics,
+                        ),
                       ),
                       for (final PageDraggableOverlayChild overlayChild
                           in widget.overlayChildren)

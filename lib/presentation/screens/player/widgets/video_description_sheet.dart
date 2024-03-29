@@ -240,7 +240,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
               children: [
                 const Row(
                   children: [
-                    AccountAvatar(size: 48),
+                    AccountAvatar(size: 48, name: 'John Jackson'),
                     SizedBox(width: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

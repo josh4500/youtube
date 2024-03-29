@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/clip_thumb_clipper.dart';
 
 class PlayableClipContent extends StatelessWidget {
@@ -116,7 +117,7 @@ class PlayableClipContent extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 8),
-              Icon(Icons.more_vert_outlined),
+              Icon(YTIcons.more_vert_outlined),
             ],
           ),
         ),

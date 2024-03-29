@@ -26,6 +26,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/playable/group/playable_group_contents.dart';
 import 'package:youtube_clone/presentation/widgets/playable/group/playable_group_videos.dart';
@@ -70,6 +72,7 @@ class _LearningScreenState extends State<LearningScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: CustomBackButton(onPressed: context.pop),
         title: AnimatedBuilder(
           animation: animation,
           builder: (BuildContext context, Widget? child) {
@@ -91,11 +94,11 @@ class _LearningScreenState extends State<LearningScreen>
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.search,
+            icon: YTIcons.search_outlined,
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.more_vert_outlined,
+            icon: YTIcons.more_vert_outlined,
             onTap: () {},
           ),
         ],

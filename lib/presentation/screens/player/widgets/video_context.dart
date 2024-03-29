@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class VideoContext extends StatelessWidget {
   const VideoContext({super.key});
@@ -73,7 +74,7 @@ class VideoContext extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 24),
-          const Icon(Icons.more_vert_outlined, size: 16),
+          const Icon(YTIcons.more_vert_outlined, size: 16),
         ],
       ),
     );

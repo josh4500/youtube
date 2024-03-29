@@ -49,7 +49,7 @@ class ViewablePostContent extends StatelessWidget {
             children: <Widget>[
               const Padding(
                 padding: EdgeInsets.all(6.0),
-                child: AccountAvatar(),
+                child: AccountAvatar(name: 'John Jackson'),
               ),
               const Expanded(
                 child: Padding(

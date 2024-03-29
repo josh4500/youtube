@@ -42,7 +42,7 @@ class _VideoHighlightedCommentState extends State<VideoHighlightedComment> {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        AccountAvatar(size: 24),
+        AccountAvatar(size: 24, name: 'John Jackson'),
         SizedBox(width: 8),
         Expanded(
           child: Text(

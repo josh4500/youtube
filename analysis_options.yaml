@@ -85,6 +85,7 @@ linter:
     - use_string_buffers
     - use_to_and_as_if_applicable
     - use_super_parameters
+    - package_api_docs
 
 custom_lint:
   rules:

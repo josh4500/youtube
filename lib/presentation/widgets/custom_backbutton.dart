@@ -25,3 +25,20 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
+
+class CustomBackButton extends StatelessWidget {
+  const CustomBackButton({super.key, required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: const Icon(YTIcons.arrow_back_outlined, color: Colors.white),
+    );
+  }
+}

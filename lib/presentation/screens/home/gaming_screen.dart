@@ -27,6 +27,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class GamingScreen extends StatefulWidget {
@@ -70,6 +72,7 @@ class _GamingScreenState extends State<GamingScreen>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        leading: CustomBackButton(onPressed: context.pop),
         title: AnimatedBuilder(
           animation: animation,
           builder: (BuildContext context, Widget? child) {
@@ -91,11 +94,11 @@ class _GamingScreenState extends State<GamingScreen>
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.search,
+            icon: YTIcons.search_outlined,
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.more_vert_outlined,
+            icon: YTIcons.more_vert_outlined,
             onTap: () {},
           ),
         ],

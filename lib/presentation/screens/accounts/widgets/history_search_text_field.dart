@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class HistorySearchTextField extends StatefulWidget {
   const HistorySearchTextField({super.key, this.controller, this.focusNode});
@@ -87,7 +88,7 @@ class _HistorySearchTextFieldState extends State<HistorySearchTextField>
         children: <Widget>[
           const Padding(
             padding: EdgeInsets.all(8.0),
-            child: Icon(Icons.search),
+            child: Icon(YTIcons.search_outlined),
           ),
           Expanded(
             child: TextField(

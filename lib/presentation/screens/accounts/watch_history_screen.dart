@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'widgets/history_search_text_field.dart';
@@ -103,11 +104,11 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.search,
+            icon: YTIcons.search_outlined,
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.more_vert_outlined,
+            icon: YTIcons.more_vert_outlined,
             onTapDown: (TapDownDetails details) {
               final Offset position = details.globalPosition;
               showHistoryMenu(

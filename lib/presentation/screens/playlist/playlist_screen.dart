@@ -28,6 +28,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
@@ -49,11 +50,11 @@ class PlaylistScreen extends StatelessWidget {
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.search,
+            icon: YTIcons.search_outlined,
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.more_vert_outlined,
+            icon: YTIcons.more_vert_outlined,
             onTapDown: (TapDownDetails details) async {
               final Offset position = details.globalPosition;
               await showPlaylistMenu(

@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class PlayableVideoContent extends StatelessWidget {
   const PlayableVideoContent({
@@ -131,7 +132,7 @@ class PlayableVideoContent extends StatelessWidget {
                       alignment: Alignment.topRight,
                       child: InkWell(
                         onTap: () {},
-                        child: const Icon(Icons.more_vert_outlined, size: 14),
+                        child: const Icon(YTIcons.more_vert_outlined, size: 14),
                       ),
                     ),
                   ],

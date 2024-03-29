@@ -43,6 +43,7 @@ class CustomActionButton extends StatelessWidget {
     this.textStyle,
     this.onTap,
     this.title,
+    this.useTappable = true,
   });
   final String? title;
   final Widget? icon;
@@ -55,44 +56,56 @@ class CustomActionButton extends StatelessWidget {
   final TextStyle? textStyle;
   final Border? border;
   final VoidCallback? onTap;
+  final bool useTappable;
 
   @override
   Widget build(BuildContext context) {
+    final buttonContent = Align(
+      alignment: alignment,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          if (icon != null) ...<Widget>[
+            icon!,
+            if (title != null) const SizedBox(width: 5),
+          ],
+          if (leadingWidth != null) SizedBox(width: leadingWidth),
+          if (title != null)
+            Text(
+              title!,
+              style: textStyle ??
+                  const TextStyle(
+                    fontSize: 12,
+                  ),
+            ),
+        ],
+      ),
+    );
+
     return Container(
       margin: margin,
+      padding: useTappable
+          ? null
+          : padding ?? const EdgeInsets.symmetric(horizontal: 11.5),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: borderRadius ?? BorderRadius.circular(32),
         border: border,
       ),
-      child: TappableArea(
-        behavior: HitTestBehavior.opaque,
-        onPressed: onTap,
-        padding: padding ?? const EdgeInsets.symmetric(horizontal: 11.5),
-        borderRadius: borderRadius ?? BorderRadius.circular(32),
-        child: Align(
-          alignment: alignment,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              if (icon != null) ...<Widget>[
-                icon!,
-                if (title != null) const SizedBox(width: 5),
-              ],
-              if (leadingWidth != null) SizedBox(width: leadingWidth),
-              if (title != null)
-                Text(
-                  title!,
-                  style: textStyle ??
-                      const TextStyle(
-                        fontSize: 12,
-                      ),
-                ),
-            ],
-          ),
-        ),
-      ),
+      child: useTappable
+          ? TappableArea(
+              behavior: HitTestBehavior.opaque,
+              onPressed: onTap,
+              padding: padding ?? const EdgeInsets.symmetric(horizontal: 11.5),
+              borderRadius: borderRadius ?? BorderRadius.circular(32),
+              child: buttonContent,
+            )
+          : GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onTap,
+              child: buttonContent,
+            ),
     );
   }
 }

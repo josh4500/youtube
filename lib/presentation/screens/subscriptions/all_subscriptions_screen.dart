@@ -28,6 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/screens/subscriptions/widgets/subscription_tile.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
@@ -57,7 +58,7 @@ class AllSubscriptionsScreen extends StatelessWidget {
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.search,
+            icon: YTIcons.search_outlined,
             onTap: () {},
           ),
           AppbarAction(

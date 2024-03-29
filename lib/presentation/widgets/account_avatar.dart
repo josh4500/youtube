@@ -26,35 +26,85 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+const List<Color> _avatarColor = <Color>[
+  Color(0xFF512DA7),
+  Color(0xFF0288d1),
+  Color(0xFF0098A6),
+  Color(0xFF7E57C2),
+  Color(0xFF689F39),
+  Color(0xFFBF360C),
+  Color(0xFF5C6BC0),
+  Color(0xFFAA47BC),
+  Color(0xFF5D4038),
+  Color(0xFF33691E),
+  Color(0xFF78909C),
+  Color(0xFF00887A),
+  Color(0xFFF5511E),
+  Color(0xFF7A1FA2),
+  Color(0xFF00579C),
+  Color(0xFF465A65),
+  Color(0xFFEF6C00),
+  Color(0xFFEC407A),
+  Color(0xFFC2175B),
+  Color(0xFF004C3F),
+];
+
 // TODO(Josh): Use clipper to create if channel is live
-class AccountAvatar extends StatelessWidget {
-  const AccountAvatar({super.key, this.size, this.onTap});
-  final double? size;
+class AccountAvatar extends StatefulWidget {
+  const AccountAvatar({
+    super.key,
+    this.size = 50,
+    required this.name,
+    this.imageUrl,
+    this.border,
+    this.onTap,
+  });
+  final Border? border;
+  final double size;
+  final String name;
+  final String? imageUrl;
   final VoidCallback? onTap;
+
+  @override
+  State<AccountAvatar> createState() => _AccountAvatarState();
+}
+
+class _AccountAvatarState extends State<AccountAvatar> {
+  final Completer<bool> _completer = Completer<bool>();
+  ImageProvider? _imageProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.imageUrl != null) {
+      _imageProvider = const NetworkImage('bytes');
+    } else {}
+  }
 
   @override
   Widget build(BuildContext context) {
     final bool hasLive = Random().nextBool();
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
         children: <Widget>[
           Container(
-            width: size ?? 50,
-            height: size ?? 50,
+            width: widget.size,
+            height: widget.size,
             padding: hasLive ? const EdgeInsets.all(1) : null,
             decoration: const BoxDecoration(
               color: Colors.white12,
-              image: DecorationImage(
-                image: NetworkImage('https://i.pravatar.cc/300'),
-                fit: BoxFit.cover,
-              ),
+              // image: DecorationImage(
+              //   image: _imageProvider,
+              //   fit: BoxFit.cover,
+              // ),
               shape: BoxShape.circle,
             ),
           ),

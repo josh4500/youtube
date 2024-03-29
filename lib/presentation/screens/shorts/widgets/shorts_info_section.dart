@@ -108,7 +108,7 @@ class ShortsInfoSection extends StatelessWidget {
                       ],
                       Row(
                         children: <Widget>[
-                          const AccountAvatar(size: 32),
+                          const AccountAvatar(size: 32, name: 'John Jackson'),
                           const SizedBox(width: 8),
                           const Text('@maxymilliano'),
                           const SizedBox(width: 12),

@@ -26,6 +26,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class SportsScreen extends StatelessWidget {
@@ -37,6 +39,7 @@ class SportsScreen extends StatelessWidget {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        leading: CustomBackButton(onPressed: context.pop),
         title: const Text(
           'Sports',
           style: TextStyle(
@@ -49,11 +52,11 @@ class SportsScreen extends StatelessWidget {
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.search,
+            icon: YTIcons.search_outlined,
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.more_vert_outlined,
+            icon: YTIcons.more_vert_outlined,
             onTap: () {},
           ),
         ],
@@ -64,9 +67,8 @@ class SportsScreen extends StatelessWidget {
           slivers: [
             const SliverToBoxAdapter(child: ViewableContentSlides()),
             const SliverToBoxAdapter(
-                child: ChannelSubscribeTile(
-              title: 'Sports',
-            )),
+              child: ChannelSubscribeTile(title: 'Sports'),
+            ),
             SliverToBoxAdapter(
               child: GroupedViewBuilder(
                 title: 'Live',

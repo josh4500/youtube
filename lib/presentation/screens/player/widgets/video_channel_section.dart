@@ -32,9 +32,8 @@ class VideoChannelButton extends StatelessWidget {
       ),
       borderRadius: BorderRadius.zero,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          AccountAvatar(size: 40),
+          AccountAvatar(size: 40, name: 'John Jackson'),
           SizedBox(width: 12),
           Text(
             'Harris Craycraft',

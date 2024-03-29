@@ -28,6 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/screens/channel/widgets/channel_section.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/view_models/content/shorts_view_model.dart';
 import 'package:youtube_clone/presentation/view_models/content/video_view_model.dart';
 import 'package:youtube_clone/presentation/widgets/dynamic_tab.dart';
@@ -76,11 +77,11 @@ class _ChannelScreenState extends State<ChannelScreen> {
               onTap: () {},
             ),
             AppbarAction(
-              icon: Icons.notifications_outlined,
+              icon: YTIcons.notification_outlined,
               onTap: () {},
             ),
             AppbarAction(
-              icon: Icons.search,
+              icon: YTIcons.search_outlined,
               onTap: () {},
             ),
           ],

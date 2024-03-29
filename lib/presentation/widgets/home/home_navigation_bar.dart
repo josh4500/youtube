@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
 import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../widgets.dart';
 
@@ -75,22 +76,34 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   IconButton(
+                    padding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.standard,
                     onPressed: () => widget.onChangeIndex(0),
-                    icon: const Column(
+                    icon: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Icon(Icons.home),
-                        // Text('Home'),
+                        Icon(
+                          widget.selectedIndex == 0
+                              ? YTIcons.home_filled
+                              : YTIcons.home_outlined,
+                        ),
+                        const Text('Home', style: TextStyle(fontSize: 10)),
                       ],
                     ),
                   ),
                   IconButton(
+                    padding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.standard,
                     onPressed: () => widget.onChangeIndex(1),
-                    icon: const Column(
+                    icon: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Icon(Icons.sort),
-                        // Text('Short'),
+                        Icon(
+                          widget.selectedIndex == 1
+                              ? YTIcons.shorts_filled
+                              : YTIcons.shorts_outlined,
+                        ),
+                        const Text('Short', style: TextStyle(fontSize: 10)),
                       ],
                     ),
                   ),
@@ -100,32 +113,42 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
                         return const SizedBox();
                       }
                       return IconButton(
+                        padding: EdgeInsets.zero,
+                        visualDensity: VisualDensity.standard,
                         onPressed: () {},
-                        icon: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(
-                              Icons.add_circle_outline_rounded,
-                              size: 32,
-                            ),
-                          ],
+                        icon: const Icon(
+                          YTIcons.create_outlined,
+                          size: 32,
+                          weight: 0.8,
                         ),
                       );
                     },
                   ),
                   IconButton(
+                    padding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.standard,
                     onPressed: () => widget.onChangeIndex(2),
-                    icon: const Column(
+                    icon: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Icon(Icons.subscriptions_outlined),
-                        // Text('Subscription'),
+                        Icon(
+                          widget.selectedIndex == 2
+                              ? YTIcons.subscriptions_filled
+                              : YTIcons.subscriptions_outlined,
+                        ),
+                        const Text(
+                          'Subscriptions',
+                          maxLines: 1,
+                          style: TextStyle(fontSize: 10),
+                        ),
                       ],
                     ),
                   ),
                   AuthStateBuilder(
                     builder: (BuildContext context, AuthState state) {
                       return IconButton(
+                        padding: EdgeInsets.zero,
+                        visualDensity: VisualDensity.standard,
                         onPressed: () => widget.onChangeIndex(3),
                         icon: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -135,8 +158,11 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
                             else
                               state.isNotAuthenticated
                                   ? const Icon(Icons.person_off)
-                                  : const Icon(Icons.person),
-                            //const Text('You'),
+                                  : const AccountAvatar(
+                                      size: 24,
+                                      name: 'John Jackson',
+                                    ),
+                            const Text('You', style: TextStyle(fontSize: 10)),
                           ],
                         ),
                       );

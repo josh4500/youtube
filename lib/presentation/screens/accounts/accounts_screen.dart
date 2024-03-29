@@ -33,6 +33,7 @@ import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/screens/accounts/account_incognito_screen.dart';
 import 'package:youtube_clone/presentation/screens/accounts/widgets/account_option_tile.dart';
 import 'package:youtube_clone/presentation/screens/accounts/widgets/account_section.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/builders/auth_state_builder.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 
@@ -55,15 +56,15 @@ class AccountsScreen extends StatelessWidget {
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.notifications_outlined,
+            icon: YTIcons.notification_outlined,
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.search,
+            icon: YTIcons.search_outlined,
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.settings_outlined,
+            icon: YTIcons.settings_outlined,
             onTap: () => context.goto(AppRoutes.settings),
           ),
         ],
@@ -125,7 +126,7 @@ class AccountsScreen extends StatelessWidget {
                     ),
                     AccountOptionTile(
                       title: 'Your videos',
-                      icon: Icons.video_settings,
+                      icon: YTIcons.your_videos_outlined,
                       networkRequired: true,
                       onTap: () => context.goto(AppRoutes.yourVideos),
                     ),
@@ -137,14 +138,14 @@ class AccountsScreen extends StatelessWidget {
                     ),
                     AccountOptionTile(
                       title: 'Your clips',
-                      icon: Icons.cut_outlined,
+                      icon: YTIcons.clip_outlined,
                       networkRequired: true,
                       onTap: () => context.goto(AppRoutes.yourClips),
                     ),
                     const Divider(thickness: 1.5),
                     AccountOptionTile(
                       title: 'Your movies',
-                      icon: Icons.movie_sharp,
+                      icon: YTIcons.movies_outlined,
                       networkRequired: true,
                       onTap: () => context.goto(AppRoutes.yourMovies),
                     ),

@@ -48,7 +48,7 @@ class AccountChannelSection extends StatelessWidget {
             padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
             child: Row(
               children: <Widget>[
-                AccountAvatar(size: 86),
+                AccountAvatar(size: 86, name: 'John Jackson'),
                 SizedBox(width: 14),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

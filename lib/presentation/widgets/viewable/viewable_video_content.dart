@@ -136,7 +136,10 @@ class ViewableVideoContent extends StatelessWidget {
               vertical: 12.0,
               horizontal: 4,
             ),
-            child: AccountAvatar(size: 36),
+            child: AccountAvatar(
+              size: 36,
+              name: 'John Jackson',
+            ),
           ),
         ),
         Positioned(

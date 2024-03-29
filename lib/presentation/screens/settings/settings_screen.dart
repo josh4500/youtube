@@ -38,6 +38,7 @@ import 'package:youtube_clone/presentation/screens/settings/widgets/settings_pop
 import 'package:youtube_clone/presentation/screens/settings/widgets/settings_tile.dart';
 import 'package:youtube_clone/presentation/theme/app_theme.dart';
 import 'package:youtube_clone/presentation/theme/relative_size.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/lazy_indexed_stack.dart';
 
 import '../../../generated/l10n.dart';
@@ -280,7 +281,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onPopInvoked: (bool canPop) => _onNavigateBack(),
       child: Scaffold(
         appBar: AppBar(
-          leading: BackButton(onPressed: _onNavigateBack),
+          leading: CustomBackButton(onPressed: _onNavigateBack),
           title: Text(_currentSettingsTitle),
         ),
         body: CustomOrientationBuilder(

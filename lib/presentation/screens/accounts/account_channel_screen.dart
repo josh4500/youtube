@@ -28,6 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/screens/accounts/widgets/account_channel_section.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/playable/playable_content.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
@@ -62,11 +63,11 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
               onTap: () {},
             ),
             AppbarAction(
-              icon: Icons.search,
+              icon: YTIcons.search_outlined,
               onTap: () {},
             ),
             AppbarAction(
-              icon: Icons.more_vert_outlined,
+              icon: YTIcons.more_vert_outlined,
               onTap: () {},
             ),
           ],

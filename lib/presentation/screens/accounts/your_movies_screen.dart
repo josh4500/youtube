@@ -28,6 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/screens/accounts/widgets/popup/show_your_movies_menu.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../widgets/appbar_action.dart';
 import '../../widgets/over_scroll_glow_behavior.dart';
@@ -93,11 +94,11 @@ class _YourMoviesScreenState extends State<YourMoviesScreen>
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.search,
+            icon: YTIcons.search_outlined,
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.more_vert_outlined,
+            icon: YTIcons.more_vert_outlined,
             onTapDown: (TapDownDetails details) async {
               final Offset position = details.globalPosition;
               await showYourMoviesMenu(

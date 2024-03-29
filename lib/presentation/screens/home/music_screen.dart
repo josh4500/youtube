@@ -27,6 +27,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class MusicScreen extends StatelessWidget {
@@ -45,6 +47,7 @@ class MusicScreen extends StatelessWidget {
               return <Widget>[
                 SliverAppBar(
                   backgroundColor: Colors.transparent,
+                  leading: CustomBackButton(onPressed: context.pop),
                   title: const Text(
                     'Music',
                     style: TextStyle(
@@ -53,7 +56,7 @@ class MusicScreen extends StatelessWidget {
                   ),
                   actions: <Widget>[
                     AppbarAction(
-                      icon: Icons.search,
+                      icon: YTIcons.search_outlined,
                       onTap: () {},
                     ),
                   ],
