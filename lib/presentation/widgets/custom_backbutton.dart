@@ -38,6 +38,8 @@ class CustomBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: onPressed,
+      padding: EdgeInsets.zero,
+      visualDensity: VisualDensity.standard,
       icon: const Icon(YTIcons.arrow_back_outlined, color: Colors.white),
     );
   }

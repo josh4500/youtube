@@ -88,7 +88,7 @@ class _LiveScreenState extends State<LiveScreen>
         ),
         actions: <Widget>[
           AppbarAction(
-            icon: Icons.cast_outlined,
+            icon: YTIcons.cast_outlined,
             onTap: () {},
           ),
           AppbarAction(

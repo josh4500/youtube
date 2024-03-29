@@ -153,7 +153,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
               leading: const AppLogo(),
               actions: <Widget>[
                 AppbarAction(
-                  icon: Icons.cast_outlined,
+                  icon: YTIcons.cast_outlined,
                   onTap: () {},
                 ),
                 AppbarAction(

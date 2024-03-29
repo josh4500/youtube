@@ -90,7 +90,7 @@ class _YourVideosScreenState extends State<YourVideosScreen>
         ),
         actions: <Widget>[
           AppbarAction(
-            icon: Icons.cast_outlined,
+            icon: YTIcons.cast_outlined,
             onTap: () {},
           ),
           AppbarAction(

@@ -100,7 +100,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
         ),
         actions: <Widget>[
           AppbarAction(
-            icon: Icons.cast_outlined,
+            icon: YTIcons.cast_outlined,
             onTap: () {},
           ),
           AppbarAction(

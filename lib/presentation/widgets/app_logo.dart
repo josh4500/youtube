@@ -11,7 +11,7 @@ class AppLogo extends StatelessWidget {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 120),
       child: Image.asset(
-        AssetsPath.ytFullLogoMedium,
+        AssetsPath.ytFullLogoMediumDark,
         fit: BoxFit.fitWidth,
         width: 120,
       ),

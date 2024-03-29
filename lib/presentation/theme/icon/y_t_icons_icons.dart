@@ -46,6 +46,7 @@ class YTIcons {
   static const IconData create_outlined = IconData(0xe816, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData settings_filled = IconData(0xe825, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData live_outlined = IconData(0xe826, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData cast_outlined = IconData(0xe827, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData discover_outlined = IconData(0xe900, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData subscriptions_outlined = IconData(0xe901, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData shorts_outlined = IconData(0xe902, fontFamily: _kFontFam, fontPackage: _kFontPkg);

@@ -92,7 +92,7 @@ class _TrendingScreenState extends State<TrendingScreen>
           ),
           actions: <Widget>[
             AppbarAction(
-              icon: Icons.cast_outlined,
+              icon: YTIcons.cast_outlined,
               onTap: () {},
             ),
             AppbarAction(
