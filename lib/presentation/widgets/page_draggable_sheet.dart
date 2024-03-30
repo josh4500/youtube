@@ -275,7 +275,10 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                                 InkWell(
                                   borderRadius: BorderRadius.circular(32),
                                   onTap: _closeSheet,
-                                  child: const Icon(YTIcons.close_outlined),
+                                  child: const Icon(
+                                    YTIcons.close_outlined,
+                                    size: 20,
+                                  ),
                                 ),
                               ],
                             ),
@@ -483,10 +486,10 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: opacityAnimation,
-      child: SlideTransition(
-        position: slideAnimation,
+    return SlideTransition(
+      position: slideAnimation,
+      child: FadeTransition(
+        opacity: opacityAnimation,
         child: Material(
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -494,7 +497,7 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
               InkWell(
                 borderRadius: BorderRadius.circular(32),
                 onTap: widget.controller.close,
-                child: const Icon(Icons.arrow_back),
+                child: const Icon(YTIcons.arrow_back_outlined),
               ),
               const SizedBox(width: 20),
               Text(
@@ -504,6 +507,7 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              const SizedBox(width: 20),
             ],
           ),
         ),
