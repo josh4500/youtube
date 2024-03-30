@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../widgets/appbar_action.dart';
@@ -55,9 +56,62 @@ class DownloadsScreen extends StatelessWidget {
           ),
           AppbarAction(
             icon: YTIcons.more_vert_outlined,
-            onTapDown: (TapDownDetails details) {
-              final Offset position = details.globalPosition;
-            },
+            onTap: () {},
+          ),
+        ],
+      ),
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                children: [
+                  Image.asset(
+                    AssetsPath.downloadWillAppear,
+                    width: 132,
+                  ),
+                  const SizedBox(height: 12.0),
+                  const Text(
+                    'Video you download will appear here',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  const SizedBox(height: 12.0),
+                ],
+              ),
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: Column(
+              children: [
+                Divider(thickness: 1, height: 0),
+                ColoredBox(
+                  color: Colors.white12,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        top: 16,
+                        left: 12,
+                        right: 12,
+                        bottom: 8,
+                      ),
+                      child: Text(
+                        'Recommended downloads',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

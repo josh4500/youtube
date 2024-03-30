@@ -162,12 +162,14 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                           icon: Icon(Icons.delete, color: Colors.black),
                         ),
                       ],
-                      child: InkWell(
-                        onTap: () {},
-                        child: const PlayableVideoContent(
-                          width: 180,
-                          height: 104,
-                          margin: EdgeInsets.all(12.0),
+                      child: Material(
+                        child: InkWell(
+                          onTap: () {},
+                          child: const PlayableVideoContent(
+                            width: 180,
+                            height: 104,
+                            margin: EdgeInsets.all(12.0),
+                          ),
                         ),
                       ),
                     );
@@ -190,14 +192,13 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                           icon: Icon(Icons.delete, color: Colors.black),
                         ),
                       ],
-                      child: InkWell(
-                        onTap: () {},
-                        child: const PlayableVideoContent(
-                          width: 180,
-                          height: 104,
-                          margin: EdgeInsets.symmetric(
-                            vertical: 4,
-                            horizontal: 12,
+                      child: Material(
+                        child: InkWell(
+                          onTap: () {},
+                          child: const PlayableVideoContent(
+                            width: 180,
+                            height: 104,
+                            margin: EdgeInsets.all(12.0),
                           ),
                         ),
                       ),

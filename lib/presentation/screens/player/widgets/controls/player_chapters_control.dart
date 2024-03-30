@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class PlayerChapterControl extends ConsumerWidget {
   const PlayerChapterControl({
@@ -22,8 +23,6 @@ class PlayerChapterControl extends ConsumerWidget {
       },
       child: const Row(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text.rich(
             TextSpan(
@@ -42,14 +41,11 @@ class PlayerChapterControl extends ConsumerWidget {
                     fontWeight: FontWeight.w400,
                   ),
                 ),
+                WidgetSpan(child: Icon(YTIcons.chevron_right, size: 14))
               ],
             ),
             maxLines: 1,
             overflow: TextOverflow.clip,
-          ),
-          Icon(
-            Icons.chevron_right_outlined,
-            size: 18,
           ),
         ],
       ),

@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/screens/subscriptions/widgets/subscriptions_tabs.dart';
@@ -168,19 +169,21 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
             const SliverToBoxAdapter(
               child: ViewablePostContent(),
             ),
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: ViewableGroupShorts(
                 title: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 12,
+                  ),
                   child: Row(
                     children: [
-                      Icon(
-                        YTIcons.shorts_filled,
-                        size: 36,
-                        color: Colors.red,
+                      Image.asset(
+                        AssetsPath.logoShorts32,
+                        filterQuality: FilterQuality.high,
                       ),
-                      SizedBox(width: 12),
-                      Text(
+                      const SizedBox(width: 8),
+                      const Text(
                         'Shorts',
                         style: TextStyle(
                           fontSize: 18,

@@ -83,7 +83,7 @@ class GroupedViewBuilder extends StatelessWidget {
                 ],
               ),
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
+                horizontal: 16,
               ),
               subtitle: subtitle != null
                   ? Text(
@@ -118,10 +118,7 @@ class GroupedViewBuilder extends StatelessWidget {
             behavior: const OverScrollGlowBehavior(enabled: false),
             child: ListView.builder(
               physics: physics,
-              padding: padding ??
-                  const EdgeInsets.symmetric(
-                    horizontal: 10,
-                  ),
+              padding: padding ?? const EdgeInsets.symmetric(horizontal: 8),
               shrinkWrap: shrinkWrap,
               itemCount: itemCount,
               itemBuilder: itemBuilder,

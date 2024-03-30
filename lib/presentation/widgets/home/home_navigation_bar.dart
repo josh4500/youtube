@@ -158,9 +158,12 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
                             else
                               state.isNotAuthenticated
                                   ? const Icon(Icons.person_off)
-                                  : const AccountAvatar(
+                                  : AccountAvatar(
                                       size: 24,
                                       name: 'John Jackson',
+                                      border: widget.selectedIndex == 3
+                                          ? Border.all(color: Colors.white)
+                                          : null,
                                     ),
                             const Text('You', style: TextStyle(fontSize: 10)),
                           ],

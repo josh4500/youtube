@@ -163,7 +163,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
             backgroundColor: Colors.black,
             extendBodyBehindAppBar: true,
             resizeToAvoidBottomInset: false,
-            appBar: true
+            appBar: false
                 ? null
                 : AppBar(
                     title: Text(
@@ -180,7 +180,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
                     backgroundColor: Colors.transparent,
                     actions: const <Widget>[
                       AppbarAction(
-                        icon: YTIcons.search_outlined,
+                        icon: YTIcons.shorts_search,
                       ),
                       AppbarAction(
                         icon: Icons.camera_alt_outlined,
@@ -192,7 +192,7 @@ class _ShortsScreenState extends State<ShortsScreen> {
                   ),
             body: Builder(
               builder: (context) {
-                if (true) {
+                if (false) {
                   return const ShortsHistoryOff();
                 }
                 return Stack(
@@ -379,7 +379,7 @@ class ShortsHistoryOff extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: GestureDetector(
               onTap: () {},
-              child: const Icon(YTIcons.search_outlined, size: 36),
+              child: const Icon(YTIcons.shorts_search, size: 36),
             ),
           ),
           const Spacer(),

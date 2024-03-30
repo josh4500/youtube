@@ -27,8 +27,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/screens/accounts/widgets/account_channel_section.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/playable/playable_content.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
@@ -57,6 +59,7 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
               fontWeight: FontWeight.w400,
             ),
           ),
+          leading: CustomBackButton(onPressed: context.pop),
           actions: <Widget>[
             AppbarAction(
               icon: YTIcons.cast_outlined,
@@ -140,13 +143,13 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
                               child: const Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                  Icon(Icons.sort),
+                                  Icon(YTIcons.sort_outlined),
                                   SizedBox(width: 4),
                                   Text('Sort'),
                                   SizedBox(width: 4),
                                   RotatedBox(
                                     quarterTurns: 1,
-                                    child: Icon(Icons.chevron_right),
+                                    child: Icon(YTIcons.chevron_right),
                                   ),
                                 ],
                               ),

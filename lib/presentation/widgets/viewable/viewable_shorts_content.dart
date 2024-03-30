@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class ViewableShortsContent extends StatelessWidget {
   const ViewableShortsContent({
@@ -68,7 +69,7 @@ class ViewableShortsContent extends StatelessWidget {
                     horizontal: 6,
                   ),
                   child: Icon(
-                    Icons.more_vert,
+                    YTIcons.more_vert_outlined,
                     size: 20,
                   ),
                 ),

@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class AppbarAction extends StatelessWidget {
   const AppbarAction({
@@ -42,15 +43,13 @@ class AppbarAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 2.0, top: 2, bottom: 2),
-      child: InkWell(
-        onTap: onTap,
+      padding: const EdgeInsets.only(left: 1.0, top: 2, bottom: 2),
+      child: TappableArea(
         onTapDown: onTapDown,
-        borderRadius: BorderRadius.circular(32),
-        child: Padding(
-          padding: const EdgeInsets.all(14.0),
-          child: Icon(icon),
-        ),
+        onPressed: onTap,
+        padding: const EdgeInsets.all(12.0),
+        borderRadius: BorderRadius.circular(24),
+        child: Icon(icon),
       ),
     );
   }

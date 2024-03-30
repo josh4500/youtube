@@ -153,7 +153,7 @@ class PlaylistScreen extends StatelessWidget {
                           const SizedBox(width: 8),
                           IconButton(
                             onPressed: () {},
-                            icon: const Icon(Icons.download),
+                            icon: const Icon(YTIcons.download_outlined),
                           ),
                         ],
                       ),

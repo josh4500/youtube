@@ -35,13 +35,6 @@ import '../../../constants.dart';
 import 'video_comment_guidelines.dart';
 
 class VideoCommentsSheet extends StatefulWidget {
-  final ScrollController? controller;
-  final ValueNotifier<bool> replyNotifier;
-  final VoidCallback closeComment;
-  final double maxHeight;
-  final bool showDragIndicator;
-  final DraggableScrollableController? draggableController;
-
   const VideoCommentsSheet({
     super.key,
     this.controller,
@@ -51,13 +44,21 @@ class VideoCommentsSheet extends StatefulWidget {
     this.draggableController,
     this.showDragIndicator = true,
   });
+  final ScrollController? controller;
+  final ValueNotifier<bool> replyNotifier;
+  final VoidCallback closeComment;
+  final double maxHeight;
+  final bool showDragIndicator;
+  final DraggableScrollableController? draggableController;
 
   @override
   State<VideoCommentsSheet> createState() => _VideoCommentsSheetState();
 }
 
 class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
-  final _replyController = PageDraggableOverlayChildController(title: 'Reply');
+  final _replyController = PageDraggableOverlayChildController(
+    title: 'Replies',
+  );
 
   @override
   Widget build(BuildContext context) {

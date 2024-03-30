@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class PlayableShortsContent extends StatelessWidget {
   const PlayableShortsContent({
@@ -64,7 +65,7 @@ class PlayableShortsContent extends StatelessWidget {
             const Align(
               alignment: Alignment.topRight,
               child: Icon(
-                Icons.more_vert_sharp,
+                YTIcons.more_vert_outlined,
                 size: 14,
               ),
             ),

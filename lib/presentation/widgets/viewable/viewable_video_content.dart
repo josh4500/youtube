@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/shimmer.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
@@ -146,15 +147,15 @@ class ViewableVideoContent extends StatelessWidget {
           right: 9.5,
           top: 227,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6.0),
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: InkWell(
               onTap: () {},
               borderRadius: BorderRadius.circular(16),
               child: const Padding(
-                padding: EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(4.0),
                 child: Icon(
-                  Icons.more_vert_sharp,
-                  size: 14,
+                  YTIcons.more_vert_outlined,
+                  size: 20,
                 ),
               ),
             ),

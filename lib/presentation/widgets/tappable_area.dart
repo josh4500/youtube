@@ -26,6 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class StackedPosition {
@@ -45,23 +46,28 @@ class TappableArea extends StatefulWidget {
       horizontal: 8,
     ),
     this.behavior,
-    this.borderRadius,
+    this.borderRadius = BorderRadius.zero,
     this.stackedPosition,
     this.stackedAlignment = Alignment.center,
     this.stackedChild,
     required this.child,
     this.onPressed,
     this.onLongPress,
+    this.splashColor,
+    this.onTapDown,
   });
+
   final Widget child;
   final HitTestBehavior? behavior;
   final EdgeInsets padding;
   final Alignment stackedAlignment;
   final StackedPosition? stackedPosition;
   final Widget? stackedChild;
-  final BorderRadius? borderRadius;
+  final BorderRadius borderRadius;
   final VoidCallback? onPressed;
   final VoidCallback? onLongPress;
+  final Color? splashColor;
+  final void Function(TapDownDetails details)? onTapDown;
 
   @override
   State<TappableArea> createState() => _TappableAreaState();
@@ -70,8 +76,8 @@ class TappableArea extends StatefulWidget {
 class _TappableAreaState extends State<TappableArea>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<Color?> _backgroundAnimation;
-  late final Animation<Border?> _borderAnimation;
+  late Animation<Color?> _backgroundAnimation;
+  late Animation<Border?> _borderAnimation;
 
   bool _reversing = false;
 
@@ -133,6 +139,49 @@ class _TappableAreaState extends State<TappableArea>
   }
 
   @override
+  void didUpdateWidget(covariant TappableArea oldWidget) {
+    if (oldWidget.splashColor != widget.splashColor) {
+      _backgroundAnimation = ColorTween(
+        begin: Colors.transparent,
+        end: widget.splashColor ?? Colors.white10,
+      ).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: const Interval(
+            0.0,
+            1.0,
+            curve: Curves.ease,
+          ),
+        ),
+      );
+
+      _borderAnimation = BorderTween(
+        begin: const Border.fromBorderSide(
+          BorderSide(color: Colors.transparent),
+        ),
+        end: Border.fromBorderSide(
+          BorderSide(color: widget.splashColor ?? Colors.white10),
+        ),
+      ).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: const Interval(
+            0,
+            0.5,
+            curve: Curves.ease,
+          ),
+          reverseCurve: const Interval(
+            0,
+            0.8,
+            curve: Curves.easeOutCubic,
+          ),
+        ),
+      );
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -146,7 +195,10 @@ class _TappableAreaState extends State<TappableArea>
           behavior: widget.behavior,
           onTap: widget.onPressed,
           onLongPress: widget.onLongPress,
-          onTapDown: (_) async => await _controller.forward(),
+          onTapDown: (details) async {
+            widget.onTapDown?.call(details);
+            await _controller.forward();
+          },
           onTapUp: (_) async => await _controller.reverse(),
           onTapCancel: () async => await _controller.reverse(),
           child: AnimatedBuilder(
@@ -157,7 +209,7 @@ class _TappableAreaState extends State<TappableArea>
                   // Border animation will show only when reversing
                   border: _reversing ? _borderAnimation.value : null,
                   color: _backgroundAnimation.value,
-                  borderRadius: widget.borderRadius ?? BorderRadius.circular(2),
+                  borderRadius: widget.borderRadius,
                 ),
                 child: backgroundChild,
               );

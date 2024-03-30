@@ -27,6 +27,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 
 import '../../../widgets/playable/playable_shorts_content.dart';
@@ -44,25 +46,31 @@ class ShortsHistory extends StatelessWidget {
             vertical: 8.0,
             horizontal: 12,
           ),
-          child: Text('Today'),
+          child: Text(
+            'Today',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: 8.0,
-            horizontal: 16,
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 8,
+            horizontal: 12,
           ),
           child: Row(
-            children: <Widget>[
-              Icon(
-                Icons.sort_sharp,
-                size: 40,
+            children: [
+              Image.asset(
+                AssetsPath.logoShorts32,
+                filterQuality: FilterQuality.high,
               ),
-              SizedBox(width: 16),
-              Text(
+              const SizedBox(width: 8),
+              const Text(
                 'Shorts',
                 style: TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],

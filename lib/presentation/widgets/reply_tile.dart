@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class ReplyTile extends StatelessWidget {
   const ReplyTile({super.key});
@@ -77,8 +78,8 @@ class ReplyTile extends StatelessWidget {
                       const Row(
                         children: <Widget>[
                           Icon(
-                            Icons.thumb_up_outlined,
-                            size: 14,
+                            YTIcons.like_outlined,
+                            size: 18,
                           ),
                           SizedBox(width: 4),
                           SizedBox(
@@ -89,8 +90,8 @@ class ReplyTile extends StatelessWidget {
                             ),
                           ),
                           Icon(
-                            Icons.thumb_down_outlined,
-                            size: 14,
+                            YTIcons.dislike_outlined,
+                            size: 18,
                           ),
                         ],
                       ),
@@ -104,7 +105,7 @@ class ReplyTile extends StatelessWidget {
                 child: const Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Icon(
-                    Icons.more_vert_sharp,
+                    YTIcons.more_vert_outlined,
                     size: 16,
                   ),
                 ),

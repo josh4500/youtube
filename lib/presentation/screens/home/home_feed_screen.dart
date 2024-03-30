@@ -77,13 +77,16 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final historyOff = 0 == 0;
+    final historyOff = 0 == 3;
     return Scaffold(
       floatingActionButton: historyOff
           ? const SizedBox()
           : Consumer(
-              builder:
-                  (BuildContext context, WidgetRef ref, Widget? childWidget) {
+              builder: (
+                BuildContext context,
+                WidgetRef ref,
+                Widget? childWidget,
+              ) {
                 final bool isPlayerActive =
                     ref.watch(playerOverlayStateProvider);
                 return Transform.translate(

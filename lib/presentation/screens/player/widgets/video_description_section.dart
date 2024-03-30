@@ -27,12 +27,11 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class VideoDescriptionSection extends StatelessWidget {
-  final VoidCallback? onTap;
   const VideoDescriptionSection({super.key, this.onTap});
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -90,9 +89,7 @@ class VideoDescriptionSection extends StatelessWidget {
                     SizedBox(width: 6),
                     Text(
                       '...more',
-                      style: TextStyle(
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(fontSize: 13),
                     ),
                   ],
                 ),

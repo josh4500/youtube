@@ -27,6 +27,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/theme/icon/y_t_icons_icons.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_button.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 
@@ -57,21 +59,18 @@ class VideoActions extends StatelessWidget {
                     title: '336',
                     leadingWidth: 4,
                     padding: EdgeInsets.symmetric(horizontal: 12),
-                    icon: Icon(Icons.thumb_up_outlined, size: 14),
+                    icon: Icon(YTIcons.like_outlined, size: 16),
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 6.0),
                     child: RotatedBox(
                       quarterTurns: 1,
-                      child: Divider(
-                        height: 0,
-                        thickness: 1.5,
-                      ),
+                      child: Divider(height: 0, thickness: 1.5),
                     ),
                   ),
                   CustomActionButton(
                     padding: EdgeInsets.symmetric(horizontal: 12),
-                    icon: Icon(Icons.thumb_down_outlined, size: 14),
+                    icon: Icon(YTIcons.dislike_outlined, size: 16),
                   ),
                 ],
               ),
@@ -81,42 +80,42 @@ class VideoActions extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 12),
               margin: EdgeInsets.symmetric(horizontal: 4),
               backgroundColor: Color(0xFF272727),
-              icon: Icon(Icons.reply_outlined, size: 14),
+              icon: Icon(YTIcons.shared_filled, size: 16),
             ),
             const CustomActionChip(
               title: 'Remix',
               padding: EdgeInsets.symmetric(horizontal: 12),
               margin: EdgeInsets.symmetric(horizontal: 4),
               backgroundColor: Color(0xFF272727),
-              icon: Icon(Icons.wifi_channel_outlined, size: 14),
+              icon: Icon(Icons.wifi_channel_outlined, size: 16),
             ),
             const CustomActionChip(
               title: 'Thanks',
               padding: EdgeInsets.symmetric(horizontal: 12),
               margin: EdgeInsets.symmetric(horizontal: 4),
               backgroundColor: Color(0xFF272727),
-              icon: Icon(Icons.attach_money, size: 14),
+              icon: Icon(YTIcons.thanks_outlined, size: 16),
             ),
             const CustomActionButton(
               title: 'Download',
               padding: EdgeInsets.symmetric(horizontal: 12),
               margin: EdgeInsets.symmetric(horizontal: 4),
               backgroundColor: Color(0xFF272727),
-              icon: Icon(Icons.download, size: 14),
+              icon: Icon(YTIcons.download_outlined, size: 16),
             ),
             const CustomActionChip(
               title: 'Clip',
               padding: EdgeInsets.symmetric(horizontal: 12),
               margin: EdgeInsets.symmetric(horizontal: 4),
               backgroundColor: Color(0xFF272727),
-              icon: Icon(Icons.cut_outlined, size: 14),
+              icon: Icon(YTIcons.clip_outlined, size: 16),
             ),
             const CustomActionChip(
               title: 'Save',
               padding: EdgeInsets.symmetric(horizontal: 12),
               margin: EdgeInsets.symmetric(horizontal: 4),
               backgroundColor: Color(0xFF272727),
-              icon: Icon(Icons.add_box_outlined, size: 14),
+              icon: Icon(YTIcons.save_outlined, size: 16),
             ),
           ],
         ),

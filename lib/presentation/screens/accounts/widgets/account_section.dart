@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
@@ -47,17 +48,17 @@ class AccountSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+      padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
         children: <Widget>[
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onTapChannelInfo,
             child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               child: Row(
                 children: <Widget>[
-                  AccountAvatar(size: 84, name: 'John Jackson'),
+                  AccountAvatar(size: 76, name: 'John Jackson'),
                   SizedBox(width: 14),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,12 +72,7 @@ class AccountSection extends StatelessWidget {
                       ),
                       Row(
                         children: <Widget>[
-                          Text(
-                            '@josh4500',
-                            style: TextStyle(
-                              fontSize: 12,
-                            ),
-                          ),
+                          Text('@josh4500', style: TextStyle(fontSize: 12)),
                           Padding(
                             padding: EdgeInsets.symmetric(
                               vertical: 4.0,
@@ -93,13 +89,10 @@ class AccountSection extends StatelessWidget {
                               fontSize: 12,
                             ),
                           ),
-                          Padding(
-                            padding: EdgeInsets.all(4.0),
-                            child: Center(
-                              child: Icon(
-                                Icons.arrow_forward_ios_sharp,
-                                size: 10,
-                              ),
+                          Center(
+                            child: Icon(
+                              YTIcons.chevron_right,
+                              size: 14,
                             ),
                           ),
                         ],
@@ -110,7 +103,7 @@ class AccountSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           SizedBox(
             height: 30,
             child: ScrollConfiguration(
@@ -123,21 +116,21 @@ class AccountSection extends StatelessWidget {
                     title: 'Switch account',
                     onTap: onTapSwitchAccount,
                     icon: const Icon(Icons.switch_account, size: 16),
-                    backgroundColor: const Color(0xFF3D3D3D),
+                    backgroundColor: const Color(0xFF272727),
                   ),
                   const SizedBox(width: 8),
                   CustomActionChip(
                     title: 'Google Account',
                     onTap: onTapGoogleAccount,
                     icon: const Icon(Icons.account_circle, size: 16),
-                    backgroundColor: const Color(0xFF3D3D3D),
+                    backgroundColor: const Color(0xFF272727),
                   ),
                   const SizedBox(width: 8),
                   CustomActionChip(
                     title: 'Turn on incognito',
                     onTap: onTapIncognito,
                     icon: const Icon(Icons.privacy_tip, size: 16),
-                    backgroundColor: const Color(0xFF3D3D3D),
+                    backgroundColor: const Color(0xFF272727),
                   ),
                 ],
               ),

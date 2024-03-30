@@ -80,8 +80,9 @@ class AccountsScreen extends StatelessWidget {
               SliverToBoxAdapter(
                 child: AccountSection(
                   onTapIncognito: () {},
-                  onTapChannelInfo: () =>
-                      context.goto(AppRoutes.accountChannel),
+                  onTapChannelInfo: () {
+                    context.goto(AppRoutes.accountChannel);
+                  },
                   onTapSwitchAccount: () {},
                   onTapGoogleAccount: () {},
                 ),
@@ -133,7 +134,7 @@ class AccountsScreen extends StatelessWidget {
                     AccountOptionTile(
                       title: 'Downloads',
                       summary: '20 recommendations',
-                      icon: Icons.download,
+                      icon: YTIcons.download_outlined,
                       onTap: () => context.goto(AppRoutes.downloads),
                     ),
                     AccountOptionTile(
@@ -164,7 +165,7 @@ class AccountsScreen extends StatelessWidget {
                     ),
                     AccountOptionTile(
                       title: 'Help and feedback',
-                      icon: Icons.help_outline_outlined,
+                      icon: YTIcons.help_outlined,
                       onTap: () {},
                     ),
                     const Divider(height: 0, thickness: 1.5),

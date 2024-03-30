@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class PlayerSettings extends StatelessWidget {
@@ -6,6 +7,6 @@ class PlayerSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const AppbarAction(icon: Icons.settings_outlined);
+    return const AppbarAction(icon: YTIcons.settings_outlined);
   }
 }

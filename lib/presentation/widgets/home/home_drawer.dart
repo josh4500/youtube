@@ -64,12 +64,12 @@ class HomeDrawer extends StatelessWidget {
                         ),
                         HomeDrawerItem(
                           title: 'Learning',
-                          icon: const Icon(Icons.lightbulb_outline_rounded),
+                          icon: const Icon(YTIcons.learning_outlined),
                           onTap: () => homeContext.goto(AppRoutes.learning),
                         ),
                         HomeDrawerItem(
                           title: 'Fashion And Beauty',
-                          icon: const Icon(Icons.font_download_outlined),
+                          icon: const Icon(YTIcons.fashion_outlined),
                           onTap: () =>
                               homeContext.goto(AppRoutes.fashionAndBeauty),
                         ),
@@ -115,14 +115,14 @@ class HomeDrawer extends StatelessWidget {
             ),
           ),
           const Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(4.0),
             child: Text(
               'Privacy Policy · Terms of Service',
               style: TextStyle(fontSize: 12, color: Colors.white60),
             ),
           ),
           const Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(4.0),
             child: Text(
               'YouTube, a Google company',
               style: TextStyle(fontSize: 12, color: Colors.white60),

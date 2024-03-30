@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class CommentTile extends StatelessWidget {
@@ -57,7 +58,7 @@ class CommentTile extends StatelessWidget {
               child: const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Icon(
-                  Icons.more_vert_sharp,
+                  YTIcons.more_vert_outlined,
                   size: 16,
                 ),
               ),
@@ -97,12 +98,12 @@ class CommentTile extends StatelessWidget {
                         const Text(
                           'Cutting fundig on precautions is going to cost more in the long run',
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         const Row(
                           children: <Widget>[
                             Icon(
-                              Icons.thumb_up_outlined,
-                              size: 14,
+                              YTIcons.like_outlined,
+                              size: 18,
                             ),
                             SizedBox(width: 4),
                             SizedBox(
@@ -113,13 +114,13 @@ class CommentTile extends StatelessWidget {
                               ),
                             ),
                             Icon(
-                              Icons.thumb_down_outlined,
-                              size: 14,
+                              YTIcons.dislike_outlined,
+                              size: 18,
                             ),
                             SizedBox(width: 48),
                             Icon(
-                              Icons.comment_outlined,
-                              size: 14,
+                              YTIcons.reply_outlined,
+                              size: 18,
                             ),
                           ],
                         ),

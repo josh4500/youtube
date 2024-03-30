@@ -113,35 +113,38 @@ class _HomePageState extends ConsumerState<HomePage>
       resizeToAvoidBottomInset: false,
       drawerEnableOpenDragGesture: false,
       drawer: HomeDrawer(homeContext: context),
-      body: Stack(
-        children: <Widget>[
-          widget.child,
-          SlideTransition(
-            position: _overlayPlayerAnimation,
-            child: Consumer(
-              builder: (
-                BuildContext context,
-                WidgetRef ref,
-                Widget? childWidget,
-              ) {
-                if (ref.watch(playerOverlayStateProvider)) {
-                  return childWidget!;
-                }
-                return const SizedBox();
-              },
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints c) {
-                    return PlayerScreen(
-                      height: c.maxHeight,
-                    );
-                  },
+      body: SafeArea(
+        bottom: false,
+        child: Stack(
+          children: <Widget>[
+            widget.child,
+            SlideTransition(
+              position: _overlayPlayerAnimation,
+              child: Consumer(
+                builder: (
+                  BuildContext context,
+                  WidgetRef ref,
+                  Widget? childWidget,
+                ) {
+                  if (ref.watch(playerOverlayStateProvider)) {
+                    return childWidget!;
+                  }
+                  return const SizedBox();
+                },
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: LayoutBuilder(
+                    builder: (BuildContext context, BoxConstraints c) {
+                      return PlayerScreen(
+                        height: c.maxHeight,
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: Consumer(
         builder: (BuildContext context, WidgetRef ref, Widget? childWidget) {

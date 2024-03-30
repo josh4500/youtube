@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
@@ -81,7 +82,7 @@ class ViewablePostContent extends StatelessWidget {
                 borderRadius: BorderRadius.circular(32),
                 child: const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.more_vert),
+                  child: Icon(YTIcons.more_vert_outlined),
                 ),
               ),
             ],
@@ -105,11 +106,11 @@ class ViewablePostContent extends StatelessWidget {
           padding: EdgeInsets.all(16.0),
           child: Row(
             children: <Widget>[
-              Icon(Icons.thumb_up_outlined),
+              Icon(YTIcons.like_outlined),
               SizedBox(width: 8),
               Text('104'),
               SizedBox(width: 32),
-              Icon(Icons.thumb_down_outlined),
+              Icon(YTIcons.dislike_outlined),
               Spacer(),
               Icon(Icons.comment_outlined),
               SizedBox(width: 8),

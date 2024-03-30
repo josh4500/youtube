@@ -28,6 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class CustomBackButton extends StatelessWidget {
   const CustomBackButton({super.key, required this.onPressed});
@@ -36,11 +37,22 @@ class CustomBackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: onPressed,
-      padding: EdgeInsets.zero,
-      visualDensity: VisualDensity.standard,
-      icon: const Icon(YTIcons.arrow_back_outlined, color: Colors.white),
+    return Padding(
+      padding: const EdgeInsets.all(4),
+      child: Tooltip(
+        message: 'Navigate up',
+        textAlign: TextAlign.center,
+        showDuration: const Duration(milliseconds: 125),
+        exitDuration: const Duration(milliseconds: 250),
+        triggerMode: TooltipTriggerMode.longPress,
+        child: TappableArea(
+          onPressed: onPressed,
+          padding: const EdgeInsets.all(12),
+          borderRadius: BorderRadius.circular(24),
+          splashColor: Colors.white24,
+          child: const Icon(YTIcons.arrow_back_outlined),
+        ),
+      ),
     );
   }
 }

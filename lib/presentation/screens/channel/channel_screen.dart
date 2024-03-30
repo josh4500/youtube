@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/screens/channel/widgets/channel_section.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/view_models/content/shorts_view_model.dart';
@@ -155,7 +156,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
             children: <Widget>[
               const Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: 16.0,
+                  horizontal: 12.0,
                   vertical: 12,
                 ),
                 child: Text(
@@ -169,7 +170,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
               Expanded(
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
                   itemBuilder: (BuildContext context, int index) {
                     if (index == 2) {
                       return ForYouContent(
@@ -189,7 +190,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
         ),
       ),
       const SliverToBoxAdapter(
-        child: SizedBox(height: 16),
+        child: SizedBox(height: 12),
       ),
       ..._buildFeaturedSection(title: 'Videos'),
       ..._buildFeaturedSection(title: 'Shorts'),
@@ -218,16 +219,27 @@ class _ChannelScreenState extends State<ChannelScreen> {
     return <Widget>[
       SliverToBoxAdapter(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
+              Row(
+                children: [
+                  if (title == 'Shorts') ...[
+                    Image.asset(
+                      AssetsPath.logoShorts32,
+                      filterQuality: FilterQuality.high,
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
               if (summary != null) ...<Widget>[
                 const SizedBox(height: 8),
@@ -266,7 +278,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
               return const TappableArea(
                 padding: EdgeInsets.symmetric(
                   vertical: 8.0,
-                  horizontal: 16,
+                  horizontal: 12,
                 ),
                 child: PlayableVideoContent(
                   height: 112,
@@ -281,11 +293,11 @@ class _ChannelScreenState extends State<ChannelScreen> {
         child: TappableArea(
           padding: EdgeInsets.symmetric(
             vertical: 8.0,
-            horizontal: 16,
+            horizontal: 12,
           ),
-          child: RotatedBox(
-            quarterTurns: 1,
-            child: Icon(Icons.chevron_right),
+          child: SizedBox(
+            width: double.infinity,
+            child: Icon(YTIcons.chevron_down),
           ),
         ),
       ),
@@ -316,7 +328,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
             return const TappableArea(
               padding: EdgeInsets.symmetric(
                 vertical: 8.0,
-                horizontal: 16,
+                horizontal: 12,
               ),
               child: PlayableVideoContent(
                 height: 112,
@@ -378,7 +390,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
             return const TappableArea(
               padding: EdgeInsets.symmetric(
                 vertical: 8.0,
-                horizontal: 16,
+                horizontal: 12,
               ),
               child: PlayableVideoContent(
                 height: 112,
@@ -403,7 +415,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
             return const TappableArea(
               padding: EdgeInsets.symmetric(
                 vertical: 8.0,
-                horizontal: 16,
+                horizontal: 12,
               ),
               child: PlayableContent(
                 width: 180,

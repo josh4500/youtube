@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import '../controls/player_control.dart';
 import '../player/player_notifications.dart';
@@ -48,13 +49,7 @@ class PlayerMinimize extends ConsumerWidget {
       horizontalPadding: 14,
       color: Colors.transparent,
       builder: (context, _) {
-        return const RotatedBox(
-          quarterTurns: 1,
-          child: Icon(
-            Icons.chevron_right_rounded,
-            size: 26,
-          ),
-        );
+        return const Icon(YTIcons.chevron_down, size: 26);
       },
     );
   }

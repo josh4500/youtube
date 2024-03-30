@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 
 import 'shorts_audio_button.dart';
@@ -73,7 +74,7 @@ class ShortsInfoSection extends StatelessWidget {
                                   style: TextStyle(fontWeight: FontWeight.w500),
                                 ),
                                 SizedBox(width: 4),
-                                Icon(Icons.chevron_right, size: 14),
+                                Icon(YTIcons.chevron_right, size: 14),
                               ],
                             ),
                           ),
@@ -97,7 +98,7 @@ class ShortsInfoSection extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                Icon(Icons.location_on_outlined, size: 14),
+                                Icon(YTIcons.location_outlined, size: 14),
                                 SizedBox(width: 4),
                                 Text('New york'),
                               ],
@@ -154,7 +155,7 @@ class ShortsInfoSection extends StatelessWidget {
                       const SizedBox(height: 16),
                       const Row(
                         children: <Widget>[
-                          Icon(Icons.music_note_outlined),
+                          Icon(YTIcons.music_outlined),
                           SizedBox(width: 8),
                           Text('Original Sound'),
                           SizedBox(width: 8),
@@ -168,43 +169,28 @@ class ShortsInfoSection extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  SomeWidget(
-                    title: const Icon(
-                      Icons.thumb_up_sharp,
-                      size: 32,
-                    ),
+                  ShortsActionButton(
+                    title: const Icon(YTIcons.shorts_like_filled, size: 32),
                     summary: '196k',
                     onTap: () {},
                   ),
-                  SomeWidget(
-                    title: const Icon(
-                      Icons.thumb_down_sharp,
-                      size: 32,
-                    ),
+                  ShortsActionButton(
+                    title: const Icon(YTIcons.shorts_dislike_filled, size: 32),
                     summary: 'Dislike',
                     onTap: () {},
                   ),
-                  SomeWidget(
-                    title: const Icon(
-                      Icons.comment,
-                      size: 32,
-                    ),
+                  ShortsActionButton(
+                    title: const Icon(YTIcons.shorts_comment_filled, size: 32),
                     summary: '1.2k',
                     onTap: onTapComment,
                   ),
-                  SomeWidget(
-                    title: const Icon(
-                      Icons.reply,
-                      size: 32,
-                    ),
+                  ShortsActionButton(
+                    title: const Icon(YTIcons.shorts_share_filled, size: 32),
                     summary: 'Share',
                     onTap: () {},
                   ),
-                  SomeWidget(
-                    title: const Icon(
-                      Icons.recycling,
-                      size: 32,
-                    ),
+                  ShortsActionButton(
+                    title: const Icon(Icons.recycling, size: 32),
                     summary: 'Remix',
                     onTap: () {},
                   ),
@@ -221,8 +207,8 @@ class ShortsInfoSection extends StatelessWidget {
   }
 }
 
-class SomeWidget extends StatelessWidget {
-  const SomeWidget({
+class ShortsActionButton extends StatelessWidget {
+  const ShortsActionButton({
     super.key,
     required this.title,
     required this.summary,

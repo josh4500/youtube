@@ -59,8 +59,8 @@ class AccountAvatar extends StatefulWidget {
   const AccountAvatar({
     super.key,
     this.size = 50,
-    required this.name,
-    this.imageUrl,
+    this.name = 'Joshua john',
+    this.imageUrl = 'https://i.pravatar.cc/300',
     this.border,
     this.onTap,
   });
@@ -82,7 +82,7 @@ class _AccountAvatarState extends State<AccountAvatar> {
   void initState() {
     super.initState();
     if (widget.imageUrl != null) {
-      _imageProvider = const NetworkImage('bytes');
+      _imageProvider = NetworkImage(widget.imageUrl!);
     } else {}
   }
 
@@ -99,12 +99,15 @@ class _AccountAvatarState extends State<AccountAvatar> {
             width: widget.size,
             height: widget.size,
             padding: hasLive ? const EdgeInsets.all(1) : null,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: Colors.white12,
-              // image: DecorationImage(
-              //   image: _imageProvider,
-              //   fit: BoxFit.cover,
-              // ),
+              image: _imageProvider != null
+                  ? DecorationImage(
+                      image: _imageProvider!,
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+              border: widget.border,
               shape: BoxShape.circle,
             ),
           ),

@@ -124,10 +124,7 @@ class _YourMoviesScreenState extends State<YourMoviesScreen>
                 ),
                 child: Row(
                   children: <Widget>[
-                    Icon(
-                      Icons.movie_sharp,
-                      size: 36,
-                    ),
+                    Icon(YTIcons.movies_outlined, size: 36),
                     SizedBox(width: 16),
                     Text(
                       'Movies',

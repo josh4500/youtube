@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 
 class ShortsCategoryActions extends StatelessWidget {
@@ -49,7 +50,7 @@ class ShortsCategoryActions extends StatelessWidget {
                   vertical: 6,
                   horizontal: 16,
                 ),
-                icon: const Icon(Icons.subscriptions_outlined),
+                icon: const Icon(YTIcons.subscriptions_outlined),
                 backgroundColor: Colors.white10,
                 title: 'Subscriptions',
                 textStyle: const TextStyle(
@@ -64,7 +65,7 @@ class ShortsCategoryActions extends StatelessWidget {
                   vertical: 6,
                   horizontal: 16,
                 ),
-                icon: const Icon(Icons.live_tv),
+                icon: const Icon(YTIcons.live_outlined),
                 backgroundColor: Colors.white10,
                 title: 'Live',
                 textStyle: const TextStyle(

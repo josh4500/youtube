@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class ShortsContextInfo extends StatelessWidget {
@@ -60,7 +61,7 @@ class ShortsContextInfo extends StatelessWidget {
             ),
             SizedBox(width: 8),
             Icon(
-              Icons.chevron_right,
+              YTIcons.chevron_right,
               size: 16,
               color: Colors.white70,
             ),
