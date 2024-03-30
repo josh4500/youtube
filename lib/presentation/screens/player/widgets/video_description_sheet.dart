@@ -37,12 +37,6 @@ import 'package:youtube_clone/presentation/widgets/persistent_header_delegate.da
 import '../../../constants.dart';
 
 class VideoDescriptionSheet extends StatefulWidget {
-  final ScrollController? controller;
-  final bool showDragIndicator;
-  final ValueNotifier<bool> transcriptNotifier;
-  final VoidCallback closeDescription;
-  final DraggableScrollableController? draggableController;
-
   const VideoDescriptionSheet({
     super.key,
     this.controller,
@@ -51,6 +45,11 @@ class VideoDescriptionSheet extends StatefulWidget {
     required this.closeDescription,
     this.draggableController,
   });
+  final ScrollController? controller;
+  final bool showDragIndicator;
+  final ValueNotifier<bool> transcriptNotifier;
+  final VoidCallback closeDescription;
+  final DraggableScrollableController? draggableController;
 
   @override
   State<VideoDescriptionSheet> createState() => _VideoDescriptionSheetState();
@@ -266,41 +265,44 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Expanded(
-                      child: CustomActionChip(
-                        title: 'Videos',
-                        icon: const Icon(Icons.video_settings),
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.all(8),
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 0.7,
-                        ),
-                        textStyle: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
+                    CustomActionChip(
+                      title: 'Videos',
+                      icon: const Icon(Icons.video_settings),
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 0.7,
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: CustomActionChip(
-                        title: 'About',
-                        icon: const Icon(
-                          Icons.account_box_outlined,
-                        ),
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.all(8),
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 0.7,
-                        ),
-                        textStyle: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
+                    const SizedBox(width: 12),
+                    CustomActionChip(
+                      title: 'About',
+                      icon: const Icon(
+                        Icons.account_box_outlined,
+                      ),
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 0.7,
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
+                    const SizedBox(width: 12),
                   ],
                 )
               ],
