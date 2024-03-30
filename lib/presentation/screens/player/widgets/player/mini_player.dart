@@ -30,19 +30,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class MiniPlayer extends StatelessWidget {
-  final double opacity;
-  final double space;
-  final double height;
-
   const MiniPlayer({
     super.key,
     required this.opacity,
     required this.space,
     required this.height,
   });
+  final double opacity;
+  final double space;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -86,16 +86,16 @@ class MiniPlayer extends StatelessWidget {
                 ),
               ),
             ),
-            const Expanded(
-              child: FittedBox(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    _MiniPlayerPausePlayButton(),
-                    _MiniPlayerCloseButton(),
-                  ],
-                ),
+            Expanded(
+              child: ListView(
+                reverse: true,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                children: const <Widget>[
+                  _MiniPlayerCloseButton(),
+                  _MiniPlayerPausePlayButton(),
+                ],
               ),
             ),
           ],
@@ -126,7 +126,7 @@ class _MiniPlayerPausePlayButton extends ConsumerWidget {
           ref.read(playerRepositoryProvider).restartVideo();
         }
       },
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 14),
       child: Icon(
         isRestart
             ? Icons.restart_alt
@@ -145,8 +145,8 @@ class _MiniPlayerCloseButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return TappableArea(
       onPressed: ref.read(playerRepositoryProvider).closePlayerScreen,
-      padding: const EdgeInsets.all(16),
-      child: const Icon(Icons.close),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 14),
+      child: const Icon(YTIcons.close_outlined),
     );
   }
 }
