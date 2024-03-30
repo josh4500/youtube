@@ -1,7 +1,6 @@
 import 'dart:collection';
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
@@ -213,7 +212,10 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
               AnimatedBuilder(
                 animation: _dynamicTabHideAnimation,
                 builder: (context, childWidget) {
-                  final v = _dynamicTabHideAnimation.value;
+                  final v = widget.dynamicTab == null
+                      ? 0
+                      : _dynamicTabHideAnimation.value;
+
                   return SliverPersistentHeader(
                     pinned: true,
                     floating: true,
