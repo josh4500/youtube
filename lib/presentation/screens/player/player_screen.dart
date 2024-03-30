@@ -1250,18 +1250,23 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                             behavior: HitTestBehavior.opaque,
                             child: ValueListenableBuilder<double>(
                               valueListenable: widthNotifier,
-                              builder:
-                                  (BuildContext context, double widthValue, _) {
+                              builder: (
+                                BuildContext context,
+                                double widthValue,
+                                _,
+                              ) {
                                 return Stack(
                                   clipBehavior: Clip.none,
                                   children: <Widget>[
                                     Align(
                                       alignment: Alignment.topRight,
-                                      child: MiniPlayer(
-                                        opacity: 1,
-                                        space: screenWidth * widthValue,
-                                        height: screenHeight *
-                                            minVideoViewPortHeight,
+                                      child: Opacity(
+                                        opacity: miniPlayerOpacity,
+                                        child: MiniPlayer(
+                                          space: screenWidth * widthValue,
+                                          height: screenHeight *
+                                              minVideoViewPortHeight,
+                                        ),
                                       ),
                                     ),
                                     Align(

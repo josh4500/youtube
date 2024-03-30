@@ -36,70 +36,65 @@ import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 class MiniPlayer extends StatelessWidget {
   const MiniPlayer({
     super.key,
-    required this.opacity,
     required this.space,
     required this.height,
   });
-  final double opacity;
   final double space;
   final double height;
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: opacity,
-      child: SizedBox(
-        height: height,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: space,
-              height: height,
-            ),
-            const Expanded(
-              flex: 2,
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Google Chromecast: Official Video',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        color: Color(0xFFF1F1F1),
-                      ),
+    return SizedBox(
+      height: height,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: space,
+            height: height,
+          ),
+          const Expanded(
+            flex: 2,
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Google Chromecast: Official Video',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: Color(0xFFF1F1F1),
                     ),
-                    SizedBox(height: 6),
-                    Text(
-                      'Harris Craycraft',
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        color: Color(0xFFAAAAAA),
-                      ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    'Harris Craycraft',
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: Color(0xFFAAAAAA),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                reverse: true,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                scrollDirection: Axis.horizontal,
-                children: const <Widget>[
-                  _MiniPlayerCloseButton(),
-                  _MiniPlayerPausePlayButton(),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: ListView(
+              reverse: true,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              scrollDirection: Axis.horizontal,
+              children: const <Widget>[
+                _MiniPlayerCloseButton(),
+                _MiniPlayerPausePlayButton(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
