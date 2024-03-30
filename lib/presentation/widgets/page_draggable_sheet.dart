@@ -1,7 +1,9 @@
 import 'dart:collection';
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import 'custom_scroll_physics.dart';
 import 'dynamic_tab.dart';
@@ -118,7 +120,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
   Future<void> _onHideDynamicTabsCallback(double offset) async {
     if (offset >= 100) {
       _dynamicTabHideController.reverse();
-    } else {
+    } else if (offset <= -100) {
       _dynamicTabHideController.forward();
     }
   }
@@ -195,6 +197,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     widget.onClose();
   }
 
+  double _beginPixels = 0.0;
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -206,90 +210,97 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
           child: CustomScrollView(
             controller: widget.controller,
             slivers: <Widget>[
-              SliverPersistentHeader(
-                pinned: true,
-                floating: true,
-                delegate: PersistentHeaderDelegate(
-                  minHeight: 66,
-                  maxHeight: 111,
-                  child: Material(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        if (widget.showDragIndicator)
-                          Container(
-                            height: 4,
-                            width: 45,
-                            margin: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                          )
-                        else
-                          const SizedBox(height: 16),
-                        const SizedBox(height: 4),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0,
+              AnimatedBuilder(
+                animation: _dynamicTabHideAnimation,
+                builder: (context, childWidget) {
+                  final v = _dynamicTabHideAnimation.value;
+                  return SliverPersistentHeader(
+                    pinned: true,
+                    floating: true,
+                    delegate: PersistentHeaderDelegate(
+                      minHeight: 66,
+                      maxHeight: (v * (111 - 66)) + 66,
+                      child: childWidget!,
+                    ),
+                  );
+                },
+                child: Material(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (widget.showDragIndicator)
+                        Container(
+                          height: 4,
+                          width: 45,
+                          margin: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(32),
                           ),
-                          child: Stack(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
+                        )
+                      else
+                        const SizedBox(height: 16),
+                      const SizedBox(height: 4),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0,
+                        ),
+                        child: Stack(
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Text(
+                                  widget.title,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                if (widget.subtitle != null)
                                   Text(
-                                    widget.title,
+                                    widget.subtitle!,
                                     style: const TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 14,
+                                      color: Colors.grey,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
-                                  if (widget.subtitle != null)
-                                    Text(
-                                      widget.subtitle!,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  const Spacer(),
-                                  const SizedBox(width: 12),
-                                  ...widget.actions,
-                                  const SizedBox(width: 12),
-                                  InkWell(
-                                    borderRadius: BorderRadius.circular(32),
-                                    onTap: _closeSheet,
-                                    child: const Icon(Icons.close),
-                                  ),
-                                ],
-                              ),
-                              for (final PageDraggableOverlayChild overlayChild
-                                  in widget.overlayChildren)
-                                _OverlayChildTitle(
-                                  controller: overlayChild.controller,
+                                const Spacer(),
+                                const SizedBox(width: 12),
+                                ...widget.actions,
+                                const SizedBox(width: 12),
+                                InkWell(
+                                  borderRadius: BorderRadius.circular(32),
+                                  onTap: _closeSheet,
+                                  child: const Icon(YTIcons.close_outlined),
                                 ),
+                              ],
+                            ),
+                            for (final PageDraggableOverlayChild overlayChild
+                                in widget.overlayChildren)
+                              _OverlayChildTitle(
+                                controller: overlayChild.controller,
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      if (widget.dynamicTab != null)
+                        SizeTransition(
+                          sizeFactor: _dynamicTabHideAnimation,
+                          child: Column(
+                            children: <Widget>[
+                              SizedBox(
+                                height: 40,
+                                child: widget.dynamicTab,
+                              ),
+                              const SizedBox(height: 4),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 18),
-                        if (widget.dynamicTab != null)
-                          SizeTransition(
-                            sizeFactor: _dynamicTabHideAnimation,
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(
-                                  height: 40,
-                                  child: widget.dynamicTab,
-                                ),
-                                const SizedBox(height: 4),
-                              ],
-                            ),
-                          ),
-                        const Divider(thickness: 1.1, height: 0),
-                      ],
-                    ),
+                      const Divider(thickness: 1.1, height: 0),
+                    ],
                   ),
                 ),
               ),
@@ -302,9 +313,12 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                     children: <Widget>[
                       NotificationListener<ScrollNotification>(
                         onNotification: (ScrollNotification notification) {
+                          if (notification is ScrollStartNotification) {
+                            _beginPixels = notification.metrics.pixels;
+                          }
                           if (notification is ScrollEndNotification) {
                             _onHideDynamicTabsCallback(
-                              notification.metrics.pixels,
+                              notification.metrics.pixels - _beginPixels,
                             );
                           }
                           return false;
