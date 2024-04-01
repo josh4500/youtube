@@ -73,7 +73,7 @@ class PlayableClipContent extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Icon(
-                    Icons.content_cut_outlined,
+                    YTIcons.clip_outlined,
                     size: 13,
                   ),
                   SizedBox(width: 2),

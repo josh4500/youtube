@@ -42,7 +42,7 @@ class ForYouVideoContent extends StatelessWidget {
         padding: const EdgeInsets.only(
           left: 8,
           right: 8,
-          bottom: 16,
+          bottom: 12,
           top: 8,
         ),
         child: SizedBox(
@@ -91,7 +91,7 @@ class ForYouVideoContent extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
             ],
           ),
         ),

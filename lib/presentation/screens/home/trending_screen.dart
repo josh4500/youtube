@@ -202,7 +202,7 @@ class _TrendingScreenState extends State<TrendingScreen>
           children: [
             Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: 16.0,
+                horizontal: 12.0,
                 vertical: 14,
               ),
               child: Text(
@@ -230,7 +230,7 @@ class _TrendingScreenState extends State<TrendingScreen>
         child: ViewableGroupShorts(
           title: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: 16.0,
+              horizontal: 12.0,
               vertical: 14,
             ),
             child: Text(

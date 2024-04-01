@@ -26,19 +26,26 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
-import 'package:youtube_clone/presentation/widgets/playable/playable_video_content.dart';
 
-import '../../widgets/appbar_action.dart';
 import 'widgets/popup/show_playlist_menu.dart';
 
-class PlaylistScreen extends StatelessWidget {
+class PlaylistScreen extends StatefulWidget {
   const PlaylistScreen({super.key});
+
+  @override
+  State<PlaylistScreen> createState() => _PlaylistScreenState();
+}
+
+class _PlaylistScreenState extends State<PlaylistScreen> {
+  final _slidableState = SharedSlidableState<int?>(null);
+  @override
+  void dispose() {
+    _slidableState.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,22 +84,22 @@ class PlaylistScreen extends StatelessWidget {
                     begin: AlignmentDirectional.topCenter,
                     end: AlignmentDirectional.bottomCenter,
                     colors: <Color>[
-                      Colors.indigoAccent,
-                      Colors.indigoAccent,
-                      Colors.white38,
+                      Color(0x34FF0000),
+                      Color(0x34FF0000),
+                      Colors.white12,
                       Colors.transparent,
                     ],
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.blueAccent,
+                            color: const Color(0xFF272727),
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
@@ -105,7 +112,7 @@ class PlaylistScreen extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       Row(
                         children: <Widget>[
                           const Column(
@@ -157,7 +164,7 @@ class PlaylistScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       const Row(
                         children: <Widget>[
                           Expanded(
@@ -176,7 +183,7 @@ class PlaylistScreen extends StatelessWidget {
                               backgroundColor: Colors.white,
                             ),
                           ),
-                          SizedBox(width: 16),
+                          SizedBox(width: 12),
                           Expanded(
                             child: CustomActionChip(
                               alignment: Alignment.center,
@@ -202,36 +209,43 @@ class PlaylistScreen extends StatelessWidget {
             ),
             const SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: EdgeInsets.all(12),
                 child: SizedBox(),
               ),
             ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
-                  return const Padding(
-                    padding: EdgeInsets.all(4.0),
+                  return Padding(
+                    padding: const EdgeInsets.all(4.0),
                     child: Slidable(
+                      key: ValueKey(index),
                       maxOffset: 0.3,
-                      items: [
+                      sharedSlidableState: _slidableState,
+                      items: const <SlidableItem>[
                         SlidableItem(
                           icon: Icon(Icons.delete, color: Colors.black),
                         ),
                       ],
-                      child: Row(
-                        children: <Widget>[
-                          Icon(Icons.sort_rounded),
-                          Expanded(
-                            child: PlayableVideoContent(
-                              width: 180,
-                              height: 112,
-                              margin: EdgeInsets.symmetric(
-                                vertical: 4,
-                                horizontal: 8,
+                      child: InkWell(
+                        onTap: () {},
+                        child: const Material(
+                          child: Row(
+                            children: <Widget>[
+                              Icon(Icons.equalizer),
+                              Expanded(
+                                child: PlayableVideoContent(
+                                  width: 180,
+                                  height: 112,
+                                  margin: EdgeInsets.symmetric(
+                                    vertical: 4,
+                                    horizontal: 8,
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   );

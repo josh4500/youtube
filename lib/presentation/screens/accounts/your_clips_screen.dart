@@ -122,7 +122,7 @@ class _YourClipsScreenState extends State<YourClipsScreen>
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   vertical: 8.0,
-                  horizontal: 16,
+                  horizontal: 12,
                 ),
                 child: Text(
                   'Your clips',
@@ -140,7 +140,7 @@ class _YourClipsScreenState extends State<YourClipsScreen>
                     onPressed: () {},
                     padding: const EdgeInsets.symmetric(
                       vertical: 8.0,
-                      horizontal: 16,
+                      horizontal: 12,
                     ),
                     child: const PlayableClipContent(
                       width: 180,

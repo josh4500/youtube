@@ -132,7 +132,7 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 8.0,
-                              horizontal: 16.0,
+                              horizontal: 12.0,
                             ),
                             child: TappableArea(
                               padding: const EdgeInsets.symmetric(

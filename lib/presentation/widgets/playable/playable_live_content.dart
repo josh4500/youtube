@@ -94,7 +94,7 @@ class PlayableLiveContent extends StatelessWidget {
                       )
                     : const Row(
                         children: [
-                          Icon(Icons.live_tv_outlined, size: 14),
+                          Icon(YTIcons.live_outlined, size: 14),
                           SizedBox(width: 4),
                           Text(
                             'LIVE',

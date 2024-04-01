@@ -107,7 +107,7 @@ class AccountSection extends StatelessWidget {
             child: ScrollConfiguration(
               behavior: const OverScrollGlowBehavior(enabled: false),
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 scrollDirection: Axis.horizontal,
                 children: <Widget>[
                   CustomActionChip(

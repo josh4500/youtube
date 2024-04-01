@@ -162,7 +162,10 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
                                       size: 24,
                                       name: 'John Jackson',
                                       border: widget.selectedIndex == 3
-                                          ? Border.all(color: Colors.white)
+                                          ? Border.all(
+                                              color: Colors.white,
+                                              width: 1.5,
+                                            )
                                           : null,
                                     ),
                             const Text('You', style: TextStyle(fontSize: 10)),

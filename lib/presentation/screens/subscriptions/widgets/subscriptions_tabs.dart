@@ -32,7 +32,7 @@ import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
-import '../subscriptions_screen.dart';
+import 'subscriptions_avatar.dart';
 
 class SubscriptionsTabs extends StatefulWidget {
   const SubscriptionsTabs({
@@ -63,8 +63,7 @@ class _SubscriptionsTabsState extends State<SubscriptionsTabs> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               itemBuilder: (BuildContext context, int index) {
-                final GlobalObjectKey<State<StatefulWidget>> key =
-                    GlobalObjectKey(index.hashCode);
+                final key = GlobalObjectKey(index.hashCode);
                 return ValueListenableBuilder<int?>(
                   key: key,
                   valueListenable: _selectedChannel,

@@ -31,7 +31,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 
-import '../constants.dart';
 import '../providers.dart';
 import '../screens.dart' show PlayerScreen;
 import '../widgets/home/home_drawer.dart';
@@ -55,12 +54,12 @@ class _HomePageState extends ConsumerState<HomePage>
     super.initState();
     _overlayPlayerController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350),
-      animationBehavior: AnimationBehavior.preserve,
+      duration: const Duration(milliseconds: 400),
+      reverseDuration: const Duration(milliseconds: 600),
     );
 
     _overlayPlayerAnimation = Tween<Offset>(
-      begin: const Offset(0, kMiniPlayerHeight),
+      begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(

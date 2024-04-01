@@ -120,7 +120,7 @@ class _YourMoviesScreenState extends State<YourMoviesScreen>
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   vertical: 8.0,
-                  horizontal: 16,
+                  horizontal: 12,
                 ),
                 child: Row(
                   children: <Widget>[

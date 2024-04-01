@@ -94,7 +94,7 @@ class DownloadsScreen extends StatelessWidget {
                     width: double.infinity,
                     child: Padding(
                       padding: EdgeInsets.only(
-                        top: 16,
+                        top: 12,
                         left: 12,
                         right: 12,
                         bottom: 8,

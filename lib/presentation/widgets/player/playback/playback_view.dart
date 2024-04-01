@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/player/playback/playback_caption.dart';
 import 'package:youtube_clone/presentation/widgets/player/playback/playback_duration.dart';
 
@@ -57,7 +58,7 @@ class _PlaybackViewState extends State<PlaybackView> {
             if (_showPlaybackControls) ...<Widget>[
               IconButton(
                 onPressed: () {},
-                icon: const Icon(Icons.volume_off),
+                icon: const Icon(YTIcons.sound_off),
               ),
               IconButton(
                 onPressed: () {},

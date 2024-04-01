@@ -96,7 +96,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                   child: RawMaterialButton(
                     elevation: 0,
                     fillColor: Colors.white,
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(12.0),
                     constraints: const BoxConstraints(
                       minWidth: 44.0,
                       minHeight: 36.0,
@@ -333,7 +333,7 @@ class HomeFeedHistoryOff extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.075),
               borderRadius: BorderRadius.circular(12),

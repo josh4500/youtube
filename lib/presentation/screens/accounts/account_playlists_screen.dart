@@ -131,7 +131,7 @@ class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
                     Padding(
                       padding: EdgeInsets.symmetric(
                         vertical: 8,
-                        horizontal: 16,
+                        horizontal: 12,
                       ),
                       child: Text(
                         'Playlists',

@@ -27,56 +27,63 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/themes.dart';
 
-class VideoContext extends StatelessWidget {
-  const VideoContext({super.key});
+class SubscriptionAvatar extends StatelessWidget {
+  const SubscriptionAvatar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // TODO(josh4500): This space should between videoChannelSection and VideoActions if no context
-    // return const SizedBox(height: 8);
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: 12,
-        horizontal: 16,
-      ),
-      margin: const EdgeInsets.only(left: 12, right: 12, top: 5, bottom: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF272727),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: RichText(
-              text: const TextSpan(
-                text: 'TRT is a Turkish public broadcast service. ',
-                children: [
-                  TextSpan(
-                    text: 'Wikipedia ',
-                    children: [
-                      WidgetSpan(
-                        child: Icon(
-                          YTIcons.external_link_outlined,
-                          color: Color(0xFF3EA6FF),
-                          size: 12,
-                        ),
+    return Column(
+      children: <Widget>[
+        const SizedBox(height: 16),
+        Expanded(
+          child: Stack(
+            children: <Widget>[
+              LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints c) {
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(c.maxHeight),
+                    child: Container(
+                      height: c.maxHeight,
+                      width: c.maxHeight,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
                       ),
-                    ],
-                    style: TextStyle(fontSize: 12, color: Color(0xFF3EA6FF)),
-                  ),
-                ],
-                style: TextStyle(fontSize: 12),
+                    ),
+                  );
+                },
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-            ),
+              Positioned(
+                right: 3.5,
+                bottom: 3.5,
+                child: Container(
+                  width: 12.5,
+                  height: 12.5,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      width: 1.7,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 24),
-          const Icon(YTIcons.more_vert_outlined, size: 16),
-        ],
-      ),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Owen Jones',
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
     );
   }
 }
