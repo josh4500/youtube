@@ -60,10 +60,8 @@ class YTIcons {
   static const IconData clip_filled = IconData(0xe831, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData dislike_outlined = IconData(0xe832, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData download_outlined = IconData(0xe833, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData location_outlined_1 = IconData(0xe834, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData play_arrow = IconData(0xe835, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData prev = IconData(0xe836, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData svgexport_83 = IconData(0xe837, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData trending_up_outlined = IconData(0xe838, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData unmuted = IconData(0xe839, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData chevron_down = IconData(0xe83a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
@@ -89,6 +87,25 @@ class YTIcons {
   static const IconData reply_outlined_1 = IconData(0xe84e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData save_outlined_1 = IconData(0xe84f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData description_outlined = IconData(0xe850, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData notification_outlined = IconData(0xe851, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData sound_off = IconData(0xe852, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData sound_on = IconData(0xe853, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData verified_filled = IconData(0xe854, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData closed_caption = IconData(0xe855, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData desktop_expand = IconData(0xe856, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData desktop_minimize = IconData(0xe857, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData fullscreen = IconData(0xe858, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData info_filled_1 = IconData(0xe859, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData minimize = IconData(0xe85a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData next = IconData(0xe85b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData paid_promotion_outlined = IconData(0xe85c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData place_outlined = IconData(0xe85d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData dislike_filled = IconData(0xe85e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData google = IconData(0xe85f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData purchases_membership = IconData(0xe860, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData switch_accounts = IconData(0xe861, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData like_filled = IconData(0xe862, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData youtube_outlined = IconData(0xe863, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData discover_outlined = IconData(0xe900, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData subscriptions_outlined = IconData(0xe901, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData shorts_outlined = IconData(0xe902, fontFamily: _kFontFam, fontPackage: _kFontPkg);
@@ -101,5 +118,4 @@ class YTIcons {
   static const IconData music_outlined = IconData(0xe909, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData location_outlined = IconData(0xe90a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData search_outlined = IconData(0xe90b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData notification_outlined = IconData(0xe90c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

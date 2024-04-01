@@ -56,8 +56,8 @@ class ShortsInfoSection extends StatelessWidget {
                         GestureDetector(
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 10,
+                              vertical: 6,
+                              horizontal: 12,
                             ),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(2),
@@ -67,7 +67,7 @@ class ShortsInfoSection extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                Icon(Icons.paid_outlined, size: 14),
+                                Icon(YTIcons.paid_promotion_outlined),
                                 SizedBox(width: 4),
                                 Text(
                                   'Includes Paid Promotions',
@@ -88,7 +88,7 @@ class ShortsInfoSection extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               vertical: 8,
-                              horizontal: 16,
+                              horizontal: 12,
                             ),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(32),
@@ -98,7 +98,7 @@ class ShortsInfoSection extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                Icon(YTIcons.location_outlined, size: 14),
+                                Icon(YTIcons.place_outlined, size: 18),
                                 SizedBox(width: 4),
                                 Text('New york'),
                               ],

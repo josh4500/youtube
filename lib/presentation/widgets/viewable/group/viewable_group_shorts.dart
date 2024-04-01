@@ -58,7 +58,7 @@ class ViewableGroupShorts extends StatelessWidget {
             itemBuilder: (context, index) {
               return ViewableShortsContent(
                 width: 175,
-                margin: const EdgeInsets.all(6),
+                margin: const EdgeInsets.all(4),
                 borderRadius: BorderRadius.circular(8),
               );
             },

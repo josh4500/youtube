@@ -152,7 +152,7 @@ class AccountsScreen extends StatelessWidget {
                     ),
                     AccountOptionTile(
                       title: 'Get Youtube Premium',
-                      icon: Icons.video_settings,
+                      icon: YTIcons.youtube_outlined,
                       networkRequired: true,
                       onTap: () {},
                     ),

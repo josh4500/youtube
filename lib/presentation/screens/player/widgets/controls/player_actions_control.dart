@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/providers/player_expanded_state_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../providers/player_signal_provider.dart';
@@ -60,12 +61,12 @@ class PlayerActionsControl extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(Icons.thumb_up_alt_outlined),
-                  const Icon(Icons.thumb_down_alt_outlined),
+                  const Icon(YTIcons.like_outlined),
+                  const Icon(YTIcons.dislike_outlined),
                   Consumer(
                     builder: (context, ref, child) {
                       return AppbarAction(
-                        icon: Icons.chat_outlined,
+                        icon: YTIcons.reply_outlined,
                         onTap: () {
                           ref.read(playerRepositoryProvider).sendPlayerSignal([
                             PlayerSignal.hideControls,
@@ -75,9 +76,9 @@ class PlayerActionsControl extends StatelessWidget {
                       );
                     },
                   ),
-                  const Icon(Icons.add_box_outlined),
-                  const Icon(Icons.reply_outlined),
-                  const Icon(Icons.more_horiz),
+                  const Icon(YTIcons.save_outlined),
+                  const Icon(YTIcons.shared_filled),
+                  const Icon(YTIcons.more_horiz_outlined),
                 ],
               ),
             ),

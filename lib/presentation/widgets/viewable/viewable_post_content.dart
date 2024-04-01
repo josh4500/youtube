@@ -42,7 +42,7 @@ class ViewablePostContent extends StatelessWidget {
         const Divider(thickness: 1.5, height: 0),
         Padding(
           padding: const EdgeInsets.only(
-            left: 8.0,
+            left: 4.0,
             top: 8.0,
             bottom: 8.0,
           ),
@@ -50,7 +50,7 @@ class ViewablePostContent extends StatelessWidget {
             children: <Widget>[
               const Padding(
                 padding: EdgeInsets.all(6.0),
-                child: AccountAvatar(name: 'John Jackson'),
+                child: AccountAvatar(size: 42),
               ),
               const Expanded(
                 child: Padding(
@@ -90,20 +90,27 @@ class ViewablePostContent extends StatelessWidget {
         ),
         TappableArea(
           onPressed: () {},
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 2),
           child: const Padding(
-            padding: EdgeInsets.only(bottom: 16.0),
+            padding: EdgeInsets.only(bottom: 8.0),
             child: Text(
               'We are often asked to design for high availability, high scalability, and high throughput. What ',
             ),
           ),
         ),
+        const SizedBox(height: 4),
         Container(
           height: 320,
-          color: Colors.white38,
+          decoration: const BoxDecoration(
+            color: Colors.white38,
+            image: DecorationImage(
+              image: NetworkImage('https://picsum.photos/450/900'),
+              fit: BoxFit.cover,
+            ),
+          ),
         ),
         const Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(12.0),
           child: Row(
             children: <Widget>[
               Icon(YTIcons.like_outlined),

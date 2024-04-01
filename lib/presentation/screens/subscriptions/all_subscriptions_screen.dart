@@ -62,7 +62,7 @@ class AllSubscriptionsScreen extends StatelessWidget {
             onTap: () {},
           ),
           AppbarAction(
-            icon: Icons.more_vert,
+            icon: YTIcons.more_vert_outlined,
             onTapDown: (TapDownDetails details) async {
               final Offset position = details.globalPosition;
               await showAllSubscriptionsMenu(

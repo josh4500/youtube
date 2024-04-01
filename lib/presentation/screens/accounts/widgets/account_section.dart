@@ -29,8 +29,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 
 class AccountSection extends StatelessWidget {
   const AccountSection({
@@ -58,7 +56,7 @@ class AccountSection extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               child: Row(
                 children: <Widget>[
-                  AccountAvatar(size: 76, name: 'John Jackson'),
+                  AccountAvatar(size: 76),
                   SizedBox(width: 14),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,14 +113,14 @@ class AccountSection extends StatelessWidget {
                   CustomActionChip(
                     title: 'Switch account',
                     onTap: onTapSwitchAccount,
-                    icon: const Icon(Icons.switch_account, size: 16),
+                    icon: const Icon(YTIcons.switch_accounts, size: 16),
                     backgroundColor: const Color(0xFF272727),
                   ),
                   const SizedBox(width: 8),
                   CustomActionChip(
                     title: 'Google Account',
                     onTap: onTapGoogleAccount,
-                    icon: const Icon(Icons.account_circle, size: 16),
+                    icon: const Icon(YTIcons.google, size: 16),
                     backgroundColor: const Color(0xFF272727),
                   ),
                   const SizedBox(width: 8),
