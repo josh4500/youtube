@@ -32,10 +32,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/core/utils/progress.dart';
 import 'package:youtube_clone/infrastructure/services/cache/in_memory_cache.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
+import 'package:youtube_clone/presentation/view_models/progress.dart';
 
 part 'player_repository_provider.g.dart';
 
@@ -254,41 +254,38 @@ class PlayerRepository {
 
   void sendPlayerSignal(List<PlayerSignal> signals) {
     for (final signal in signals) {
-      switch (signal) {
-        case PlayerSignal.minimize:
-          _playerViewState.add(PlayerViewState.minimized);
-        case PlayerSignal.maximize:
-          _playerViewState.remove(PlayerViewState.minimized);
-        case PlayerSignal.enterExpanded:
-          _playerViewState.add(PlayerViewState.expanded);
-        case PlayerSignal.exitExpanded:
-          _playerViewState.remove(PlayerViewState.expanded);
-        case PlayerSignal.enterFullscreen:
-          _playerViewState.add(PlayerViewState.fullscreen);
-        case PlayerSignal.exitFullscreen:
-          _playerViewState.remove(PlayerViewState.fullscreen);
-        case PlayerSignal.showControls:
-          _playerViewState.add(PlayerViewState.visibleControls);
-        case PlayerSignal.hideControls:
-          _playerViewState.remove(PlayerViewState.visibleControls);
-        case PlayerSignal.showAmbient:
-          _playerViewState.add(PlayerViewState.visibleAmbient);
-        case PlayerSignal.hideAmbient:
-          _playerViewState.remove(PlayerViewState.visibleAmbient);
-        case PlayerSignal.openDescription:
-          _playerViewState.add(PlayerViewState.visibleDescription);
-        case PlayerSignal.closeDescription:
-          _playerViewState.remove(PlayerViewState.visibleDescription);
-        case PlayerSignal.openComments:
-          _playerViewState.add(PlayerViewState.visibleDescription);
-        case PlayerSignal.closeComments:
-          _playerViewState.remove(PlayerViewState.visibleDescription);
-        case PlayerSignal.openChapters:
-          _playerViewState.add(PlayerViewState.visibleChapters);
-        case PlayerSignal.closeChapters:
-          _playerViewState.remove(PlayerViewState.visibleChapters);
-        default:
-          return;
+      if (signal case PlayerSignal.minimize) {
+        _playerViewState.add(PlayerViewState.minimized);
+      } else if (signal case PlayerSignal.maximize) {
+        _playerViewState.remove(PlayerViewState.minimized);
+      } else if (signal case PlayerSignal.enterExpanded) {
+        _playerViewState.add(PlayerViewState.expanded);
+      } else if (signal case PlayerSignal.exitExpanded) {
+        _playerViewState.remove(PlayerViewState.expanded);
+      } else if (signal case PlayerSignal.enterFullscreen) {
+        _playerViewState.add(PlayerViewState.fullscreen);
+      } else if (signal case PlayerSignal.exitFullscreen) {
+        _playerViewState.remove(PlayerViewState.fullscreen);
+      } else if (signal case PlayerSignal.showControls) {
+        _playerViewState.add(PlayerViewState.visibleControls);
+      } else if (signal case PlayerSignal.hideControls) {
+        _playerViewState.remove(PlayerViewState.visibleControls);
+      } else if (signal case PlayerSignal.showAmbient) {
+        _playerViewState.add(PlayerViewState.visibleAmbient);
+      } else if (signal case PlayerSignal.hideAmbient) {
+        _playerViewState.remove(PlayerViewState.visibleAmbient);
+      } else if (signal case PlayerSignal.openDescription) {
+        _playerViewState.add(PlayerViewState.visibleDescription);
+      } else if (signal case PlayerSignal.closeDescription) {
+        _playerViewState.remove(PlayerViewState.visibleDescription);
+      } else if (signal case PlayerSignal.openComments) {
+        _playerViewState.add(PlayerViewState.visibleDescription);
+      } else if (signal case PlayerSignal.closeComments) {
+        _playerViewState.remove(PlayerViewState.visibleDescription);
+      } else if (signal case PlayerSignal.openChapters) {
+        _playerViewState.add(PlayerViewState.visibleChapters);
+      } else if (signal case PlayerSignal.closeChapters) {
+        _playerViewState.remove(PlayerViewState.visibleChapters);
       }
       _playerSignalController.sink.add(signal);
     }

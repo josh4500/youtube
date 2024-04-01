@@ -47,15 +47,30 @@ extension DurationUtils on Duration {
   int get minutesPart => inMinutes.remainder(60);
 
   String get hoursMinutes {
-    String hoursPart = (inMinutes / 60).floor().toString().padLeft(2, '0');
-    String minutesPart = inMinutes.remainder(60).toString().padLeft(2, '0');
+    final String hoursPart =
+        (inMinutes / 60).floor().toString().padLeft(2, '0');
+    final String minutesPart =
+        inMinutes.remainder(60).toString().padLeft(2, '0');
     return '$hoursPart:$minutesPart';
   }
 
   String get hoursMinutesSeconds {
-    String hoursPart = (inMinutes / 60).floor().toString().padLeft(2, '0');
-    String minutesPart = inMinutes.remainder(60).toString().padLeft(2, '0');
-    String secondsPart = inSeconds.remainder(60).toString().padLeft(2, '0');
+    final String hoursPart =
+        (inMinutes / 60).floor().toString().padLeft(2, '0');
+    final String minutesPart =
+        inMinutes.remainder(60).toString().padLeft(2, '0');
+    final String secondsPart =
+        inSeconds.remainder(60).toString().padLeft(2, '0');
     return '${(inMinutes / 60) > 1 ? '$hoursPart:' : ''}$minutesPart:$secondsPart';
+  }
+}
+
+extension ClampDurationExtension on Duration {
+  Duration clamp(Duration min, Duration max) {
+    return this < min
+        ? min
+        : this > max
+            ? max
+            : this;
   }
 }

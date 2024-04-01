@@ -144,6 +144,9 @@ class _PlaybackProgressState extends State<PlaybackProgress>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
+  /// Y position of user pointer when vertical drag starts
+  double _longPressYStartPosition = 0;
+
   @override
   void initState() {
     super.initState();

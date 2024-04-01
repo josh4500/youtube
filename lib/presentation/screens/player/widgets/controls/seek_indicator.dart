@@ -30,14 +30,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class SeekIndicator extends StatelessWidget {
-  final ValueListenable<bool> valueListenable;
-  final Widget child;
-
   const SeekIndicator({
     super.key,
     required this.valueListenable,
     required this.child,
   });
+  final ValueListenable<bool> valueListenable;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +63,8 @@ class SeekIndicator extends StatelessWidget {
 }
 
 class SeekIndicatorClipper extends CustomClipper<Path> {
-  final bool forward;
-
   SeekIndicatorClipper({super.reclip, this.forward = true});
+  final bool forward;
   @override
   Path getClip(Size size) {
     Path path = Path();

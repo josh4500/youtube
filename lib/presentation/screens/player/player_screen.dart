@@ -501,7 +501,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     await _zoomPanAnimationController.forward();
   }
 
-  // Opens the player in fullscreen mode by sending a player signal to the repository.
+  /// Opens the player in fullscreen mode by sending a player signal to the repository.
   Future<void> _openFullscreenPlayer() async {
     _hideControls();
     await context.goto(AppRoutes.playerLandscapeScreen);
@@ -713,6 +713,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     // Hide controls when the height falls below a certain threshold
     if (heightNotifier.value < 1) {
       _hideControls();
+
+      ref.read(playerRepositoryProvider).sendPlayerSignal(
+        <PlayerSignal>[PlayerSignal.hidePlaybackProgress],
+      );
     }
   }
 
@@ -1037,6 +1041,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (notification.depth >= 1) {
       if (notification is ScrollStartNotification) {
         _allowInfoDrag = false;
+
+        if (additionalHeightNotifier.value > 0) {
+          additionalHeightNotifier.value = 0;
+          ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+            PlayerSignal.exitExpanded,
+            PlayerSignal.showPlaybackProgress,
+          ]);
+        }
       } else if (notification is ScrollEndNotification) {
         _allowInfoDrag = true;
       }
@@ -1438,8 +1450,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                     shouldCloseOnMinExtent: false,
                     controller: _chaptersDraggableController,
                     snapAnimationDuration: const Duration(milliseconds: 300),
-                    builder:
-                        (BuildContext context, ScrollController controller) {
+                    builder: (
+                      BuildContext context,
+                      ScrollController controller,
+                    ) {
                       return VideoChaptersSheet(
                         controller: controller,
                         closeChapter: _closeChapterSheetSignal,

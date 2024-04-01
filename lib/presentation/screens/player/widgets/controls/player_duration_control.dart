@@ -29,7 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class PlayerDurationControl extends ConsumerStatefulWidget {
@@ -75,9 +75,11 @@ class _PlayerDurationControlState extends ConsumerState<PlayerDurationControl> {
                 final position = reversed
                     ? videoDuration - (snapshot.data ?? Duration.zero)
                     : snapshot.data ?? Duration.zero;
-                return Text(reversed
-                    ? '-${position.hoursMinutesSeconds}'
-                    : position.hoursMinutesSeconds);
+                return Text(
+                  reversed
+                      ? '-${position.hoursMinutesSeconds}'
+                      : position.hoursMinutesSeconds,
+                );
               },
             ),
             const Text(

@@ -32,19 +32,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/core/constants/constants.dart';
-import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
-import 'package:youtube_clone/presentation/constants/values.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/providers/player_expanded_state_provider.dart';
-import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_settings.dart';
-import 'package:youtube_clone/presentation/theme/device_theme.dart';
+import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../../providers/player_expanded_state_provider.dart';
+import '../../providers/player_viewstate_provider.dart';
 import '../player/player_notifications.dart';
 import 'player_actions_control.dart';
 import 'player_autoplay_switch.dart';
@@ -59,6 +56,7 @@ import 'player_next.dart';
 import 'player_play_pause_restart.dart';
 import 'player_previous.dart';
 import 'player_seek_slide_frame.dart';
+import 'player_settings.dart';
 import 'seek_indicator.dart';
 
 class PlayerOverlayControls extends ConsumerStatefulWidget {
@@ -91,10 +89,10 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   bool _startedOnLongPress = false;
 
   /// Y position of user pointer when long press action starts
-  double _longPressYPosition = 0;
+  double _longPressYStartPosition = 0;
 
   /// X position of user pointer when long press action starts
-  //double _longPressXPosition = 0;
+  double _longPressXUpdatePosition = 0;
 
   /// Timer used for hiding `Release` message while slide seeking.
   Timer? _releaseTimer;
@@ -124,7 +122,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   bool _showPullUp = false;
   final _showSlidingSeekIndicator = ValueNotifier<bool>(false);
   final _showSlidingReleaseIndicator = ValueNotifier<bool>(false);
-  final _slidingSeekDuration = ValueNotifier<Duration?>(null);
   final _showSlidingSeekDuration = ValueNotifier<bool>(false);
 
   /// Notifiers and variables for forward seeking at 2x speed
@@ -145,6 +142,13 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     return _showSlidingSeekIndicator.value || _showSlideFrame.value;
   }
 
+  /// Whether it was playing
+  bool wasPlaying = false;
+
+  /// Duration when slide seeking on progress or long press
+  Duration _slideSeekDuration = Duration.zero;
+
+  late Animation<Offset> _slideAnimation;
   @override
   void initState() {
     super.initState();
@@ -164,6 +168,13 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       vsync: this,
       value: 1,
       duration: const Duration(milliseconds: 300),
+    );
+
+    _slideAnimation = _slideFrameController.drive(
+      Tween<Offset>(
+        begin: const Offset(0, slideFrameHeight),
+        end: Offset.zero,
+      ),
     );
 
     _bufferController = AnimationController(
@@ -201,7 +212,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       reverseCurve: Curves.easeOutCubic,
     );
 
-    // TODO: Use Orientation for condition
+    // TODO(Josh4500): Use Orientation for condition
     Future(() {
       if (!ref.read(playerNotifierProvider).loading) {
         if (!ref.read(playerNotifierProvider).playing) {
@@ -306,7 +317,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _slideFrameController.dispose();
     _bufferController.dispose();
     _showSlidingReleaseIndicator.dispose();
-    _slidingSeekDuration.dispose();
 
     super.dispose();
   }
@@ -344,19 +354,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                   valueListenable: _showSlideFrame,
                   builder: (_, show, __) {
                     if (show) return const SizedBox();
-                    return SeekIndicator(
-                      valueListenable: _showSlidingSeekDuration,
-                      child: ValueListenableBuilder(
-                        valueListenable: _slidingSeekDuration,
-                        builder: (_, duration, __) {
-                          return SizedBox(
-                            child: duration != null
-                                ? Text(duration.hoursMinutesSeconds)
-                                : null,
-                          );
-                        },
-                      ),
-                    );
+                    return _buildShowSlideSeekDuration();
                   },
                 ),
               ),
@@ -421,9 +419,10 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _showPullUp
-                                ? const Icon(Icons.expand_less)
-                                : const Icon(Icons.linear_scale),
+                            if (_showPullUp)
+                              const Icon(Icons.expand_less)
+                            else
+                              const Icon(Icons.linear_scale),
                             const SizedBox(width: 4),
                             Text(
                               _showPullUp
@@ -481,14 +480,14 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                                 !showSlideFrame,
                             child: Opacity(
                               opacity: _controlsAnimation.value,
-                              child: childWidget!,
+                              child: childWidget,
                             ),
                           );
                         },
                       ),
                     );
                   },
-                  child: ColoredBox(
+                  child: const ColoredBox(
                     color: Colors.black54,
                     child: Column(
                       children: [
@@ -496,97 +495,96 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                           child: Stack(
                             clipBehavior: Clip.none,
                             children: [
-                              const _GroupControl(),
-                              PlayerSeekSlideFrame(
-                                animation: _slideFrameController,
-                                frameHeight: slideFrameHeight,
-                                valueListenable: _showSlideFrame,
-                                onClose: _onEndSlideFrameSeek,
-                                seekDurationIndicator: SeekIndicator(
-                                  valueListenable: _showSlidingSeekDuration,
-                                  child: ValueListenableBuilder(
-                                    valueListenable: _slidingSeekDuration,
-                                    builder: (_, duration, __) {
-                                      return SizedBox(
-                                        child: duration != null
-                                            ? Text(duration.hoursMinutesSeconds)
-                                            : null,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
+                              _GroupControl(),
                             ],
                           ),
                         ),
-                        const PlayerActionsControl(),
+                        PlayerActionsControl(),
                       ],
                     ),
                   ),
                 ),
               ),
+              PlayerSeekSlideFrame(
+                animation: _slideFrameController,
+                frameHeight: slideFrameHeight,
+                valueListenable: _showSlideFrame,
+                onClose: _onEndSlideFrameSeek,
+                seekDurationIndicator: _buildShowSlideSeekDuration(),
+              ),
               // Shows loading indicator, regardless if controls are shown/hidden
               const Center(child: PlayerLoadingIndicator()),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: CustomOrientationBuilder(
-                  onLandscape: (context, childWidget) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 58,
-                      ),
-                      child: childWidget,
-                    );
-                  },
-                  onPortrait: (context, childWidget) {
-                    return Consumer(
-                      builder: (context, ref, _) {
-                        ref.watch(playerExpandedStateProvider);
-                        final isExpanded =
-                            ref.read(playerViewStateProvider).isExpanded;
-                        if (isExpanded) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 58,
-                              horizontal: 8,
-                            ),
-                            child: childWidget!,
-                          );
-                        }
-                        return childWidget!;
-                      },
-                    );
-                  },
-                  child: ValueListenableBuilder(
-                    valueListenable: _showPlaybackProgress,
-                    builder: (context, visible, childWidget) {
-                      return Visibility(
-                        visible: visible,
-                        // opacity: visible ? 1 : 0,
-                        // curve: Curves.easeInCubic,
-                        // duration: const Duration(milliseconds: 100),
-                        child: childWidget!,
+              AnimatedBuilder(
+                animation: _slideAnimation,
+                builder: (BuildContext context, Widget? childWidget) {
+                  return FractionalTranslation(
+                    translation: _slideAnimation.value,
+                    child: childWidget,
+                  );
+                },
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: CustomOrientationBuilder(
+                    onLandscape: (BuildContext context, Widget? childWidget) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0,
+                          vertical: 58,
+                        ),
+                        child: childWidget,
                       );
                     },
-                    child: Builder(
-                      builder: (context) {
-                        final playerRepo = ref.read(playerRepositoryProvider);
-                        return PlaybackProgress(
-                          progress: playerRepo.videoProgressStream,
-                          // TODO: Revisit this code
-                          start:
-                              playerRepo.currentVideoProgress ?? Progress.zero,
-                          // TODO: Get ready value
-                          end: const Duration(minutes: 1),
-                          animation: _progressAnimation,
-                          bufferAnimation: _bufferAnimation,
-                          onTap: _onPlaybackProgressTap,
-                          onDragStart: _onPlaybackProgressDragStart,
-                          onChangePosition: _onPlaybackProgressPositionChanged,
-                          onDragEnd: _onPlaybackProgressDragEnd,
+                    onPortrait: (context, childWidget) {
+                      return Consumer(
+                        builder: (
+                          BuildContext context,
+                          WidgetRef ref,
+                          Widget? _,
+                        ) {
+                          ref.watch(playerExpandedStateProvider);
+                          final isExpanded =
+                              ref.read(playerViewStateProvider).isExpanded;
+                          if (isExpanded) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 58,
+                                horizontal: 8,
+                              ),
+                              child: childWidget,
+                            );
+                          }
+                          return childWidget!;
+                        },
+                      );
+                    },
+                    child: ValueListenableBuilder(
+                      valueListenable: _showPlaybackProgress,
+                      builder: (context, visible, childWidget) {
+                        return Visibility(
+                          visible: visible,
+                          child: childWidget!,
                         );
                       },
+                      child: Builder(
+                        builder: (context) {
+                          final playerRepo = ref.read(playerRepositoryProvider);
+                          return PlaybackProgress(
+                            progress: playerRepo.videoProgressStream,
+                            // TODO(Josh4500): Revisit this code
+                            start: playerRepo.currentVideoProgress ??
+                                Progress.zero,
+                            // TODO(Josh4500): Get ready value
+                            end: const Duration(minutes: 1),
+                            animation: _progressAnimation,
+                            bufferAnimation: _bufferAnimation,
+                            onTap: _onPlaybackProgressTap,
+                            onDragStart: _onPlaybackProgressDragStart,
+                            onChangePosition:
+                                _onPlaybackProgressPositionChanged,
+                            onDragEnd: _onPlaybackProgressDragEnd,
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -595,6 +593,23 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildShowSlideSeekDuration() {
+    return StreamBuilder<Progress>(
+      initialData: Progress.zero,
+      stream: ref.read(playerRepositoryProvider).videoProgressStream,
+      builder: (context, snapshot) {
+        return SeekIndicator(
+          valueListenable: _showSlidingSeekDuration,
+          child: SizedBox(
+            child: Text(
+              snapshot.data!.position.hoursMinutesSeconds,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -685,17 +700,14 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _showSlidingSeekIndicator.value = false;
 
     // If a sliding seek duration is set, perform seek operation to that duration
-    if (_slidingSeekDuration.value != null) {
-      // Release updating from player
-      ref.read(playerRepositoryProvider).updatePosition(
-            _slidingSeekDuration.value!,
-            lockProgress: false,
-          );
-      ref.read(playerRepositoryProvider).seekTo(_slidingSeekDuration.value!);
-    }
+    // Release updating from player
+    ref.read(playerRepositoryProvider).updatePosition(
+          _slideSeekDuration,
+          lockProgress: false,
+        );
+    ref.read(playerRepositoryProvider).seekTo(_slideSeekDuration);
 
     // Reset sliding seek-related values and indicators
-    _slidingSeekDuration.value = null;
     _showSlidingSeekDuration.value = false;
 
     // Reset duration variables for slide seeking
@@ -755,8 +767,10 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   void _onLongPressStart(LongPressStartDetails details) {
     if (_preventCommonControlGestures) return;
 
-    _longPressYPosition = details.localPosition.dy;
-    // _longPressXPosition = details.localPosition.dx;
+    _longPressYStartPosition = details.localPosition.dy;
+    _longPressXUpdatePosition = details.localPosition.dx;
+    _slideSeekDuration =
+        ref.read(playerRepositoryProvider).currentVideoPosition;
 
     if (!_controlsHidden) {
       final screenWidth = MediaQuery.sizeOf(context).width;
@@ -796,7 +810,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     if (_preventCommonControlGestures) return;
 
     if (!_startedOnLongPress) return;
-    _longPressYPosition = 0;
+    _longPressYStartPosition = 0;
     _startedOnLongPress = false;
     final isPlaying = ref.read(playerNotifierProvider).playing;
     final hasEnded = ref.read(playerNotifierProvider).ended;
@@ -826,10 +840,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
     if (_isSlidingSeek) {
       SlideSeekUpdatePlayerNotification().dispatch(context);
-      final totalMicroseconds = ref
-          .read(playerRepositoryProvider)
-          .currentVideoDuration
-          .inMicroseconds;
+      // TODO(Josh4500): Use real data
+      final totalMicroseconds = const Duration(seconds: 60).inMicroseconds;
       final lastPosition =
           ref.read(playerRepositoryProvider).currentVideoPosition;
 
@@ -837,59 +849,47 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       final localY = details.localPosition.dy;
       final screenWidth = MediaQuery.sizeOf(context).width;
 
-      final bound = Duration(microseconds: (totalMicroseconds * 0.1).floor());
+      if (_showSlideFrame.value == false) {
+        final bound = Duration(microseconds: (totalMicroseconds * 0.1).floor());
 
-      // Set initial values
-      _lastDuration ??= lastPosition;
-      _upperboundSlideDuration ??= lastPosition + bound;
-      _lowerboundSlideDuration ??= lastPosition - bound;
+        // Set initial values
+        _lastDuration ??= lastPosition;
+        _upperboundSlideDuration ??= lastPosition + bound;
+        _lowerboundSlideDuration ??= lastPosition - bound;
 
-      // TODO: This might fix inconsistency with changes in position
-      //  final longPressXDuration = Duration(
-      //         microseconds:
-      //             (_longPressXPosition * totalMicroseconds / screenWidth).floor(),
-      //       );
-      // Duration newDuration;
-      // if (_longPressXPosition < localX) {
-      //   newDuration = longPressXDuration +
-      //       Duration(
-      //         microseconds: ((localX - _longPressXPosition) *
-      //                 totalMicroseconds /
-      //                 screenWidth)
-      //             .floor(),
-      //       );
-      // }else {
-      //   newDuration = longPressXDuration  -
-      //       Duration(
-      //         microseconds: (( _longPressXPosition - localX) *
-      //             totalMicroseconds /
-      //             screenWidth)
-      //             .floor(),
-      //       );
-      // }
-      final newDuration = Duration(
-        microseconds: (localX * totalMicroseconds / screenWidth).floor(),
-      );
+        final localDeltaX = localX - _longPressXUpdatePosition;
+        _longPressXUpdatePosition = localX;
 
-      _checkOutOfBound(lastPosition, newDuration);
+        final newD = (localDeltaX * totalMicroseconds / screenWidth).floor();
 
-      if (!_showSlideFrame.value) {
+        _slideSeekDuration = localDeltaX.isNegative
+            ? _slideSeekDuration - Duration(microseconds: newD.abs())
+            : _slideSeekDuration + Duration(microseconds: newD);
+
+        _slideSeekDuration = _slideSeekDuration.clamp(
+          Duration.zero,
+          // TODO(Josh4500): Use real data
+          const Duration(seconds: 60),
+        );
+
+        _checkOutOfBound(lastPosition, _slideSeekDuration);
+
         _showSlidingSeekDuration.value = true;
-        _slidingSeekDuration.value = newDuration;
 
         // Updates and locks progress from player
-        ref.read(playerRepositoryProvider).updatePosition(newDuration);
+        ref.read(playerRepositoryProvider).updatePosition(_slideSeekDuration);
       }
 
-      if (localY < (_longPressYPosition - 10)) {
+      if (localY < (_longPressYStartPosition - 30)) {
         if (!_showSlidingSeekIndicator.value) {
           HapticFeedback.selectionClick();
         }
 
+        _showSlideFrame.value = true; // This disengages long press sliding seek
         _showSlidingSeekIndicator.value = false;
-        _showSlideFrame.value = true;
+
         _slideFrameController.value = clampDouble(
-          (_longPressYPosition - localY) / 50,
+          (_longPressYStartPosition - 30 - localY) / slideFrameHeight,
           0,
           1,
         );
@@ -928,8 +928,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     }
   }
 
-  bool wasPlaying = false;
-
   /// When PlaybackProgress is tapped to change the position of currently playing
   /// video.
   void _onPlaybackProgressTap(Duration position) {
@@ -948,7 +946,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
     _showPullUp = true;
     _showSlidingSeekDuration.value = true;
-    _slidingSeekDuration.value = position;
+    _slideSeekDuration = position;
 
     _showSlideSeek();
     // Updates and locks progress from player
@@ -956,18 +954,16 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   }
 
   void _onPlaybackProgressDragEnd() {
-    if (_slidingSeekDuration.value != null) {
-      ref.read(playerRepositoryProvider).seekTo(_slidingSeekDuration.value!);
-      // Updates the progress for the las time and unlocks getting progress from
-      // player
-      ref.read(playerRepositoryProvider).updatePosition(
-            _slidingSeekDuration.value!,
-            lockProgress: false, // Releases lock on player progress
-          );
-    }
+    ref.read(playerRepositoryProvider).seekTo(_slideSeekDuration);
+    // Updates the progress for the last time and unlocks getting progress from
+    // player
+    ref.read(playerRepositoryProvider).updatePosition(
+          _slideSeekDuration,
+          lockProgress: false, // Releases lock on player progress
+        );
 
     _showPullUp = false;
-    _slidingSeekDuration.value = null;
+    _showSlidingReleaseIndicator.value = false;
     _showSlidingReleaseIndicator.value = false;
     _hideSlideSeek();
 
@@ -991,7 +987,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     // Send vibration feedback when going in or out of lower and upper bound
     _checkOutOfBound(lastPosition, position);
 
-    _slidingSeekDuration.value = position;
+    _slideSeekDuration = position;
     // Updates and locks progress from player
     ref.read(playerRepositoryProvider).updatePosition(position);
   }
