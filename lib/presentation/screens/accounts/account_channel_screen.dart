@@ -87,26 +87,28 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
                   handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
                     context,
                   ),
-                  sliver: const SliverAppBar(
+                  sliver: const SliverPersistentHeader(
+                    floating: true,
                     pinned: true,
-                    toolbarHeight: 0,
-                    centerTitle: false,
-                    automaticallyImplyLeading: false,
-                    bottom: TabBar(
-                      isScrollable: true,
-                      tabAlignment: TabAlignment.start,
-                      dividerColor: Colors.white,
-                      indicatorColor: Colors.white,
-                      tabs: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Tab(text: 'Home'),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Tab(text: 'Playlists'),
-                        ),
-                      ],
+                    delegate: PersistentHeaderDelegate(
+                      maxHeight: 50,
+                      minHeight: 50,
+                      child: TabBar(
+                        isScrollable: true,
+                        tabAlignment: TabAlignment.start,
+                        dividerColor: Colors.white,
+                        indicatorColor: Colors.white,
+                        tabs: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Tab(text: 'Home'),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Tab(text: 'Playlists'),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

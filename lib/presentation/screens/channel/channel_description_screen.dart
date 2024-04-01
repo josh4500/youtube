@@ -63,7 +63,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
           slivers: <Widget>[
             SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -74,7 +74,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 12),
                     Text(
                       'MKBHD Quality Tech Videos | YouTube | Geek | Consumer Electronics | Tech Head | Internet Personality!\n\nbusiness@MKBHD.com\n\nNYC',
                       textAlign: TextAlign.left,
@@ -85,7 +85,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -108,7 +108,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -124,16 +124,11 @@ class ChannelDescriptionScreen extends StatelessWidget {
                       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                       child: Row(
                         children: <Widget>[
-                          Icon(
-                            Icons.circle_outlined,
-                            size: 28,
-                          ),
+                          Icon(YTIcons.network_outlined),
                           SizedBox(width: 8),
                           Text(
-                            'htttp://www.youtube.com/MKBHD',
-                            style: TextStyle(
-                              color: Colors.blue,
-                            ),
+                            'http://www.youtube.com/MKBHD',
+                            style: TextStyle(color: Colors.blue),
                           ),
                         ],
                       ),
@@ -142,14 +137,9 @@ class ChannelDescriptionScreen extends StatelessWidget {
                       padding: EdgeInsets.all(8.0),
                       child: Row(
                         children: <Widget>[
-                          Icon(
-                            Icons.no_accounts_rounded,
-                            size: 28,
-                          ),
+                          Icon(YTIcons.location_outlined),
                           SizedBox(width: 8),
-                          Text(
-                            'United States',
-                          ),
+                          Text('United States'),
                         ],
                       ),
                     ),
@@ -157,10 +147,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
                       padding: EdgeInsets.all(8.0),
                       child: Row(
                         children: <Widget>[
-                          Icon(
-                            Icons.info_outline_rounded,
-                            size: 28,
-                          ),
+                          Icon(YTIcons.info_outlined),
                           SizedBox(width: 8),
                           Text(
                             'Joined Mar 21, 2008',
@@ -172,14 +159,9 @@ class ChannelDescriptionScreen extends StatelessWidget {
                       padding: EdgeInsets.all(8.0),
                       child: Row(
                         children: <Widget>[
-                          Icon(
-                            Icons.trending_up,
-                            size: 28,
-                          ),
+                          Icon(YTIcons.trending_up_outlined),
                           SizedBox(width: 8),
-                          Text(
-                            '3,952,243,270 views',
-                          ),
+                          Text('3,952,243,270 views'),
                         ],
                       ),
                     ),

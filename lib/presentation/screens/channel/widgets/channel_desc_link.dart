@@ -35,7 +35,7 @@ class ChannelDescLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const TappableArea(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       child: Row(
         children: <Widget>[
           Icon(

@@ -77,7 +77,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final historyOff = 0 == 0;
+    final historyOff = 0 == 8;
     return Scaffold(
       floatingActionButton: historyOff
           ? const SizedBox()
@@ -238,9 +238,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                   : null,
             ),
             if (historyOff)
-              const SliverToBoxAdapter(
-                child: HomeFeedHistoryOff(),
-              )
+              const SliverToBoxAdapter(child: HomeFeedHistoryOff())
             else
               SliverList(
                 delegate: SliverChildBuilderDelegate(

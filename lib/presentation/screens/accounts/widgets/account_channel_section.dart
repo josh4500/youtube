@@ -118,7 +118,7 @@ class AccountChannelSection extends StatelessWidget {
                   child: CustomActionChip(
                     alignment: Alignment.center,
                     backgroundColor: Color(0xff2c2c2c),
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.all(12),
                     title: 'Manage videos',
                     textStyle: TextStyle(
                       fontSize: 14,
