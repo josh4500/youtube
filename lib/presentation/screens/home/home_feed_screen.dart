@@ -77,7 +77,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final historyOff = 0 == 3;
+    final historyOff = 0 == 0;
     return Scaffold(
       floatingActionButton: historyOff
           ? const SizedBox()
@@ -340,56 +340,82 @@ class HomeFeedHistoryOff extends StatelessWidget {
               color: Colors.white.withOpacity(0.075),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Column(
-              children: [
-                const SizedBox(height: 18),
-                const Text(
-                  'Your watch history is off',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                RichText(
-                  text: const TextSpan(
-                    text:
-                        'You can change setting at any time to get the latest videos tailored to you. ',
+            child: 00 == 88
+                ? Column(
                     children: [
-                      TextSpan(
-                        text: 'Learn more',
+                      const SizedBox(height: 18),
+                      const Text(
+                        'Try searching to get started',
                         style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      RichText(
+                        text: const TextSpan(
+                          text:
+                              'Start watching videos to help us build a feed of videos you\'ll love.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white60,
+                          ),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 18),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      const SizedBox(height: 18),
+                      const Text(
+                        'Your watch history is off',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      RichText(
+                        text: const TextSpan(
+                          text:
+                              'You can change setting at any time to get the latest videos tailored to you. ',
+                          children: [
+                            TextSpan(
+                              text: 'Learn more',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ],
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white60,
+                          ),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      CustomActionButton(
+                        title: 'Update Setting',
+                        backgroundColor: Colors.white.withOpacity(0.08),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 12,
+                        ),
+                        borderRadius: BorderRadius.circular(24),
+                        alignment: Alignment.center,
+                        useTappable: false,
+                        textStyle: const TextStyle(
                           fontSize: 14,
-                          color: Colors.blue,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white60,
-                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 10),
-                CustomActionButton(
-                  title: 'Update Setting',
-                  backgroundColor: Colors.white.withOpacity(0.08),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 12,
-                  ),
-                  borderRadius: BorderRadius.circular(24),
-                  alignment: Alignment.center,
-                  useTappable: false,
-                  textStyle: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
