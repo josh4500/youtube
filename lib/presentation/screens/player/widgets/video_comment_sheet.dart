@@ -27,7 +27,6 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/page_draggable_sheet.dart';
 
@@ -59,6 +58,12 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
   final _replyController = PageDraggableOverlayChildController(
     title: 'Replies',
   );
+
+  @override
+  void dispose() {
+    _replyController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -396,8 +396,6 @@ class _PageDraggableOverlayChildState extends State<PageDraggableOverlayChild>
   @override
   void dispose() {
     controller.dispose();
-    // NOTE: Disposing the controller once in here
-    widget.controller.dispose();
     super.dispose();
   }
 

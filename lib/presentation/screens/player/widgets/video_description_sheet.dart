@@ -27,12 +27,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/core/constants/constants.dart';
 import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/page_draggable_sheet.dart';
-import 'package:youtube_clone/presentation/widgets/persistent_header_delegate.dart';
 
 import '../../../constants.dart';
 
@@ -59,6 +56,13 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
   final _tScriptController = PageDraggableOverlayChildController(
     title: 'Transcript',
   );
+
+  @override
+  void dispose() {
+    _tScriptController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
@@ -259,7 +263,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -304,9 +308,9 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                     ),
                     const SizedBox(width: 12),
                   ],
-                )
+                ),
               ],
-            )
+            ),
           ],
         );
       },
@@ -338,6 +342,7 @@ class TranscriptTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
