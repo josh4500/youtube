@@ -31,9 +31,10 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class CustomBackButton extends StatelessWidget {
-  const CustomBackButton({super.key, required this.onPressed});
+  const CustomBackButton({super.key, required this.onPressed, this.icon});
 
   final VoidCallback onPressed;
+  final Widget? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +51,7 @@ class CustomBackButton extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           borderRadius: BorderRadius.circular(24),
           splashColor: Colors.white24,
-          child: const Icon(YTIcons.arrow_back_outlined),
+          child: icon ?? const Icon(YTIcons.arrow_back_outlined),
         ),
       ),
     );

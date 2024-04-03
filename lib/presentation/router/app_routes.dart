@@ -26,18 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-class RouteInfo {
-  RouteInfo({required this.name, required this.path});
-  final String name;
-  final String path;
-
-  RouteInfo withPrefixParent(RouteInfo parent) {
-    return RouteInfo(
-      name: name,
-      path: '${parent.path.replaceFirst('/', '')}/$path',
-    );
-  }
-}
+import 'router_info.dart';
 
 class AppRoutes {
   static final RouteInfo dashboard = RouteInfo(
@@ -211,5 +200,21 @@ class AppRoutes {
   static final RouteInfo playerLandscapeScreen = RouteInfo(
     name: 'player',
     path: '/player/landscape',
+  );
+
+  ///
+  ///
+  /// Search
+  ///
+  ///
+
+  static final RouteInfo search = RouteInfo(
+    name: 'search',
+    path: '/search',
+  );
+
+  static final RouteInfo searchVoiceRequest = RouteInfo(
+    name: 'search voice request',
+    path: '/search/voice_request',
   );
 }

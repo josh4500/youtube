@@ -44,7 +44,6 @@ abstract final class AppTheme {
     primaryColor: Colors.white,
     canvasColor: const Color(0xFFFFFFFF),
     colorScheme: const ColorScheme.light(
-      background: Colors.white,
       secondary: Color(0xFF065DD0),
     ),
     scrollbarTheme: const ScrollbarThemeData(
@@ -55,6 +54,13 @@ abstract final class AppTheme {
       iconTheme: const IconThemeData(weight: 100),
       elevation: 0,
       titleTextStyle: AppStyle.appBar.light,
+      systemOverlayStyle: const SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.light,
+        statusBarColor: Colors.white,
+        systemNavigationBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarDividerColor: Colors.white,
+      ),
     ),
     listTileTheme: const ListTileThemeData(
       horizontalTitleGap: 0,
@@ -100,7 +106,13 @@ abstract final class AppTheme {
       iconTheme: const IconThemeData(weight: 100),
       elevation: 0,
       titleTextStyle: AppStyle.appBar.dark,
-      systemOverlayStyle: const SystemUiOverlayStyle(),
+      systemOverlayStyle: const SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.dark,
+        statusBarColor: Color(0xFF0F0F0F),
+        systemNavigationBarColor: Color(0xFF0F0F0F),
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarDividerColor: Color(0xFF0F0F0F),
+      ),
     ),
     listTileTheme: const ListTileThemeData(
       horizontalTitleGap: 0,

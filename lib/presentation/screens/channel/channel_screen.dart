@@ -27,7 +27,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/screens/channel/widgets/channel_section.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/view_models/content/shorts_view_model.dart';
@@ -41,6 +43,7 @@ import 'package:youtube_clone/presentation/widgets/viewable/viewable_post_conten
 import 'package:youtube_clone/presentation/widgets/viewable/viewable_shorts_content.dart';
 import 'package:youtube_clone/presentation/widgets/viewable/viewable_video_content.dart';
 
+import '../../providers.dart';
 import '../../widgets/appbar_action.dart';
 import 'widgets/for_you_content.dart';
 
@@ -81,9 +84,16 @@ class _ChannelScreenState extends State<ChannelScreen> {
               icon: YTIcons.notification_outlined,
               onTap: () {},
             ),
-            AppbarAction(
-              icon: YTIcons.search_outlined,
-              onTap: () {},
+            Consumer(
+              builder: (context, ref, child) {
+                return AppbarAction(
+                  icon: YTIcons.search_outlined,
+                  onTap: () async {
+                    ref.read(homeRepositoryProvider).lockNavBarPosition();
+                    await context.goto(AppRoutes.search);
+                  },
+                );
+              },
             ),
           ],
         ),

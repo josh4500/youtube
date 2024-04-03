@@ -31,6 +31,7 @@ import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/screens.dart';
 
 import 'app_routes.dart';
+import 'router_info.dart';
 
 class AppRouter {
   static final GlobalKey<NavigatorState> rootKey = GlobalKey<NavigatorState>();
@@ -299,6 +300,20 @@ class AppRouter {
               ),
             ],
           ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                name: AppRoutes.search.name,
+                path: AppRoutes.search.path,
+                builder: (BuildContext context, GoRouterState state) {
+                  return SearchScreen(
+                    key: state.pageKey,
+                  );
+                },
+                routes: [],
+              ),
+            ],
+          ),
         ],
       ),
       GoRoute(
@@ -405,6 +420,36 @@ class AppRouter {
               );
             },
             child: const PlayerLandscapeScreen(),
+          );
+        },
+      ),
+      GoRoute(
+        name: AppRoutes.searchVoiceRequest.name,
+        path: AppRoutes.searchVoiceRequest.path,
+        parentNavigatorKey: rootKey,
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          return CustomTransitionPage(
+            transitionDuration: const Duration(milliseconds: 200),
+            reverseTransitionDuration: const Duration(
+              milliseconds: 200,
+            ),
+            transitionsBuilder: (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secAnimation,
+              Widget child,
+            ) {
+              return SlideTransition(
+                position: animation.drive(
+                  Tween<Offset>(
+                    begin: const Offset(1, 0),
+                    end: Offset.zero,
+                  ),
+                ),
+                child: child,
+              );
+            },
+            child: const SearchVoiceRequestScreen(),
           );
         },
       ),

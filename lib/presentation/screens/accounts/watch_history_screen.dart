@@ -27,9 +27,12 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../../providers.dart';
 import 'widgets/history_search_text_field.dart';
 import 'widgets/popup/show_history_menu.dart';
 import 'widgets/shorts_history.dart';
@@ -63,8 +66,8 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
     animation = CurvedAnimation(parent: opacityController, curve: Curves.ease);
 
     controller.addListener(() {
-      if (controller.offset <= 250) {
-        opacityController.value = controller.offset / 250;
+      if (controller.offset <= 150) {
+        opacityController.value = controller.offset / 150;
       }
     });
   }
@@ -103,9 +106,16 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
             icon: YTIcons.cast_outlined,
             onTap: () {},
           ),
-          AppbarAction(
-            icon: YTIcons.search_outlined,
-            onTap: () {},
+          Consumer(
+            builder: (context, ref, child) {
+              return AppbarAction(
+                icon: YTIcons.search_outlined,
+                onTap: () async {
+                  ref.read(homeRepositoryProvider).lockNavBarPosition();
+                  await context.goto(AppRoutes.search);
+                },
+              );
+            },
           ),
           AppbarAction(
             icon: YTIcons.more_vert_outlined,

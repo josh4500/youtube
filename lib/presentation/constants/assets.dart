@@ -26,4 +26,6 @@ class AssetsPath {
 
   static const String downloadWillAppear =
       '${_imagePrefix}download_will_appear.png';
+  static const String searchVoiceRequest =
+      '${_imagePrefix}search_voice_request.png';
 }

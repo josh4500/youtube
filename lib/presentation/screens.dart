@@ -62,6 +62,11 @@ export 'screens/player/player_screen.dart';
 export 'screens/playlist/edit_playlist_screen.dart';
 export 'screens/playlist/playlist_screen.dart';
 
+// Search
+export 'screens/search/search_result_screen.dart';
+export 'screens/search/search_screen.dart';
+export 'screens/search/search_voice_request_screen.dart';
+
 // Settings
 export 'screens/settings/about_screen.dart';
 export 'screens/settings/accessibility_settings_screen.dart';

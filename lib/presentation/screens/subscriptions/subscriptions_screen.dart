@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
@@ -38,6 +39,7 @@ import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dar
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 import 'package:youtube_clone/presentation/widgets/viewable/group/viewable_group_shorts.dart';
 
+import '../../providers.dart';
 import '../../widgets/appbar_action.dart';
 import '../../widgets/viewable/viewable_post_content.dart';
 import '../../widgets/viewable/viewable_video_content.dart';
@@ -74,9 +76,16 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                   icon: YTIcons.notification_outlined,
                   onTap: () {},
                 ),
-                AppbarAction(
-                  icon: YTIcons.search_outlined,
-                  onTap: () {},
+                Consumer(
+                  builder: (context, ref, child) {
+                    return AppbarAction(
+                      icon: YTIcons.search_outlined,
+                      onTap: () async {
+                        ref.read(homeRepositoryProvider).lockNavBarPosition();
+                        await context.goto(AppRoutes.search);
+                      },
+                    );
+                  },
                 ),
               ],
               floating: true,

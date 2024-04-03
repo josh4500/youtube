@@ -26,9 +26,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
+
+import '../../providers.dart';
 
 class SportsScreen extends StatelessWidget {
   const SportsScreen({super.key});
@@ -51,9 +55,16 @@ class SportsScreen extends StatelessWidget {
             icon: YTIcons.cast_outlined,
             onTap: () {},
           ),
-          AppbarAction(
-            icon: YTIcons.search_outlined,
-            onTap: () {},
+          Consumer(
+            builder: (context, ref, child) {
+              return AppbarAction(
+                icon: YTIcons.search_outlined,
+                onTap: () async {
+                  ref.read(homeRepositoryProvider).lockNavBarPosition();
+                  await context.goto(AppRoutes.search);
+                },
+              );
+            },
           ),
           AppbarAction(
             icon: YTIcons.more_vert_outlined,

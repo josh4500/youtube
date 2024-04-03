@@ -27,11 +27,14 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/screens/accounts/widgets/popup/show_your_clips_menu.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
+import '../../providers.dart';
 import '../../widgets/appbar_action.dart';
 import '../../widgets/playable/playable_clip_content.dart';
 
@@ -95,9 +98,16 @@ class _YourClipsScreenState extends State<YourClipsScreen>
             icon: YTIcons.cast_outlined,
             onTap: () {},
           ),
-          AppbarAction(
-            icon: YTIcons.search_outlined,
-            onTap: () {},
+          Consumer(
+            builder: (context, ref, child) {
+              return AppbarAction(
+                icon: YTIcons.search_outlined,
+                onTap: () async {
+                  ref.read(homeRepositoryProvider).lockNavBarPosition();
+                  await context.goto(AppRoutes.search);
+                },
+              );
+            },
           ),
           AppbarAction(
             icon: YTIcons.more_vert_outlined,

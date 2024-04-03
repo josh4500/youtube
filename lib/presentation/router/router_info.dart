@@ -26,43 +26,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:media_kit_video/media_kit_video.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
-import 'package:youtube_clone/presentation/view_models/playback/player_sizing.dart';
+class RouteInfo {
+  RouteInfo({required this.name, required this.path});
+  final String name;
+  final String path;
 
-final playerSizingProvider = Provider<PlayerSizing>(
-  (ref) => throw UnimplementedError(),
-);
-
-class PlayerView extends ConsumerWidget {
-  const PlayerView({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final playerSizing = ref.watch(playerSizingProvider);
-    // TODO(josh4500): Avoid using context here, just pass value from above
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    final screenWidth = MediaQuery.sizeOf(context).width;
-
-    final controller = ref.watch(playerRepositoryProvider).videoController;
-
-    return Container(
-      color: Colors.transparent,
-      constraints: BoxConstraints(
-        minWidth: 135,
-        maxWidth: screenWidth,
-        maxHeight: screenHeight * playerSizing.maxHeight,
-        minHeight: screenHeight * playerSizing.minHeight,
-      ),
-      child: Video(
-        controller: controller,
-        fit: BoxFit.fitWidth,
-        fill: Colors.transparent,
-        filterQuality: FilterQuality.none,
-        controls: null,
-      ),
+  RouteInfo withPrefixParent(RouteInfo parent) {
+    return RouteInfo(
+      name: name,
+      path: '${parent.path.replaceFirst('/', '')}/$path',
     );
   }
 }

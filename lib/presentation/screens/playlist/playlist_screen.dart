@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -58,7 +59,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
           ),
           AppbarAction(
             icon: YTIcons.search_outlined,
-            onTap: () {},
+            onTap: () => context.goto(AppRoutes.search),
           ),
           AppbarAction(
             icon: YTIcons.more_vert_outlined,

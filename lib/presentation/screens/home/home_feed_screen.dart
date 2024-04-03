@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 import 'package:youtube_clone/presentation/providers.dart';
@@ -79,71 +80,70 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
   Widget build(BuildContext context) {
     final historyOff = 0 == 8;
     return Scaffold(
-      floatingActionButton: historyOff
-          ? const SizedBox()
-          : Consumer(
-              builder: (
-                BuildContext context,
-                WidgetRef ref,
-                Widget? childWidget,
-              ) {
-                final bool isPlayerActive =
-                    ref.watch(playerOverlayStateProvider);
-                return Transform.translate(
-                  offset: isPlayerActive
-                      ? const Offset(0, -kMiniPlayerHeight)
-                      : Offset.zero,
-                  child: RawMaterialButton(
-                    elevation: 0,
-                    fillColor: Colors.white,
-                    padding: const EdgeInsets.all(12.0),
-                    constraints: const BoxConstraints(
-                      minWidth: 44.0,
-                      minHeight: 36.0,
+      floatingActionButton: Consumer(
+        builder: (
+          BuildContext context,
+          WidgetRef ref,
+          Widget? childWidget,
+        ) {
+          if (historyOff) return const SizedBox();
+
+          final bool isPlayerActive = ref.watch(playerOverlayStateProvider);
+          return Transform.translate(
+            offset: isPlayerActive
+                ? const Offset(0, -kMiniPlayerHeight)
+                : Offset.zero,
+            child: RawMaterialButton(
+              elevation: 0,
+              fillColor: Colors.white,
+              padding: const EdgeInsets.all(12.0),
+              constraints: const BoxConstraints(
+                minWidth: 44.0,
+                minHeight: 36.0,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              onPressed: () {},
+              child: AnimatedSize(
+                duration: const Duration(milliseconds: 150),
+                curve: Curves.easeInOutCubic,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    const Icon(
+                      Icons.play_arrow,
+                      color: Colors.black,
+                      size: 28,
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: _playSNotifier,
+                      builder: (BuildContext context, bool value, _) {
+                        if (!value) {
+                          return const SizedBox();
+                        }
+                        return const Row(
+                          children: <Widget>[
+                            SizedBox(width: 8),
+                            Text(
+                              'Play something',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
-                    onPressed: () {},
-                    child: AnimatedSize(
-                      duration: const Duration(milliseconds: 150),
-                      curve: Curves.easeInOutCubic,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          const Icon(
-                            Icons.play_arrow,
-                            color: Colors.black,
-                            size: 28,
-                          ),
-                          ValueListenableBuilder<bool>(
-                            valueListenable: _playSNotifier,
-                            builder: (BuildContext context, bool value, _) {
-                              if (!value) {
-                                return const SizedBox();
-                              }
-                              return const Row(
-                                children: <Widget>[
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Play something',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
+                  ],
+                ),
+              ),
             ),
+          );
+        },
+      ),
       body: ScrollConfiguration(
         behavior: const OverScrollGlowBehavior(enabled: false),
         child: CustomScrollView(
@@ -163,9 +163,16 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                   icon: YTIcons.notification_outlined,
                   onTap: () {},
                 ),
-                AppbarAction(
-                  icon: YTIcons.search_outlined,
-                  onTap: () {},
+                Consumer(
+                  builder: (context, ref, child) {
+                    return AppbarAction(
+                      icon: YTIcons.search_outlined,
+                      onTap: () async {
+                        ref.read(homeRepositoryProvider).lockNavBarPosition();
+                        await context.goto(AppRoutes.search);
+                      },
+                    );
+                  },
                 ),
               ],
               bottom: historyOff == false
@@ -318,6 +325,7 @@ class HomeFeedHistoryOff extends StatelessWidget {
                     ),
                     useTappable: false,
                     borderRadius: BorderRadius.circular(24),
+                    onTap: () => context.goto(AppRoutes.search),
                   ),
                 ),
                 const SizedBox(width: 12),

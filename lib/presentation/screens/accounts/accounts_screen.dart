@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
@@ -37,6 +38,7 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/builders/auth_state_builder.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 
+import '../../providers.dart';
 import '../../widgets/appbar_action.dart';
 import '../../widgets/playable/playable_content.dart';
 import '../../widgets/playlist/add_new_playlist.dart';
@@ -59,9 +61,16 @@ class AccountsScreen extends StatelessWidget {
             icon: YTIcons.notification_outlined,
             onTap: () {},
           ),
-          AppbarAction(
-            icon: YTIcons.search_outlined,
-            onTap: () {},
+          Consumer(
+            builder: (context, ref, child) {
+              return AppbarAction(
+                icon: YTIcons.search_outlined,
+                onTap: () async {
+                  ref.read(homeRepositoryProvider).lockNavBarPosition();
+                  await context.goto(AppRoutes.search);
+                },
+              );
+            },
           ),
           AppbarAction(
             icon: YTIcons.settings_outlined,

@@ -27,9 +27,12 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import '../../providers.dart';
 import '../../widgets/appbar_action.dart';
 
 class DownloadsScreen extends StatelessWidget {
@@ -50,9 +53,16 @@ class DownloadsScreen extends StatelessWidget {
             icon: YTIcons.cast_outlined,
             onTap: () {},
           ),
-          AppbarAction(
-            icon: YTIcons.search_outlined,
-            onTap: () {},
+          Consumer(
+            builder: (context, ref, child) {
+              return AppbarAction(
+                icon: YTIcons.search_outlined,
+                onTap: () async {
+                  ref.read(homeRepositoryProvider).lockNavBarPosition();
+                  await context.goto(AppRoutes.search);
+                },
+              );
+            },
           ),
           AppbarAction(
             icon: YTIcons.more_vert_outlined,
