@@ -28,6 +28,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -489,19 +490,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                   },
                   child: const ColoredBox(
                     color: Colors.black54,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              _GroupControl(),
-                            ],
-                          ),
-                        ),
-                        PlayerActionsControl(),
-                      ],
-                    ),
+                    child: _GroupControl(),
                   ),
                 ),
               ),
@@ -999,11 +988,20 @@ class _GroupControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _TopControl(),
+        Expanded(
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: _TopControl(),
+          ),
+        ),
         _MiddleControl(),
-        _BottomControl(),
+        Expanded(
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: _BottomControl(),
+          ),
+        ),
       ],
     );
   }
@@ -1061,12 +1059,18 @@ class _BottomControl extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 12.0),
-      child: Row(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          PlayerDurationControl(),
-          PlayerChapterControl(),
-          Spacer(),
-          PlayerFullscreen(),
+          Row(
+            children: [
+              PlayerDurationControl(),
+              PlayerChapterControl(),
+              Spacer(),
+              PlayerFullscreen(),
+            ],
+          ),
+          PlayerActionsControl(),
         ],
       ),
     );
