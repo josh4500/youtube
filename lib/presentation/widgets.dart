@@ -57,6 +57,7 @@ export 'widgets/playable/playable_clip_content.dart';
 export 'widgets/playable/playable_content.dart';
 export 'widgets/playable/playable_live_content.dart';
 export 'widgets/playable/playable_shorts_content.dart';
+export 'widgets/playable/playable_timed_video_content.dart';
 export 'widgets/playable/playable_video_content.dart';
 
 export 'widgets/player/playback/playback_caption.dart';

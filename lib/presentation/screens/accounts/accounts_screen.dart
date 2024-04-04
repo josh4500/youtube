@@ -26,6 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
@@ -101,14 +102,13 @@ class AccountsScreen extends StatelessWidget {
                   <Widget>[
                     GroupedViewBuilder(
                       title: 'History',
-                      height: MediaQuery.sizeOf(context).height * 0.23,
+                      height: 170,
                       onTap: () => context.goto(AppRoutes.watchHistory),
                       itemBuilder: (BuildContext context, int index) {
-                        return TappableArea(
-                          onPressed: () => context.goto(AppRoutes.watchHistory),
-                          child: const PlayableContent(
+                        return const TappableArea(
+                          child: PlayableContent(
                             width: 160,
-                            height: 110,
+                            margin: EdgeInsets.only(bottom: 16),
                           ),
                         );
                       },
@@ -116,19 +116,17 @@ class AccountsScreen extends StatelessWidget {
                     ),
                     GroupedViewBuilder(
                       title: 'Playlist',
-                      height: MediaQuery.sizeOf(context).height * 0.23,
+                      height: 170,
                       onTap: () => context.goto(AppRoutes.accountPlaylists),
                       itemBuilder: (BuildContext context, int index) {
                         return TappableArea(
-                          onPressed: () => context.goto(
-                            AppRoutes.playlist,
-                          ),
+                          onPressed: () => context.goto(AppRoutes.playlist),
                           child: index == 7
                               ? const AddNewPlaylist()
                               : const PlayableContent(
                                   width: 160,
-                                  height: 110,
                                   isPlaylist: true,
+                                  margin: EdgeInsets.only(bottom: 16),
                                 ),
                         );
                       },

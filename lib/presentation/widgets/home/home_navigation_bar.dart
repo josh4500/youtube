@@ -63,7 +63,10 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
 
     return Material(
       child: Container(
-        constraints: BoxConstraints(maxHeight: widget.height),
+        constraints: BoxConstraints(
+          maxHeight: widget.height,
+          maxWidth: 400,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.end,

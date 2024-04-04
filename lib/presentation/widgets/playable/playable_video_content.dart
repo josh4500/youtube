@@ -52,46 +52,50 @@ class PlayableVideoContent extends StatelessWidget {
         direction: direction,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: <Widget>[
-              Container(
-                width: width,
-                height: height,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  image: const DecorationImage(
-                    image: NetworkImage('https://picsum.photos/300/300'),
-                    fit: BoxFit.cover,
+          Flexible(
+            flex: direction == Axis.vertical ? 1 : 0,
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: <Widget>[
+                Container(
+                  width: width,
+                  height: height,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    image: const DecorationImage(
+                      image: NetworkImage('https://picsum.photos/300/300'),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 2,
-                  horizontal: 4,
-                ),
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  '6:54',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 2,
+                    horizontal: 4,
+                  ),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    '6:54',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(width: 8),
           Flexible(
+            flex: direction == Axis.vertical ? 0 : 1,
             child: SizedBox(
               width: direction == Axis.vertical ? width : null,
               child: Stack(

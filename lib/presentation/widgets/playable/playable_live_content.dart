@@ -56,60 +56,64 @@ class PlayableLiveContent extends StatelessWidget {
         direction: direction,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: <Widget>[
-              Container(
-                width: width,
-                height: height,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  image: const DecorationImage(
-                    image: NetworkImage('https://picsum.photos/300/300'),
-                    fit: BoxFit.cover,
+          Flexible(
+            flex: direction == Axis.vertical ? 1 : 0,
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: <Widget>[
+                Container(
+                  width: width,
+                  height: height,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    image: const DecorationImage(
+                      image: NetworkImage('https://picsum.photos/300/300'),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 2,
-                  horizontal: 4,
-                ),
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: completed ? Colors.black54 : const Color(0xFFFF0000),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: completed
-                    ? const Text(
-                        '2:06:14',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      )
-                    : const Row(
-                        children: [
-                          Icon(YTIcons.live_outlined, size: 14),
-                          SizedBox(width: 4),
-                          Text(
-                            'LIVE',
-                            style: TextStyle(fontSize: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 2,
+                    horizontal: 4,
+                  ),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: completed ? Colors.black54 : const Color(0xFFFF0000),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: completed
+                      ? const Text(
+                          '2:06:14',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ],
-                      ),
-              ),
-            ],
+                        )
+                      : const Row(
+                          children: [
+                            Icon(YTIcons.live_outlined, size: 14),
+                            SizedBox(width: 4),
+                            Text(
+                              'LIVE',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                ),
+              ],
+            ),
           ),
           if (direction == Axis.vertical)
             const SizedBox(height: 8)
           else
             const SizedBox(width: 12),
           Flexible(
+            flex: direction == Axis.vertical ? 0 : 1,
             child: SizedBox(
               width: direction == Axis.vertical ? width : null,
               child: Row(

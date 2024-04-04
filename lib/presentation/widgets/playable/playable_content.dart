@@ -54,85 +54,88 @@ class PlayableContent extends StatelessWidget {
         direction: direction,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          SizedBox(
-            width: width,
-            height: height,
-            child: Column(
-              children: <Widget>[
-                if (isPlaylist) ...<Widget>[
-                  Container(
-                    height: 4,
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 1,
-                      horizontal: 6,
-                    ),
-                    decoration: const BoxDecoration(
-                      color: Colors.white60,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.elliptical(16, 8),
-                        topRight: Radius.elliptical(16, 8),
+          Flexible(
+            flex: direction == Axis.vertical ? 1 : 0,
+            child: SizedBox(
+              width: width,
+              height: height,
+              child: Column(
+                children: <Widget>[
+                  if (isPlaylist) ...<Widget>[
+                    Container(
+                      height: 4,
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 1,
+                        horizontal: 6,
                       ),
-                      image: DecorationImage(
-                        image: NetworkImage('https://picsum.photos/300/300'),
-                        fit: BoxFit.cover,
+                      decoration: const BoxDecoration(
+                        color: Colors.white60,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.elliptical(16, 8),
+                          topRight: Radius.elliptical(16, 8),
+                        ),
+                        image: DecorationImage(
+                          image: NetworkImage('https://picsum.photos/300/300'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ],
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+                        children: <Widget>[
+                          Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.white60,
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                  'https://picsum.photos/300/300',
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          if (isPlaylist)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 2,
+                                horizontal: 4,
+                              ),
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Icon(
+                                    YTIcons.playlists_outlined,
+                                    size: 18,
+                                  ),
+                                  SizedBox(width: 2),
+                                  Text(
+                                    '2',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
                 ],
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: <Widget>[
-                        Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.white60,
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                'https://picsum.photos/300/300',
-                              ),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        if (isPlaylist)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 2,
-                              horizontal: 4,
-                            ),
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Icon(
-                                  YTIcons.playlists_outlined,
-                                  size: 18,
-                                ),
-                                SizedBox(width: 2),
-                                Text(
-                                  '2',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
           if (direction == Axis.vertical)
@@ -140,6 +143,7 @@ class PlayableContent extends StatelessWidget {
           else
             const SizedBox(width: 16),
           Flexible(
+            flex: direction == Axis.vertical ? 0 : 1,
             child: SizedBox(
               width: width,
               child: Row(
