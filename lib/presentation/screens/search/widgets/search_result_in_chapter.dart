@@ -95,7 +95,7 @@ class SearchResultInChapters extends StatelessWidget {
         return InkWell(
           onTap: () {},
           child: const PlayableTimedVideoContent(
-            width: 120,
+            width: 150,
             margin: EdgeInsets.all(4),
           ),
         );

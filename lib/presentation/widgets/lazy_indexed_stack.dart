@@ -96,6 +96,10 @@ class _LazyIndexedStackState extends State<LazyIndexedStack> {
   Widget build(BuildContext context) {
     return IndexedStack(
       index: index,
+      alignment: widget.alignment,
+      clipBehavior: widget.clipBehavior,
+      textDirection: widget.textDirection,
+      sizing: widget.sizing,
       children: _lazyChildren,
     );
   }
