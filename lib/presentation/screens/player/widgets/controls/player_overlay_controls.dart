@@ -32,6 +32,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/constants.dart';
@@ -461,7 +462,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                 },
               ),
               GestureDetector(
-                // onTap: _onTap,
                 onDoubleTapDown: _onDoubleTapDown,
                 onLongPressStart: _onLongPressStart,
                 onLongPressEnd: _onLongPressEnd,
@@ -503,80 +503,15 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
               ),
               // Shows loading indicator, regardless if controls are shown/hidden
               const Center(child: PlayerLoadingIndicator()),
-              AnimatedBuilder(
-                animation: _slideAnimation,
-                builder: (BuildContext context, Widget? childWidget) {
-                  return FractionalTranslation(
-                    translation: _slideAnimation.value,
-                    child: childWidget,
-                  );
-                },
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: CustomOrientationBuilder(
-                    onLandscape: (BuildContext context, Widget? childWidget) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12.0,
-                          vertical: 58,
-                        ),
-                        child: childWidget,
-                      );
-                    },
-                    onPortrait: (context, childWidget) {
-                      return Consumer(
-                        builder: (
-                          BuildContext context,
-                          WidgetRef ref,
-                          Widget? _,
-                        ) {
-                          ref.watch(playerExpandedStateProvider);
-                          final isExpanded =
-                              ref.read(playerViewStateProvider).isExpanded;
-                          if (isExpanded) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 58,
-                                horizontal: 8,
-                              ),
-                              child: childWidget,
-                            );
-                          }
-                          return childWidget!;
-                        },
-                      );
-                    },
-                    child: ValueListenableBuilder(
-                      valueListenable: _showPlaybackProgress,
-                      builder: (context, visible, childWidget) {
-                        return Visibility(
-                          visible: visible,
-                          child: childWidget!,
-                        );
-                      },
-                      child: Builder(
-                        builder: (context) {
-                          final playerRepo = ref.read(playerRepositoryProvider);
-                          return PlaybackProgress(
-                            progress: playerRepo.videoProgressStream,
-                            // TODO(Josh4500): Revisit this code
-                            start: playerRepo.currentVideoProgress ??
-                                Progress.zero,
-                            // TODO(Josh4500): Get ready value
-                            end: const Duration(minutes: 1),
-                            animation: _progressAnimation,
-                            bufferAnimation: _bufferAnimation,
-                            onTap: _onPlaybackProgressTap,
-                            onDragStart: _onPlaybackProgressDragStart,
-                            onChangePosition:
-                                _onPlaybackProgressPositionChanged,
-                            onDragEnd: _onPlaybackProgressDragEnd,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
+              _OverlayProgress(
+                slideAnimation: _slideAnimation,
+                showPlaybackProgress: _showPlaybackProgress,
+                progressAnimation: _progressAnimation,
+                bufferAnimation: _bufferAnimation,
+                onTap: _onPlaybackProgressTap,
+                onDragStart: _onPlaybackProgressDragStart,
+                onChangePosition: _onPlaybackProgressPositionChanged,
+                onDragEnd: _onPlaybackProgressDragEnd,
               ),
             ],
           ),
@@ -979,6 +914,109 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _slideSeekDuration = position;
     // Updates and locks progress from player
     ref.read(playerRepositoryProvider).updatePosition(position);
+  }
+}
+
+class _OverlayProgress extends StatelessWidget {
+  const _OverlayProgress({
+    super.key,
+    required Animation<Offset> slideAnimation,
+    required ValueNotifier<bool> showPlaybackProgress,
+    required Animation<double> progressAnimation,
+    required Animation<Color?> bufferAnimation,
+    this.onTap,
+    this.onDragStart,
+    this.onDragEnd,
+    this.onChangePosition,
+  })  : _slideAnimation = slideAnimation,
+        _showPlaybackProgress = showPlaybackProgress,
+        _progressAnimation = progressAnimation,
+        _bufferAnimation = bufferAnimation;
+
+  final void Function(Duration)? onTap;
+  final void Function(Duration position)? onDragStart;
+  final void Function()? onDragEnd;
+  final void Function(Duration position)? onChangePosition;
+
+  final Animation<Offset> _slideAnimation;
+  final ValueNotifier<bool> _showPlaybackProgress;
+  final Animation<double> _progressAnimation;
+  final Animation<Color?> _bufferAnimation;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _slideAnimation,
+      builder: (BuildContext context, Widget? childWidget) {
+        return FractionalTranslation(
+          translation: _slideAnimation.value,
+          child: childWidget,
+        );
+      },
+      child: Align(
+        alignment: Alignment.bottomLeft,
+        child: CustomOrientationBuilder(
+          onLandscape: (BuildContext context, Widget? childWidget) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12.0,
+                vertical: 58,
+              ),
+              child: childWidget,
+            );
+          },
+          onPortrait: (context, childWidget) {
+            return Consumer(
+              builder: (
+                BuildContext context,
+                WidgetRef ref,
+                Widget? _,
+              ) {
+                ref.watch(playerExpandedStateProvider);
+                final isExpanded = ref.read(playerViewStateProvider).isExpanded;
+                if (isExpanded) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 58,
+                      horizontal: 8,
+                    ),
+                    child: childWidget,
+                  );
+                }
+                return childWidget!;
+              },
+            );
+          },
+          child: ValueListenableBuilder(
+            valueListenable: _showPlaybackProgress,
+            builder: (context, visible, childWidget) {
+              return Visibility(
+                visible: visible,
+                child: childWidget!,
+              );
+            },
+            child: Consumer(
+              builder: (context, ref, child) {
+                final playerRepo = ref.read(playerRepositoryProvider);
+                return PlaybackProgress(
+                  progress: playerRepo.videoProgressStream,
+                  // TODO(Josh4500): Revisit this code
+                  start: playerRepo.currentVideoProgress ?? Progress.zero,
+                  // TODO(Josh4500): Get ready value
+                  end: const Duration(minutes: 1),
+                  animation: _progressAnimation,
+                  bufferAnimation: _bufferAnimation,
+                  onTap: onTap,
+                  onDragStart: onDragStart,
+                  onChangePosition: onChangePosition,
+                  onDragEnd: onDragEnd,
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
