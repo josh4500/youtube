@@ -28,11 +28,9 @@
 
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/constants.dart';
@@ -919,44 +917,43 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
 class _OverlayProgress extends StatelessWidget {
   const _OverlayProgress({
-    super.key,
-    required Animation<Offset> slideAnimation,
-    required ValueNotifier<bool> showPlaybackProgress,
-    required Animation<double> progressAnimation,
-    required Animation<Color?> bufferAnimation,
+    required this.slideAnimation,
+    required this.showPlaybackProgress,
+    required this.progressAnimation,
+    required this.bufferAnimation,
     this.onTap,
     this.onDragStart,
     this.onDragEnd,
     this.onChangePosition,
-  })  : _slideAnimation = slideAnimation,
-        _showPlaybackProgress = showPlaybackProgress,
-        _progressAnimation = progressAnimation,
-        _bufferAnimation = bufferAnimation;
+  });
 
   final void Function(Duration)? onTap;
   final void Function(Duration position)? onDragStart;
   final void Function()? onDragEnd;
   final void Function(Duration position)? onChangePosition;
 
-  final Animation<Offset> _slideAnimation;
-  final ValueNotifier<bool> _showPlaybackProgress;
-  final Animation<double> _progressAnimation;
-  final Animation<Color?> _bufferAnimation;
+  final Animation<Offset> slideAnimation;
+  final ValueNotifier<bool> showPlaybackProgress;
+  final Animation<double> progressAnimation;
+  final Animation<Color?> bufferAnimation;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _slideAnimation,
+      animation: slideAnimation,
       builder: (BuildContext context, Widget? childWidget) {
         return FractionalTranslation(
-          translation: _slideAnimation.value,
+          translation: slideAnimation.value,
           child: childWidget,
         );
       },
       child: Align(
         alignment: Alignment.bottomLeft,
         child: CustomOrientationBuilder(
-          onLandscape: (BuildContext context, Widget? childWidget) {
+          onLandscape: (
+            BuildContext context,
+            Widget? childWidget,
+          ) {
             return Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 12.0,
@@ -965,7 +962,10 @@ class _OverlayProgress extends StatelessWidget {
               child: childWidget,
             );
           },
-          onPortrait: (context, childWidget) {
+          onPortrait: (
+            BuildContext context,
+            Widget? childWidget,
+          ) {
             return Consumer(
               builder: (
                 BuildContext context,
@@ -987,9 +987,13 @@ class _OverlayProgress extends StatelessWidget {
               },
             );
           },
-          child: ValueListenableBuilder(
-            valueListenable: _showPlaybackProgress,
-            builder: (context, visible, childWidget) {
+          child: ValueListenableBuilder<bool>(
+            valueListenable: showPlaybackProgress,
+            builder: (
+              BuildContext context,
+              bool visible,
+              Widget? childWidget,
+            ) {
               return Visibility(
                 visible: visible,
                 child: childWidget!,
@@ -1004,8 +1008,8 @@ class _OverlayProgress extends StatelessWidget {
                   start: playerRepo.currentVideoProgress ?? Progress.zero,
                   // TODO(Josh4500): Get ready value
                   end: const Duration(minutes: 1),
-                  animation: _progressAnimation,
-                  bufferAnimation: _bufferAnimation,
+                  animation: progressAnimation,
+                  bufferAnimation: bufferAnimation,
                   onTap: onTap,
                   onDragStart: onDragStart,
                   onChangePosition: onChangePosition,
