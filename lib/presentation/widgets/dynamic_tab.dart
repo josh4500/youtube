@@ -112,10 +112,14 @@ class _DynamicTabState extends State<DynamicTab> {
             return widget.trailing!;
           }
           index -= (widget.leading != null ? 1 : 0);
-          final ValueListenableBuilder<int> child = ValueListenableBuilder(
+
+          final child = ValueListenableBuilder(
             valueListenable: _selectedIndexNotifier,
-            builder:
-                (BuildContext context, int selectedIndex, Widget? childWidget) {
+            builder: (
+              BuildContext context,
+              int selectedIndex,
+              Widget? childWidget,
+            ) {
               return Container(
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(
@@ -123,10 +127,11 @@ class _DynamicTabState extends State<DynamicTab> {
                   horizontal: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: index == selectedIndex
-                      ? const Color(0xFFF1F1F1)
-                      : const Color(0xFF272727),
-                  borderRadius: BorderRadius.circular(8),
+                  color: widget.useTappable
+                      ? null
+                      : index == selectedIndex
+                          ? const Color(0xFFF1F1F1)
+                          : const Color(0xFF272727),
                 ),
                 child: Text(
                   widget.options[index],
@@ -145,17 +150,36 @@ class _DynamicTabState extends State<DynamicTab> {
               );
             },
           );
+
           if (widget.useTappable) {
             return Padding(
               padding: const EdgeInsets.all(4.0),
-              child: TappableArea(
-                onPressed: () {
-                  _selectedIndexNotifier.value = index;
-                  widget.onChanged?.call(index);
+              child: ValueListenableBuilder(
+                valueListenable: _selectedIndexNotifier,
+                builder: (
+                  BuildContext context,
+                  int selectedIndex,
+                  Widget? childWidget,
+                ) {
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: ColoredBox(
+                      color: index == selectedIndex
+                          ? const Color(0xFFF1F1F1)
+                          : const Color(0xFF272727),
+                      child: childWidget,
+                    ),
+                  );
                 },
-                padding: EdgeInsets.zero,
-                borderRadius: BorderRadius.circular(8),
-                child: child,
+                child: TappableArea(
+                  onPressed: () {
+                    _selectedIndexNotifier.value = index;
+                    widget.onChanged?.call(index);
+                  },
+                  padding: EdgeInsets.zero,
+                  borderRadius: BorderRadius.circular(8),
+                  child: child,
+                ),
               ),
             );
           } else {
