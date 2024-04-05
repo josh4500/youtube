@@ -26,7 +26,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class SubscriptionAvatar extends StatelessWidget {
   const SubscriptionAvatar({super.key});
@@ -41,17 +44,7 @@ class SubscriptionAvatar extends StatelessWidget {
             children: <Widget>[
               LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints c) {
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(c.maxHeight),
-                    child: Container(
-                      height: c.maxHeight,
-                      width: c.maxHeight,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  );
+                  return AccountAvatar(size: c.maxHeight);
                 },
               ),
               Positioned(
@@ -63,9 +56,7 @@ class SubscriptionAvatar extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.blue,
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      width: 1.7,
-                    ),
+                    border: Border.all(width: 1.7),
                   ),
                 ),
               ),

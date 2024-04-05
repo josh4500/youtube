@@ -59,18 +59,9 @@ class MusicScreen extends StatelessWidget {
                     ),
                   ),
                   actions: <Widget>[
-                    Consumer(
-                      builder: (context, ref, child) {
-                        return AppbarAction(
-                          icon: YTIcons.search_outlined,
-                          onTap: () async {
-                            ref
-                                .read(homeRepositoryProvider)
-                                .lockNavBarPosition();
-                            await context.goto(AppRoutes.search);
-                          },
-                        );
-                      },
+                    AppbarAction(
+                      icon: YTIcons.search_outlined,
+                      onTap: () => context.goto(AppRoutes.search),
                     ),
                   ],
                 ),

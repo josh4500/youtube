@@ -46,6 +46,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_showSearchResultNotifier.value == false) {
+      ref.read(homeRepositoryProvider).lockNavBarPosition();
+    }
+  }
+
+  @override
   void dispose() {
     _focusNode.dispose();
     _textController.dispose();

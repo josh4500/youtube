@@ -217,4 +217,9 @@ class AppRoutes {
     name: 'search voice request',
     path: '/search/voice_request',
   );
+
+  static final RouteInfo notifications = RouteInfo(
+    name: 'notifications',
+    path: '/notifications',
+  );
 }

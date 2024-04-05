@@ -82,18 +82,11 @@ class _ChannelScreenState extends State<ChannelScreen> {
             ),
             AppbarAction(
               icon: YTIcons.notification_outlined,
-              onTap: () {},
+              onTap: () => context.goto(AppRoutes.notifications),
             ),
-            Consumer(
-              builder: (context, ref, child) {
-                return AppbarAction(
-                  icon: YTIcons.search_outlined,
-                  onTap: () async {
-                    ref.read(homeRepositoryProvider).lockNavBarPosition();
-                    await context.goto(AppRoutes.search);
-                  },
-                );
-              },
+            AppbarAction(
+              icon: YTIcons.search_outlined,
+              onTap: () => context.goto(AppRoutes.search),
             ),
           ],
         ),

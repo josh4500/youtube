@@ -161,18 +161,11 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                 ),
                 AppbarAction(
                   icon: YTIcons.notification_outlined,
-                  onTap: () {},
+                  onTap: () => context.goto(AppRoutes.notifications),
                 ),
-                Consumer(
-                  builder: (context, ref, child) {
-                    return AppbarAction(
-                      icon: YTIcons.search_outlined,
-                      onTap: () async {
-                        ref.read(homeRepositoryProvider).lockNavBarPosition();
-                        await context.goto(AppRoutes.search);
-                      },
-                    );
-                  },
+                AppbarAction(
+                  icon: YTIcons.search_outlined,
+                  onTap: () => context.goto(AppRoutes.search),
                 ),
               ],
               bottom: historyOff == false
@@ -185,6 +178,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                           child: DynamicTab(
                             initialIndex: 0,
                             leadingWidth: 7.5,
+                            useTappable: true,
                             leading: Padding(
                               padding: const EdgeInsets.all(4.0),
                               child: Consumer(

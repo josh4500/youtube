@@ -110,7 +110,6 @@ class _HomePageState extends ConsumerState<HomePage>
     return Scaffold(
       key: scaffoldKey,
       resizeToAvoidBottomInset: false,
-      drawerEnableOpenDragGesture: false,
       drawer: HomeDrawer(homeContext: context),
       body: SafeArea(
         bottom: false,

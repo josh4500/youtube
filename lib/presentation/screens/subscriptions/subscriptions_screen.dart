@@ -74,31 +74,20 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                 ),
                 AppbarAction(
                   icon: YTIcons.notification_outlined,
-                  onTap: () {},
+                  onTap: () => context.goto(AppRoutes.notifications),
                 ),
-                Consumer(
-                  builder: (context, ref, child) {
-                    return AppbarAction(
-                      icon: YTIcons.search_outlined,
-                      onTap: () async {
-                        ref.read(homeRepositoryProvider).lockNavBarPosition();
-                        await context.goto(AppRoutes.search);
-                      },
-                    );
-                  },
+                AppbarAction(
+                  icon: YTIcons.search_outlined,
+                  onTap: () => context.goto(AppRoutes.search),
                 ),
               ],
               floating: true,
               bottom: PreferredSize(
-                preferredSize: Size(
-                  MediaQuery.sizeOf(context).width,
-                  MediaQuery.sizeOf(context).width * 0.3 +
-                      MediaQuery.sizeOf(context).height * 0.05,
-                ),
+                preferredSize: const Size(double.infinity, 125 + 44),
                 child: Column(
                   children: <Widget>[
                     SizedBox(
-                      height: MediaQuery.sizeOf(context).width * 0.3,
+                      height: 125,
                       child: SubscriptionsTabs(
                         valueListenable: _selectedChannel,
                         onChange: (int? value) {},

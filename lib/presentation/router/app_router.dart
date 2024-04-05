@@ -305,12 +305,24 @@ class AppRouter {
               GoRoute(
                 name: AppRoutes.search.name,
                 path: AppRoutes.search.path,
-                builder: (BuildContext context, GoRouterState state) {
-                  return SearchScreen(
-                    key: state.pageKey,
+                pageBuilder: (BuildContext context, GoRouterState state) {
+                  return NoTransitionPage(
+                    child: SearchScreen(key: state.pageKey),
                   );
                 },
-                routes: [],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                name: AppRoutes.notifications.name,
+                path: AppRoutes.notifications.path,
+                pageBuilder: (BuildContext context, GoRouterState state) {
+                  return NoTransitionPage(
+                    child: NotificationsScreen(key: state.pageKey),
+                  );
+                },
               ),
             ],
           ),

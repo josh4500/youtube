@@ -20,6 +20,7 @@ abstract class CustomNetworkImage extends ImageProvider<CustomNetworkImage> {
   /// The scale to place in the [ImageInfo] object of the image.
   double get scale;
 
+  ///
   ImageReplacement? replacement;
 
   /// The HTTP headers that will be used with [HttpClient.get] to fetch image from network.

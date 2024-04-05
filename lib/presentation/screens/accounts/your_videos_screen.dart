@@ -96,16 +96,9 @@ class _YourVideosScreenState extends State<YourVideosScreen>
             icon: YTIcons.cast_outlined,
             onTap: () {},
           ),
-          Consumer(
-            builder: (context, ref, child) {
-              return AppbarAction(
-                icon: YTIcons.search_outlined,
-                onTap: () async {
-                  ref.read(homeRepositoryProvider).lockNavBarPosition();
-                  await context.goto(AppRoutes.search);
-                },
-              );
-            },
+          AppbarAction(
+            icon: YTIcons.search_outlined,
+            onTap: () => context.goto(AppRoutes.search),
           ),
           AppbarAction(
             icon: YTIcons.more_vert_outlined,
