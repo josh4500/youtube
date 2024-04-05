@@ -103,6 +103,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     }
 
     if (_searchedTextHistory.isEmpty) {
+      ref.read(homeRepositoryProvider).unlockNavBarPosition();
       context.pop();
     }
   }
