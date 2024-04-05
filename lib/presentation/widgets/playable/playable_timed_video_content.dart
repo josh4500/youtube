@@ -28,6 +28,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../network_image/custom_network_image.dart';
+
 class PlayableTimedVideoContent extends StatelessWidget {
   const PlayableTimedVideoContent({
     super.key,
@@ -50,7 +52,7 @@ class PlayableTimedVideoContent extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(4),
               image: const DecorationImage(
-                image: NetworkImage('https://picsum.photos/300/300'),
+                image: CustomNetworkImage('https://picsum.photos/300/300'),
                 fit: BoxFit.cover,
               ),
             ),

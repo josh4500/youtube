@@ -250,9 +250,13 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                         child: Stack(
                           children: <Widget>[
                             Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
                                 Text(
                                   widget.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.fade,
+                                  softWrap: false,
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,

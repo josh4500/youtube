@@ -53,22 +53,20 @@ class ReplyTile extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          RichText(
-                            text: const TextSpan(
-                              text: '@BussyBoyBonanza',
-                              children: <InlineSpan>[
-                                TextSpan(text: ' · '),
-                                TextSpan(text: '7mo ago'),
-                              ],
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
-                            ),
+                      RichText(
+                        text: const TextSpan(
+                          text: '@BussyBoyBonanza',
+                          children: <InlineSpan>[
+                            TextSpan(text: ' · '),
+                            TextSpan(text: '7mo ago'),
+                          ],
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
                           ),
-                        ],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       const Text(
@@ -76,18 +74,18 @@ class ReplyTile extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       const Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           Icon(
                             YTIcons.like_outlined,
                             size: 18,
                           ),
                           SizedBox(width: 4),
-                          SizedBox(
-                            width: 42,
-                            child: Text(
-                              '69',
-                              style: TextStyle(fontSize: 12),
-                            ),
+                          Text(
+                            '69',
+                            style: TextStyle(fontSize: 12),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           Icon(
                             YTIcons.dislike_outlined,

@@ -29,6 +29,8 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import '../network_image/custom_network_image.dart';
+
 class ViewableShortsContent extends StatelessWidget {
   const ViewableShortsContent({
     super.key,
@@ -51,7 +53,7 @@ class ViewableShortsContent extends StatelessWidget {
         color: Colors.white12,
         borderRadius: borderRadius,
         image: const DecorationImage(
-          image: NetworkImage('https://picsum.photos/400/900'),
+          image: CustomNetworkImage('https://picsum.photos/400/900'),
           fit: BoxFit.cover,
         ),
       ),

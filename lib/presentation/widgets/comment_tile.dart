@@ -77,29 +77,28 @@ class CommentTile extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            RichText(
-                              text: const TextSpan(
-                                text: '@BussyBoyBonanza',
-                                children: <InlineSpan>[
-                                  TextSpan(text: ' · '),
-                                  TextSpan(text: '7mo ago'),
-                                ],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              ),
+                        RichText(
+                          text: const TextSpan(
+                            text: '@BussyBoyBonanza',
+                            children: <InlineSpan>[
+                              TextSpan(text: ' · '),
+                              TextSpan(text: '7mo ago'),
+                            ],
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
                             ),
-                          ],
+                          ),
                         ),
                         const SizedBox(height: 4),
                         const Text(
-                          'Cutting fundig on precautions is going to cost more in the long run',
+                          'Cutting funding on precautions is going to cost more in the long run',
+                          maxLines: 5,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 12),
                         const Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             Icon(
                               YTIcons.like_outlined,

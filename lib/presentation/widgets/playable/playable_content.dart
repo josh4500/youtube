@@ -29,6 +29,8 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import '../network_image/custom_network_image.dart';
+
 class PlayableContent extends StatelessWidget {
   const PlayableContent({
     super.key,
@@ -74,10 +76,6 @@ class PlayableContent extends StatelessWidget {
                           topLeft: Radius.elliptical(16, 8),
                           topRight: Radius.elliptical(16, 8),
                         ),
-                        image: DecorationImage(
-                          image: NetworkImage('https://picsum.photos/300/300'),
-                          fit: BoxFit.cover,
-                        ),
                       ),
                     ),
                   ],
@@ -91,7 +89,7 @@ class PlayableContent extends StatelessWidget {
                             decoration: const BoxDecoration(
                               color: Colors.white60,
                               image: DecorationImage(
-                                image: NetworkImage(
+                                image: CustomNetworkImage(
                                   'https://picsum.photos/300/300',
                                 ),
                                 fit: BoxFit.cover,

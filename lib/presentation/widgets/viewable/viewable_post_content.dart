@@ -31,6 +31,8 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
+import '../network_image/custom_network_image.dart';
+
 class ViewablePostContent extends StatelessWidget {
   const ViewablePostContent({super.key});
 
@@ -104,7 +106,7 @@ class ViewablePostContent extends StatelessWidget {
           decoration: const BoxDecoration(
             color: Colors.white38,
             image: DecorationImage(
-              image: NetworkImage('https://picsum.photos/450/900'),
+              image: CustomNetworkImage('https://picsum.photos/450/900'),
               fit: BoxFit.cover,
             ),
           ),

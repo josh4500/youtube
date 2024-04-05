@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../network_image/custom_network_image.dart';
 import '../over_scroll_glow_behavior.dart';
 import '../slides_indicator.dart';
 
@@ -78,8 +79,9 @@ class _ViewableContentSlidesState extends State<ViewableContentSlides> {
                       Container(
                         decoration: const BoxDecoration(
                           image: DecorationImage(
-                            image:
-                                NetworkImage('https://picsum.photos/500/500'),
+                            image: CustomNetworkImage(
+                              'https://picsum.photos/500/500',
+                            ),
                             fit: BoxFit.cover,
                           ),
                         ),

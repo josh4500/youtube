@@ -32,6 +32,7 @@ import 'package:youtube_clone/presentation/widgets/shimmer.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 import '../account_avatar.dart';
+import '../network_image/custom_network_image.dart';
 import '../player/playback/playback_view.dart';
 
 class ViewableVideoContent extends StatelessWidget {
@@ -55,7 +56,9 @@ class ViewableVideoContent extends StatelessWidget {
                     decoration: const BoxDecoration(
                       color: Color(0xFF656565),
                       image: DecorationImage(
-                        image: NetworkImage('https://picsum.photos/900/500'),
+                        image: CustomNetworkImage(
+                          'https://picsum.photos/900/500',
+                        ),
                         fit: BoxFit.cover,
                       ),
                     ),

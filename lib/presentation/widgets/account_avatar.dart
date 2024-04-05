@@ -30,6 +30,9 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
+
+import 'network_image/custom_network_image.dart';
 
 const List<Color> _avatarColor = <Color>[
   Color(0xFF512DA7),
@@ -75,15 +78,47 @@ class AccountAvatar extends StatefulWidget {
 }
 
 class _AccountAvatarState extends State<AccountAvatar> {
-  final Completer<bool> _completer = Completer<bool>();
-  ImageProvider? _imageProvider;
+  late CustomNetworkImage _imageProvider;
 
   @override
   void initState() {
     super.initState();
-    if (widget.imageUrl != null) {
-      _imageProvider = NetworkImage(widget.imageUrl!);
-    } else {}
+    _imageProvider = CustomNetworkImage(
+      widget.imageUrl!,
+      replacement: ImageReplacement(
+        text: widget.name,
+        color: _computeColorFromText(widget.name),
+        size: const Size.square(200),
+        textStyle: const TextStyle(
+          fontSize: 72,
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant AccountAvatar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.name != oldWidget.name) {
+      _imageProvider.replacement = ImageReplacement(
+        text: widget.name,
+        color: _computeColorFromText(widget.name),
+        size: const Size.square(200),
+        textStyle: const TextStyle(
+          fontSize: 72,
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+      );
+    }
+  }
+
+  Color _computeColorFromText(String text) {
+    final hash = text.hashCode;
+    final int colorIndex = hash % _avatarColor.length;
+    return _avatarColor[colorIndex];
   }
 
   @override
@@ -101,12 +136,10 @@ class _AccountAvatarState extends State<AccountAvatar> {
             padding: hasLive ? const EdgeInsets.all(1) : null,
             decoration: BoxDecoration(
               color: Colors.white12,
-              image: _imageProvider != null
-                  ? DecorationImage(
-                      image: _imageProvider!,
-                      fit: BoxFit.cover,
-                    )
-                  : null,
+              image: DecorationImage(
+                image: _imageProvider,
+                fit: BoxFit.cover,
+              ),
               border: widget.border,
               shape: BoxShape.circle,
             ),

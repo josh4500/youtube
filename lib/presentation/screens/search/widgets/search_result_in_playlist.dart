@@ -17,7 +17,7 @@ class SearchResultInPlaylist extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(2),
               image: const DecorationImage(
-                image: NetworkImage('https://picsum.photos/200/200'),
+                image: CustomNetworkImage('https://picsum.photos/200/200'),
                 fit: BoxFit.cover,
               ),
             ),

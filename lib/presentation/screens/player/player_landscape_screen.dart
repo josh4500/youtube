@@ -29,10 +29,15 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
+import 'package:image/image.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/video_comment_sheet.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/video_description_sheet.dart';
 import 'package:youtube_clone/presentation/widgets/custom_scroll_physics.dart';
@@ -313,58 +318,53 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
     );
 
     return Material(
-      child: SlideTransition(
-        position: _slideAnimation,
-        child: ScaleTransition(
-          scale: _scaleAnimation,
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: _onTapPlayer,
-                      onVerticalDragUpdate: _onDragPlayer,
-                      onVerticalDragEnd: _onDragPlayerEnd,
-                      behavior: HitTestBehavior.opaque,
-                      child: interactivePlayerView,
-                    ),
-                  ],
+      child: Row(
+        children: [
+          Expanded(
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: GestureDetector(
+                  onTap: _onTapPlayer,
+                  onVerticalDragUpdate: _onDragPlayer,
+                  onVerticalDragEnd: _onDragPlayerEnd,
+                  behavior: HitTestBehavior.opaque,
+                  child: interactivePlayerView,
                 ),
               ),
-              Row(
-                children: <Widget>[
-                  SizeTransition(
-                    sizeFactor: _descAnimation,
-                    axis: Axis.horizontal,
-                    child: SizedBox(
-                      width: MediaQuery.sizeOf(context).width * .4,
-                      child: VideoDescriptionSheet(
-                        transcriptNotifier: _transcriptionNotifier,
-                        closeDescription: _closeDesc,
-                        showDragIndicator: false,
-                      ),
-                    ),
-                  ),
-                  SizeTransition(
-                    sizeFactor: _commentAnimation,
-                    axis: Axis.horizontal,
-                    child: SizedBox(
-                      width: MediaQuery.sizeOf(context).width * .4,
-                      child: VideoCommentsSheet(
-                        replyNotifier: _replyNotifier,
-                        closeComment: _closeComment,
-                        showDragIndicator: false,
-                        maxHeight: 0,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
+          SizeTransition(
+            sizeFactor: _descAnimation,
+            axis: Axis.horizontal,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.sizeOf(context).width * .4,
+              ),
+              child: VideoDescriptionSheet(
+                transcriptNotifier: _transcriptionNotifier,
+                closeDescription: _closeDesc,
+                showDragIndicator: false,
+              ),
+            ),
+          ),
+          SizeTransition(
+            sizeFactor: _commentAnimation,
+            axis: Axis.horizontal,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.sizeOf(context).width * .4,
+              ),
+              child: VideoCommentsSheet(
+                replyNotifier: _replyNotifier,
+                closeComment: _closeComment,
+                showDragIndicator: false,
+                maxHeight: 0,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

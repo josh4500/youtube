@@ -29,10 +29,12 @@
 export 'widgets/account_avatar.dart';
 export 'widgets/app_logo.dart';
 export 'widgets/appbar_action.dart';
+
 export 'widgets/builders/auth_state_builder.dart';
 export 'widgets/builders/network_builder.dart';
 export 'widgets/builders/network_listenable_builder.dart';
 export 'widgets/builders/orientation_builder.dart';
+
 export 'widgets/channel_subscription_tile.dart';
 export 'widgets/clip_thumb_clipper.dart';
 export 'widgets/comment_textfield_placeholder.dart';
@@ -48,6 +50,10 @@ export 'widgets/error_overlay.dart';
 export 'widgets/grouped_view_builder.dart';
 export 'widgets/lazy_indexed_stack.dart';
 export 'widgets/marquee.dart';
+
+export 'widgets/network_image/image_replacement.dart';
+export 'widgets/network_image/custom_network_image.dart';
+
 export 'widgets/notification_option.dart';
 export 'widgets/option_button.dart';
 export 'widgets/over_scroll_glow_behavior.dart';

@@ -70,7 +70,7 @@ class ChapterTile extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 image: const DecorationImage(
-                  image: NetworkImage('https://picsum.photos/900/500'),
+                  image: CustomNetworkImage('https://picsum.photos/900/500'),
                   fit: BoxFit.cover,
                 ),
               ),

@@ -347,14 +347,14 @@ class ShortsPlayerView extends StatelessWidget {
         color: const Color(0xFF656565),
         image: DecorationImage(
           image: _isSubscriptionScreen
-              ? const NetworkImage(
+              ? const CustomNetworkImage(
                   'https://picsum.photos/360/700',
                 )
               : _isLiveScreen
-                  ? const NetworkImage(
+                  ? const CustomNetworkImage(
                       'https://picsum.photos/400/800',
                     )
-                  : const NetworkImage(
+                  : const CustomNetworkImage(
                       'https://picsum.photos/444/800',
                     ),
           fit: BoxFit.fitHeight,
