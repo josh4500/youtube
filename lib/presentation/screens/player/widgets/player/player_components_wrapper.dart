@@ -28,30 +28,28 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/infographics/video_channel_watermark.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../controls/player_loading.dart';
+import '../controls/player_notifications.dart';
 import '../controls/player_overlay_controls.dart';
+import '../infographics/video_channel_watermark.dart';
 
 class PlayerComponentsWrapper extends StatelessWidget {
-  final Widget child;
-
-  final void Function(PlayerNotification notification)? handleNotification;
-
   const PlayerComponentsWrapper({
     super.key,
     this.handleNotification,
     required this.child,
   });
+  final Widget child;
+
+  final void Function(PlayerNotification notification)? handleNotification;
 
   @override
   Widget build(BuildContext context) {
     return NotificationListener<PlayerNotification>(
       onNotification: (PlayerNotification playerNotification) {
         if (handleNotification != null) {
-          handleNotification!(playerNotification);
+          handleNotification!.call(playerNotification);
         }
         // Return true to cancel the notification bubbling.
         return true;

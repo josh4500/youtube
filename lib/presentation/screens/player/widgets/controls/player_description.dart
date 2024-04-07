@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/providers/player_signal_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
+
+import '../../providers/player_signal_provider.dart';
+import '../../providers/player_viewstate_provider.dart';
+import 'player_notifications.dart';
 
 class PlayerDescription extends ConsumerWidget {
-  final bool showOnExpanded;
-  final bool showOnFullscreen;
-
   const PlayerDescription({
     super.key,
     this.showOnExpanded = false,
@@ -20,6 +19,8 @@ class PlayerDescription extends ConsumerWidget {
           !(showOnExpanded && showOnFullscreen),
           'showOnExpanded or showOnFullscreen cannot be true at the same time',
         );
+  final bool showOnExpanded;
+  final bool showOnFullscreen;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -55,10 +56,15 @@ class PlayerDescription extends ConsumerWidget {
     }
 
     return GestureDetector(
-      onTap: () => ref.read(playerRepositoryProvider).sendPlayerSignal([
-        PlayerSignal.hideControls,
-        PlayerSignal.openDescription,
-      ]),
+      onTap: () {
+        if (ref.read(playerViewStateProvider).isExpanded) {
+          DeExpandPlayerNotification().dispatch(context);
+        }
+        ref.read(playerRepositoryProvider).sendPlayerSignal([
+          PlayerSignal.hideControls,
+          PlayerSignal.openDescription,
+        ]);
+      },
       child: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
@@ -70,7 +76,8 @@ class PlayerDescription extends ConsumerWidget {
                   child: Text(
                     'LP Funds Fund Controversy: LP Spokesman Says Obi\'s Transparency, Foundation Of Labour Party',
                     maxLines: 1,
-                    overflow: TextOverflow.clip,
+                    softWrap: false,
+                    overflow: TextOverflow.fade,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,

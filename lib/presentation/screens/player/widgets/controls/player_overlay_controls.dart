@@ -42,7 +42,7 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../providers/player_expanded_state_provider.dart';
 import '../../providers/player_viewstate_provider.dart';
-import '../player/player_notifications.dart';
+import 'player_notifications.dart';
 import 'player_actions_control.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';

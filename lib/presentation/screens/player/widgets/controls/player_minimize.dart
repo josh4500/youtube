@@ -32,7 +32,7 @@ import 'package:youtube_clone/presentation/provider/repository/player_repository
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../controls/player_control.dart';
-import '../player/player_notifications.dart';
+import 'player_notifications.dart';
 
 class PlayerMinimize extends ConsumerWidget {
   const PlayerMinimize({super.key});

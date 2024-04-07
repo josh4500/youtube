@@ -47,7 +47,7 @@ import '../../providers.dart';
 import '../../view_models/playback/player_sizing.dart';
 import 'widgets/player/player.dart';
 import 'widgets/player/player_components_wrapper.dart';
-import 'widgets/player/player_notifications.dart';
+import 'widgets/controls/player_notifications.dart';
 
 class PlayerLandscapeScreen extends ConsumerStatefulWidget {
   const PlayerLandscapeScreen({super.key});
@@ -335,35 +335,35 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
               ),
             ),
           ),
-          SizeTransition(
-            sizeFactor: _descAnimation,
-            axis: Axis.horizontal,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.sizeOf(context).width * .4,
-              ),
-              child: VideoDescriptionSheet(
-                transcriptNotifier: _transcriptionNotifier,
-                closeDescription: _closeDesc,
-                showDragIndicator: false,
-              ),
-            ),
-          ),
-          SizeTransition(
-            sizeFactor: _commentAnimation,
-            axis: Axis.horizontal,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.sizeOf(context).width * .4,
-              ),
-              child: VideoCommentsSheet(
-                replyNotifier: _replyNotifier,
-                closeComment: _closeComment,
-                showDragIndicator: false,
-                maxHeight: 0,
-              ),
-            ),
-          ),
+          // SizeTransition(
+          //   sizeFactor: _descAnimation,
+          //   axis: Axis.horizontal,
+          //   child: ConstrainedBox(
+          //     constraints: BoxConstraints(
+          //       maxWidth: MediaQuery.sizeOf(context).width * .4,
+          //     ),
+          //     child: VideoDescriptionSheet(
+          //       transcriptNotifier: _transcriptionNotifier,
+          //       closeDescription: _closeDesc,
+          //       showDragIndicator: false,
+          //     ),
+          //   ),
+          // ),
+          // SizeTransition(
+          //   sizeFactor: _commentAnimation,
+          //   axis: Axis.horizontal,
+          //   child: ConstrainedBox(
+          //     constraints: BoxConstraints(
+          //       maxWidth: MediaQuery.sizeOf(context).width * .4,
+          //     ),
+          //     child: VideoCommentsSheet(
+          //       replyNotifier: _replyNotifier,
+          //       closeComment: _closeComment,
+          //       showDragIndicator: false,
+          //       maxHeight: 0,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

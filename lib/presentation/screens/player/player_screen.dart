@@ -33,21 +33,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
-import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
-import 'package:youtube_clone/presentation/router/app_router.dart';
-import 'package:youtube_clone/presentation/router/app_routes.dart';
-import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/player/player_components_wrapper.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/player/player_notifications.dart';
+import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../constants.dart';
 import '../../providers.dart';
 import '../../view_models/playback/player_sizing.dart';
+import 'providers/player_viewstate_provider.dart';
 import 'widgets/controls/player_ambient.dart';
+import 'widgets/controls/player_notifications.dart';
 import 'widgets/player/mini_player.dart';
 import 'widgets/player/player.dart';
+import 'widgets/player/player_components_wrapper.dart';
 import 'widgets/video_actions.dart';
 import 'widgets/video_channel_section.dart';
 import 'widgets/video_chapters_sheet.dart';
@@ -91,11 +89,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   late final AnimationController _draggableOpacityController;
   late final Animation<double> _draggableOpacityAnimation;
 
-  late final ValueNotifier<double> additionalHeightNotifier;
+  late final ValueNotifier<double> _additionalHeightNotifier;
 
-  late final ValueNotifier<double> marginNotifier;
-  late final ValueNotifier<double> heightNotifier;
-  late final ValueNotifier<double> widthNotifier;
+  late final ValueNotifier<double> _marginNotifier;
+
+  late final AnimationController _heightController;
+  late final ValueNotifier<double> _heightNotifier;
+
+  late final AnimationController _widthController;
+  late final ValueNotifier<double> _widthNotifier;
 
   late final Animation<double> sizeAnimation;
 
@@ -120,7 +122,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     return screenHeight * (1 - avgVideoViewPortHeight) / 1.5;
   }
 
-  double get additionalHeight => additionalHeightNotifier.value;
+  double get additionalHeight => _additionalHeightNotifier.value;
 
   /// PlayerSignal StreamSubscription
   StreamSubscription<PlayerSignal>? _subscription;
@@ -133,7 +135,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         minVideoViewPortWidth,
         1,
         curve: Curves.easeInCubic,
-      ).transform(widthNotifier.value).invertByOne;
+      ).transform(_widthNotifier.value).invertByOne;
 
   // Video Comment Sheet
   bool _commentIsOpened = false;
@@ -155,6 +157,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   @override
   void initState() {
     super.initState();
+
+    _widthController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+    _heightController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
     _playerDismissController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 125),
@@ -197,7 +208,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       curve: Curves.easeIn,
     );
 
-    additionalHeightNotifier = ValueNotifier<double>(
+    _additionalHeightNotifier = ValueNotifier<double>(
       clampDouble(
         (screenHeight * (1 - avgVideoViewPortHeight)) -
             (screenHeight * (1 - videoViewHeight)),
@@ -210,7 +221,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     // (i.e when player going in or out of expanded mode)
     // Opacity of info does not need to be updated when either bottom sheets are open
     // (i.e Comment or Description Sheet)
-    additionalHeightNotifier.addListener(() {
+    _additionalHeightNotifier.addListener(() {
       double opacityValue;
       if (expandedMode) {
         opacityValue =
@@ -225,13 +236,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       }
     });
 
-    marginNotifier = ValueNotifier<double>(0);
-    heightNotifier = ValueNotifier<double>(1);
-    widthNotifier = ValueNotifier<double>(1);
+    _marginNotifier = ValueNotifier<double>(0);
+    _widthNotifier = ValueNotifier<double>(minVideoViewPortWidth);
+    _heightNotifier = ValueNotifier<double>(minVideoViewPortHeight);
+
+    _animateWidth(1);
+    _animateHeight(1);
 
     sizeAnimation = CurvedAnimation(
       parent: Animation<double>.fromValueListenable(
-        heightNotifier,
+        _heightNotifier,
         transformer: (v) => v.clamp(0.5, 1),
       ),
       curve: const Interval(minVideoViewPortHeight, 1),
@@ -241,9 +255,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _infoScrollPhysics.canScroll(false);
     }
 
-    heightNotifier.addListener(() {
-      _showHideNavigationBar(heightNotifier.value);
-      _recomputeDraggableOpacityAndHeight(heightNotifier.value);
+    _heightNotifier.addListener(() {
+      _showHideNavigationBar(_heightNotifier.value);
+      _recomputeDraggableOpacityAndHeight(_heightNotifier.value);
     });
 
     _transformationController.addListener(() {
@@ -258,7 +272,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _descDraggableController.addListener(() {
       final double size = _descDraggableController.size;
-      if (size == 0 && heightNotifier.value != minVideoViewPortHeight) {
+      if (size == 0 && _heightNotifier.value != minVideoViewPortHeight) {
         _descIsOpened = false;
       }
       _changeInfoOpacityOnDraggable(size);
@@ -267,7 +281,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _commentDraggableController.addListener(() {
       final double size = _commentDraggableController.size;
-      if (size == 0 && heightNotifier.value != minVideoViewPortHeight) {
+      if (size == 0 && _heightNotifier.value != minVideoViewPortHeight) {
         _commentIsOpened = false;
       }
       _changeInfoOpacityOnDraggable(size);
@@ -276,7 +290,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _chaptersDraggableController.addListener(() {
       final double size = _chaptersDraggableController.size;
-      if (size == 0 && heightNotifier.value != minVideoViewPortHeight) {
+      if (size == 0 && _heightNotifier.value != minVideoViewPortHeight) {
         _chaptersIsOpened = false;
       }
       _changeInfoOpacityOnDraggable(size);
@@ -285,7 +299,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     Future<void>(() async {
       // Initial changes
-      _showHideNavigationBar(heightNotifier.value);
+      _showHideNavigationBar(_heightNotifier.value);
 
       final PlayerRepository playerRepo = ref.read(playerRepositoryProvider);
 
@@ -394,7 +408,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Callback to updates the info opacity when draggable sheets changes its size
   void _changeInfoOpacityOnDraggable(double size) {
-    if (heightNotifier.value == 1) {
+    if (_heightNotifier.value == 1) {
       _infoOpacityController.value =
           clampDouble(size / (1 - heightRatio), 0, 1);
     }
@@ -407,7 +421,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         );
   }
 
-  /// Callback to change Draggable heights when the Player height changes (via [heightNotifier])
+  /// Callback to change Draggable heights when the Player height changes (via [_heightNotifier])
   void _recomputeDraggableOpacityAndHeight(double value) {
     final double newSizeValue = clampDouble(
       (value - minVideoViewPortHeight) - (value * 0.135),
@@ -416,7 +430,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     );
 
     /***************************** Opacity Changes *****************************/
-    final double opacityValue = 1 - (heightNotifier.value - 0.45) / (1 - 0.45);
+    final double opacityValue = 1 - (_heightNotifier.value - 0.45) / (1 - 0.45);
     // Changes info opacity when neither of the draggable sheet are opened
     if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
       _infoOpacityController.value = (opacityValue - .225).clamp(0, 1);
@@ -428,7 +442,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     /***************************** Height Changes *****************************/
     // Changes Comment Draggable height
     if (_commentIsOpened) {
-      if (heightNotifier.value == minVideoViewPortHeight) {
+      if (_heightNotifier.value == minVideoViewPortHeight) {
         _commentDraggableController.jumpTo(0);
       } else {
         _commentDraggableController.jumpTo(newSizeValue);
@@ -437,7 +451,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     // Changes Description Draggable height
     if (_descIsOpened) {
-      if (heightNotifier.value == minVideoViewPortHeight) {
+      if (_heightNotifier.value == minVideoViewPortHeight) {
         _descDraggableController.jumpTo(0);
       } else {
         _descDraggableController.jumpTo(newSizeValue);
@@ -446,7 +460,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     // Changes Chapters Draggable height
     if (_chaptersIsOpened) {
-      if (heightNotifier.value == minVideoViewPortHeight) {
+      if (_heightNotifier.value == minVideoViewPortHeight) {
         _descDraggableController.jumpTo(0);
       } else {
         _descDraggableController.jumpTo(newSizeValue);
@@ -551,20 +565,20 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Handles tap events on the player.
   Future<void> _onTapPlayer() async {
     // If the player is fully expanded, show controls
-    if (heightNotifier.value == 1) {
+    if (_heightNotifier.value == 1) {
       _toggleControls();
     }
 
     // Maximizes player
-    if (widthNotifier.value != 1 && heightNotifier.value != 1) {
+    if (_widthNotifier.value != 1 && _heightNotifier.value != 1) {
       ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
         PlayerSignal.maximize,
         PlayerSignal.showPlaybackProgress,
       ]);
 
       // Set height and width to maximum
-      heightNotifier.value = 1;
-      widthNotifier.value = 1;
+      _animateHeight(1);
+      _animateWidth(1);
 
       if (ref.read(playerNotifierProvider).ended) {
         ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
@@ -601,7 +615,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         }
 
         // Set additional height to its maximum value
-        additionalHeightNotifier.value = maxAdditionalHeight;
+        _additionalHeightNotifier.value = maxAdditionalHeight;
       }
     }
   }
@@ -614,20 +628,20 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     // Check the direction of the drag
     if (details.delta.dy < 0) {
       // If dragging up
-      if (marginNotifier.value > 0) {
+      if (_marginNotifier.value > 0) {
         // Prevent player from being dragged up beyond the top
         _preventPlayerDragUp = true;
 
         // Adjust player view margin within valid limits
-        marginNotifier.value = clampDouble(
-          marginNotifier.value + details.delta.dy,
+        _marginNotifier.value = clampDouble(
+          _marginNotifier.value + details.delta.dy,
           0,
           screenHeight - (screenHeight * heightRatio),
         );
       } else if (!_preventPlayerDragUp) {
-        // If not preventing drag up, adjust additionalHeightNotifier
-        additionalHeightNotifier.value = clampDouble(
-          additionalHeightNotifier.value + details.delta.dy,
+        // If not preventing drag up, adjust _additionalHeightNotifier
+        _additionalHeightNotifier.value = clampDouble(
+          _additionalHeightNotifier.value + details.delta.dy,
           0,
           screenHeight - (screenHeight * heightRatio),
         );
@@ -638,24 +652,24 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         if (additionalHeight >= screenHeight * (1 - heightRatio)) {
           if (!_preventPlayerMarginUpdate) {
             // Adjust player view margin within valid limits
-            marginNotifier.value = clampDouble(
-              marginNotifier.value + details.delta.dy,
+            _marginNotifier.value = clampDouble(
+              _marginNotifier.value + details.delta.dy,
               0,
               screenHeight - (screenHeight * heightRatio),
             );
           }
         } else {
           _preventPlayerMarginUpdate = true;
-          additionalHeightNotifier.value = clampDouble(
-            additionalHeightNotifier.value + details.delta.dy,
+          _additionalHeightNotifier.value = clampDouble(
+            _additionalHeightNotifier.value + details.delta.dy,
             0,
             screenHeight * (1 - heightRatio),
           );
         }
       } else {
-        // If preventing drag down, adjust additionalHeightNotifier
-        additionalHeightNotifier.value = clampDouble(
-          additionalHeightNotifier.value + details.delta.dy,
+        // If preventing drag down, adjust _additionalHeightNotifier
+        _additionalHeightNotifier.value = clampDouble(
+          _additionalHeightNotifier.value + details.delta.dy,
           0,
           screenHeight * (1 - heightRatio),
         );
@@ -673,7 +687,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     if (!_preventPlayerDismiss) {
       if (details.delta.dy > 0 &&
-          heightNotifier.value == minVideoViewPortHeight) {
+          _heightNotifier.value == minVideoViewPortHeight) {
         // Ensures that the first drag down by the from [minVideoViewPortHeight]
         // will be dismissing player if user pointer was recently released
         _isDismissing = true && _releasedPlayerPointer;
@@ -692,14 +706,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     // If dragging down
     if (_isPlayerDraggingDown ?? false) {
       // Adjust height and width based on the drag delta
-      heightNotifier.value = clampDouble(
-        heightNotifier.value - (details.delta.dy / screenHeight),
+      _heightNotifier.value = clampDouble(
+        _heightNotifier.value - (details.delta.dy / screenHeight),
         minVideoViewPortHeight,
         1,
       );
 
-      widthNotifier.value = clampDouble(
-        heightNotifier.value / heightRatio,
+      _widthNotifier.value = clampDouble(
+        _heightNotifier.value / heightRatio,
         minVideoViewPortWidth,
         1,
       );
@@ -711,7 +725,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
 
     // Hide controls when the height falls below a certain threshold
-    if (heightNotifier.value < 1) {
+    if (_heightNotifier.value < 1) {
       _hideControls();
 
       ref.read(playerRepositoryProvider).sendPlayerSignal(
@@ -763,7 +777,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         ref
             .read(playerRepositoryProvider)
             .sendPlayerSignal(<PlayerSignal>[PlayerSignal.enterExpanded]);
-        additionalHeightNotifier.value =
+        _additionalHeightNotifier.value =
             screenHeight - (screenHeight * heightRatio);
       } else {
         ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
@@ -771,13 +785,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           PlayerSignal.showPlaybackProgress,
         ]);
         if (expandedMode) {
-          additionalHeightNotifier.value = maxAdditionalHeight;
+          _additionalHeightNotifier.value = maxAdditionalHeight;
         } else {
-          additionalHeightNotifier.value = 0;
+          _additionalHeightNotifier.value = 0;
         }
       }
 
-      if (marginNotifier.value >
+      if (_marginNotifier.value >
           (screenHeight - (screenHeight * heightRatio)) / 4) {
         ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.exitExpanded,
@@ -785,32 +799,36 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         ]);
 
         if (expandedMode) {
-          additionalHeightNotifier.value = maxAdditionalHeight;
+          _additionalHeightNotifier.value = maxAdditionalHeight;
         } else {
-          additionalHeightNotifier.value = 0;
+          _additionalHeightNotifier.value = 0;
         }
       }
 
-      marginNotifier.value = 0;
+      _marginNotifier.value = 0;
       _infoScrollPhysics.canScroll(true);
     } else {
       // Set to false because the user pointer events will no longer be updated
       _isDismissing = false;
 
       if (_isPlayerDraggingDown ?? false) {
-        final double latestHeightVal = heightNotifier.value;
+        final double latestHeightVal = _heightNotifier.value;
         final double velocityY = details.velocity.pixelsPerSecond.dy;
 
         if (latestHeightVal >= 0.5) {
-          heightNotifier.value = velocityY >= 200 ? minVideoViewPortHeight : 1;
-          widthNotifier.value = velocityY >= 200 ? minVideoViewPortWidth : 1;
+          await Future.wait([
+            _animateHeight(velocityY >= 200 ? minVideoViewPortHeight : 1),
+            _animateWidth(velocityY >= 200 ? minVideoViewPortWidth : 1),
+          ]);
         } else {
-          heightNotifier.value = velocityY <= -150 ? 1 : minVideoViewPortHeight;
-          widthNotifier.value = velocityY <= -150 ? 1 : minVideoViewPortWidth;
+          await Future.wait([
+            _animateHeight(velocityY <= -150 ? 1 : minVideoViewPortHeight),
+            _animateWidth(velocityY <= -150 ? 1 : minVideoViewPortWidth),
+          ]);
         }
       }
 
-      if (heightNotifier.value > minVideoViewPortHeight) {
+      if (_heightNotifier.value > minVideoViewPortHeight) {
         _isPlayerDraggingDown = null;
         _preventPlayerDismiss = true;
       } else {
@@ -824,7 +842,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _playerDismissController.value = 0;
       }
 
-      if (widthNotifier.value == minVideoViewPortWidth) {
+      if (_widthNotifier.value == minVideoViewPortWidth) {
         ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.minimize,
           PlayerSignal.hidePlaybackProgress,
@@ -868,8 +886,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         (videoViewHeight > heightRatio && event.delta.dy < 0)) {
       if (_allowInfoDrag) {
         _infoScrollPhysics.canScroll(false);
-        additionalHeightNotifier.value = clampDouble(
-          additionalHeightNotifier.value + event.delta.dy,
+        _additionalHeightNotifier.value = clampDouble(
+          _additionalHeightNotifier.value + event.delta.dy,
           0,
           screenHeight * (1 - heightRatio),
         );
@@ -888,9 +906,47 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _allowInfoDrag = false;
     }
 
-    if (additionalHeightNotifier.value == 0) {
+    if (_additionalHeightNotifier.value == 0) {
       _infoScrollPhysics.canScroll(true);
     }
+  }
+
+  Future<void> _animateHeight(double value) async {
+    final Animation<double> tween = Tween<double>(
+      begin: _heightNotifier.value,
+      end: value,
+    ).animate(
+      CurvedAnimation(parent: _heightController, curve: Curves.easeInCubic),
+    );
+
+    tween.addListener(() {
+      _heightNotifier.value = tween.value;
+    });
+
+    // Reset the animation controller to its initial state
+    _heightController.reset();
+
+    // Start the animation by moving it forward
+    await _heightController.forward();
+  }
+
+  Future<void> _animateWidth(double value) async {
+    final Animation<double> tween = Tween<double>(
+      begin: _widthNotifier.value,
+      end: value,
+    ).animate(
+      CurvedAnimation(parent: _widthController, curve: Curves.easeInCubic),
+    );
+
+    tween.addListener(() {
+      _widthNotifier.value = tween.value;
+    });
+
+    // Reset the animation controller to its initial state
+    _widthController.reset();
+
+    // Start the animation by moving it forward
+    await _widthController.forward();
   }
 
   void _onDragInfoUp(PointerUpEvent event) {
@@ -899,13 +955,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.enterExpanded,
         ]);
-        additionalHeightNotifier.value =
+        _additionalHeightNotifier.value =
             screenHeight - (screenHeight * heightRatio);
       } else {
         if (expandedMode) {
           // TODO(Josh): Handle expanded mode
         } else {
-          additionalHeightNotifier.value = 0;
+          _additionalHeightNotifier.value = 0;
 
           ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
             PlayerSignal.exitExpanded,
@@ -938,7 +994,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       await Future<void>.delayed(const Duration(milliseconds: 150));
     }
     if (videoViewHeight != heightRatio && additionalHeight > 0) {
-      additionalHeightNotifier.value = 0;
+      _additionalHeightNotifier.value = 0;
     }
 
     _commentDraggableController.animateTo(
@@ -972,7 +1028,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       await Future<void>.delayed(const Duration(milliseconds: 150));
     }
     if (videoViewHeight != heightRatio && additionalHeight > 0) {
-      additionalHeightNotifier.value = 0;
+      _additionalHeightNotifier.value = 0;
     }
     _descDraggableController.animateTo(
       1 - heightRatio,
@@ -1007,7 +1063,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     // TODO(Josh): Check for expanded mode
     // Changes the additional heights to zero on Expanded mode
     if (videoViewHeight != heightRatio && additionalHeight > 0) {
-      additionalHeightNotifier.value = 0;
+      _additionalHeightNotifier.value = 0;
     }
 
     _chaptersDraggableController.animateTo(
@@ -1042,8 +1098,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       if (notification is ScrollStartNotification) {
         _allowInfoDrag = false;
 
-        if (additionalHeightNotifier.value > 0) {
-          additionalHeightNotifier.value = 0;
+        if (_additionalHeightNotifier.value > 0) {
+          _additionalHeightNotifier.value = 0;
           ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
             PlayerSignal.exitExpanded,
             PlayerSignal.showPlaybackProgress,
@@ -1071,19 +1127,20 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           // We set to true to emulate player was dragged down to minimize
           _isPlayerDraggingDown = true;
           _preventPlayerDismiss = false;
-          heightNotifier.value = minVideoViewPortHeight;
-          widthNotifier.value = minVideoViewPortWidth;
+
+          _animateHeight(minVideoViewPortHeight);
+          _animateWidth(minVideoViewPortWidth);
         } else if (notification is ExpandPlayerNotification) {
           _hideControls();
-          additionalHeightNotifier.value = screenHeight * (1 - heightRatio);
+          _additionalHeightNotifier.value = screenHeight * (1 - heightRatio);
           ref
               .read(playerRepositoryProvider)
               .sendPlayerSignal(<PlayerSignal>[PlayerSignal.enterExpanded]);
         } else if (notification is DeExpandPlayerNotification) {
           if (expandedMode) {
-            additionalHeightNotifier.value = maxAdditionalHeight;
+            _additionalHeightNotifier.value = maxAdditionalHeight;
           } else {
-            additionalHeightNotifier.value = 0;
+            _additionalHeightNotifier.value = 0;
           }
           _hideControls();
           ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
@@ -1213,8 +1270,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     );
 
     return ValueListenableBuilder<double>(
-      valueListenable: heightNotifier,
-      builder: (BuildContext context, double heightValue, Widget? childWidget) {
+      valueListenable: _heightNotifier,
+      builder: (
+        BuildContext context,
+        double heightValue,
+        Widget? childWidget,
+      ) {
         return SlideTransition(
           position: _playerSlideAnimation,
           child: FadeTransition(
@@ -1238,21 +1299,21 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 ValueListenableBuilder<double>(
-                  valueListenable: heightNotifier,
+                  valueListenable: _heightNotifier,
                   builder: (
                     BuildContext context,
                     double heightValue,
                     Widget? miniPlayer,
                   ) {
                     return ValueListenableBuilder<double>(
-                      valueListenable: additionalHeightNotifier,
+                      valueListenable: _additionalHeightNotifier,
                       builder: (
                         BuildContext context,
                         double addHeightValue,
                         Widget? childWidget,
                       ) {
                         return SizedBox(
-                          height: heightNotifier.value < 1
+                          height: _heightNotifier.value < 1
                               ? null
                               : screenHeight * heightRatio + addHeightValue,
                           child: GestureDetector(
@@ -1261,7 +1322,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                             onVerticalDragEnd: _onDragPlayerEnd,
                             behavior: HitTestBehavior.opaque,
                             child: ValueListenableBuilder<double>(
-                              valueListenable: widthNotifier,
+                              valueListenable: _widthNotifier,
                               builder: (
                                 BuildContext context,
                                 double widthValue,
@@ -1284,7 +1345,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                     Align(
                                       alignment: Alignment.centerLeft,
                                       child: ValueListenableBuilder<double>(
-                                        valueListenable: marginNotifier,
+                                        valueListenable: _marginNotifier,
                                         builder: (
                                           BuildContext context,
                                           double marginValue,
