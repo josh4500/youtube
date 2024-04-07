@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/comment_tile.dart';
-import 'package:youtube_clone/presentation/widgets/custom_scroll_physics.dart';
-import 'package:youtube_clone/presentation/widgets/page_draggable_sheet.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-class ShortsCommentsBottomSheet extends StatelessWidget {
+class ShortsCommentsBottomSheet extends StatefulWidget {
   const ShortsCommentsBottomSheet({
     super.key,
     required this.controller,
@@ -18,24 +16,44 @@ class ShortsCommentsBottomSheet extends StatelessWidget {
   final DraggableScrollableController draggableController;
 
   @override
+  State<ShortsCommentsBottomSheet> createState() =>
+      _ShortsCommentsBottomSheetState();
+}
+
+class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet> {
+  final _replyController = PageDraggableOverlayChildController(
+    title: 'Replies',
+  );
+
+  @override
+  void dispose() {
+    _replyController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Comment',
       subtitle: '16k',
       scrollTag: 'short_comment',
       borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(16),
-        topRight: Radius.circular(16),
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
       ),
-      controller: controller,
-      onClose: closeComment,
+      controller: widget.controller,
+      onClose: widget.closeComment,
       showDragIndicator: true,
-      draggableController: draggableController,
+      draggableController: widget.draggableController,
       actions: <Widget>[
-        InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(32),
-          child: const Icon(YTIcons.tune_outlined, size: 24),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: IconButton(
+            onPressed: () {},
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(maxHeight: 24),
+            icon: const Icon(YTIcons.tune_outlined, size: 24),
+          ),
         ),
       ],
       contentBuilder: (
@@ -70,32 +88,28 @@ class ShortsCommentsBottomSheet extends StatelessWidget {
           ],
         );
       },
+      overlayChildren: [
+        PageDraggableOverlayChild(
+          controller: _replyController,
+          builder: (context, controller, physics) {
+            return ListView.builder(
+              controller: controller,
+              physics: physics,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return const CommentTile(
+                    showReplies: false,
+                    backgroundColor: Color(0xFF272727),
+                  );
+                }
+                return const ReplyTile();
+              },
+              itemCount: 20,
+            );
+          },
+        ),
+      ],
       baseHeight: 0.68,
     );
   }
 }
-
-// PageDraggableOverlayChildItem(
-//   title: 'Reply',
-//   listenable: widget.replyNotifier,
-//   builder: (context) {
-//     return Material(
-//       child: Column(
-//         children: [
-//           Expanded(
-//             child: ListView.builder(
-//               itemBuilder: (context, index) {
-//                 if (index == 0) {
-//                   return const CommentTile(showReplies: false);
-//                 }
-//                 return const ReplyTile();
-//               },
-//               itemCount: 20,
-//             ),
-//           ),
-//           const CommentTextFieldPlaceholder(isReply: true),
-//         ],
-//       ),
-//     );
-//   },
-// ),

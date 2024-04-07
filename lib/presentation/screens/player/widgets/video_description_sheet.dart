@@ -27,9 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
-import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
-import 'package:youtube_clone/presentation/widgets/page_draggable_sheet.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../../constants.dart';
 
@@ -72,6 +70,10 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
       onClose: widget.closeDescription,
       showDragIndicator: widget.showDragIndicator,
       draggableController: widget.draggableController,
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      ),
       contentBuilder: (context, controller, physics) {
         return ListView(
           physics: physics,

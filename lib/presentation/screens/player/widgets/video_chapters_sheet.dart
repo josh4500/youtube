@@ -5,16 +5,15 @@ import 'package:youtube_clone/presentation/widgets/page_draggable_sheet.dart';
 import '../../../constants.dart';
 
 class VideoChaptersSheet extends StatefulWidget {
-  final ScrollController controller;
-  final VoidCallback closeChapter;
-  final DraggableScrollableController draggableController;
-
   const VideoChaptersSheet({
     super.key,
     required this.controller,
     required this.closeChapter,
     required this.draggableController,
   });
+  final ScrollController controller;
+  final VoidCallback closeChapter;
+  final DraggableScrollableController draggableController;
 
   @override
   State<VideoChaptersSheet> createState() => _VideoChaptersSheetState();
@@ -30,6 +29,10 @@ class _VideoChaptersSheetState extends State<VideoChaptersSheet> {
       onClose: widget.closeChapter,
       showDragIndicator: true,
       draggableController: widget.draggableController,
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      ),
       contentBuilder: (context, controller, physics) {
         return ListView.builder(
           physics: physics,
@@ -51,17 +54,18 @@ class _VideoChaptersSheetState extends State<VideoChaptersSheet> {
 }
 
 class ChapterTile extends StatelessWidget {
-  final bool selected;
-
   const ChapterTile({super.key, this.selected = false});
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
       color: selected ? Colors.white10 : Colors.transparent,
       child: TappableArea(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
-        borderRadius: BorderRadius.zero,
+        padding: const EdgeInsets.symmetric(
+          vertical: 8.0,
+          horizontal: 12,
+        ),
         child: Row(
           children: [
             Container(

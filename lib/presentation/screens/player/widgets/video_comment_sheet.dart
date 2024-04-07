@@ -28,7 +28,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/page_draggable_sheet.dart';
 
 import '../../../constants.dart';
 import 'video_comment_guidelines.dart';
@@ -74,6 +73,10 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
       onClose: widget.closeComment,
       showDragIndicator: widget.showDragIndicator,
       draggableController: widget.draggableController,
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      ),
       dynamicTab: const DynamicTab(
         initialIndex: 0,
         options: ['Top', 'Timed', 'Newest'],

@@ -26,13 +26,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-
-import 'network_image/custom_network_image.dart';
 
 const List<Color> _avatarColor = <Color>[
   Color(0xFF512DA7),

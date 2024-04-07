@@ -29,17 +29,11 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hive/hive.dart';
-import 'package:image/image.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/video_comment_sheet.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/video_description_sheet.dart';
 import 'package:youtube_clone/presentation/widgets/custom_scroll_physics.dart';
 
 import '../../constants.dart';
