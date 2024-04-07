@@ -127,6 +127,7 @@ class _DynamicTabState extends State<DynamicTab> {
                   horizontal: 12,
                 ),
                 decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
                   color: widget.useTappable
                       ? null
                       : index == selectedIndex
