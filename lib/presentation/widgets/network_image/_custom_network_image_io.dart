@@ -3,10 +3,12 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '_retry.dart';
 import 'custom_network_image.dart' as image_provider;
 import 'image_replacement.dart';
 
@@ -23,6 +25,7 @@ class CustomNetworkImage
     this.scale = 1.0,
     this.headers,
     this.replacement,
+    this.retry,
   });
 
   @override
@@ -38,10 +41,7 @@ class CustomNetworkImage
   final ImageReplacement? replacement;
 
   @override
-  set replacement(ImageReplacement? replacement) {
-    this.replacement = replacement;
-    // TODO(josh4500): Might rebuild image
-  }
+  final Retry? retry;
 
   @override
   Future<CustomNetworkImage> obtainKey(ImageConfiguration configuration) {
@@ -85,8 +85,26 @@ class CustomNetworkImage
     final StreamController<ImageChunkEvent> chunkEvents =
         StreamController<ImageChunkEvent>();
 
+    Future<Codec> fetchCodec() {
+      if (retry != null) {
+        return retry!.retry(
+          () => _loadAsync(
+            key as CustomNetworkImage,
+            chunkEvents,
+            decode: decode,
+          ),
+        );
+      } else {
+        return _loadAsync(
+          key as CustomNetworkImage,
+          chunkEvents,
+          decode: decode,
+        );
+      }
+    }
+
     return MultiFrameImageStreamCompleter(
-      codec: _loadAsync(key as CustomNetworkImage, chunkEvents, decode: decode),
+      codec: fetchCodec(),
       chunkEvents: chunkEvents.stream,
       scale: key.scale,
       debugLabel: key.url,

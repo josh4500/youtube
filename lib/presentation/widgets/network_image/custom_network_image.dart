@@ -1,6 +1,7 @@
 import 'package:flutter/rendering.dart';
 import 'package:youtube_clone/presentation/widgets/network_image/image_replacement.dart';
 import '_custom_network_image_io.dart' as custom_network_image;
+import '_retry.dart';
 
 abstract class CustomNetworkImage extends ImageProvider<CustomNetworkImage> {
   /// Creates an object that fetches the image at the given URL.
@@ -12,6 +13,7 @@ abstract class CustomNetworkImage extends ImageProvider<CustomNetworkImage> {
     double scale,
     ImageReplacement? replacement,
     Map<String, String>? headers,
+    Retry? retry,
   }) = custom_network_image.CustomNetworkImage;
 
   /// The URL from which the image will be fetched.
@@ -20,8 +22,10 @@ abstract class CustomNetworkImage extends ImageProvider<CustomNetworkImage> {
   /// The scale to place in the [ImageInfo] object of the image.
   double get scale;
 
-  ///
-  ImageReplacement? replacement;
+  /// Uses image replacement when network failed
+  ImageReplacement? get replacement;
+
+  Retry? get retry;
 
   /// The HTTP headers that will be used with [HttpClient.get] to fetch image from network.
   ///
