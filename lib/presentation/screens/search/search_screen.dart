@@ -50,7 +50,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     super.didChangeDependencies();
 
     if (_showSearchResultNotifier.value == false) {
-      ref.read(homeRepositoryProvider).lockNavBarPosition();
+      Future(() {
+        ref.read(homeRepositoryProvider).lockNavBarPosition();
+      });
     }
   }
 
@@ -183,22 +185,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           bool hasText,
                           Widget? _,
                         ) {
-                          if (!hasText) {
-                            return const SizedBox();
-                          }
-                          return Align(
-                            alignment: Alignment.centerRight,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 4.0,
-                              ),
-                              child: TappableArea(
-                                onPressed: _clearSearchField,
-                                padding: const EdgeInsets.all(16),
-                                borderRadius: BorderRadius.circular(24),
-                                child: const Icon(
-                                  YTIcons.close_outlined,
-                                  size: 16,
+                          return Visibility(
+                            visible: hasText,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4.0,
+                                ),
+                                child: TappableArea(
+                                  onPressed: _clearSearchField,
+                                  padding: const EdgeInsets.all(16),
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: const Icon(
+                                    YTIcons.close_outlined,
+                                    size: 16,
+                                  ),
                                 ),
                               ),
                             ),
@@ -243,7 +245,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 }
 
-class SearchActions extends StatelessWidget {
+class SearchActions extends StatefulWidget {
   const SearchActions({
     super.key,
     required this.focusNode,
@@ -256,19 +258,34 @@ class SearchActions extends StatelessWidget {
   final ValueNotifier<bool> hasTextNotifier;
 
   @override
+  State<SearchActions> createState() => _SearchActionsState();
+}
+
+class _SearchActionsState extends State<SearchActions> {
+  void _onVoiceSearch() async {
+    await Permission.microphone
+        .onDeniedCallback(() => context.goto(AppRoutes.searchVoiceRequest))
+        .onPermanentlyDeniedCallback(
+          () => context.goto(AppRoutes.searchVoiceRequest),
+        )
+        .onGrantedCallback(() {})
+        .request();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: Listenable.merge([
-        focusNode,
-        showSearchResultNotifier,
+        widget.focusNode,
+        widget.showSearchResultNotifier,
       ]),
       builder: (BuildContext context, Widget? childWidget) {
-        final hasFocus = focusNode.hasFocus;
-        final showSearchResult = showSearchResultNotifier.value;
+        final hasFocus = widget.focusNode.hasFocus;
+        final showSearchResult = widget.showSearchResultNotifier.value;
         return Row(
           children: [
             ValueListenableBuilder<bool>(
-              valueListenable: hasTextNotifier,
+              valueListenable: widget.hasTextNotifier,
               builder: (
                 BuildContext context,
                 bool hasText,
@@ -280,14 +297,7 @@ class SearchActions extends StatelessWidget {
                 return TappableArea(
                   padding: const EdgeInsets.all(8),
                   borderRadius: BorderRadius.circular(24),
-                  onPressed: () async {
-                    await Permission.microphone.onDeniedCallback(() {
-                      context.goto(AppRoutes.searchVoiceRequest);
-                    }).onGrantedCallback(() {
-                      // Your code
-                      print('Granted');
-                    }).request();
-                  },
+                  onPressed: _onVoiceSearch,
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white10,
