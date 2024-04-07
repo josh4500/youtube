@@ -58,7 +58,7 @@ const List<Color> _avatarColor = <Color>[
 ];
 
 // TODO(Josh): Use clipper to create if channel is live
-class AccountAvatar extends StatefulWidget {
+class AccountAvatar extends StatelessWidget {
   const AccountAvatar({
     super.key,
     this.size = 50,
@@ -73,48 +73,6 @@ class AccountAvatar extends StatefulWidget {
   final String? imageUrl;
   final VoidCallback? onTap;
 
-  @override
-  State<AccountAvatar> createState() => _AccountAvatarState();
-}
-
-class _AccountAvatarState extends State<AccountAvatar> {
-  late CustomNetworkImage _imageProvider;
-
-  @override
-  void initState() {
-    super.initState();
-    _imageProvider = CustomNetworkImage(
-      widget.imageUrl!,
-      replacement: ImageReplacement(
-        text: widget.name,
-        color: _computeColorFromText(widget.name),
-        size: const Size.square(200),
-        textStyle: const TextStyle(
-          fontSize: 72,
-          color: Colors.white,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  @override
-  void didUpdateWidget(covariant AccountAvatar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.name != oldWidget.name) {
-      _imageProvider.replacement = ImageReplacement(
-        text: widget.name,
-        color: _computeColorFromText(widget.name),
-        size: const Size.square(200),
-        textStyle: const TextStyle(
-          fontSize: 72,
-          color: Colors.white,
-          fontWeight: FontWeight.w500,
-        ),
-      );
-    }
-  }
-
   Color _computeColorFromText(String text) {
     final hash = text.hashCode;
     final int colorIndex = hash % _avatarColor.length;
@@ -125,22 +83,34 @@ class _AccountAvatarState extends State<AccountAvatar> {
   Widget build(BuildContext context) {
     final bool hasLive = Random().nextBool();
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
         children: <Widget>[
           Container(
-            width: widget.size,
-            height: widget.size,
+            width: size,
+            height: size,
             padding: hasLive ? const EdgeInsets.all(1) : null,
             decoration: BoxDecoration(
               color: Colors.white12,
               image: DecorationImage(
-                image: _imageProvider,
+                image: CustomNetworkImage(
+                  imageUrl!,
+                  replacement: ImageReplacement(
+                    text: name,
+                    color: _computeColorFromText(name),
+                    size: const Size.square(200),
+                    textStyle: const TextStyle(
+                      fontSize: 72,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
                 fit: BoxFit.cover,
               ),
-              border: widget.border,
+              border: border,
               shape: BoxShape.circle,
             ),
           ),
