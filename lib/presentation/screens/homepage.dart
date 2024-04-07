@@ -29,7 +29,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 
 import '../providers.dart';
 import '../screens.dart' show PlayerScreen;
@@ -109,8 +108,9 @@ class _HomePageState extends ConsumerState<HomePage>
     final scaffoldKey = ref.read(homeRepositoryProvider).scaffoldKey;
     return Scaffold(
       key: scaffoldKey,
-      resizeToAvoidBottomInset: false,
-      drawer: HomeDrawer(homeContext: context),
+      drawerEnableOpenDragGesture: false,
+      // resizeToAvoidBottomInset: false,
+      drawer: const HomeDrawer(),
       body: SafeArea(
         bottom: false,
         child: Stack(
@@ -144,25 +144,14 @@ class _HomePageState extends ConsumerState<HomePage>
           ],
         ),
       ),
-      bottomNavigationBar: Consumer(
-        builder: (BuildContext context, WidgetRef ref, Widget? childWidget) {
-          final bool isPlayerActive = ref.watch(playerOverlayStateProvider);
-          return Padding(
-            padding: isPlayerActive
-                ? MediaQuery.viewInsetsOf(context)
-                : EdgeInsets.zero,
-            child: childWidget,
+      bottomNavigationBar: HomeNavigatorBar(
+        selectedIndex: widget.child.currentIndex,
+        onChangeIndex: (int index) {
+          widget.child.goBranch(
+            index,
+            initialLocation: index == widget.child.currentIndex,
           );
         },
-        child: HomeNavigatorBar(
-          selectedIndex: widget.child.currentIndex,
-          onChangeIndex: (int index) {
-            widget.child.goBranch(
-              index,
-              initialLocation: index == widget.child.currentIndex,
-            );
-          },
-        ),
       ),
     );
   }

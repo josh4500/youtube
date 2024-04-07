@@ -11,10 +11,7 @@ import '../../constants.dart';
 class HomeDrawer extends StatelessWidget {
   const HomeDrawer({
     super.key,
-    required this.homeContext,
   });
-
-  final BuildContext homeContext;
 
   @override
   Widget build(BuildContext context) {
@@ -35,43 +32,42 @@ class HomeDrawer extends StatelessWidget {
                         HomeDrawerItem(
                           title: 'Trending',
                           icon: const Icon(YTIcons.trending_outlined),
-                          onTap: () => homeContext.goto(AppRoutes.trending),
+                          onTap: () => context.goto(AppRoutes.trending),
                         ),
                         HomeDrawerItem(
                           title: 'Music',
                           icon: const Icon(YTIcons.music_outlined),
-                          onTap: () => homeContext.goto(AppRoutes.music),
+                          onTap: () => context.goto(AppRoutes.music),
                         ),
                         HomeDrawerItem(
                           title: 'Live',
                           icon: const Icon(YTIcons.live_outlined),
-                          onTap: () => homeContext.goto(AppRoutes.live),
+                          onTap: () => context.goto(AppRoutes.live),
                         ),
                         HomeDrawerItem(
                           title: 'Gaming',
                           icon: const Icon(YTIcons.games_outlined),
-                          onTap: () => homeContext.goto(AppRoutes.gaming),
+                          onTap: () => context.goto(AppRoutes.gaming),
                         ),
                         HomeDrawerItem(
                           title: 'News',
                           icon: const Icon(YTIcons.news_outlined),
-                          onTap: () => homeContext.goto(AppRoutes.news),
+                          onTap: () => context.goto(AppRoutes.news),
                         ),
                         HomeDrawerItem(
                           title: 'Sports',
                           icon: const Icon(YTIcons.sports_outlined),
-                          onTap: () => homeContext.goto(AppRoutes.sports),
+                          onTap: () => context.goto(AppRoutes.sports),
                         ),
                         HomeDrawerItem(
                           title: 'Learning',
                           icon: const Icon(YTIcons.learning_outlined),
-                          onTap: () => homeContext.goto(AppRoutes.learning),
+                          onTap: () => context.goto(AppRoutes.learning),
                         ),
                         HomeDrawerItem(
                           title: 'Fashion And Beauty',
                           icon: const Icon(YTIcons.fashion_outlined),
-                          onTap: () =>
-                              homeContext.goto(AppRoutes.fashionAndBeauty),
+                          onTap: () => context.goto(AppRoutes.fashionAndBeauty),
                         ),
                         const Divider(height: 12, thickness: 2),
                         HomeDrawerItem(

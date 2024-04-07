@@ -61,21 +61,21 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
       },
     );
 
-    return Material(
-      child: Container(
-        constraints: BoxConstraints(
-          maxHeight: widget.height,
-          maxWidth: 400,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            const Divider(height: 0.5),
-            SizeTransition(
-              axisAlignment: -1,
-              sizeFactor: _animation,
-              child: Row(
+    return SizeTransition(
+      axisAlignment: -1,
+      sizeFactor: _animation,
+      child: Material(
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: widget.height,
+            maxWidth: 400,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              const Divider(height: 0.5),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   IconButton(
@@ -179,25 +179,25 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
                   ),
                 ],
               ),
-            ),
-            AuthStateBuilder(
-              builder: (BuildContext context, AuthState state) {
-                if (state.isInIncognito) {
-                  return Container(
-                    alignment: Alignment.center,
-                    color: Colors.grey,
-                    child: const Text(
-                      'You\'re incognito',
-                      style: TextStyle(
-                        fontSize: 12,
+              AuthStateBuilder(
+                builder: (BuildContext context, AuthState state) {
+                  if (state.isInIncognito) {
+                    return Container(
+                      alignment: Alignment.center,
+                      color: Colors.grey,
+                      child: const Text(
+                        'You\'re incognito',
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
                       ),
-                    ),
-                  );
-                }
-                return const ConnectionSnackbar(autoHide: true);
-              },
-            ),
-          ],
+                    );
+                  }
+                  return const ConnectionSnackbar(autoHide: true);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
