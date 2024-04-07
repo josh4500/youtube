@@ -89,6 +89,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   late final AnimationController _draggableOpacityController;
   late final Animation<double> _draggableOpacityAnimation;
 
+  late final AnimationController _additionalHeightController;
   late final ValueNotifier<double> _additionalHeightNotifier;
 
   late final ValueNotifier<double> _marginNotifier;
@@ -160,12 +161,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _widthController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 125),
     );
     _heightController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 125),
     );
+
+    _additionalHeightController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 125),
+    );
+
     _playerDismissController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 125),
@@ -615,7 +622,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         }
 
         // Set additional height to its maximum value
-        _additionalHeightNotifier.value = maxAdditionalHeight;
+        _animateAdditionalHeight(maxAdditionalHeight);
       }
     }
   }
@@ -777,17 +784,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         ref
             .read(playerRepositoryProvider)
             .sendPlayerSignal(<PlayerSignal>[PlayerSignal.enterExpanded]);
-        _additionalHeightNotifier.value =
-            screenHeight - (screenHeight * heightRatio);
+        _animateAdditionalHeight(screenHeight - (screenHeight * heightRatio));
       } else {
         ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.exitExpanded,
           PlayerSignal.showPlaybackProgress,
         ]);
         if (expandedMode) {
-          _additionalHeightNotifier.value = maxAdditionalHeight;
+          _animateAdditionalHeight(maxAdditionalHeight);
         } else {
-          _additionalHeightNotifier.value = 0;
+          _animateAdditionalHeight(0);
         }
       }
 
@@ -799,9 +805,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         ]);
 
         if (expandedMode) {
-          _additionalHeightNotifier.value = maxAdditionalHeight;
+          _animateAdditionalHeight(maxAdditionalHeight);
         } else {
-          _additionalHeightNotifier.value = 0;
+          _animateAdditionalHeight(0);
         }
       }
 
@@ -911,42 +917,51 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
   }
 
-  Future<void> _animateHeight(double value) async {
-    final Animation<double> tween = Tween<double>(
-      begin: _heightNotifier.value,
-      end: value,
-    ).animate(
-      CurvedAnimation(parent: _heightController, curve: Curves.easeInCubic),
+  Future<void> _animateHeight(double to) async {
+    await _tweenAnimateNotifier(
+      notifier: _heightNotifier,
+      controller: _heightController,
+      value: to,
     );
-
-    tween.addListener(() {
-      _heightNotifier.value = tween.value;
-    });
-
-    // Reset the animation controller to its initial state
-    _heightController.reset();
-
-    // Start the animation by moving it forward
-    await _heightController.forward();
   }
 
-  Future<void> _animateWidth(double value) async {
+  Future<void> _animateWidth(double to) async {
+    await _tweenAnimateNotifier(
+      notifier: _widthNotifier,
+      controller: _widthController,
+      value: to,
+    );
+  }
+
+  Future<void> _animateAdditionalHeight(double to) async {
+    await _tweenAnimateNotifier(
+      notifier: _additionalHeightNotifier,
+      controller: _additionalHeightController,
+      value: to,
+    );
+  }
+
+  Future<void> _tweenAnimateNotifier({
+    required ValueNotifier<double> notifier,
+    required AnimationController controller,
+    required double value,
+  }) async {
     final Animation<double> tween = Tween<double>(
-      begin: _widthNotifier.value,
+      begin: notifier.value,
       end: value,
     ).animate(
-      CurvedAnimation(parent: _widthController, curve: Curves.easeInCubic),
+      CurvedAnimation(
+        parent: controller,
+        curve: Curves.easeInCubic,
+      ),
     );
-
-    tween.addListener(() {
-      _widthNotifier.value = tween.value;
-    });
+    tween.addListener(() => notifier.value = tween.value);
 
     // Reset the animation controller to its initial state
-    _widthController.reset();
+    controller.reset();
 
     // Start the animation by moving it forward
-    await _widthController.forward();
+    await controller.forward();
   }
 
   void _onDragInfoUp(PointerUpEvent event) {
@@ -961,13 +976,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         if (expandedMode) {
           // TODO(Josh): Handle expanded mode
         } else {
-          _additionalHeightNotifier.value = 0;
-
           ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
             PlayerSignal.exitExpanded,
             PlayerSignal.showPlaybackProgress,
           ]);
           _infoScrollPhysics.canScroll(true);
+
+          _animateAdditionalHeight(0);
         }
       }
     } else if (_allowInfoDrag && additionalHeight == 0) {
@@ -994,7 +1009,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       await Future<void>.delayed(const Duration(milliseconds: 150));
     }
     if (videoViewHeight != heightRatio && additionalHeight > 0) {
-      _additionalHeightNotifier.value = 0;
+      _animateAdditionalHeight(0);
     }
 
     _commentDraggableController.animateTo(
@@ -1028,7 +1043,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       await Future<void>.delayed(const Duration(milliseconds: 150));
     }
     if (videoViewHeight != heightRatio && additionalHeight > 0) {
-      _additionalHeightNotifier.value = 0;
+      _animateAdditionalHeight(0);
     }
     _descDraggableController.animateTo(
       1 - heightRatio,
@@ -1063,7 +1078,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     // TODO(Josh): Check for expanded mode
     // Changes the additional heights to zero on Expanded mode
     if (videoViewHeight != heightRatio && additionalHeight > 0) {
-      _additionalHeightNotifier.value = 0;
+      _animateAdditionalHeight(0);
     }
 
     _chaptersDraggableController.animateTo(
@@ -1132,15 +1147,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           _animateWidth(minVideoViewPortWidth);
         } else if (notification is ExpandPlayerNotification) {
           _hideControls();
-          _additionalHeightNotifier.value = screenHeight * (1 - heightRatio);
+          _animateAdditionalHeight(screenHeight * (1 - heightRatio));
           ref
               .read(playerRepositoryProvider)
               .sendPlayerSignal(<PlayerSignal>[PlayerSignal.enterExpanded]);
         } else if (notification is DeExpandPlayerNotification) {
           if (expandedMode) {
-            _additionalHeightNotifier.value = maxAdditionalHeight;
+            _animateAdditionalHeight(maxAdditionalHeight);
           } else {
-            _additionalHeightNotifier.value = 0;
+            _animateAdditionalHeight(0);
           }
           _hideControls();
           ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
