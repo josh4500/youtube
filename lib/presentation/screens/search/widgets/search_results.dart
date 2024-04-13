@@ -1,10 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/screens/search/widgets/search_result_in_chapter.dart';
-import 'package:youtube_clone/presentation/screens/search/widgets/search_result_in_concepts.dart';
-import 'package:youtube_clone/presentation/screens/search/widgets/search_result_in_playlist.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
+
+import 'search_result_in_chapter.dart';
+import 'search_result_in_concepts.dart';
+import 'search_result_in_desc.dart';
+import 'search_result_in_playlist.dart';
 
 class SearchResults extends StatelessWidget {
   const SearchResults({super.key});
@@ -57,7 +59,9 @@ class SearchResults extends StatelessWidget {
                         ? random.nextBool()
                             ? const SearchResultInPlaylist()
                             : const SearchResultInConcepts()
-                        : const SearchResultInChapters(),
+                        : random.nextBool()
+                            ? const SearchResultInDesc()
+                            : const SearchResultInChapters(),
                 ],
               );
             },

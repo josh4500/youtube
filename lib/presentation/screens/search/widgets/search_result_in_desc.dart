@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'search_result_compound.dart';
 
@@ -8,99 +7,39 @@ class SearchResultInDesc extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SearchResultCompound(
+    return const SearchResultCompound(
       firstTitle: Row(
-        children: [
-          Container(
-            height: 18,
-            width: 32,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(2),
-              image: const DecorationImage(
-                image: CustomNetworkImage('https://picsum.photos/200/200'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            height: 18,
-            width: 32,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(2),
-              image: const DecorationImage(
-                image: CustomNetworkImage('https://picsum.photos/200/200'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            height: 18,
-            width: 32,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(2),
-              image: const DecorationImage(
-                image: CustomNetworkImage('https://picsum.photos/200/200'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            height: 18,
-            width: 32,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(2),
-              image: const DecorationImage(
-                image: CustomNetworkImage('https://picsum.photos/200/200'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            height: 18,
-            width: 32,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(2),
-              image: const DecorationImage(
-                image: CustomNetworkImage('https://picsum.photos/200/200'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ],
-      ),
-      secondTitle: const Row(
         children: [
           Flexible(
             child: Text(
-              '8 chapters in this video',
+              '...somethings you can find in the description',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
             ),
           ),
           SizedBox(width: 12),
         ],
       ),
-      trailing: const Text(
-        '8 chapters',
+      secondTitle: Row(
+        children: [
+          Flexible(
+            child: Text(
+              'From the video description',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
+          SizedBox(width: 12),
+        ],
+      ),
+      trailing: Text(
+        'Description',
         style: TextStyle(fontWeight: FontWeight.w700),
       ),
-      itemBuilder: (BuildContext context, int index) {
-        return CustomInkWell(
-          onTap: () {},
-          child: const PlayableTimedVideoContent(
-            width: 150,
-            margin: EdgeInsets.all(4),
-          ),
-        );
-      },
-      itemCount: 20,
+      child: Text(
+        'Best thing will be in the title description, somethings you can find in the description',
+      ),
     );
   }
 }

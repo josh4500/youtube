@@ -8,15 +8,17 @@ class SearchResultCompound extends StatefulWidget {
     required this.firstTitle,
     required this.secondTitle,
     required this.trailing,
-    required this.itemBuilder,
-    required this.itemCount,
+    this.itemBuilder,
+    this.itemCount,
+    this.child,
   });
 
   final Widget firstTitle;
   final Widget secondTitle;
   final Widget trailing;
-  final Widget Function(BuildContext context, int index) itemBuilder;
-  final int itemCount;
+  final Widget Function(BuildContext context, int index)? itemBuilder;
+  final int? itemCount;
+  final Widget? child;
 
   @override
   State<SearchResultCompound> createState() => _SearchResultCompoundState();
@@ -67,7 +69,7 @@ class _SearchResultCompoundState extends State<SearchResultCompound>
                 },
                 child: Row(
                   children: [
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 4),
                     Expanded(
                       child: ValueListenableBuilder<bool>(
                         valueListenable: _showContent,
@@ -108,28 +110,35 @@ class _SearchResultCompoundState extends State<SearchResultCompound>
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
               FadeTransition(
                 opacity: _animationController,
                 child: SizeTransition(
                   sizeFactor: _animationController,
-                  child: SizedBox(
-                    height: 180,
-                    child: ScrollConfiguration(
-                      behavior: const OverScrollGlowBehavior(
-                        color: Colors.black12,
-                      ),
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                  child: widget.itemBuilder == null
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          child: widget.child,
+                        )
+                      : SizedBox(
+                          height: 180,
+                          child: ScrollConfiguration(
+                            behavior: const OverScrollGlowBehavior(
+                              color: Colors.black12,
+                            ),
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              itemCount: widget.itemCount,
+                              itemBuilder: widget.itemBuilder!,
+                            ),
+                          ),
                         ),
-                        itemBuilder: widget.itemBuilder,
-                        itemCount: widget.itemCount,
-                      ),
-                    ),
-                  ),
                 ),
               ),
             ],
