@@ -65,7 +65,7 @@ class VideoActions extends StatelessWidget {
                     padding: EdgeInsets.symmetric(vertical: 6.0),
                     child: RotatedBox(
                       quarterTurns: 1,
-                      child: Divider(height: 0, thickness: 1.5),
+                      child: Divider(height: 0, thickness: 1),
                     ),
                   ),
                   CustomActionButton(

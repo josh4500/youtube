@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class VideoDescriptionSection extends StatelessWidget {
@@ -46,7 +47,6 @@ class VideoDescriptionSection extends StatelessWidget {
               vertical: 8,
               horizontal: 12,
             ),
-            borderRadius: BorderRadius.zero,
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -73,7 +73,7 @@ class VideoDescriptionSection extends StatelessWidget {
                       children: [
                         SizedBox(width: 4),
                         Icon(
-                          Icons.shopping_bag_outlined,
+                          YTIcons.shopping_bag_outlined,
                           color: Color(0xFFAAAAAA),
                           size: 14,
                         ),

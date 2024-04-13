@@ -1299,7 +1299,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                         ),
                       ),
                       Spacer(),
-                      Divider(height: 0, thickness: 1.5),
+                      Divider(height: 0, thickness: 1),
                     ],
                   ),
                 ),

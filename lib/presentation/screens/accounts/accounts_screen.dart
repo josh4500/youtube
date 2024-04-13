@@ -201,7 +201,7 @@ class AccountsScreen extends StatelessWidget {
                       networkRequired: true,
                       onTap: () => context.goto(AppRoutes.yourClips),
                     ),
-                    const Divider(thickness: 1.5),
+                    const Divider(thickness: 1),
                     AccountOptionTile(
                       title: 'Your movies',
                       icon: YTIcons.movies_outlined,
@@ -214,7 +214,7 @@ class AccountsScreen extends StatelessWidget {
                       networkRequired: true,
                       onTap: () {},
                     ),
-                    const Divider(thickness: 1.5),
+                    const Divider(thickness: 1),
                     AccountOptionTile(
                       title: 'Time watched',
                       icon: YTIcons.analytics_outlined,
@@ -226,7 +226,7 @@ class AccountsScreen extends StatelessWidget {
                       icon: YTIcons.help_outlined,
                       onTap: () {},
                     ),
-                    const Divider(height: 0, thickness: 1.5),
+                    const Divider(height: 0, thickness: 1),
                   ],
                 ),
               ),

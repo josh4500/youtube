@@ -36,10 +36,7 @@ class CommentTextFieldPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        const Divider(
-          thickness: 1.5,
-          height: 0,
-        ),
+        const Divider(thickness: 1, height: 0),
         Padding(
           padding: const EdgeInsets.symmetric(
             vertical: 4,

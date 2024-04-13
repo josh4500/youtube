@@ -88,7 +88,7 @@ class ShortsInfoSection extends StatelessWidget {
                           borderRadius: BorderRadius.circular(32),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                              vertical: 8,
+                              vertical: 6,
                               horizontal: 12,
                             ),
                             decoration: BoxDecoration(

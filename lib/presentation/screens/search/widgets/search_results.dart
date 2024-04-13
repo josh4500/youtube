@@ -38,7 +38,7 @@ class SearchResults extends StatelessWidget {
                     ),
                   ),
                   Spacer(),
-                  Divider(height: 0, thickness: 1.5),
+                  Divider(height: 0, thickness: 1),
                 ],
               ),
             ),

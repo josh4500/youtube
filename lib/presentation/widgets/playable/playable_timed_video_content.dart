@@ -76,7 +76,7 @@ class PlayableTimedVideoContent extends StatelessWidget {
               ),
               const Expanded(
                 child: Divider(
-                  thickness: 2,
+                  thickness: 1,
                   height: 0,
                   color: Colors.white12,
                 ),

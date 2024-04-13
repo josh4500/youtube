@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class OptionButton extends StatefulWidget {
   const OptionButton({
@@ -125,7 +126,7 @@ class _OptionButtonState extends State<OptionButton>
               child: const RotatedBox(
                 quarterTurns: 1,
                 child: Icon(
-                  Icons.chevron_right,
+                  YTIcons.chevron_right,
                   size: 16,
                 ),
               ),

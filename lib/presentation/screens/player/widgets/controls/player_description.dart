@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../providers/player_signal_provider.dart';
 import '../../providers/player_viewstate_provider.dart';
@@ -85,7 +86,7 @@ class PlayerDescription extends ConsumerWidget {
                   ),
                 ),
                 SizedBox(width: 16),
-                Icon(Icons.chevron_right),
+                Icon(YTIcons.chevron_right),
               ],
             ),
             SizedBox(height: 4),

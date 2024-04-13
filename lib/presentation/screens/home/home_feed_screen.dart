@@ -78,66 +78,75 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
   Widget build(BuildContext context) {
     const historyOff = 0 == 8;
     return Scaffold(
-      floatingActionButton: Consumer(
-        builder: (
-          BuildContext context,
-          WidgetRef ref,
-          Widget? childWidget,
-        ) {
-          if (historyOff) return const SizedBox();
+      floatingActionButton: AuthStateBuilder(
+        builder: (BuildContext context, state) {
+          return Visibility(
+            visible: state.isAuthenticated,
+            child: Consumer(
+              builder: (
+                BuildContext context,
+                WidgetRef ref,
+                Widget? childWidget,
+              ) {
+                final bool isPlayerActive =
+                    ref.watch(playerOverlayStateProvider);
 
-          final bool isPlayerActive = ref.watch(playerOverlayStateProvider);
-          return Transform.translate(
-            offset: isPlayerActive
-                ? const Offset(0, -kMiniPlayerHeight)
-                : Offset.zero,
-            child: RawMaterialButton(
-              elevation: 0,
-              fillColor: Colors.white,
-              padding: const EdgeInsets.all(12.0),
-              constraints: const BoxConstraints(
-                minWidth: 44.0,
-                minHeight: 36.0,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              onPressed: () {},
-              child: AnimatedSize(
-                duration: const Duration(milliseconds: 150),
-                curve: Curves.easeInOutCubic,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const Icon(
-                      Icons.play_arrow,
-                      color: Colors.black,
-                      size: 28,
-                    ),
-                    ValueListenableBuilder<bool>(
-                      valueListenable: _playSNotifier,
-                      builder: (BuildContext context, bool value, _) {
-                        if (!value) {
-                          return const SizedBox();
-                        }
-                        return const Row(
+                return Visibility(
+                  child: Transform.translate(
+                    offset: isPlayerActive
+                        ? const Offset(0, -kMiniPlayerHeight)
+                        : Offset.zero,
+                    child: RawMaterialButton(
+                      elevation: 0,
+                      fillColor: Colors.white,
+                      padding: const EdgeInsets.all(12.0),
+                      constraints: const BoxConstraints(
+                        minWidth: 44.0,
+                        minHeight: 36.0,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      onPressed: () {},
+                      child: AnimatedSize(
+                        duration: const Duration(milliseconds: 150),
+                        curve: Curves.easeInOutCubic,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            SizedBox(width: 8),
-                            Text(
-                              'Play something',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            const Icon(YTIcons.play_arrow, color: Colors.black),
+                            ValueListenableBuilder<bool>(
+                              valueListenable: _playSNotifier,
+                              builder: (
+                                BuildContext context,
+                                bool show,
+                                Widget? _,
+                              ) {
+                                return Visibility(
+                                  visible: show,
+                                  child: const Row(
+                                    children: <Widget>[
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Play something',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ],
-                        );
-                      },
+                        ),
+                      ),
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
           );
         },
@@ -285,8 +294,9 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                                   title: 'Share',
                                 ),
                                 const DynamicSheetItem(
-                                  leading:
-                                      Icon(YTIcons.not_interested_outlined),
+                                  leading: Icon(
+                                    YTIcons.not_interested_outlined,
+                                  ),
                                   title: 'Not interested',
                                 ),
                                 const DynamicSheetItem(

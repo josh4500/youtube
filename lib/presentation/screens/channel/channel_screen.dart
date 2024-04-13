@@ -27,25 +27,15 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router.dart';
-import 'package:youtube_clone/presentation/screens/channel/widgets/channel_section.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/view_models/content/shorts_view_model.dart';
 import 'package:youtube_clone/presentation/view_models/content/video_view_model.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/dynamic_tab.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
-import 'package:youtube_clone/presentation/widgets/playable/playable_content.dart';
-import 'package:youtube_clone/presentation/widgets/playable/playable_video_content.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
-import 'package:youtube_clone/presentation/widgets/viewable/viewable_post_content.dart';
-import 'package:youtube_clone/presentation/widgets/viewable/viewable_shorts_content.dart';
-import 'package:youtube_clone/presentation/widgets/viewable/viewable_video_content.dart';
 
-import '../../providers.dart';
-import '../../widgets/appbar_action.dart';
+import 'widgets/channel_section.dart';
 import 'widgets/for_you_content.dart';
 
 class ChannelScreen extends StatefulWidget {
@@ -76,6 +66,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Marques Brownlee'),
+          leading: CustomBackButton(onPressed: context.pop),
           actions: <Widget>[
             AppbarAction(
               icon: YTIcons.cast_outlined,
@@ -212,7 +203,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
         child: Column(
           children: <Widget>[
             ViewableVideoContent(),
-            Divider(thickness: 1.5),
+            Divider(thickness: 1),
           ],
         ),
       ),

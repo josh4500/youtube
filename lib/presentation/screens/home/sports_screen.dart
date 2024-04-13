@@ -91,7 +91,7 @@ class SportsScreen extends StatelessWidget {
             ),
             const SliverToBoxAdapter(child: ViewableVideoContent()),
             const SliverToBoxAdapter(child: ViewableVideoContent()),
-            const SliverToBoxAdapter(child: Divider(height: 0, thickness: 1.5)),
+            const SliverToBoxAdapter(child: Divider(height: 0, thickness: 1)),
             SliverToBoxAdapter(
               child: GroupedViewBuilder(
                 title: 'Highlights',
@@ -110,7 +110,7 @@ class SportsScreen extends StatelessWidget {
             ),
             const SliverToBoxAdapter(child: ViewableVideoContent()),
             const SliverToBoxAdapter(child: ViewableVideoContent()),
-            const SliverToBoxAdapter(child: Divider(height: 0, thickness: 1.5)),
+            const SliverToBoxAdapter(child: Divider(height: 0, thickness: 1)),
             SliverToBoxAdapter(
               child: GroupedViewBuilder(
                 title: 'Top Stories',

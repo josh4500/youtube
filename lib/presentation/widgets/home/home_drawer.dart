@@ -70,7 +70,7 @@ class HomeDrawer extends StatelessWidget {
                           icon: const Icon(YTIcons.fashion_outlined),
                           onTap: () => context.goto(AppRoutes.fashionAndBeauty),
                         ),
-                        const Divider(height: 12, thickness: 2),
+                        const Divider(height: 12, thickness: 1),
                         HomeDrawerItem(
                           title: 'Youtube Premium',
                           icon: Image.asset(
@@ -99,7 +99,7 @@ class HomeDrawer extends StatelessWidget {
                             filterQuality: FilterQuality.high,
                           ),
                         ),
-                        const Divider(height: 12, thickness: 2),
+                        const Divider(height: 12, thickness: 1),
                         const HomeDrawerItem(
                           title: 'How YouTube works',
                           icon: Icon(YTIcons.help_outlined),

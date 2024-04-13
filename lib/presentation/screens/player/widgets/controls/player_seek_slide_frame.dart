@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class PlayerSeekSlideFrame extends StatefulWidget {
@@ -81,7 +82,7 @@ class _PlayerSeekSlideFrameState extends State<PlayerSeekSlideFrame> {
                   },
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: Icon(Icons.close),
+                    child: Icon(YTIcons.close_outlined),
                   ),
                 ),
               ),
@@ -113,7 +114,7 @@ class _PlayerSeekSlideFrameState extends State<PlayerSeekSlideFrame> {
                                       shape: BoxShape.circle,
                                     ),
                                     child: const Icon(
-                                      Icons.play_arrow,
+                                      YTIcons.play_arrow,
                                       color: Colors.white,
                                       size: 36,
                                     ),

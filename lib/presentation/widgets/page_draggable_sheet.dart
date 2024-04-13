@@ -309,7 +309,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                             ],
                           ),
                         ),
-                      const Divider(thickness: 1.1, height: 0),
+                      const Divider(thickness: 1, height: 0),
                     ],
                   ),
                 ),

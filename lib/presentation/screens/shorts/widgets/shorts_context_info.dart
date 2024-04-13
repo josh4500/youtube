@@ -47,7 +47,7 @@ class ShortsContextInfo extends StatelessWidget {
         child: const Row(
           children: <Widget>[
             Icon(
-              Icons.info_outline_rounded,
+              YTIcons.info_outlined,
               size: 16,
             ),
             SizedBox(width: 8),

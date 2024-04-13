@@ -59,7 +59,7 @@ class WatchOnTvScreen extends StatelessWidget {
             ),
           ),
           const FoundTVs(),
-          const Divider(thickness: 1.5, height: 0),
+          const Divider(thickness: 1, height: 0),
           TappableArea(
             onTap: () => context.goto(AppRoutes.linkTv),
             padding: EdgeInsets.zero,
@@ -89,12 +89,12 @@ class WatchOnTvScreen extends StatelessWidget {
               ),
             ),
           ),
-          const Divider(thickness: 1.5, height: 0),
+          const Divider(thickness: 1, height: 0),
           ListTile(
             onTap: () {},
             title: const Text('Don\'t see your TV?'),
           ),
-          const Divider(thickness: 1.5, height: 0),
+          const Divider(thickness: 1, height: 0),
         ],
       ),
     );

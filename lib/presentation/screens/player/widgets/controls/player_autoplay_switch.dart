@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class PlayerAutoplaySwitch extends ConsumerWidget {
   const PlayerAutoplaySwitch({super.key});
@@ -55,12 +56,12 @@ class PlayerAutoplaySwitch extends ConsumerWidget {
         (states) {
           if (states.contains(MaterialState.selected)) {
             return const Icon(
-              Icons.play_arrow,
+              YTIcons.play_arrow,
               color: Colors.black,
             );
           }
           return const Icon(
-            Icons.pause,
+            YTIcons.pause,
             color: Colors.white,
           );
         },

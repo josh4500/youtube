@@ -91,7 +91,7 @@ class AllSubscriptionsScreen extends StatelessWidget {
                           SizedBox(width: 4),
                           RotatedBox(
                             quarterTurns: 1,
-                            child: Icon(Icons.chevron_right),
+                            child: Icon(YTIcons.chevron_right),
                           ),
                         ],
                       ),

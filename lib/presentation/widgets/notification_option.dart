@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import 'tappable_area.dart';
 
@@ -67,7 +68,7 @@ class NotificationOption extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Icon(Icons.notifications_active),
+            const Icon(YTIcons.notification_all_filled),
             if (title != null) ...<Widget>[
               const SizedBox(width: 4),
               Text(title!, style: textStyle),
@@ -75,7 +76,7 @@ class NotificationOption extends StatelessWidget {
             const SizedBox(width: 4),
             const RotatedBox(
               quarterTurns: 1,
-              child: Icon(Icons.chevron_right),
+              child: Icon(YTIcons.chevron_right),
             ),
           ],
         ),

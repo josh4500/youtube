@@ -44,7 +44,7 @@ class ViewablePostContent extends StatelessWidget {
     // TODO(Josh): Be able to hide more button
     return Column(
       children: <Widget>[
-        const Divider(thickness: 1.5, height: 0),
+        const Divider(thickness: 1, height: 0),
         Padding(
           padding: const EdgeInsets.only(
             left: 4.0,
@@ -132,19 +132,33 @@ class ViewablePostContent extends StatelessWidget {
             ),
           ),
         ),
-        const Padding(
-          padding: EdgeInsets.all(12.0),
+        Padding(
+          padding: const EdgeInsets.all(6.0),
           child: Row(
             children: <Widget>[
-              Icon(YTIcons.like_outlined),
-              SizedBox(width: 8),
-              Text('104'),
-              SizedBox(width: 32),
-              Icon(YTIcons.dislike_outlined),
-              Spacer(),
-              Icon(YTIcons.comments_outlined),
-              SizedBox(width: 8),
-              Text('2'),
+              TappableArea(
+                padding: const EdgeInsets.all(8),
+                borderRadius: BorderRadius.circular(32),
+                child: const Icon(YTIcons.like_outlined),
+              ),
+              const Text('104', maxLines: 1, overflow: TextOverflow.clip),
+              const SizedBox(width: 24),
+              CustomInkWell(
+                onTap: () {},
+                padding: const EdgeInsets.all(8),
+                borderRadius: BorderRadius.circular(32),
+                child: const Icon(YTIcons.dislike_outlined),
+              ),
+              const Spacer(),
+              const TappableArea(
+                child: Row(
+                  children: [
+                    Icon(YTIcons.comments_outlined),
+                    SizedBox(width: 8),
+                    Text('2'),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

@@ -116,7 +116,7 @@ class _HistorySearchTextFieldState extends State<HistorySearchTextField>
                 _effectiveController.clear();
                 _focusNodeListener();
               },
-              icon: const Icon(Icons.clear),
+              icon: const Icon(YTIcons.close_outlined, size: 18),
             ),
           ),
           SizeTransition(

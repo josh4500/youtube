@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
@@ -76,7 +77,7 @@ class ChannelSection extends StatelessWidget {
                           ),
                           SizedBox(width: 8),
                           Icon(
-                            Icons.check_circle,
+                            YTIcons.verified_filled,
                             size: 16,
                           )
                         ],
@@ -127,7 +128,7 @@ class ChannelSection extends StatelessWidget {
               ),
               SizedBox(width: 32),
               Icon(
-                Icons.chevron_right,
+                YTIcons.chevron_right,
                 size: 20,
                 color: Colors.grey,
               ),

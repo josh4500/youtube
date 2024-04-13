@@ -20,8 +20,8 @@ class CustomInkWell extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: borderRadius,
-      splashColor: Colors.white12,
-      highlightColor: Colors.white24,
+      splashColor: Colors.white10,
+      highlightColor: Colors.white10,
       splashFactory: CustomInkSplash.splashFactory,
       child: padding == null ? child : Padding(padding: padding!, child: child),
     );

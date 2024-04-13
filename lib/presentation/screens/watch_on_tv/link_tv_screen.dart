@@ -138,7 +138,7 @@ class _LinkTvScreenState extends State<LinkTvScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          const Divider(thickness: 1.5, height: 0),
+          const Divider(thickness: 1, height: 0),
         ],
       ),
     );
