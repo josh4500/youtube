@@ -22,7 +22,7 @@ abstract class DataResourceUseCase {
   /// Throws an [UnresolvedDependencyException] if the dependency is not bound.
   @protected
   @visibleForTesting
-  R get<R>() {
+  R use<R>() {
     // Ensure required resource is available
     final resource = _dependencies[R];
     if (resource == null) {

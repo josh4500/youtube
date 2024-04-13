@@ -1,4 +1,4 @@
-import 'package:youtube_clone/data/data_resource_client.dart';
+import 'data_resource_client.dart';
 
 /// Abstract base class representing a data resource.
 ///

@@ -27,10 +27,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/router/app_router.dart';
-import 'package:youtube_clone/presentation/router/app_routes.dart';
-import 'package:youtube_clone/presentation/screens/watch_on_tv/widgets/found_tvs.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
+import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
+
+import 'widgets/found_tvs.dart';
 
 class WatchOnTvScreen extends StatelessWidget {
   const WatchOnTvScreen({super.key});

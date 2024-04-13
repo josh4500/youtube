@@ -10,5 +10,5 @@ class FetchAccountUseCase extends DataResourceUseCase {
         AccountRepository,
         AuthenticationRepository,
       ];
-  void runTestFuc() => get<AccountRepository>().testFunc();
+  void runTestFuc() => use<AccountRepository>().testFunc();
 }

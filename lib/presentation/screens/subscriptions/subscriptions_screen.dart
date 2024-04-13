@@ -28,8 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/constants.dart';
-import 'package:youtube_clone/presentation/router/app_router.dart';
-import 'package:youtube_clone/presentation/router/app_routes.dart';
+import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 

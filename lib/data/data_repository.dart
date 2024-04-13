@@ -1,5 +1,4 @@
-import 'package:youtube_clone/data/data_resource.dart';
-
+import 'data_resource.dart';
 import 'data_resource_use_case.dart';
 
 typedef ResourceUseCaseFactory<U extends DataResourceUseCase> = U Function();
