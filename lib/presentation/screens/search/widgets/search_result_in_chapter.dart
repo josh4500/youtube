@@ -92,7 +92,7 @@ class SearchResultInChapters extends StatelessWidget {
         style: TextStyle(fontWeight: FontWeight.w700),
       ),
       itemBuilder: (BuildContext context, int index) {
-        return InkWell(
+        return CustomInkWell(
           onTap: () {},
           child: const PlayableTimedVideoContent(
             width: 150,

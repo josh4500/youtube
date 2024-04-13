@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import '../custom_ink_well.dart';
 import '../network_image/custom_network_image.dart';
 
 class PlayableShortsContent extends StatelessWidget {
@@ -37,10 +38,12 @@ class PlayableShortsContent extends StatelessWidget {
     this.width,
     this.height,
     this.onTap,
+    this.onMore,
   });
   final double? width;
   final double? height;
   final VoidCallback? onTap;
+  final VoidCallback? onMore;
 
   @override
   Widget build(BuildContext context) {
@@ -64,11 +67,11 @@ class PlayableShortsContent extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            const Align(
+            Align(
               alignment: Alignment.topRight,
-              child: Icon(
-                YTIcons.more_vert_outlined,
-                size: 14,
+              child: CustomInkWell(
+                onTap: onMore,
+                child: const Icon(YTIcons.more_vert_outlined, size: 14),
               ),
             ),
             Container(

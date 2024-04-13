@@ -30,7 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_control.dart';
+import 'player_control.dart';
 
 class PlayPauseRestartControl extends ConsumerStatefulWidget {
   const PlayPauseRestartControl({super.key});

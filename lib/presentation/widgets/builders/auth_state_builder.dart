@@ -35,6 +35,7 @@ class AuthStateBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO(josh4500): Complete implementation
     return builder(context, AuthState.authenticated);
   }
 }

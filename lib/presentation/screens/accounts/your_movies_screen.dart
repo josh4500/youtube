@@ -27,14 +27,12 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/router.dart';
-import 'package:youtube_clone/presentation/screens/accounts/widgets/popup/show_your_movies_menu.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../providers.dart';
-import '../../widgets/appbar_action.dart';
-import '../../widgets/over_scroll_glow_behavior.dart';
+import 'widgets/popup/show_your_movies_menu.dart';
 
 class YourMoviesScreen extends StatefulWidget {
   const YourMoviesScreen({super.key});
@@ -91,6 +89,7 @@ class _YourMoviesScreenState extends State<YourMoviesScreen>
             ),
           ),
         ),
+        leading: CustomBackButton(onPressed: context.pop),
         actions: <Widget>[
           AppbarAction(
             icon: YTIcons.cast_outlined,

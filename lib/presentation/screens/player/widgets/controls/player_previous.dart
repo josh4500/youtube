@@ -49,7 +49,7 @@ class PlayerPrevious extends ConsumerWidget {
         return const Padding(
           padding: EdgeInsets.all(4.0),
           child: Icon(
-            Icons.skip_previous,
+            YTIcons.play_prev,
             color: Colors.white30,
           ),
         );

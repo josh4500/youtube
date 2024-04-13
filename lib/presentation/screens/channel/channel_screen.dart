@@ -34,6 +34,7 @@ import 'package:youtube_clone/presentation/screens/channel/widgets/channel_secti
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/view_models/content/shorts_view_model.dart';
 import 'package:youtube_clone/presentation/view_models/content/video_view_model.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/dynamic_tab.dart';
 import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
 import 'package:youtube_clone/presentation/widgets/playable/playable_content.dart';
@@ -366,8 +367,20 @@ class _ChannelScreenState extends State<ChannelScreen> {
       SliverGrid(
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
-            return const ViewableShortsContent(
+            return ViewableShortsContent(
               showTitle: false,
+              onMore: () {
+                showDynamicSheet(
+                  context,
+                  items: [
+                    const DynamicSheetItem(
+                      leading: Icon(YTIcons.feedbck_outlined),
+                      title: 'Send feedback',
+                      dependents: [DynamicSheetItemDependent.auth],
+                    ),
+                  ],
+                );
+              },
             );
           },
           childCount: 20,
@@ -412,11 +425,39 @@ class _ChannelScreenState extends State<ChannelScreen> {
       const SliverToBoxAdapter(
         child: SizedBox(height: 8),
       ),
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 8.0,
+            horizontal: 12.0,
+          ),
+          child: TappableArea(
+            padding: const EdgeInsets.symmetric(
+              vertical: 4,
+              horizontal: 2,
+            ),
+            onPressed: () async {},
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(YTIcons.sort_outlined),
+                SizedBox(width: 4),
+                Text('Sort'),
+                SizedBox(width: 4),
+                RotatedBox(
+                  quarterTurns: 1,
+                  child: Icon(YTIcons.chevron_right),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
       SliverList(
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
-            return const TappableArea(
-              padding: EdgeInsets.symmetric(
+            return TappableArea(
+              padding: const EdgeInsets.symmetric(
                 vertical: 8.0,
                 horizontal: 12,
               ),
@@ -425,6 +466,33 @@ class _ChannelScreenState extends State<ChannelScreen> {
                 height: 112,
                 direction: Axis.horizontal,
                 isPlaylist: true,
+                onMore: () {
+                  showDynamicSheet(
+                    context,
+                    items: [
+                      DynamicSheetItem(
+                        leading: const Icon(YTIcons.playlist_play_outlined),
+                        title: 'Play next in queue',
+                        trailing: ClipRRect(
+                          borderRadius: BorderRadius.circular(2),
+                          child: Image.asset(
+                            AssetsPath.ytPAccessIcon48,
+                            width: 18,
+                            height: 18,
+                          ),
+                        ),
+                      ),
+                      const DynamicSheetItem(
+                        leading: Icon(YTIcons.save_outlined_1),
+                        title: 'Save to library',
+                      ),
+                      const DynamicSheetItem(
+                        leading: Icon(YTIcons.share_outlined),
+                        title: 'Share',
+                      ),
+                    ],
+                  );
+                },
               ),
             );
           },
@@ -442,7 +510,19 @@ class _ChannelScreenState extends State<ChannelScreen> {
       SliverList(
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
-            return const ViewablePostContent();
+            return ViewablePostContent(
+              onMore: () {
+                showDynamicSheet(
+                  context,
+                  items: [
+                    const DynamicSheetItem(
+                      leading: Icon(YTIcons.report_outlined),
+                      title: 'Report',
+                    ),
+                  ],
+                );
+              },
+            );
           },
           childCount: 10,
         ),

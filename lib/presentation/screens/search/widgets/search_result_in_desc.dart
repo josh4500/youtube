@@ -3,8 +3,8 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'search_result_compound.dart';
 
-class SearchResultInConcepts extends StatelessWidget {
-  const SearchResultInConcepts({super.key});
+class SearchResultInDesc extends StatelessWidget {
+  const SearchResultInDesc({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +76,7 @@ class SearchResultInConcepts extends StatelessWidget {
         children: [
           Flexible(
             child: Text(
-              '6 auto-generated concepts',
+              '8 chapters in this video',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -88,7 +88,7 @@ class SearchResultInConcepts extends StatelessWidget {
         ],
       ),
       trailing: const Text(
-        '6 key concepts',
+        '8 chapters',
         style: TextStyle(fontWeight: FontWeight.w700),
       ),
       itemBuilder: (BuildContext context, int index) {
@@ -100,7 +100,7 @@ class SearchResultInConcepts extends StatelessWidget {
           ),
         );
       },
-      itemCount: 6,
+      itemCount: 20,
     );
   }
 }

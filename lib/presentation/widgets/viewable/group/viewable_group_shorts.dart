@@ -31,8 +31,8 @@ import 'package:youtube_clone/presentation/widgets/viewable/group/viewable_group
 
 import '../viewable_shorts_content.dart';
 
+// TODO(josh4500): What is the use of this Widget
 class ViewableGroupShorts extends StatelessWidget {
-  // TODO: Add how the different layouts should be built
   const ViewableGroupShorts({
     super.key,
     required this.title,
@@ -48,7 +48,7 @@ class ViewableGroupShorts extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Divider(thickness: 1.5, height: 0),
+        const Divider(thickness: 1, height: 0),
         title,
         SizedBox(
           height: 300,

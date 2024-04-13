@@ -29,9 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/constants.dart';
-import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
@@ -78,7 +76,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final historyOff = 0 == 8;
+    const historyOff = 0 == 8;
     return Scaffold(
       floatingActionButton: Consumer(
         builder: (
@@ -255,6 +253,65 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                             ref
                                 .read(playerRepositoryProvider)
                                 .openPlayerScreen();
+                          },
+                          onMore: () {
+                            showDynamicSheet(
+                              context,
+                              items: [
+                                DynamicSheetItem(
+                                  leading: const Icon(
+                                    YTIcons.playlist_play_outlined,
+                                  ),
+                                  title: 'Play next in queue',
+                                  trailing: ClipRRect(
+                                    borderRadius: BorderRadius.circular(2),
+                                    child: Image.asset(
+                                      AssetsPath.ytPAccessIcon48,
+                                      width: 18,
+                                      height: 18,
+                                    ),
+                                  ),
+                                ),
+                                const DynamicSheetItem(
+                                  leading: Icon(YTIcons.watch_later_outlined),
+                                  title: 'Save to Watch later',
+                                ),
+                                const DynamicSheetItem(
+                                  leading: Icon(YTIcons.save_outlined_1),
+                                  title: 'Save to playlist',
+                                ),
+                                const DynamicSheetItem(
+                                  leading: Icon(YTIcons.share_outlined),
+                                  title: 'Share',
+                                ),
+                                const DynamicSheetItem(
+                                  leading:
+                                      Icon(YTIcons.not_interested_outlined),
+                                  title: 'Not interested',
+                                ),
+                                const DynamicSheetItem(
+                                  leading: Icon(
+                                    YTIcons.not_interested_outlined,
+                                  ),
+                                  title: 'Don\'t recommend channel',
+                                  dependents: [DynamicSheetItemDependent.auth],
+                                ),
+                                const DynamicSheetItem(
+                                  leading: Icon(
+                                    YTIcons.youtube_music_outlined,
+                                  ),
+                                  title: 'Listened with YouTube music',
+                                  trailing: Icon(
+                                    YTIcons.external_link_outlined,
+                                    size: 20,
+                                  ),
+                                ),
+                                const DynamicSheetItem(
+                                  leading: Icon(YTIcons.report_outlined),
+                                  title: 'Report',
+                                ),
+                              ],
+                            );
                           },
                         );
                       },

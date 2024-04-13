@@ -27,13 +27,11 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-
-import '../../providers.dart';
-import '../../widgets/appbar_action.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class DownloadsScreen extends StatelessWidget {
   const DownloadsScreen({super.key});
@@ -48,6 +46,7 @@ class DownloadsScreen extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
+        leading: CustomBackButton(onPressed: context.pop),
         actions: <Widget>[
           AppbarAction(
             icon: YTIcons.cast_outlined,

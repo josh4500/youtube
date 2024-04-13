@@ -30,6 +30,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 import 'package:youtube_clone/presentation/screens/shorts/widgets/shorts_info_section.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -43,7 +45,7 @@ import '../../widgets/appbar_action.dart';
 import 'widgets/shorts_category_actions.dart';
 import 'widgets/shorts_comments_bottom_sheet.dart';
 
-class ShortsScreen extends StatefulWidget {
+class ShortsScreen extends ConsumerStatefulWidget {
   const ShortsScreen({
     super.key,
     this.isSubscription = false,
@@ -53,10 +55,10 @@ class ShortsScreen extends StatefulWidget {
   final bool isLive;
 
   @override
-  State<ShortsScreen> createState() => _ShortsScreenState();
+  ConsumerState<ShortsScreen> createState() => _ShortsScreenState();
 }
 
-class _ShortsScreenState extends State<ShortsScreen> {
+class _ShortsScreenState extends ConsumerState<ShortsScreen> {
   final PageController _pageController = PageController();
   final ValueNotifier<bool> _progressVisibilityNotifier = ValueNotifier<bool>(
     true,
@@ -127,8 +129,10 @@ class _ShortsScreenState extends State<ShortsScreen> {
   void _scrollPhysicsCallback() {
     final double size = _draggableController.size;
     if (size > 0) {
+      ref.read(homeRepositoryProvider).hideNavBar();
       physicsNotifier.value = const NeverScrollableScrollPhysics();
     } else {
+      ref.read(homeRepositoryProvider).showNavBar();
       physicsNotifier.value = const AlwaysScrollableScrollPhysics();
     }
   }

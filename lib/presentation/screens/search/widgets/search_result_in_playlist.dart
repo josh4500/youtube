@@ -53,7 +53,7 @@ class SearchResultInPlaylist extends StatelessWidget {
         style: TextStyle(fontWeight: FontWeight.w700),
       ),
       itemBuilder: (BuildContext context, int index) {
-        return InkWell(
+        return CustomInkWell(
           onTap: () {},
           child: const PlayableVideoContent(
             width: 150,

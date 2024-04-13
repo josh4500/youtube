@@ -38,6 +38,7 @@ import 'package:youtube_clone/presentation/screens/settings/widgets/settings_pop
 import 'package:youtube_clone/presentation/screens/settings/widgets/settings_tile.dart';
 import 'package:youtube_clone/presentation/theme/app_theme.dart';
 import 'package:youtube_clone/presentation/theme/relative_size.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/lazy_indexed_stack.dart';
 
@@ -140,9 +141,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           return SettingsPopupContainer(
             title: title,
             showDismissButtons: false,
-            action: InkWell(
+            action: CustomInkWell(
               onTap: () {},
-              child: const Icon(Icons.add),
+              child: const Icon(YTIcons.save_outlined),
             ),
             child: Container(
               color: context.theme.appColors.settingsPopupBackgroundColor,

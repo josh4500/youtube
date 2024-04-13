@@ -22,6 +22,10 @@ class AssetsPath {
   static const String ytIcon24 = '${_iconPrefix}yt_icon_24.png';
   static const String ytMusicIcon24 = '${_iconPrefix}yt_music_icon_24.png';
   static const String ytStudioIcon24 = '${_iconPrefix}yt_studio_icon_24.png';
+  static const String ytPAccessIcon28 =
+      '${_iconPrefix}yt_premium_access_icon_28.png';
+  static const String ytPAccessIcon48 =
+      '${_iconPrefix}yt_premium_access_icon_48.png';
   static const String ytKidsIcon24 = '${_iconPrefix}yt_kids_icon_24.png';
 
   static const String downloadWillAppear =

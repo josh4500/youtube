@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/screens/settings/widgets/settings_popup_container.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/roulette_scroll.dart';
 
 class DateRangePicker extends StatefulWidget {
@@ -81,35 +82,31 @@ class _DateRangePickerState extends State<DateRangePicker> {
       padding: const EdgeInsets.all(8.0) + const EdgeInsets.only(left: 40.0),
       child: Column(
         children: <Widget>[
-          InkWell(
+          CustomInkWell(
             onTap: _showStartStop,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  const Text('Start time'),
-                  Text(
-                    '${startDuration.hourPart.toString().padLeft(2, '0')}:${startDuration.minutesPart.toString().padLeft(2, '0')}',
-                  ),
-                ],
-              ),
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                const Text('Start time'),
+                Text(
+                  '${startDuration.hourPart.toString().padLeft(2, '0')}:${startDuration.minutesPart.toString().padLeft(2, '0')}',
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 8),
-          InkWell(
+          CustomInkWell(
             onTap: () => _showStartStop(false),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  const Text('Stop time'),
-                  Text(
-                    '${stopDuration.hourPart.toString().padLeft(2, '0')}:${stopDuration.minutesPart.toString().padLeft(2, '0')}',
-                  ),
-                ],
-              ),
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                const Text('Stop time'),
+                Text(
+                  '${stopDuration.hourPart.toString().padLeft(2, '0')}:${stopDuration.minutesPart.toString().padLeft(2, '0')}',
+                ),
+              ],
             ),
           ),
         ],

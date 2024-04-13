@@ -27,14 +27,18 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/constants/assets.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
+import '../custom_ink_well.dart';
+import '../dynamic_sheet.dart';
 import '../network_image/custom_network_image.dart';
 
 class ViewablePostContent extends StatelessWidget {
-  const ViewablePostContent({super.key});
+  const ViewablePostContent({super.key, this.onMore});
+  final VoidCallback? onMore;
 
   @override
   Widget build(BuildContext context) {
@@ -79,13 +83,31 @@ class ViewablePostContent extends StatelessWidget {
                   ),
                 ),
               ),
-              InkWell(
-                onTap: () {},
+              CustomInkWell(
+                onTap: onMore ??
+                    () {
+                      showDynamicSheet(
+                        context,
+                        items: [
+                          const DynamicSheetItem(
+                            leading: Icon(YTIcons.report_outlined),
+                            title: 'Report',
+                          ),
+                          const DynamicSheetItem(
+                            leading: Icon(YTIcons.not_interested_outlined),
+                            title: 'Not interested',
+                          ),
+                          const DynamicSheetItem(
+                            leading: Icon(YTIcons.not_interested_outlined),
+                            title: 'Don\'t recommend posts from channel',
+                            dependents: [DynamicSheetItemDependent.auth],
+                          ),
+                        ],
+                      );
+                    },
+                padding: const EdgeInsets.all(8.0),
                 borderRadius: BorderRadius.circular(32),
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Icon(YTIcons.more_vert_outlined),
-                ),
+                child: const Icon(YTIcons.more_vert_outlined),
               ),
             ],
           ),

@@ -27,22 +27,13 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
-import 'package:youtube_clone/presentation/screens/subscriptions/widgets/subscriptions_tabs.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
-import 'package:youtube_clone/presentation/widgets/dynamic_tab.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
-import 'package:youtube_clone/presentation/widgets/viewable/group/viewable_group_shorts.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../providers.dart';
-import '../../widgets/appbar_action.dart';
-import '../../widgets/viewable/viewable_post_content.dart';
-import '../../widgets/viewable/viewable_video_content.dart';
+import 'widgets/subscriptions_tabs.dart';
 
 class SubscriptionsScreen extends StatefulWidget {
   const SubscriptionsScreen({super.key});
@@ -87,7 +78,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                 child: Column(
                   children: <Widget>[
                     SizedBox(
-                      height: 125,
+                      height: 120,
                       child: SubscriptionsTabs(
                         valueListenable: _selectedChannel,
                         onChange: (int? value) {},
@@ -168,6 +159,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
               child: ViewablePostContent(),
             ),
             SliverToBoxAdapter(
+              // TODO(josh4500): What is the use of this Widget
               child: ViewableGroupShorts(
                 title: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -204,7 +196,54 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
               child: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return const ViewableVideoContent();
+                    return ViewableVideoContent(
+                      onMore: () {
+                        showDynamicSheet(
+                          context,
+                          items: [
+                            DynamicSheetItem(
+                              leading:
+                                  const Icon(YTIcons.playlist_play_outlined),
+                              title: 'Play next in queue',
+                              trailing: ClipRRect(
+                                borderRadius: BorderRadius.circular(2),
+                                child: Image.asset(
+                                  AssetsPath.ytPAccessIcon48,
+                                  width: 18,
+                                  height: 18,
+                                ),
+                              ),
+                            ),
+                            const DynamicSheetItem(
+                              leading: Icon(YTIcons.watch_later_outlined),
+                              title: 'Save to Watch later',
+                            ),
+                            const DynamicSheetItem(
+                              leading: Icon(YTIcons.save_outlined_1),
+                              title: 'Save to playlist',
+                            ),
+                            const DynamicSheetItem(
+                              leading: Icon(YTIcons.download_outlined),
+                              title: 'Download video',
+                            ),
+                            const DynamicSheetItem(
+                              leading: Icon(YTIcons.share_outlined),
+                              title: 'Share',
+                            ),
+                            const DynamicSheetItem(
+                              leading: Icon(YTIcons.close_circle_outlined),
+                              title: 'Unsubscribe',
+                              dependents: [DynamicSheetItemDependent.auth],
+                            ),
+                            const DynamicSheetItem(
+                              leading: Icon(YTIcons.not_interested_outlined),
+                              title: 'Hide',
+                              dependents: [DynamicSheetItemDependent.auth],
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                   childCount: 20,
                 ),

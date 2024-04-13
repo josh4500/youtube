@@ -26,25 +26,18 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/screens/accounts/account_incognito_screen.dart';
 import 'package:youtube_clone/presentation/screens/accounts/widgets/account_option_tile.dart';
 import 'package:youtube_clone/presentation/screens/accounts/widgets/account_section.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/builders/auth_state_builder.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../providers.dart';
-import '../../widgets/appbar_action.dart';
-import '../../widgets/playable/playable_content.dart';
 import '../../widgets/playlist/add_new_playlist.dart';
-import '../../widgets/tappable_area.dart';
-import '../../widgets/grouped_view_builder.dart';
 
 class AccountsScreen extends StatelessWidget {
   const AccountsScreen({super.key});
@@ -98,10 +91,53 @@ class AccountsScreen extends StatelessWidget {
                       height: 170,
                       onTap: () => context.goto(AppRoutes.watchHistory),
                       itemBuilder: (BuildContext context, int index) {
-                        return const TappableArea(
+                        return TappableArea(
                           child: PlayableContent(
                             width: 160,
-                            margin: EdgeInsets.only(bottom: 16),
+                            margin: const EdgeInsets.only(bottom: 16),
+                            onMore: () {
+                              showDynamicSheet(
+                                context,
+                                items: [
+                                  DynamicSheetItem(
+                                    leading: const Icon(
+                                      YTIcons.playlist_play_outlined,
+                                    ),
+                                    title: 'Play next in queue',
+                                    trailing: ClipRRect(
+                                      borderRadius: BorderRadius.circular(2),
+                                      child: Image.asset(
+                                        AssetsPath.ytPAccessIcon48,
+                                        width: 18,
+                                        height: 18,
+                                      ),
+                                    ),
+                                  ),
+                                  const DynamicSheetItem(
+                                    leading: Icon(
+                                      YTIcons.watch_later_outlined,
+                                    ),
+                                    title: 'Save to Watch later',
+                                  ),
+                                  const DynamicSheetItem(
+                                    leading: Icon(YTIcons.save_outlined_1),
+                                    title: 'Save to playlist',
+                                  ),
+                                  const DynamicSheetItem(
+                                    leading: Icon(YTIcons.download_outlined),
+                                    title: 'Download',
+                                  ),
+                                  const DynamicSheetItem(
+                                    leading: Icon(YTIcons.share_outlined),
+                                    title: 'Share',
+                                  ),
+                                  const DynamicSheetItem(
+                                    leading: Icon(YTIcons.delete_outlined),
+                                    title: 'Remove from watch history',
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                         );
                       },
@@ -116,10 +152,32 @@ class AccountsScreen extends StatelessWidget {
                           onPressed: () => context.goto(AppRoutes.playlist),
                           child: index == 7
                               ? const AddNewPlaylist()
-                              : const PlayableContent(
+                              : PlayableContent(
                                   width: 160,
                                   isPlaylist: true,
-                                  margin: EdgeInsets.only(bottom: 16),
+                                  margin: const EdgeInsets.only(bottom: 16),
+                                  onMore: () {
+                                    showDynamicSheet(
+                                      context,
+                                      items: [
+                                        DynamicSheetItem(
+                                          leading: const Icon(
+                                            YTIcons.playlist_play_outlined,
+                                          ),
+                                          title: 'Play next in queue',
+                                          trailing: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(2),
+                                            child: Image.asset(
+                                              AssetsPath.ytPAccessIcon48,
+                                              width: 18,
+                                              height: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 ),
                         );
                       },
@@ -159,7 +217,7 @@ class AccountsScreen extends StatelessWidget {
                     const Divider(thickness: 1.5),
                     AccountOptionTile(
                       title: 'Time watched',
-                      icon: Icons.table_rows_outlined,
+                      icon: YTIcons.analytics_outlined,
                       networkRequired: true,
                       onTap: () {},
                     ),

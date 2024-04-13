@@ -32,12 +32,14 @@ import 'package:youtube_clone/presentation/widgets/shimmer.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 import '../account_avatar.dart';
+import '../custom_ink_well.dart';
 import '../network_image/custom_network_image.dart';
 import '../player/playback/playback_view.dart';
 
 class ViewableVideoContent extends StatelessWidget {
-  const ViewableVideoContent({super.key, this.onTap});
+  const ViewableVideoContent({super.key, this.onTap, this.onMore});
   final VoidCallback? onTap;
+  final VoidCallback? onMore;
 
   @override
   Widget build(BuildContext context) {
@@ -119,10 +121,7 @@ class ViewableVideoContent extends StatelessWidget {
                             vertical: 8,
                             horizontal: 2,
                           ),
-                          child: SizedBox(
-                            width: 32,
-                            height: 24,
-                          ),
+                          child: SizedBox(width: 32, height: 24),
                         ),
                       ],
                     ),
@@ -147,20 +146,15 @@ class ViewableVideoContent extends StatelessWidget {
           ),
         ),
         Positioned(
-          right: 9.5,
-          top: 227,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: InkWell(
-              onTap: () {},
-              borderRadius: BorderRadius.circular(16),
-              child: const Padding(
-                padding: EdgeInsets.all(4.0),
-                child: Icon(
-                  YTIcons.more_vert_outlined,
-                  size: 20,
-                ),
-              ),
+          right: 8,
+          top: 231,
+          child: CustomInkWell(
+            onTap: onMore,
+            padding: const EdgeInsets.all(8.0),
+            borderRadius: BorderRadius.circular(32),
+            child: const Icon(
+              YTIcons.more_vert_outlined,
+              size: 18,
             ),
           ),
         ),

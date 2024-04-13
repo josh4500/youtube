@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import 'custom_ink_well.dart';
 import 'custom_scroll_physics.dart';
 import 'dynamic_tab.dart';
 import 'over_scroll_glow_behavior.dart';
@@ -276,7 +277,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                                 const SizedBox(width: 12),
                                 ...widget.actions,
                                 const SizedBox(width: 12),
-                                InkWell(
+                                CustomInkWell(
                                   borderRadius: BorderRadius.circular(32),
                                   onTap: _closeSheet,
                                   child: const Icon(
@@ -496,7 +497,7 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              InkWell(
+              CustomInkWell(
                 borderRadius: BorderRadius.circular(32),
                 onTap: widget.controller.close,
                 child: const Icon(YTIcons.arrow_back_outlined),

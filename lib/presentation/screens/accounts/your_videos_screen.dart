@@ -27,13 +27,11 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../providers.dart';
-import '../../widgets/appbar_action.dart';
 import 'widgets/popup/show_your_videos_menu.dart';
 
 class YourVideosScreen extends StatefulWidget {
@@ -91,6 +89,7 @@ class _YourVideosScreenState extends State<YourVideosScreen>
             ),
           ),
         ),
+        leading: CustomBackButton(onPressed: context.pop),
         actions: <Widget>[
           AppbarAction(
             icon: YTIcons.cast_outlined,
@@ -150,7 +149,7 @@ class _YourVideosScreenState extends State<YourVideosScreen>
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
-                        Icons.tune_outlined,
+                        YTIcons.tune_outlined,
                         size: 24,
                       ),
                     ),

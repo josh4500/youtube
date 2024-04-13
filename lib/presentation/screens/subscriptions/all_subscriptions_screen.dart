@@ -27,16 +27,12 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/router.dart';
-import 'package:youtube_clone/presentation/screens/subscriptions/widgets/subscription_tile.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../providers.dart';
-import '../../widgets/appbar_action.dart';
 import 'widgets/popup/show_all_subscriptions_menu.dart';
+import 'widgets/subscription_tile.dart';
 
 class AllSubscriptionsScreen extends StatelessWidget {
   const AllSubscriptionsScreen({super.key});

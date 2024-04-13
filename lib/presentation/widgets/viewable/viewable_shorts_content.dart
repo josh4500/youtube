@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import '../custom_ink_well.dart';
 import '../network_image/custom_network_image.dart';
 
 class ViewableShortsContent extends StatelessWidget {
@@ -38,11 +39,13 @@ class ViewableShortsContent extends StatelessWidget {
     this.margin,
     this.borderRadius,
     this.showTitle = true,
+    this.onMore,
   });
   final double? width;
   final EdgeInsets? margin;
   final BorderRadius? borderRadius;
   final bool showTitle;
+  final VoidCallback? onMore;
 
   @override
   Widget build(BuildContext context) {
@@ -63,16 +66,11 @@ class ViewableShortsContent extends StatelessWidget {
         children: <Widget>[
           Align(
             alignment: Alignment.topRight,
-            child: InkWell(
-              onTap: () {},
+            child: CustomInkWell(
+              onTap: onMore,
               borderRadius: BorderRadius.circular(20),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: 8.0,
-                  horizontal: 6,
-                ),
-                child: Icon(YTIcons.more_vert_outlined, size: 20),
-              ),
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6),
+              child: const Icon(YTIcons.more_vert_outlined, size: 20),
             ),
           ),
           const Spacer(),

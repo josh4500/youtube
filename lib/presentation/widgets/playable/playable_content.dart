@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import '../custom_ink_well.dart';
 import '../network_image/custom_network_image.dart';
 
 class PlayableContent extends StatelessWidget {
@@ -39,10 +40,13 @@ class PlayableContent extends StatelessWidget {
     this.isPlaylist = false,
     this.direction = Axis.vertical,
     this.margin,
+    this.onMore,
   });
+
   final bool isPlaylist;
   final Axis direction;
   final EdgeInsets? margin;
+  final VoidCallback? onMore;
 
   // TODO(Josh): rename width and height
   final double? width;
@@ -169,7 +173,11 @@ class PlayableContent extends StatelessWidget {
                     const SizedBox(height: 8)
                   else
                     const SizedBox(width: 8),
-                  const Icon(YTIcons.more_vert_outlined, size: 14),
+                  CustomInkWell(
+                    onTap: onMore,
+                    borderRadius: BorderRadius.circular(16),
+                    child: const Icon(YTIcons.more_vert_outlined, size: 14),
+                  ),
                 ],
               ),
             ),

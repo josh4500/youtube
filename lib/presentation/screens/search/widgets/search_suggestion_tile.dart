@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class SearchSuggestionTile extends StatelessWidget {
   const SearchSuggestionTile({
@@ -14,33 +15,31 @@ class SearchSuggestionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        InkWell(
+        CustomInkWell(
           onTap: () {
             // TODO(josh4500): Make request
             onInsertSuggestion('Something to suggest');
           },
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              children: [
-                if (Random().nextBool())
-                  Random().nextBool()
-                      ? const Icon(YTIcons.search_outlined)
-                      : const Icon(YTIcons.history_outlined)
-                else
-                  const Icon(YTIcons.trending_outlined),
-                const SizedBox(width: 24.0),
-                const Expanded(
-                  child: Text(
-                    'Something to suggest',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 16),
-                  ),
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              if (Random().nextBool())
+                Random().nextBool()
+                    ? const Icon(YTIcons.search_outlined)
+                    : const Icon(YTIcons.history_outlined)
+              else
+                const Icon(YTIcons.trending_outlined),
+              const SizedBox(width: 24.0),
+              const Expanded(
+                child: Text(
+                  'Something to suggest',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 16),
                 ),
-                const SizedBox(width: 36.0),
-              ],
-            ),
+              ),
+              const SizedBox(width: 36.0),
+            ],
           ),
         ),
         Align(

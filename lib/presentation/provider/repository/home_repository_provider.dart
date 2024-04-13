@@ -6,6 +6,20 @@ class HomeRepository extends ChangeNotifier {
   double _navBarPos = 1;
   double get navBarPos => _navBarPos;
   bool _lockNavBarPos = false;
+  bool _navBarHidden = false;
+  bool get navBarHidden => _navBarHidden;
+
+  void hideNavBar() {
+    final oldValue = _navBarHidden;
+    _navBarHidden = true;
+    if (oldValue != _navBarHidden) notifyListeners();
+  }
+
+  void showNavBar() {
+    final oldValue = _navBarHidden;
+    _navBarHidden = false;
+    if (oldValue != _navBarHidden) notifyListeners();
+  }
 
   void lockNavBarPosition() {
     _lockNavBarPos = true;

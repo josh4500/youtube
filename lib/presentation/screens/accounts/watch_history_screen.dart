@@ -27,12 +27,12 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../providers.dart';
 import 'widgets/history_search_text_field.dart';
 import 'widgets/popup/show_history_menu.dart';
 import 'widgets/shorts_history.dart';
@@ -101,6 +101,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
             ),
           ),
         ),
+        leading: CustomBackButton(onPressed: context.pop),
         actions: <Widget>[
           AppbarAction(
             icon: YTIcons.cast_outlined,
@@ -162,16 +163,62 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                       sharedSlidableState: sharedSlidableState,
                       items: const <SlidableItem>[
                         SlidableItem(
-                          icon: Icon(Icons.delete, color: Colors.black),
+                          icon: Icon(
+                            YTIcons.delete_outlined,
+                            color: Colors.black,
+                          ),
                         ),
                       ],
                       child: Material(
-                        child: InkWell(
+                        child: CustomInkWell(
                           onTap: () {},
-                          child: const PlayableVideoContent(
+                          child: PlayableVideoContent(
                             width: 180,
                             height: 104,
-                            margin: EdgeInsets.all(12.0),
+                            margin: const EdgeInsets.all(12.0),
+                            onMore: () {
+                              showDynamicSheet(
+                                context,
+                                items: [
+                                  const DynamicSheetItem(
+                                    leading: Icon(YTIcons.delete_outlined),
+                                    title: 'Remove from watch history',
+                                  ),
+                                  DynamicSheetItem(
+                                    leading: const Icon(
+                                      YTIcons.playlist_play_outlined,
+                                    ),
+                                    title: 'Play next in queue',
+                                    trailing: ClipRRect(
+                                      borderRadius: BorderRadius.circular(2),
+                                      child: Image.asset(
+                                        AssetsPath.ytPAccessIcon48,
+                                        width: 18,
+                                        height: 18,
+                                      ),
+                                    ),
+                                  ),
+                                  const DynamicSheetItem(
+                                    leading: Icon(
+                                      YTIcons.watch_later_outlined,
+                                    ),
+                                    title: 'Save to Watch later',
+                                  ),
+                                  const DynamicSheetItem(
+                                    leading: Icon(YTIcons.save_outlined_1),
+                                    title: 'Save to playlist',
+                                  ),
+                                  const DynamicSheetItem(
+                                    leading: Icon(YTIcons.download_outlined),
+                                    title: 'Download video',
+                                  ),
+                                  const DynamicSheetItem(
+                                    leading: Icon(YTIcons.share_outlined),
+                                    title: 'Share',
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -192,11 +239,14 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                       sharedSlidableState: sharedSlidableState,
                       items: const <SlidableItem>[
                         SlidableItem(
-                          icon: Icon(Icons.delete, color: Colors.black),
+                          icon: Icon(
+                            YTIcons.delete_outlined,
+                            color: Colors.black,
+                          ),
                         ),
                       ],
                       child: Material(
-                        child: InkWell(
+                        child: CustomInkWell(
                           onTap: () {},
                           child: const PlayableVideoContent(
                             width: 180,

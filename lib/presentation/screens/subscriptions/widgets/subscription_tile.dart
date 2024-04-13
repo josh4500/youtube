@@ -27,12 +27,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/router/app_router.dart';
-import 'package:youtube_clone/presentation/router/app_routes.dart';
-import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
-
-import '../../../widgets/notification_option.dart';
+import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class SubscriptionTile extends StatelessWidget {
   const SubscriptionTile({super.key});

@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class AccountChannelSection extends StatelessWidget {
@@ -129,9 +130,7 @@ class AccountChannelSection extends StatelessWidget {
                 SizedBox(width: 8),
                 CustomActionChip(
                   alignment: Alignment.center,
-                  icon: Icon(
-                    Icons.analytics_outlined,
-                  ),
+                  icon: Icon(YTIcons.analytics_outlined),
                   padding: EdgeInsets.all(8),
                   backgroundColor: Color(0xff2c2c2c),
                 ),
@@ -140,7 +139,7 @@ class AccountChannelSection extends StatelessWidget {
                   alignment: Alignment.center,
                   padding: EdgeInsets.all(8),
                   icon: Icon(
-                    Icons.mode_edit_outline_outlined,
+                    YTIcons.edit_outlined,
                   ),
                   backgroundColor: Color(0xff2c2c2c),
                 ),

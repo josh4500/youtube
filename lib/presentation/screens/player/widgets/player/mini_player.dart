@@ -126,8 +126,8 @@ class _MiniPlayerPausePlayButton extends ConsumerWidget {
         isRestart
             ? Icons.restart_alt
             : isPlaying
-                ? Icons.pause
-                : Icons.play_arrow,
+                ? YTIcons.pause
+                : YTIcons.play_arrow,
       ),
     );
   }

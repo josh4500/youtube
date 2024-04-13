@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../providers/player_viewstate_provider.dart';
 import 'player_control.dart';
@@ -67,13 +68,13 @@ class PlayerFullscreen extends ConsumerWidget {
       },
       color: Colors.transparent,
       horizontalPadding: 0,
-      verticalPadding: 12,
+      verticalPadding: 10,
       builder: (context, _) {
         final isExpanded = ref.read(playerViewStateProvider).isExpanded;
         final isFullscreen = ref.read(playerViewStateProvider).isFullscreen;
         return isExpanded || isFullscreen
-            ? const Icon(Icons.fullscreen_exit)
-            : const Icon(Icons.fullscreen);
+            ? const Icon(YTIcons.exit_fullscreen_outlined)
+            : const Icon(YTIcons.fullscreen);
       },
     );
   }

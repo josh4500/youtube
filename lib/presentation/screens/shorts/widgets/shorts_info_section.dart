@@ -28,6 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 
 import 'shorts_audio_button.dart';
@@ -82,7 +83,7 @@ class ShortsInfoSection extends StatelessWidget {
                         const SizedBox(height: 16),
                       ],
                       ...<Widget>[
-                        InkWell(
+                        CustomInkWell(
                           onTap: () {},
                           borderRadius: BorderRadius.circular(32),
                           child: Container(
@@ -224,23 +225,21 @@ class ShortsActionButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(64),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 10),
-        child: InkWell(
+        child: CustomInkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(64),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16),
-            child: Column(
-              children: <Widget>[
-                title,
-                const SizedBox(height: 8),
-                Text(
-                  summary,
-                  style: const TextStyle(
-                    fontSize: 12,
-                  ),
+          padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16),
+          child: Column(
+            children: <Widget>[
+              title,
+              const SizedBox(height: 8),
+              Text(
+                summary,
+                style: const TextStyle(
+                  fontSize: 12,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

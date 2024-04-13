@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -52,6 +53,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: CustomBackButton(onPressed: context.pop),
         actions: <Widget>[
           AppbarAction(
             icon: YTIcons.cast_outlined,
@@ -137,7 +139,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                   ),
                                   SizedBox(width: 8),
                                   Icon(
-                                    Icons.lock,
+                                    YTIcons.private_dot_outlined,
                                     size: 13,
                                     color: Colors.grey,
                                   ),
@@ -156,7 +158,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                           const Spacer(),
                           IconButton(
                             onPressed: () {},
-                            icon: const Icon(Icons.edit_outlined),
+                            icon: const Icon(YTIcons.edit_outlined),
                           ),
                           const SizedBox(width: 8),
                           IconButton(
@@ -172,7 +174,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                             child: CustomActionChip(
                               alignment: Alignment.center,
                               icon: Icon(
-                                Icons.play_arrow,
+                                YTIcons.playlist_play_outlined,
                                 color: Colors.black,
                               ),
                               title: 'Play all',
@@ -189,7 +191,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                             child: CustomActionChip(
                               alignment: Alignment.center,
                               icon: Icon(
-                                Icons.shuffle,
+                                YTIcons.shuffle_outlined,
                                 color: Colors.white,
                               ),
                               title: 'Shuffle',
@@ -225,15 +227,18 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                       sharedSlidableState: _slidableState,
                       items: const <SlidableItem>[
                         SlidableItem(
-                          icon: Icon(Icons.delete, color: Colors.black),
+                          icon: Icon(
+                            YTIcons.delete_outlined,
+                            color: Colors.black,
+                          ),
                         ),
                       ],
-                      child: InkWell(
+                      child: CustomInkWell(
                         onTap: () {},
                         child: const Material(
                           child: Row(
                             children: <Widget>[
-                              Icon(Icons.equalizer),
+                              Icon(YTIcons.move_outlined),
                               Expanded(
                                 child: PlayableVideoContent(
                                   width: 180,

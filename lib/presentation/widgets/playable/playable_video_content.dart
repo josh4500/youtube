@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import '../custom_ink_well.dart';
 import '../network_image/custom_network_image.dart';
 
 class PlayableVideoContent extends StatelessWidget {
@@ -38,9 +39,11 @@ class PlayableVideoContent extends StatelessWidget {
     this.height,
     this.direction = Axis.horizontal,
     this.margin,
+    this.onMore,
   });
   final Axis direction;
   final EdgeInsets? margin;
+  final VoidCallback? onMore;
 
   // TODO(Josh): rename width and height
   final double? width;
@@ -137,8 +140,8 @@ class PlayableVideoContent extends StatelessWidget {
                   ),
                   Align(
                     alignment: Alignment.topRight,
-                    child: InkWell(
-                      onTap: () {},
+                    child: CustomInkWell(
+                      onTap: onMore,
                       child: const Icon(YTIcons.more_vert_outlined, size: 14),
                     ),
                   ),

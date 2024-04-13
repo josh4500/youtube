@@ -30,6 +30,8 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
+import 'custom_ink_well.dart';
+
 class CommentTile extends StatelessWidget {
   const CommentTile({
     super.key,
@@ -52,16 +54,11 @@ class CommentTile extends StatelessWidget {
             onPressed: openReply,
             padding: const EdgeInsets.all(16),
             stackedAlignment: Alignment.topRight,
-            stackedChild: InkWell(
+            stackedChild: CustomInkWell(
               onTap: () {},
+              padding: const EdgeInsets.all(16.0),
               borderRadius: BorderRadius.circular(32),
-              child: const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Icon(
-                  YTIcons.more_vert_outlined,
-                  size: 16,
-                ),
-              ),
+              child: const Icon(YTIcons.more_vert_outlined, size: 16),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
