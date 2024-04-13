@@ -28,9 +28,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/player/playback/playback_caption.dart';
-import 'package:youtube_clone/presentation/widgets/player/playback/playback_duration.dart';
 
+import 'playback_caption.dart';
+import 'playback_duration.dart';
 import 'playback_progress.dart';
 
 class PlaybackView extends StatefulWidget {

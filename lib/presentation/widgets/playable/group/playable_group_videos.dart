@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets.dart';
+
+import '../../tappable_area.dart';
+import '../playable_video_content.dart';
 
 class PlayableGroupVideos extends StatelessWidget {
   const PlayableGroupVideos({

@@ -29,9 +29,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/infrastructure/services/internet_connectivity/internet_connectivity.dart';
-
-import '../../infrastructure/services/internet_connectivity/connectivity_state.dart';
+import 'package:youtube_clone/infrastructure.dart';
 
 class ConnectionSnackbar extends StatefulWidget {
   const ConnectionSnackbar({

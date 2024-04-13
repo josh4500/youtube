@@ -4,7 +4,9 @@ import 'package:youtube_clone/core/enums/auth_state.dart';
 import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
-import '../../widgets.dart';
+import '../account_avatar.dart';
+import '../builders/auth_state_builder.dart';
+import '../connection_snackbar.dart';
 
 class HomeNavigatorBar extends ConsumerStatefulWidget {
   const HomeNavigatorBar({
@@ -120,8 +122,10 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
                                     ? YTIcons.home_filled
                                     : YTIcons.home_outlined,
                               ),
-                              const Text('Home',
-                                  style: TextStyle(fontSize: 10)),
+                              const Text(
+                                'Home',
+                                style: TextStyle(fontSize: 10),
+                              ),
                             ],
                           ),
                         ),
@@ -137,8 +141,10 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
                                     ? YTIcons.shorts_filled
                                     : YTIcons.shorts_outlined,
                               ),
-                              const Text('Short',
-                                  style: TextStyle(fontSize: 10)),
+                              const Text(
+                                'Short',
+                                style: TextStyle(fontSize: 10),
+                              ),
                             ],
                           ),
                         ),

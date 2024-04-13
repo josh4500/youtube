@@ -27,9 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-
-import '../../../infrastructure/services/internet_connectivity/connectivity_state.dart';
-import '../../../infrastructure/services/internet_connectivity/internet_connectivity.dart';
+import 'package:youtube_clone/infrastructure.dart';
 
 class NetworkBuilder extends StatelessWidget {
   const NetworkBuilder({super.key, required this.builder});

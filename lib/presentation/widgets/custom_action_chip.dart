@@ -123,7 +123,7 @@ class _CustomActionChipState extends State<CustomActionChip>
                         const TextStyle(
                           fontSize: 12,
                         ),
-                  )
+                  ),
               ],
             ),
           ),

@@ -29,7 +29,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets.dart';
+
+import 'network_image/custom_network_image.dart';
+import 'network_image/image_replacement.dart';
 
 const List<Color> _avatarColor = <Color>[
   Color(0xFF512DA7),

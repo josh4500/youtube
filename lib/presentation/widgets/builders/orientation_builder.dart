@@ -27,7 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/theme/device_theme.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 typedef LandscapeBuilder = Widget Function(BuildContext context, Widget? child);
 typedef PortraitBuilder = Widget Function(BuildContext context, Widget? child);

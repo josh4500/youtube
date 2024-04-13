@@ -27,14 +27,13 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/constants/assets.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
+import '../account_avatar.dart';
 import '../custom_ink_well.dart';
 import '../dynamic_sheet.dart';
 import '../network_image/custom_network_image.dart';
+import '../tappable_area.dart';
 
 class ViewablePostContent extends StatelessWidget {
   const ViewablePostContent({super.key, this.onMore});
@@ -143,7 +142,7 @@ class ViewablePostContent extends StatelessWidget {
               SizedBox(width: 32),
               Icon(YTIcons.dislike_outlined),
               Spacer(),
-              Icon(Icons.comment_outlined),
+              Icon(YTIcons.comments_outlined),
               SizedBox(width: 8),
               Text('2'),
             ],

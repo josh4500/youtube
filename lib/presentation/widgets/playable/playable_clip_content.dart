@@ -28,7 +28,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/clip_thumb_clipper.dart';
+
+import '../clip_thumb_clipper.dart';
 
 class PlayableClipContent extends StatelessWidget {
   const PlayableClipContent({

@@ -146,6 +146,7 @@ class YTIcons {
   static const IconData unsubscribe_outlined = IconData(0xe887, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData shorts_comment_filled = IconData(0xe888, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData analytics_outlined = IconData(0xe88a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData comments_outlined = IconData(0xe88b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData discover_outlined = IconData(0xe900, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData subscriptions_outlined = IconData(0xe901, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData shorts_outlined = IconData(0xe902, fontFamily: _kFontFam, fontPackage: _kFontPkg);

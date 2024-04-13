@@ -28,13 +28,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/shimmer.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 import '../account_avatar.dart';
 import '../custom_ink_well.dart';
 import '../network_image/custom_network_image.dart';
 import '../player/playback/playback_view.dart';
+import '../shimmer.dart';
+import '../tappable_area.dart';
 
 class ViewableVideoContent extends StatelessWidget {
   const ViewableVideoContent({super.key, this.onTap, this.onMore});

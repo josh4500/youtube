@@ -1923,6 +1923,20 @@
       "search": [
         "analytics_outlined"
       ]
+    },
+    {
+      "uid": "33fbefafc050963a0ffde4501bbaadfc",
+      "css": "comments_outlined",
+      "code": 59531,
+      "src": "custom_icons",
+      "selected": true,
+      "svg": {
+        "path": "M333.3 291.7H666.7V375H333.3V291.7ZM333.3 541.7H541.7V458.3H333.3V541.7ZM208.3 125V666.7H625 642.1L654.2 678.7 791.7 816.3V125H208.3ZM166.7 83.3H833.3V916.7L625 708.3H166.7V83.3Z",
+        "width": 1000
+      },
+      "search": [
+        "comments_outlined"
+      ]
     }
   ]
 }

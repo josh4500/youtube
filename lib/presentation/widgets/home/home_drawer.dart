@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
-import 'package:youtube_clone/presentation/router/app_router.dart';
-import 'package:youtube_clone/presentation/router/app_routes.dart';
+import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../constants.dart';
+import '../app_logo.dart';
+import '../over_scroll_glow_behavior.dart';
+import '../tappable_area.dart';
 
 class HomeDrawer extends StatelessWidget {
   const HomeDrawer({

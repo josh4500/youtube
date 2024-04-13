@@ -28,9 +28,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 import 'custom_ink_well.dart';
+import 'tappable_area.dart';
 
 class CommentTile extends StatelessWidget {
   const CommentTile({
