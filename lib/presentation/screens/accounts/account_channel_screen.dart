@@ -138,7 +138,7 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
                                 vertical: 4,
                                 horizontal: 2,
                               ),
-                              onPressed: () async {
+                              onTap: () async {
                                 showAccountPlaylistsSortMenu(context);
                               },
                               child: const Row(
@@ -161,7 +161,7 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
                           delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               return TappableArea(
-                                onPressed: () {},
+                                onTap: () {},
                                 child: const Padding(
                                   padding: EdgeInsets.symmetric(
                                     vertical: 4.0,

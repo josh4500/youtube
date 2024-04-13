@@ -194,7 +194,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                   vertical: 4.0,
                                 ),
                                 child: TappableArea(
-                                  onPressed: _clearSearchField,
+                                  onTap: _clearSearchField,
                                   padding: const EdgeInsets.all(16),
                                   borderRadius: BorderRadius.circular(24),
                                   child: const Icon(
@@ -297,7 +297,7 @@ class _SearchActionsState extends State<SearchActions> {
                 return TappableArea(
                   padding: const EdgeInsets.all(8),
                   borderRadius: BorderRadius.circular(24),
-                  onPressed: _onVoiceSearch,
+                  onTap: _onVoiceSearch,
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white10,

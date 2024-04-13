@@ -47,7 +47,7 @@ class AppbarAction extends StatelessWidget {
       padding: const EdgeInsets.only(left: 1.0, top: 2, bottom: 2),
       child: TappableArea(
         onTapDown: onTapDown,
-        onPressed: onTap,
+        onTap: onTap,
         padding: const EdgeInsets.all(12.0),
         borderRadius: BorderRadius.circular(24),
         child: Icon(icon),

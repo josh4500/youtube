@@ -128,7 +128,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                         trailing: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TappableArea(
-                            onPressed: () {},
+                            onTap: () {},
                             padding: const EdgeInsets.all(4.0),
                             child: const Text(
                               'Settings',

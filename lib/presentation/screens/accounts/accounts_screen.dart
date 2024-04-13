@@ -149,7 +149,7 @@ class AccountsScreen extends StatelessWidget {
                       onTap: () => context.goto(AppRoutes.accountPlaylists),
                       itemBuilder: (BuildContext context, int index) {
                         return TappableArea(
-                          onPressed: () => context.goto(AppRoutes.playlist),
+                          onTap: () => context.goto(AppRoutes.playlist),
                           child: index == 7
                               ? const AddNewPlaylist()
                               : PlayableContent(

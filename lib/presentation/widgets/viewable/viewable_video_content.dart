@@ -46,7 +46,7 @@ class ViewableVideoContent extends StatelessWidget {
     return Stack(
       children: <Widget>[
         TappableArea(
-          onPressed: onTap,
+          onTap: onTap,
           padding: const EdgeInsets.only(bottom: 12),
           child: Column(
             children: <Widget>[

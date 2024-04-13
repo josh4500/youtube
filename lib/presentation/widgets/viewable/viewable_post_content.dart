@@ -112,7 +112,7 @@ class ViewablePostContent extends StatelessWidget {
           ),
         ),
         TappableArea(
-          onPressed: () {},
+          onTap: () {},
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 2),
           child: const Padding(
             padding: EdgeInsets.only(bottom: 8.0),

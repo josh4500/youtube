@@ -81,7 +81,7 @@ class AccountChannelSection extends StatelessWidget {
             ),
           ),
           TappableArea(
-            onPressed: () {
+            onTap: () {
               context.goto(
                 AppRoutes.channelDescription.withPrefixParent(
                   AppRoutes.accounts,

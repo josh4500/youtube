@@ -436,7 +436,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
               vertical: 4,
               horizontal: 2,
             ),
-            onPressed: () async {},
+            onTap: () async {},
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[

@@ -61,7 +61,7 @@ class WatchOnTvScreen extends StatelessWidget {
           const FoundTVs(),
           const Divider(thickness: 1.5, height: 0),
           TappableArea(
-            onPressed: () => context.goto(AppRoutes.linkTv),
+            onTap: () => context.goto(AppRoutes.linkTv),
             padding: EdgeInsets.zero,
             child: Padding(
               padding: const EdgeInsets.all(16.0),

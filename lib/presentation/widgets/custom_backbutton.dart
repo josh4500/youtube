@@ -47,7 +47,7 @@ class CustomBackButton extends StatelessWidget {
         exitDuration: const Duration(milliseconds: 250),
         triggerMode: TooltipTriggerMode.longPress,
         child: TappableArea(
-          onPressed: onPressed,
+          onTap: onPressed,
           padding: const EdgeInsets.all(12),
           borderRadius: BorderRadius.circular(24),
           splashColor: Colors.white24,

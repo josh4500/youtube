@@ -105,7 +105,7 @@ class ChannelSection extends StatelessWidget {
           ),
         ),
         TappableArea(
-          onPressed: () {
+          onTap: () {
             context.goto(
               AppRoutes.channelDescription.withPrefixParent(
                 AppRoutes.subscriptions,

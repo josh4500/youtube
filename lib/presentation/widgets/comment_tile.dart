@@ -51,7 +51,7 @@ class CommentTile extends StatelessWidget {
       child: Column(
         children: <Widget>[
           TappableArea(
-            onPressed: openReply,
+            onTap: openReply,
             padding: const EdgeInsets.all(16),
             stackedAlignment: Alignment.topRight,
             stackedChild: CustomInkWell(
@@ -134,7 +134,7 @@ class CommentTile extends StatelessWidget {
               children: <Widget>[
                 const SizedBox(width: 52),
                 TappableArea(
-                  onPressed: openReply,
+                  onTap: openReply,
                   padding: const EdgeInsets.symmetric(
                     vertical: 16,
                     horizontal: 8,

@@ -158,7 +158,7 @@ class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
                     return TappableArea(
-                      onPressed: () {},
+                      onTap: () {},
                       padding: const EdgeInsets.symmetric(
                         vertical: 8,
                         horizontal: 16,

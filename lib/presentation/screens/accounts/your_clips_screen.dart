@@ -136,7 +136,7 @@ class _YourClipsScreenState extends State<YourClipsScreen>
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
                   return TappableArea(
-                    onPressed: () {},
+                    onTap: () {},
                     padding: const EdgeInsets.symmetric(
                       vertical: 8.0,
                       horizontal: 12,

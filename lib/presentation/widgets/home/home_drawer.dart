@@ -146,7 +146,7 @@ class HomeDrawerItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return TappableArea(
-      onPressed: () {
+      onTap: () {
         if (onTap != null) {
           ref.read(homeRepositoryProvider).closeDrawer();
           onTap?.call();

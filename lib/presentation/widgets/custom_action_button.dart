@@ -97,7 +97,7 @@ class CustomActionButton extends StatelessWidget {
       child: useTappable
           ? TappableArea(
               behavior: HitTestBehavior.opaque,
-              onPressed: onTap,
+              onTap: onTap,
               padding: padding ?? const EdgeInsets.symmetric(horizontal: 11.5),
               borderRadius: borderRadius ?? BorderRadius.circular(32),
               child: buttonContent,

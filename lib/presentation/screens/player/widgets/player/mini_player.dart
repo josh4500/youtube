@@ -110,7 +110,7 @@ class _MiniPlayerPausePlayButton extends ConsumerWidget {
     final isRestart = playerNotifier.ended;
     final isLoading = playerNotifier.loading;
     return TappableArea(
-      onPressed: () {
+      onTap: () {
         if (!isRestart) {
           if (isPlaying) {
             ref.read(playerRepositoryProvider).pauseVideo();
@@ -139,7 +139,7 @@ class _MiniPlayerCloseButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return TappableArea(
-      onPressed: ref.read(playerRepositoryProvider).closePlayerScreen,
+      onTap: ref.read(playerRepositoryProvider).closePlayerScreen,
       padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 14),
       child: const Icon(YTIcons.close_outlined),
     );

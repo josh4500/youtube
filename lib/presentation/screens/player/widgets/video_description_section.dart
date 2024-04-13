@@ -41,7 +41,7 @@ class VideoDescriptionSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TappableArea(
-            onPressed: onTap,
+            onTap: onTap,
             padding: const EdgeInsets.symmetric(
               vertical: 8,
               horizontal: 12,

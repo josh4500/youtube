@@ -84,7 +84,7 @@ class _SubscriptionsTabsState extends State<SubscriptionsTabs> {
                     );
                   },
                   child: TappableArea(
-                    onPressed: () {
+                    onTap: () {
                       final int? prevSelected = _selectedChannel.value;
                       if (prevSelected == index) {
                         _selectedChannel.value = null;
@@ -109,7 +109,7 @@ class _SubscriptionsTabsState extends State<SubscriptionsTabs> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TappableArea(
-            onPressed: () {
+            onTap: () {
               context.goto(AppRoutes.allSubscriptions);
             },
             padding: const EdgeInsets.all(4.0),

@@ -48,7 +48,7 @@ class PlayableGroupContents extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             itemBuilder: (BuildContext context, int index) {
               return TappableArea(
-                onPressed: () {},
+                onTap: () {},
                 onLongPress: () {},
                 child: const PlayableContent(
                   width: 142,

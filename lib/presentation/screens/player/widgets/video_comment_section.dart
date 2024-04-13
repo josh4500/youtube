@@ -151,7 +151,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
         child: LayoutBuilder(
           builder: (context, c) {
             return TappableArea(
-              onPressed: widget.onTap,
+              onTap: widget.onTap,
               padding: EdgeInsets.zero,
               borderRadius: BorderRadius.circular(16),
               stackedPosition: StackedPosition(bottom: 5),
@@ -166,7 +166,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
                             onPageChanged: (page) => currentPage = page,
                             children: [
                               TappableArea(
-                                onPressed: widget.onTap,
+                                onTap: widget.onTap,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12.0,
                                   vertical: 8,

@@ -38,13 +38,13 @@ Future<T?> showAccountPlaylistsSortMenu<T>(
     items: <PopupMenuEntry<T>>[
       PopupMenuItem(
         child: TappableArea(
-          onPressed: () {},
+          onTap: () {},
           child: const Text('Date added (newest)'),
         ),
       ),
       PopupMenuItem(
         child: TappableArea(
-          onPressed: () {},
+          onTap: () {},
           child: const Text('Last video added'),
         ),
       ),

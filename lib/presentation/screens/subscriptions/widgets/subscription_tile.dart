@@ -39,7 +39,7 @@ class SubscriptionTile extends StatelessWidget {
       alignment: Alignment.centerRight,
       children: <Widget>[
         TappableArea(
-          onPressed: () {
+          onTap: () {
             context.goto(
               AppRoutes.channel.withPrefixParent(
                 AppRoutes.subscriptions,

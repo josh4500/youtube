@@ -50,7 +50,7 @@ class TappableArea extends StatefulWidget {
     this.stackedAlignment = Alignment.center,
     this.stackedChild,
     required this.child,
-    this.onPressed,
+    this.onTap,
     this.onLongPress,
     this.splashColor,
     this.onTapDown,
@@ -63,7 +63,7 @@ class TappableArea extends StatefulWidget {
   final StackedPosition? stackedPosition;
   final Widget? stackedChild;
   final BorderRadius borderRadius;
-  final VoidCallback? onPressed;
+  final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final Color? splashColor;
   final void Function(TapDownDetails details)? onTapDown;
@@ -192,7 +192,7 @@ class _TappableAreaState extends State<TappableArea>
       children: <Widget>[
         GestureDetector(
           behavior: widget.behavior,
-          onTap: widget.onPressed,
+          onTap: widget.onTap,
           onLongPress: widget.onLongPress,
           onTapDown: (details) async {
             widget.onTapDown?.call(details);

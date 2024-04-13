@@ -173,7 +173,7 @@ class _DynamicTabState extends State<DynamicTab> {
                   );
                 },
                 child: TappableArea(
-                  onPressed: () {
+                  onTap: () {
                     _selectedIndexNotifier.value = index;
                     widget.onChanged?.call(index);
                   },

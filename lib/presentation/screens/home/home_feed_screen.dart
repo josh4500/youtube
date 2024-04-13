@@ -197,7 +197,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                             trailing: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TappableArea(
-                                onPressed: () {},
+                                onTap: () {},
                                 padding: const EdgeInsets.all(4.0),
                                 child: const Text(
                                   'Send feedback',

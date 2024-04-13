@@ -50,7 +50,7 @@ class PlayableGroupVideos extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             itemBuilder: (BuildContext context, int index) {
               return TappableArea(
-                onPressed: () {},
+                onTap: () {},
                 onLongPress: () {},
                 child: const PlayableVideoContent(
                   width: 142,

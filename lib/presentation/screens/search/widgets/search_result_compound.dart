@@ -56,7 +56,7 @@ class _SearchResultCompoundState extends State<SearchResultCompound>
             children: [
               TappableArea(
                 borderRadius: BorderRadius.circular(8),
-                onPressed: () {
+                onTap: () {
                   if (_showContent.value == false) {
                     _showContent.value = true;
                     _animationController.forward();
