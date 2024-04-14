@@ -32,4 +32,8 @@ class AssetsPath {
       '${_imagePrefix}download_will_appear.png';
   static const String searchVoiceRequest =
       '${_imagePrefix}search_voice_request.png';
+  static String accountIncognito108 =
+      '${_imagePrefix}account_incognito_108.png';
+  static String accountIncognito144 =
+      '${_imagePrefix}account_incognito_144.png';
 }

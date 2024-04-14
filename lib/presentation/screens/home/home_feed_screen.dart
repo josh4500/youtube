@@ -77,10 +77,10 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
   @override
   Widget build(BuildContext context) {
     const historyOff = 0 == 8;
-    return Scaffold(
-      floatingActionButton: AuthStateBuilder(
-        builder: (BuildContext context, state) {
-          return Visibility(
+    return AuthStateBuilder(
+      builder: (BuildContext context, state) {
+        return Scaffold(
+          floatingActionButton: Visibility(
             visible: state.isAuthenticated,
             child: Consumer(
               builder: (
@@ -148,191 +148,197 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                 );
               },
             ),
-          );
-        },
-      ),
-      body: ScrollConfiguration(
-        behavior: const OverScrollGlowBehavior(enabled: false),
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: <Widget>[
-            SliverAppBar(
-              floating: true,
-              automaticallyImplyLeading: false,
-              leadingWidth: 120,
-              leading: const AppLogo(),
-              actions: <Widget>[
-                AppbarAction(
-                  icon: YTIcons.cast_outlined,
-                  onTap: () {},
-                ),
-                AppbarAction(
-                  icon: YTIcons.notification_outlined,
-                  onTap: () => context.goto(AppRoutes.notifications),
-                ),
-                AppbarAction(
-                  icon: YTIcons.search_outlined,
-                  onTap: () => context.goto(AppRoutes.search),
-                ),
-              ],
-              bottom: historyOff == false
-                  ? PreferredSize(
-                      preferredSize: Size(MediaQuery.sizeOf(context).width, 48),
-                      child: SizedBox(
-                        height: 48,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0),
-                          child: DynamicTab(
-                            initialIndex: 0,
-                            leadingWidth: 7.5,
-                            useTappable: true,
-                            leading: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Consumer(
-                                builder: (context, ref, child) {
-                                  return CustomActionChip(
-                                    borderRadius: BorderRadius.circular(4),
-                                    backgroundColor: Colors.white12,
-                                    icon: const Icon(YTIcons.discover_outlined),
-                                    onTap: () {
-                                      ref
-                                          .read(homeRepositoryProvider)
-                                          .openDrawer();
+          ),
+          body: ScrollConfiguration(
+            behavior: const OverScrollGlowBehavior(enabled: false),
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: <Widget>[
+                SliverAppBar(
+                  floating: true,
+                  automaticallyImplyLeading: false,
+                  leadingWidth: 120,
+                  leading: const AppLogo(),
+                  actions: <Widget>[
+                    AppbarAction(
+                      icon: YTIcons.cast_outlined,
+                      onTap: () {},
+                    ),
+                    AppbarAction(
+                      icon: YTIcons.notification_outlined,
+                      onTap: () => context.goto(AppRoutes.notifications),
+                    ),
+                    AppbarAction(
+                      icon: YTIcons.search_outlined,
+                      onTap: () => context.goto(AppRoutes.search),
+                    ),
+                  ],
+                  bottom: historyOff == false && state.isAuthenticated
+                      ? PreferredSize(
+                          preferredSize:
+                              Size(MediaQuery.sizeOf(context).width, 48),
+                          child: SizedBox(
+                            height: 48,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              child: DynamicTab(
+                                initialIndex: 0,
+                                leadingWidth: 7.5,
+                                useTappable: true,
+                                leading: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Consumer(
+                                    builder: (context, ref, child) {
+                                      return CustomActionChip(
+                                        borderRadius: BorderRadius.circular(4),
+                                        backgroundColor: Colors.white12,
+                                        icon: const Icon(
+                                            YTIcons.discover_outlined),
+                                        onTap: () {
+                                          ref
+                                              .read(homeRepositoryProvider)
+                                              .openDrawer();
+                                        },
+                                      );
                                     },
-                                  );
-                                },
-                              ),
-                            ),
-                            trailing: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TappableArea(
-                                onTap: () {},
-                                padding: const EdgeInsets.all(4.0),
-                                child: const Text(
-                                  'Send feedback',
-                                  style: TextStyle(
-                                    color: Colors.blueAccent,
                                   ),
                                 ),
-                              ),
-                            ),
-                            options: const <String>[
-                              'All',
-                              'Music',
-                              'Debates',
-                              'News',
-                              'Computer programing',
-                              'Apple',
-                              'Mixes',
-                              'Manga',
-                              'Podcasts',
-                              'Stewie Griffin',
-                              'Gaming',
-                              'Electrical Engineering',
-                              'Physics',
-                              'Live',
-                              'Sketch comedy',
-                              'Courts',
-                              'AI',
-                              'Machines',
-                              'Recently uploaded',
-                              'Posts',
-                              'New to you',
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  : null,
-            ),
-            if (historyOff)
-              const SliverToBoxAdapter(child: HomeFeedHistoryOff())
-            else
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    return Consumer(
-                      builder: (context, ref, child) {
-                        return ViewableVideoContent(
-                          onTap: () async {
-                            if (context.orientation.isLandscape) {
-                              await context
-                                  .goto(AppRoutes.playerLandscapeScreen);
-                            }
-                            ref
-                                .read(playerRepositoryProvider)
-                                .openPlayerScreen();
-                          },
-                          onMore: () {
-                            showDynamicSheet(
-                              context,
-                              items: [
-                                DynamicSheetItem(
-                                  leading: const Icon(
-                                    YTIcons.playlist_play_outlined,
-                                  ),
-                                  title: 'Play next in queue',
-                                  trailing: ClipRRect(
-                                    borderRadius: BorderRadius.circular(2),
-                                    child: Image.asset(
-                                      AssetsPath.ytPAccessIcon48,
-                                      width: 18,
-                                      height: 18,
+                                trailing: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TappableArea(
+                                    onTap: () {},
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: const Text(
+                                      'Send feedback',
+                                      style: TextStyle(
+                                        color: Colors.blueAccent,
+                                      ),
                                     ),
                                   ),
                                 ),
-                                const DynamicSheetItem(
-                                  leading: Icon(YTIcons.watch_later_outlined),
-                                  title: 'Save to Watch later',
-                                ),
-                                const DynamicSheetItem(
-                                  leading: Icon(YTIcons.save_outlined_1),
-                                  title: 'Save to playlist',
-                                ),
-                                const DynamicSheetItem(
-                                  leading: Icon(YTIcons.share_outlined),
-                                  title: 'Share',
-                                ),
-                                const DynamicSheetItem(
-                                  leading: Icon(
-                                    YTIcons.not_interested_outlined,
-                                  ),
-                                  title: 'Not interested',
-                                ),
-                                const DynamicSheetItem(
-                                  leading: Icon(
-                                    YTIcons.not_interested_outlined,
-                                  ),
-                                  title: 'Don\'t recommend channel',
-                                  dependents: [DynamicSheetItemDependent.auth],
-                                ),
-                                const DynamicSheetItem(
-                                  leading: Icon(
-                                    YTIcons.youtube_music_outlined,
-                                  ),
-                                  title: 'Listened with YouTube music',
-                                  trailing: Icon(
-                                    YTIcons.external_link_outlined,
-                                    size: 20,
-                                  ),
-                                ),
-                                const DynamicSheetItem(
-                                  leading: Icon(YTIcons.report_outlined),
-                                  title: 'Report',
-                                ),
-                              ],
+                                options: const <String>[
+                                  'All',
+                                  'Music',
+                                  'Debates',
+                                  'News',
+                                  'Computer programing',
+                                  'Apple',
+                                  'Mixes',
+                                  'Manga',
+                                  'Podcasts',
+                                  'Stewie Griffin',
+                                  'Gaming',
+                                  'Electrical Engineering',
+                                  'Physics',
+                                  'Live',
+                                  'Sketch comedy',
+                                  'Courts',
+                                  'AI',
+                                  'Machines',
+                                  'Recently uploaded',
+                                  'Posts',
+                                  'New to you',
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                      : null,
+                ),
+                if (historyOff || state.isInIncognito)
+                  const SliverToBoxAdapter(child: HomeFeedHistoryOff())
+                else
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return Consumer(
+                          builder: (context, ref, child) {
+                            return ViewableVideoContent(
+                              onTap: () async {
+                                if (context.orientation.isLandscape) {
+                                  await context
+                                      .goto(AppRoutes.playerLandscapeScreen);
+                                }
+                                ref
+                                    .read(playerRepositoryProvider)
+                                    .openPlayerScreen();
+                              },
+                              onMore: () {
+                                showDynamicSheet(
+                                  context,
+                                  items: [
+                                    DynamicSheetItem(
+                                      leading: const Icon(
+                                        YTIcons.playlist_play_outlined,
+                                      ),
+                                      title: 'Play next in queue',
+                                      trailing: ClipRRect(
+                                        borderRadius: BorderRadius.circular(2),
+                                        child: Image.asset(
+                                          AssetsPath.ytPAccessIcon48,
+                                          width: 18,
+                                          height: 18,
+                                        ),
+                                      ),
+                                    ),
+                                    const DynamicSheetItem(
+                                      leading:
+                                          Icon(YTIcons.watch_later_outlined),
+                                      title: 'Save to Watch later',
+                                    ),
+                                    const DynamicSheetItem(
+                                      leading: Icon(YTIcons.save_outlined_1),
+                                      title: 'Save to playlist',
+                                    ),
+                                    const DynamicSheetItem(
+                                      leading: Icon(YTIcons.share_outlined),
+                                      title: 'Share',
+                                    ),
+                                    const DynamicSheetItem(
+                                      leading: Icon(
+                                        YTIcons.not_interested_outlined,
+                                      ),
+                                      title: 'Not interested',
+                                    ),
+                                    const DynamicSheetItem(
+                                      leading: Icon(
+                                        YTIcons.not_interested_outlined,
+                                      ),
+                                      title: 'Don\'t recommend channel',
+                                      dependents: [
+                                        DynamicSheetItemDependent.auth
+                                      ],
+                                    ),
+                                    const DynamicSheetItem(
+                                      leading: Icon(
+                                        YTIcons.youtube_music_outlined,
+                                      ),
+                                      title: 'Listened with YouTube music',
+                                      trailing: Icon(
+                                        YTIcons.external_link_outlined,
+                                        size: 20,
+                                      ),
+                                    ),
+                                    const DynamicSheetItem(
+                                      leading: Icon(YTIcons.report_outlined),
+                                      title: 'Report',
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           },
                         );
                       },
-                    );
-                  },
-                  childCount: 10,
-                ),
-              ),
-          ],
-        ),
-      ),
+                      childCount: 10,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -406,9 +412,18 @@ class HomeFeedHistoryOff extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.075),
               borderRadius: BorderRadius.circular(12),
+              // boxShadow: const [
+              //   BoxShadow(
+              //     blurRadius: 8,
+              //     spreadRadius: -4,
+              //     color: Colors.black54,
+              //   )
+              // ],
             ),
-            child: 00 == 88
-                ? Column(
+            child: AuthStateBuilder(
+              builder: (BuildContext context, state) {
+                if (state.isInIncognito) {
+                  return Column(
                     children: [
                       const SizedBox(height: 18),
                       const Text(
@@ -432,57 +447,61 @@ class HomeFeedHistoryOff extends StatelessWidget {
                       ),
                       const SizedBox(height: 18),
                     ],
-                  )
-                : Column(
-                    children: [
-                      const SizedBox(height: 18),
-                      const Text(
-                        'Your watch history is off',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                        ),
+                  );
+                }
+
+                return Column(
+                  children: [
+                    const SizedBox(height: 18),
+                    const Text(
+                      'Your watch history is off',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
                       ),
-                      const SizedBox(height: 18),
-                      RichText(
-                        text: const TextSpan(
-                          text:
-                              'You can change setting at any time to get the latest videos tailored to you. ',
-                          children: [
-                            TextSpan(
-                              text: 'Learn more',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.blue,
-                              ),
+                    ),
+                    const SizedBox(height: 18),
+                    RichText(
+                      text: const TextSpan(
+                        text:
+                            'You can change setting at any time to get the latest videos tailored to you. ',
+                        children: [
+                          TextSpan(
+                            text: 'Learn more',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.blue,
                             ),
-                          ],
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white60,
                           ),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 10),
-                      CustomActionButton(
-                        title: 'Update Setting',
-                        backgroundColor: Colors.white.withOpacity(0.08),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 12,
-                        ),
-                        borderRadius: BorderRadius.circular(24),
-                        alignment: Alignment.center,
-                        useTappable: false,
-                        textStyle: const TextStyle(
+                        ],
+                        style: TextStyle(
                           fontSize: 14,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
+                          color: Colors.white60,
                         ),
                       ),
-                    ],
-                  ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 10),
+                    CustomActionButton(
+                      title: 'Update Setting',
+                      backgroundColor: Colors.white.withOpacity(0.08),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 12,
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                      alignment: Alignment.center,
+                      useTappable: false,
+                      textStyle: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ],
       ),

@@ -142,7 +142,7 @@ class PlayableVideoContent extends StatelessWidget {
                     alignment: Alignment.topRight,
                     child: CustomInkWell(
                       onTap: onMore,
-                      child: const Icon(YTIcons.more_vert_outlined, size: 14),
+                      child: const Icon(YTIcons.more_vert_outlined, size: 15.5),
                     ),
                   ),
                 ],

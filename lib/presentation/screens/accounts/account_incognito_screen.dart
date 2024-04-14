@@ -27,6 +27,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class AccountIncognitoScreen extends StatelessWidget {
   const AccountIncognitoScreen({super.key});
@@ -38,33 +40,41 @@ class AccountIncognitoScreen extends StatelessWidget {
         Expanded(
           child: Column(
             children: <Widget>[
-              const SizedBox(height: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(36),
-                  margin: const EdgeInsets.symmetric(horizontal: 94),
-                  alignment: Alignment.center,
-                  child: const SizedBox(
-                    width: 100,
-                    height: 100,
-                  ),
+              const SizedBox(height: 56),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset(
+                  AssetsPath.accountIncognito108,
+                  width: 96,
+                  height: 96,
+                  color: const Color(0xFFCCCCCC),
                 ),
               ),
+              const SizedBox(height: 44),
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 62.0),
+                margin: const EdgeInsets.symmetric(horizontal: 48.0),
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: const Text(
                   'Nothing is added to the "You" tab while you\'re incognito',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
+                    color: Colors.white70,
                   ),
                 ),
               ),
-              const SizedBox(height: 9),
-              TextButton(
-                child: const Text('Turn off Incognito'),
-                onPressed: () {},
+              const SizedBox(height: 24),
+              const TappableArea(
+                padding: EdgeInsets.symmetric(
+                  vertical: 6.0,
+                  horizontal: 12,
+                ),
+                child: Text(
+                  'Turn off Incognito',
+                  style: TextStyle(
+                    color: Color(0xFF3EA6FF),
+                  ),
+                ),
               ),
             ],
           ),

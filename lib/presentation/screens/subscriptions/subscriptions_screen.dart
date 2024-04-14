@@ -47,209 +47,374 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ScrollConfiguration(
-        behavior: const OverScrollGlowBehavior(
-          enabled: false,
-        ),
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: <Widget>[
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              actions: <Widget>[
-                AppbarAction(
-                  icon: YTIcons.cast_outlined,
-                  onTap: () {},
-                ),
-                AppbarAction(
-                  icon: YTIcons.notification_outlined,
-                  onTap: () => context.goto(AppRoutes.notifications),
-                ),
-                AppbarAction(
-                  icon: YTIcons.search_outlined,
-                  onTap: () => context.goto(AppRoutes.search),
-                ),
-              ],
-              floating: true,
-              bottom: PreferredSize(
-                preferredSize: const Size(double.infinity, 125 + 44),
-                child: Column(
-                  children: <Widget>[
-                    SizedBox(
-                      height: 120,
-                      child: SubscriptionsTabs(
-                        valueListenable: _selectedChannel,
-                        onChange: (int? value) {},
-                      ),
+    return AuthStateBuilder(
+      builder: (context, state) {
+        if (state.isInIncognito) {
+          return const SubscriptionsIncognitoScreen();
+        } else if (state.isNotAuthenticated) {
+          return const UnAuthenticatedSubscriptionScreen();
+        }
+        return Scaffold(
+          resizeToAvoidBottomInset: false,
+          body: ScrollConfiguration(
+            behavior: const OverScrollGlowBehavior(
+              enabled: false,
+            ),
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: <Widget>[
+                SliverAppBar(
+                  automaticallyImplyLeading: false,
+                  actions: <Widget>[
+                    AppbarAction(
+                      icon: YTIcons.cast_outlined,
+                      onTap: () {},
                     ),
-                    const SizedBox(height: 8),
-                    ValueListenableBuilder<int?>(
-                      valueListenable: _selectedChannel,
-                      builder: (
-                        BuildContext context,
-                        int? value,
-                        Widget? childWidget,
-                      ) {
-                        if (value != null) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                CustomActionChip(
-                                  title: 'View channel',
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                    horizontal: 16,
-                                  ),
-                                  backgroundColor: Colors.white12,
-                                  onTap: () {
-                                    context.goto(
-                                      AppRoutes.channel.withPrefixParent(
-                                        AppRoutes.subscriptions,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                        return SizedBox(
-                          height: MediaQuery.sizeOf(context).height * 0.05,
-                          child: childWidget,
-                        );
-                      },
-                      child: DynamicTab(
-                        initialIndex: 1,
-                        useTappable: true,
-                        trailing: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TappableArea(
-                            onTap: () {},
-                            padding: const EdgeInsets.all(4.0),
-                            child: const Text(
-                              'Settings',
-                              style: TextStyle(
-                                color: Colors.blueAccent,
-                              ),
-                            ),
+                    AppbarAction(
+                      icon: YTIcons.notification_outlined,
+                      onTap: () => context.goto(AppRoutes.notifications),
+                    ),
+                    AppbarAction(
+                      icon: YTIcons.search_outlined,
+                      onTap: () => context.goto(AppRoutes.search),
+                    ),
+                  ],
+                  floating: true,
+                  bottom: PreferredSize(
+                    preferredSize: const Size(double.infinity, 125 + 44),
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 120,
+                          child: SubscriptionsTabs(
+                            valueListenable: _selectedChannel,
+                            onChange: (int? value) {},
                           ),
                         ),
-                        options: const <String>[
-                          'All',
-                          'Today',
-                          'Live',
-                          'Shorts',
-                          'Continue watching',
-                          'Unwatched',
-                          'Post',
+                        const SizedBox(height: 8),
+                        ValueListenableBuilder<int?>(
+                          valueListenable: _selectedChannel,
+                          builder: (
+                            BuildContext context,
+                            int? value,
+                            Widget? childWidget,
+                          ) {
+                            if (value != null) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: <Widget>[
+                                    CustomActionChip(
+                                      title: 'View channel',
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 8,
+                                        horizontal: 16,
+                                      ),
+                                      backgroundColor: Colors.white12,
+                                      onTap: () {
+                                        context.goto(
+                                          AppRoutes.channel.withPrefixParent(
+                                            AppRoutes.subscriptions,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                            return SizedBox(
+                              height: MediaQuery.sizeOf(context).height * 0.05,
+                              child: childWidget,
+                            );
+                          },
+                          child: DynamicTab(
+                            initialIndex: 1,
+                            useTappable: true,
+                            trailing: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TappableArea(
+                                onTap: () {},
+                                padding: const EdgeInsets.all(4.0),
+                                child: const Text(
+                                  'Settings',
+                                  style: TextStyle(
+                                    color: Colors.blueAccent,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            options: const <String>[
+                              'All',
+                              'Today',
+                              'Live',
+                              'Shorts',
+                              'Continue watching',
+                              'Unwatched',
+                              'Post',
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                      ],
+                    ),
+                  ),
+                ),
+                const SliverToBoxAdapter(
+                  child: ViewablePostContent(),
+                ),
+                SliverToBoxAdapter(
+                  // TODO(josh4500): What is the use of this Widget
+                  child: ViewableGroupShorts(
+                    title: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 12,
+                      ),
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            AssetsPath.logoShorts32,
+                            filterQuality: FilterQuality.high,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Shorts',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 2),
-                  ],
-                ),
-              ),
-            ),
-            const SliverToBoxAdapter(
-              child: ViewablePostContent(),
-            ),
-            SliverToBoxAdapter(
-              // TODO(josh4500): What is the use of this Widget
-              child: ViewableGroupShorts(
-                title: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 12,
-                  ),
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        AssetsPath.logoShorts32,
-                        filterQuality: FilterQuality.high,
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Shorts',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
                   ),
                 ),
-              ),
-            ),
-            ValueListenableBuilder<int?>(
-              valueListenable: _selectedChannel,
-              builder: (BuildContext context, int? value, Widget? childWidget) {
-                if (value != null) {
-                  return const SliverFillRemaining();
-                }
-                return childWidget!;
-              },
-              child: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return ViewableVideoContent(
-                      onMore: () {
-                        showDynamicSheet(
-                          context,
-                          items: [
-                            DynamicSheetItem(
-                              leading:
-                                  const Icon(YTIcons.playlist_play_outlined),
-                              title: 'Play next in queue',
-                              trailing: ClipRRect(
-                                borderRadius: BorderRadius.circular(2),
-                                child: Image.asset(
-                                  AssetsPath.ytPAccessIcon48,
-                                  width: 18,
-                                  height: 18,
+                ValueListenableBuilder<int?>(
+                  valueListenable: _selectedChannel,
+                  builder:
+                      (BuildContext context, int? value, Widget? childWidget) {
+                    if (value != null) {
+                      return const SliverFillRemaining();
+                    }
+                    return childWidget!;
+                  },
+                  child: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return ViewableVideoContent(
+                          onMore: () {
+                            showDynamicSheet(
+                              context,
+                              items: [
+                                DynamicSheetItem(
+                                  leading: const Icon(
+                                    YTIcons.playlist_play_outlined,
+                                  ),
+                                  title: 'Play next in queue',
+                                  trailing: ClipRRect(
+                                    borderRadius: BorderRadius.circular(2),
+                                    child: Image.asset(
+                                      AssetsPath.ytPAccessIcon48,
+                                      width: 18,
+                                      height: 18,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            const DynamicSheetItem(
-                              leading: Icon(YTIcons.watch_later_outlined),
-                              title: 'Save to Watch later',
-                            ),
-                            const DynamicSheetItem(
-                              leading: Icon(YTIcons.save_outlined_1),
-                              title: 'Save to playlist',
-                            ),
-                            const DynamicSheetItem(
-                              leading: Icon(YTIcons.download_outlined),
-                              title: 'Download video',
-                            ),
-                            const DynamicSheetItem(
-                              leading: Icon(YTIcons.share_outlined),
-                              title: 'Share',
-                            ),
-                            const DynamicSheetItem(
-                              leading: Icon(YTIcons.close_circle_outlined),
-                              title: 'Unsubscribe',
-                              dependents: [DynamicSheetItemDependent.auth],
-                            ),
-                            const DynamicSheetItem(
-                              leading: Icon(YTIcons.not_interested_outlined),
-                              title: 'Hide',
-                              dependents: [DynamicSheetItemDependent.auth],
-                            ),
-                          ],
+                                const DynamicSheetItem(
+                                  leading: Icon(YTIcons.watch_later_outlined),
+                                  title: 'Save to Watch later',
+                                ),
+                                const DynamicSheetItem(
+                                  leading: Icon(YTIcons.save_outlined_1),
+                                  title: 'Save to playlist',
+                                ),
+                                const DynamicSheetItem(
+                                  leading: Icon(YTIcons.download_outlined),
+                                  title: 'Download video',
+                                ),
+                                const DynamicSheetItem(
+                                  leading: Icon(YTIcons.share_outlined),
+                                  title: 'Share',
+                                ),
+                                const DynamicSheetItem(
+                                  leading: Icon(YTIcons.close_circle_outlined),
+                                  title: 'Unsubscribe',
+                                  dependents: [DynamicSheetItemDependent.auth],
+                                ),
+                                const DynamicSheetItem(
+                                  leading:
+                                      Icon(YTIcons.not_interested_outlined),
+                                  title: 'Hide',
+                                  dependents: [DynamicSheetItemDependent.auth],
+                                ),
+                              ],
+                            );
+                          },
                         );
                       },
-                    );
-                  },
-                  childCount: 20,
+                      childCount: 20,
+                    ),
+                  ),
                 ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class UnAuthenticatedSubscriptionScreen extends StatelessWidget {
+  const UnAuthenticatedSubscriptionScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const AppLogo(),
+        actions: <Widget>[
+          AppbarAction(
+            icon: YTIcons.cast_outlined,
+            onTap: () {},
+          ),
+          AppbarAction(
+            icon: YTIcons.notification_outlined,
+            onTap: () => context.goto(AppRoutes.notifications),
+          ),
+          AppbarAction(
+            icon: YTIcons.search_outlined,
+            onTap: () => context.goto(AppRoutes.search),
+          ),
+        ],
+      ),
+      body: const Padding(
+        padding: EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            SizedBox(height: 24),
+            Icon(Icons.subscriptions_sharp, size: 120),
+            SizedBox(height: 48),
+            Text(
+              'Don\'t miss new videos',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
               ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Sign in to see updates from your favorite\n YouTube channels',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white54,
+              ),
+            ),
+            SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CustomActionChip(
+                  alignment: Alignment.center,
+                  backgroundColor: Color(0xFF3EA6FF),
+                  title: 'Sign in',
+                  borderRadius: BorderRadius.zero,
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class SubscriptionsIncognitoScreen extends StatelessWidget {
+  const SubscriptionsIncognitoScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const AppLogo(),
+        actions: <Widget>[
+          AppbarAction(
+            icon: YTIcons.cast_outlined,
+            onTap: () {},
+          ),
+          AppbarAction(
+            icon: YTIcons.notification_outlined,
+            onTap: () => context.goto(AppRoutes.notifications),
+          ),
+          AppbarAction(
+            icon: YTIcons.search_outlined,
+            onTap: () => context.goto(AppRoutes.search),
+          ),
+        ],
+      ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                const SizedBox(height: 56),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset(
+                    AssetsPath.accountIncognito108,
+                    width: 96,
+                    height: 96,
+                    color: const Color(0xFFCCCCCC),
+                  ),
+                ),
+                const SizedBox(height: 44),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 48.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: const Text(
+                    'Your subscriptions are hidden while you\'re incognito',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const TappableArea(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 6.0,
+                    horizontal: 12,
+                  ),
+                  child: Text(
+                    'Turn off Incognito',
+                    style: TextStyle(
+                      color: Color(0xFF3EA6FF),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Expanded(
+            child: Column(
+              children: <Widget>[
+                if (false) Center(child: CircularProgressIndicator()),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

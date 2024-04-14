@@ -69,6 +69,8 @@ class AccountsScreen extends StatelessWidget {
         builder: (BuildContext context, AuthState state) {
           if (state.isInIncognito) {
             return const AccountIncognitoScreen();
+          } else if (state.isNotAuthenticated) {
+            return const UnAuthenticatedAccountScreen();
           }
           return CustomScrollView(
             scrollBehavior: const OverScrollGlowBehavior(enabled: false),
@@ -233,6 +235,57 @@ class AccountsScreen extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class UnAuthenticatedAccountScreen extends StatelessWidget {
+  const UnAuthenticatedAccountScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.all(24.0),
+      child: Column(
+        children: [
+          SizedBox(height: 24),
+          Icon(Icons.folder, size: 120),
+          SizedBox(height: 48),
+          Text(
+            'Enjoy your favorite videos',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Sign in to access videos that you\'ve liked or\nsaved',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white54,
+            ),
+          ),
+          SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CustomActionChip(
+                alignment: Alignment.center,
+                backgroundColor: Color(0xFF3EA6FF),
+                title: 'Sign in',
+                borderRadius: BorderRadius.zero,
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

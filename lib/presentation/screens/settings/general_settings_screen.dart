@@ -85,6 +85,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
           ),
           SettingsTile(
             title: 'Remind me when it\'s bedtime',
+            accountRequired: true,
             onGenerateSummary: (_) {
               final RemindForBedtime remindForBedtime =
                   preferences.remindForBedtime;
@@ -335,7 +336,8 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
                           },
                         ),
                         const Text(
-                            'Wait until I finish video to show reminder'),
+                          'Wait until I finish video to show reminder',
+                        ),
                       ],
                     ),
                   ),

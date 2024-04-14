@@ -82,6 +82,50 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
     super.dispose();
   }
 
+  void onMorePlaybleVideo() {
+    showDynamicSheet(
+      context,
+      items: [
+        const DynamicSheetItem(
+          leading: Icon(YTIcons.delete_outlined),
+          title: 'Remove from watch history',
+        ),
+        DynamicSheetItem(
+          leading: const Icon(
+            YTIcons.playlist_play_outlined,
+          ),
+          title: 'Play next in queue',
+          trailing: ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: Image.asset(
+              AssetsPath.ytPAccessIcon48,
+              width: 18,
+              height: 18,
+            ),
+          ),
+        ),
+        const DynamicSheetItem(
+          leading: Icon(
+            YTIcons.watch_later_outlined,
+          ),
+          title: 'Save to Watch later',
+        ),
+        const DynamicSheetItem(
+          leading: Icon(YTIcons.save_outlined_1),
+          title: 'Save to playlist',
+        ),
+        const DynamicSheetItem(
+          leading: Icon(YTIcons.download_outlined),
+          title: 'Download video',
+        ),
+        const DynamicSheetItem(
+          leading: Icon(YTIcons.share_outlined),
+          title: 'Share',
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,49 +220,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                             width: 180,
                             height: 104,
                             margin: const EdgeInsets.all(12.0),
-                            onMore: () {
-                              showDynamicSheet(
-                                context,
-                                items: [
-                                  const DynamicSheetItem(
-                                    leading: Icon(YTIcons.delete_outlined),
-                                    title: 'Remove from watch history',
-                                  ),
-                                  DynamicSheetItem(
-                                    leading: const Icon(
-                                      YTIcons.playlist_play_outlined,
-                                    ),
-                                    title: 'Play next in queue',
-                                    trailing: ClipRRect(
-                                      borderRadius: BorderRadius.circular(2),
-                                      child: Image.asset(
-                                        AssetsPath.ytPAccessIcon48,
-                                        width: 18,
-                                        height: 18,
-                                      ),
-                                    ),
-                                  ),
-                                  const DynamicSheetItem(
-                                    leading: Icon(
-                                      YTIcons.watch_later_outlined,
-                                    ),
-                                    title: 'Save to Watch later',
-                                  ),
-                                  const DynamicSheetItem(
-                                    leading: Icon(YTIcons.save_outlined_1),
-                                    title: 'Save to playlist',
-                                  ),
-                                  const DynamicSheetItem(
-                                    leading: Icon(YTIcons.download_outlined),
-                                    title: 'Download video',
-                                  ),
-                                  const DynamicSheetItem(
-                                    leading: Icon(YTIcons.share_outlined),
-                                    title: 'Share',
-                                  ),
-                                ],
-                              );
-                            },
+                            onMore: onMorePlaybleVideo,
                           ),
                         ),
                       ),
@@ -248,10 +250,11 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                       child: Material(
                         child: CustomInkWell(
                           onTap: () {},
-                          child: const PlayableVideoContent(
+                          child: PlayableVideoContent(
                             width: 180,
                             height: 104,
-                            margin: EdgeInsets.all(12.0),
+                            margin: const EdgeInsets.all(12.0),
+                            onMore: onMorePlaybleVideo,
                           ),
                         ),
                       ),

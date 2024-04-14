@@ -54,7 +54,8 @@ class ShortsInfoSection extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       ...<Widget>[
-                        GestureDetector(
+                        CustomInkWell(
+                          onTap: () {},
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               vertical: 6,
@@ -114,21 +115,24 @@ class ShortsInfoSection extends StatelessWidget {
                           const SizedBox(width: 8),
                           const Text('@maxymilliano'),
                           const SizedBox(width: 12),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                            child: const Text(
-                              'Subscribe',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
+                          CustomInkWell(
+                            onTap: () {},
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(32),
+                              ),
+                              child: const Text(
+                                'Subscribe',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ),

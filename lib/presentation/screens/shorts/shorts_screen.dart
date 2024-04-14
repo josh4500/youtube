@@ -26,24 +26,15 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
-import 'package:youtube_clone/presentation/screens/shorts/widgets/shorts_info_section.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/custom_action_button.dart';
-import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
-import 'package:youtube_clone/presentation/widgets/custom_backbutton.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
-import 'package:youtube_clone/presentation/widgets/player/playback/playback_progress.dart';
 
-import '../../widgets/appbar_action.dart';
 import 'widgets/shorts_category_actions.dart';
 import 'widgets/shorts_comments_bottom_sheet.dart';
+import 'widgets/shorts_info_section.dart';
 
 class ShortsScreen extends ConsumerStatefulWidget {
   const ShortsScreen({
@@ -78,9 +69,9 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
       DraggableScrollableController();
 
   final ValueNotifier<double> playerBottomPadding = ValueNotifier<double>(0);
-  final ValueNotifier<ScrollPhysics> physicsNotifier =
-      ValueNotifier<ScrollPhysics>(
-    const AlwaysScrollableScrollPhysics(),
+  final CustomScrollableScrollPhysics physics =
+      const CustomScrollableScrollPhysics(
+    tag: 'shorts',
   );
 
   @override
@@ -130,10 +121,10 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
     final double size = _draggableController.size;
     if (size > 0) {
       ref.read(homeRepositoryProvider).hideNavBar();
-      physicsNotifier.value = const NeverScrollableScrollPhysics();
+      physics.canScroll(false);
     } else {
       ref.read(homeRepositoryProvider).showNavBar();
-      physicsNotifier.value = const AlwaysScrollableScrollPhysics();
+      physics.canScroll(true);
     }
   }
 
@@ -159,174 +150,169 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        SafeArea(
-          bottom: false,
-          child: Scaffold(
-            backgroundColor: Colors.black,
-            extendBodyBehindAppBar: true,
-            resizeToAvoidBottomInset: false,
-            appBar: false
-                ? null
-                : AppBar(
-                    title: Text(
-                      _isSubscriptionScreen
-                          ? 'Subscriptions'
-                          : _isLiveScreen
-                              ? 'Live'
-                              : 'Shorts',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    backgroundColor: Colors.transparent,
-                    actions: const <Widget>[
-                      AppbarAction(
-                        icon: YTIcons.shorts_search,
-                      ),
-                      AppbarAction(
-                        icon: Icons.camera_alt_outlined,
-                      ),
-                      AppbarAction(
-                        icon: YTIcons.more_vert_outlined,
-                      ),
-                    ],
-                  ),
-            body: Builder(
-              builder: (context) {
-                if (false) {
-                  return const ShortsHistoryOff();
-                }
-                return Stack(
-                  children: <Widget>[
-                    ScrollConfiguration(
-                      behavior: const OverScrollGlowBehavior(enabled: false),
-                      child: NotificationListener<ScrollNotification>(
-                        onNotification: (ScrollNotification notification) {
-                          if (notification is ScrollEndNotification) {
-                            _progressVisibilityNotifier.value = true;
-                          } else if (notification is ScrollUpdateNotification) {
-                            _progressVisibilityNotifier.value = false;
-                          }
-                          return false;
-                        },
-                        child: ValueListenableBuilder<ScrollPhysics>(
-                          valueListenable: physicsNotifier,
-                          builder: (
-                            BuildContext context,
-                            ScrollPhysics physics,
-                            Widget? childWidget,
-                          ) {
-                            return PageView.builder(
-                              physics: physics,
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (BuildContext context, int index) {
-                                return Stack(
-                                  children: <Widget>[
-                                    Column(
-                                      children: <Widget>[
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: _pausePlay,
-                                            child: ShortsPlayerView(
-                                              isSubscriptionScreen:
-                                                  _isSubscriptionScreen,
-                                              isLiveScreen: _isLiveScreen,
-                                            ),
-                                          ),
-                                        ),
-                                        ValueListenableBuilder<double>(
-                                          valueListenable: playerBottomPadding,
-                                          builder: (
-                                            BuildContext context,
-                                            double value,
-                                            _,
-                                          ) {
-                                            return SizedBox(
-                                              height: value,
-                                              width: double.infinity,
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                    Align(
-                                      alignment: Alignment.bottomCenter,
-                                      child: ShortsInfoSection(
-                                        onTapComment: _openCommentSheet,
-                                      ),
-                                    ),
-                                    ListenableBuilder(
-                                      listenable: _isPaused,
-                                      builder: (
-                                        BuildContext context,
-                                        Widget? childWidget,
-                                      ) {
-                                        if (_showCategoryActions &&
-                                            index == _currentIndex) {
-                                          return childWidget!;
-                                        }
-                                        return const SizedBox();
-                                      },
-                                      child: const ShortsCategoryActions(),
-                                    ),
-                                  ],
-                                );
-                              },
-                              onPageChanged: _onPageIndexChange,
-                              itemCount: 20,
-                            );
-                          },
+    const historyOff = 0 != 0;
+    return Theme(
+      data: AppTheme.dark,
+      child: Stack(
+        children: <Widget>[
+          SafeArea(
+            bottom: false,
+            child: Scaffold(
+              extendBodyBehindAppBar: true,
+              resizeToAvoidBottomInset: false,
+              appBar: historyOff
+                  ? AppBar()
+                  : AppBar(
+                      title: Text(
+                        _isSubscriptionScreen
+                            ? 'Subscriptions'
+                            : _isLiveScreen
+                                ? 'Live'
+                                : 'Shorts',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                      backgroundColor: Colors.transparent,
+                      actions: const <Widget>[
+                        AppbarAction(
+                          icon: YTIcons.shorts_search,
+                        ),
+                        AppbarAction(
+                          icon: Icons.camera_alt_outlined,
+                        ),
+                        AppbarAction(
+                          icon: YTIcons.more_vert_outlined,
+                        ),
+                      ],
                     ),
-
-                    // Playback progress bar
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: ValueListenableBuilder<bool>(
-                        valueListenable: _progressVisibilityNotifier,
-                        builder: (
-                          BuildContext context,
-                          bool visible,
-                          Widget? childWidget,
-                        ) {
-                          return Visibility(
-                            visible: visible,
-                            child: childWidget!,
-                          );
-                        },
-                        child: const PlaybackProgress(),
+              body: Builder(
+                builder: (context) {
+                  if (historyOff) {
+                    return const ShortsHistoryOff();
+                  }
+                  return Stack(
+                    children: <Widget>[
+                      ScrollConfiguration(
+                        behavior: const OverScrollGlowBehavior(enabled: false),
+                        child: NotificationListener<ScrollNotification>(
+                          onNotification: (ScrollNotification notification) {
+                            if (notification is ScrollEndNotification) {
+                              _progressVisibilityNotifier.value = true;
+                            } else if (notification
+                                is ScrollUpdateNotification) {
+                              _progressVisibilityNotifier.value = false;
+                            }
+                            return false;
+                          },
+                          child: PageView.builder(
+                            physics: physics,
+                            scrollDirection: Axis.vertical,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Stack(
+                                children: <Widget>[
+                                  Column(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: _pausePlay,
+                                          child: ShortsPlayerView(
+                                            isSubscriptionScreen:
+                                                _isSubscriptionScreen,
+                                            isLiveScreen: _isLiveScreen,
+                                          ),
+                                        ),
+                                      ),
+                                      ValueListenableBuilder<double>(
+                                        valueListenable: playerBottomPadding,
+                                        builder: (
+                                          BuildContext context,
+                                          double value,
+                                          _,
+                                        ) {
+                                          return SizedBox(
+                                            height: value,
+                                            width: double.infinity,
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: ShortsInfoSection(
+                                      onTapComment: _openCommentSheet,
+                                    ),
+                                  ),
+                                  ListenableBuilder(
+                                    listenable: _isPaused,
+                                    builder: (
+                                      BuildContext context,
+                                      Widget? childWidget,
+                                    ) {
+                                      if (_showCategoryActions &&
+                                          index == _currentIndex) {
+                                        return childWidget!;
+                                      }
+                                      return const SizedBox();
+                                    },
+                                    child: const ShortsCategoryActions(),
+                                  ),
+                                ],
+                              );
+                            },
+                            onPageChanged: _onPageIndexChange,
+                            itemCount: 20,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              },
+
+                      // Playback progress bar
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: ValueListenableBuilder<bool>(
+                          valueListenable: _progressVisibilityNotifier,
+                          builder: (
+                            BuildContext context,
+                            bool visible,
+                            Widget? childWidget,
+                          ) {
+                            return Visibility(
+                              visible: visible,
+                              child: childWidget!,
+                            );
+                          },
+                          child: const PlaybackProgress(),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
-        ),
 
-        // Comment and Reply bottom sheet
-        DraggableScrollableSheet(
-          snap: true,
-          minChildSize: 0,
-          initialChildSize: 0,
-          snapSizes: const <double>[0.0, 0.68],
-          shouldCloseOnMinExtent: false,
-          controller: _draggableController,
-          snapAnimationDuration: const Duration(milliseconds: 300),
-          builder: (BuildContext context, ScrollController controller) {
-            return ShortsCommentsBottomSheet(
-              controller: controller,
-              replyNotifier: _replyIsOpenedNotifier,
-              closeComment: _closeCommentSheet,
-              draggableController: _draggableController,
-            );
-          },
-        ),
-      ],
+          // Comment and Reply bottom sheet
+          DraggableScrollableSheet(
+            snap: true,
+            minChildSize: 0,
+            initialChildSize: 0,
+            snapSizes: const <double>[0.0, 0.68],
+            shouldCloseOnMinExtent: false,
+            controller: _draggableController,
+            snapAnimationDuration: const Duration(milliseconds: 300),
+            builder: (BuildContext context, ScrollController controller) {
+              return ShortsCommentsBottomSheet(
+                controller: controller,
+                replyNotifier: _replyIsOpenedNotifier,
+                closeComment: _closeCommentSheet,
+                draggableController: _draggableController,
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }

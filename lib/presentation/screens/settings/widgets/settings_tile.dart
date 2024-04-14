@@ -96,7 +96,7 @@ class SettingsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return AuthStateBuilder(
       builder: (BuildContext context, AuthState state) {
-        if (state.isNotAuthenticated && accountRequired) {
+        if (!state.isAuthenticated && accountRequired) {
           return const SizedBox();
         }
 
