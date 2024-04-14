@@ -135,31 +135,35 @@ class _YourVideosScreenState extends State<YourVideosScreen>
               automaticallyImplyLeading: false,
               pinned: true,
               title: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 5.5,
-                        horizontal: 12,
-                      ),
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: SizedBox(
+                  height: 44,
+                  child: DynamicTab(
+                    initialIndex: -2,
+                    leading: Container(
                       decoration: BoxDecoration(
                         color: Colors.white12,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(
-                        YTIcons.tune_outlined,
-                        size: 24,
+                      child: CustomInkWell(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 5.5,
+                          horizontal: 12,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        child: const Icon(
+                          YTIcons.tune_outlined,
+                          size: 24,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    const SomeButton(title: 'Videos', isSelected: true),
-                    const SizedBox(width: 8),
-                    const SomeButton(title: 'Shorts'),
-                    const SizedBox(width: 8),
-                    const SomeButton(title: 'Live'),
-                  ],
+                    textStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    useTappable: true,
+                    options: const ['Videos', 'Shorts', 'Live'],
+                  ),
                 ),
               ),
             ),
@@ -168,40 +172,6 @@ class _YourVideosScreenState extends State<YourVideosScreen>
               sliver: SliverFillRemaining(),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class SomeButton extends StatefulWidget {
-  const SomeButton({
-    super.key,
-    this.isSelected = false,
-    required this.title,
-  });
-  final bool isSelected;
-  final String title;
-
-  @override
-  State<SomeButton> createState() => _SomeButtonState();
-}
-
-class _SomeButtonState extends State<SomeButton> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8.5, horizontal: 12),
-      decoration: BoxDecoration(
-        color: widget.isSelected ? Colors.white : Colors.white12,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        widget.title,
-        style: TextStyle(
-          color: widget.isSelected ? Colors.black : Colors.white,
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
         ),
       ),
     );

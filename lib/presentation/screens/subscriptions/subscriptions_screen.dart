@@ -26,6 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router.dart';
@@ -276,7 +277,9 @@ class UnAuthenticatedSubscriptionScreen extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const AppLogo(),
+        automaticallyImplyLeading: false,
+        leadingWidth: 120,
+        leading: const AppLogo(),
         actions: <Widget>[
           AppbarAction(
             icon: YTIcons.cast_outlined,
@@ -292,48 +295,46 @@ class UnAuthenticatedSubscriptionScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            SizedBox(height: 24),
-            Icon(Icons.subscriptions_sharp, size: 120),
-            SizedBox(height: 48),
-            Text(
-              'Don\'t miss new videos',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
+      body: ListView(
+        padding: const EdgeInsets.all(24.0),
+        children: const <Widget>[
+          SizedBox(height: 24),
+          Icon(Icons.subscriptions_sharp, size: 120),
+          SizedBox(height: 48),
+          Text(
+            'Don\'t miss new videos',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
             ),
-            SizedBox(height: 8),
-            Text(
-              'Sign in to see updates from your favorite\n YouTube channels',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white54,
-              ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Sign in to see updates from your favorite\n YouTube channels',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white54,
             ),
-            SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CustomActionChip(
-                  alignment: Alignment.center,
-                  backgroundColor: Color(0xFF3EA6FF),
-                  title: 'Sign in',
-                  borderRadius: BorderRadius.zero,
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w400,
-                  ),
+          ),
+          SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CustomActionChip(
+                alignment: Alignment.center,
+                backgroundColor: Color(0xFF3EA6FF),
+                title: 'Sign in',
+                borderRadius: BorderRadius.zero,
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w400,
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -347,7 +348,9 @@ class SubscriptionsIncognitoScreen extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const AppLogo(),
+        automaticallyImplyLeading: false,
+        leadingWidth: 120,
+        leading: const AppLogo(),
         actions: <Widget>[
           AppbarAction(
             icon: YTIcons.cast_outlined,
@@ -363,58 +366,75 @@ class SubscriptionsIncognitoScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Column(
-              children: <Widget>[
-                const SizedBox(height: 56),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image.asset(
-                    AssetsPath.accountIncognito108,
-                    width: 96,
-                    height: 96,
-                    color: const Color(0xFFCCCCCC),
-                  ),
-                ),
-                const SizedBox(height: 44),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 48.0),
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: const Text(
-                    'Your subscriptions are hidden while you\'re incognito',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white70,
+      body: SingleChildScrollView(
+        child: IntrinsicHeight(
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  children: <Widget>[
+                    const SizedBox(height: 56),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.asset(
+                        AssetsPath.accountIncognito108,
+                        width: 96,
+                        height: 96,
+                        color: const Color(0xFFCCCCCC),
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const TappableArea(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 6.0,
-                    horizontal: 12,
-                  ),
-                  child: Text(
-                    'Turn off Incognito',
-                    style: TextStyle(
-                      color: Color(0xFF3EA6FF),
+                    const SizedBox(height: 44),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 48.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: const Text(
+                        'Your subscriptions are hidden while you\'re incognito',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white70,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 24),
+                    const TappableArea(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 6.0,
+                        horizontal: 12,
+                      ),
+                      child: Text(
+                        'Turn off Incognito',
+                        style: TextStyle(
+                          color: Color(0xFF3EA6FF),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const Expanded(
+                child: Column(
+                  children: <Widget>[
+                    if (false) Center(child: CircularProgressIndicator()),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const Expanded(
-            child: Column(
-              children: <Widget>[
-                if (false) Center(child: CircularProgressIndicator()),
-              ],
-            ),
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+class NoSubscriptionsScreen extends StatelessWidget {
+  const NoSubscriptionsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: CustomScrollView(
+        slivers: [],
       ),
     );
   }
