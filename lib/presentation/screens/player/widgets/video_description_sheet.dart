@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../../constants.dart';
@@ -228,10 +229,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                   title: 'Show transcript',
                   alignment: Alignment.center,
                   padding: const EdgeInsets.all(12),
-                  border: Border.all(
-                    color: Colors.grey,
-                    width: 0.7,
-                  ),
+                  border: Border.all(color: Colors.grey, width: 0.7),
                   onTap: _tScriptController.open,
                   textStyle: const TextStyle(
                     fontSize: 14,
@@ -273,16 +271,13 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                   children: [
                     CustomActionChip(
                       title: 'Videos',
-                      icon: const Icon(Icons.video_settings),
+                      icon: const Icon(YTIcons.your_videos_outlined),
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 6,
                       ),
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 0.7,
-                      ),
+                      border: Border.all(color: Colors.grey, width: 0.7),
                       textStyle: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -299,10 +294,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                         horizontal: 12,
                         vertical: 6,
                       ),
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 0.7,
-                      ),
+                      border: Border.all(color: Colors.grey, width: 0.7),
                       textStyle: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,

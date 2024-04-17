@@ -47,6 +47,7 @@ class AccountOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO(josh4500): Use TappableArea
     if (networkRequired) {
       return NetworkListenableBuilder(
         builder: (BuildContext context, ConnectivityState state) {
@@ -84,9 +85,7 @@ class AccountOptionTile extends StatelessWidget {
       subtitle: summary != null
           ? Text(
               summary!,
-              style: const TextStyle(
-                color: Color(0xFFAAAAAA),
-              ),
+              style: const TextStyle(color: Color(0xFFAAAAAA)),
             )
           : null,
       onTap: onTap,

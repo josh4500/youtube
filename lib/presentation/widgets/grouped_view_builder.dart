@@ -94,17 +94,17 @@ class GroupedViewBuilder extends StatelessWidget {
               onTap: onTap,
             ),
             Positioned(
-              top: 10,
+              top: 12,
               right: 12,
               child: CustomActionChip(
                 title: 'View all',
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.symmetric(
-                  vertical: 10,
+                  vertical: 8,
                   horizontal: 12,
                 ),
                 border: const Border.fromBorderSide(
-                  BorderSide(color: Colors.white12, width: 0.9),
+                  BorderSide(color: Colors.white12),
                 ),
                 onTap: onTap,
               ),

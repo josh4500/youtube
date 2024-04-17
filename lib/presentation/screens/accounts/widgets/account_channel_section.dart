@@ -138,9 +138,7 @@ class AccountChannelSection extends StatelessWidget {
                 CustomActionChip(
                   alignment: Alignment.center,
                   padding: EdgeInsets.all(8),
-                  icon: Icon(
-                    YTIcons.edit_outlined,
-                  ),
+                  icon: Icon(YTIcons.edit_outlined),
                   backgroundColor: Color(0xff2c2c2c),
                 ),
               ],

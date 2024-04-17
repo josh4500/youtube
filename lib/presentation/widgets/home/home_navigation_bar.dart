@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
@@ -103,7 +102,7 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
               axisAlignment: -1,
               sizeFactor: _navBarSizeAnimation,
               child: Material(
-                child: Container(
+                child: ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: widget.height),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -112,127 +111,43 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
                       if (widget.selectedIndex != 1) const Divider(height: 0.5),
                       AuthStateBuilder(
                         builder: (BuildContext context, AuthState state) {
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 26.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  visualDensity: VisualDensity.standard,
-                                  isSelected: widget.selectedIndex == 0,
-                                  onPressed: () => widget.onChangeIndex(0),
-                                  icon: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Icon(
-                                        widget.selectedIndex == 0
-                                            ? YTIcons.home_filled
-                                            : YTIcons.home_outlined,
-                                      ),
-                                      const Text(
-                                        'Home',
-                                        style: TextStyle(fontSize: 10),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  visualDensity: VisualDensity.standard,
-                                  onPressed: () => widget.onChangeIndex(1),
-                                  icon: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Icon(
-                                        widget.selectedIndex == 1
-                                            ? YTIcons.shorts_filled
-                                            : YTIcons.shorts_outlined,
-                                      ),
-                                      const Text(
-                                        'Short',
-                                        style: TextStyle(fontSize: 10),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (state.isAuthenticated)
-                                  IconButton(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 6),
-                                    visualDensity: VisualDensity.standard,
-                                    onPressed: () {},
-                                    icon: const Icon(
-                                      YTIcons.create_outlined,
-                                      size: 32,
-                                      weight: 0.8,
-                                    ),
-                                  ),
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  visualDensity: VisualDensity.standard,
-                                  onPressed: () => widget.onChangeIndex(2),
-                                  icon: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Icon(
-                                        widget.selectedIndex == 2
-                                            ? YTIcons.subscriptions_filled
-                                            : YTIcons.subscriptions_outlined,
-                                      ),
-                                      const Text(
-                                        'Subscriptions',
-                                        maxLines: 1,
-                                        style: TextStyle(fontSize: 10),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  visualDensity: VisualDensity.standard,
-                                  onPressed: () => widget.onChangeIndex(3),
-                                  icon: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      if (state.isInIncognito)
-                                        const Icon(Icons.hourglass_top)
-                                      else
-                                        state.isNotAuthenticated
-                                            ? Container(
-                                                margin: const EdgeInsets.all(4),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(32),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.person_rounded,
-                                                  color: Colors.black,
-                                                  size: 18,
-                                                ),
-                                              )
-                                            : AccountAvatar(
-                                                size: 24,
-                                                name: 'John Jackson',
-                                                border:
-                                                    widget.selectedIndex == 3
-                                                        ? Border.all(
-                                                            color: Colors.white,
-                                                            width: 1.5,
-                                                          )
-                                                        : null,
-                                              ),
-                                      const Text(
-                                        'You',
-                                        style: TextStyle(fontSize: 10),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              _NavButton(
+                                key: const ValueKey(1),
+                                title: 'Home',
+                                onPressed: () => widget.onChangeIndex(0),
+                                isSelected: widget.selectedIndex == 0,
+                                selectedIcon: YTIcons.home_filled,
+                                notSelectedIcon: YTIcons.home_outlined,
+                              ),
+                              _NavButton(
+                                key: const ValueKey(2),
+                                title: 'Shorts',
+                                onPressed: () => widget.onChangeIndex(1),
+                                isSelected: widget.selectedIndex == 1,
+                                selectedIcon: YTIcons.shorts_filled,
+                                notSelectedIcon: YTIcons.shorts_outlined,
+                              ),
+                              if (state.isAuthenticated)
+                                const _NavCreateButton(key: ValueKey(0)),
+                              _NavButton(
+                                key: const ValueKey(3),
+                                title: 'Subscriptions',
+                                onPressed: () => widget.onChangeIndex(2),
+                                isSelected: widget.selectedIndex == 2,
+                                selectedIcon: YTIcons.subscriptions_filled,
+                                notSelectedIcon: YTIcons.subscriptions_outlined,
+                              ),
+                              _NavLibraryButton(
+                                key: const ValueKey(4),
+                                widget: widget,
+                                isLibrary: false,
+                                isSelected: widget.selectedIndex == 3,
+                                onPressed: () => widget.onChangeIndex(3),
+                              ),
+                            ],
                           );
                         },
                       ),
@@ -261,6 +176,117 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
               return const ConnectionSnackbar(autoHide: true);
             },
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NavCreateButton extends StatelessWidget {
+  const _NavCreateButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {},
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      visualDensity: VisualDensity.standard,
+      icon: const Icon(YTIcons.create_outlined, size: 32, weight: 0.8),
+    );
+  }
+}
+
+class _NavLibraryButton extends StatelessWidget {
+  const _NavLibraryButton({
+    super.key,
+    required this.widget,
+    required this.onPressed,
+    required this.isLibrary,
+    required this.isSelected,
+  });
+
+  final HomeNavigatorBar widget;
+  final VoidCallback onPressed;
+  final bool isLibrary;
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return AuthStateBuilder(
+      builder: (BuildContext context, AuthState state) {
+        return IconButton(
+          padding: EdgeInsets.zero,
+          visualDensity: VisualDensity.standard,
+          onPressed: onPressed,
+          highlightColor: Colors.white12,
+          splashColor: Colors.transparent,
+          icon: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              if (state.isInIncognito)
+                const Icon(Icons.hourglass_top)
+              else
+                state.isNotAuthenticated
+                    ? Container(
+                        margin: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        child: const Icon(
+                          Icons.person_rounded,
+                          color: Colors.black,
+                          size: 18,
+                        ),
+                      )
+                    : AccountAvatar(
+                        size: 24,
+                        name: 'John Jackson',
+                        border: isSelected
+                            ? Border.all(color: Colors.white, width: 1.5)
+                            : null,
+                      ),
+              Text(
+                isLibrary ? 'Library' : 'You',
+                style: const TextStyle(fontSize: 10),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _NavButton extends StatelessWidget {
+  const _NavButton({
+    super.key,
+    required this.isSelected,
+    required this.onPressed,
+    required this.title,
+    required this.selectedIcon,
+    required this.notSelectedIcon,
+  });
+  final bool isSelected;
+  final IconData selectedIcon;
+  final IconData notSelectedIcon;
+  final VoidCallback onPressed;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      padding: EdgeInsets.zero,
+      visualDensity: VisualDensity.standard,
+      isSelected: isSelected,
+      onPressed: onPressed,
+      highlightColor: Colors.white12,
+      splashColor: Colors.transparent,
+      icon: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(isSelected ? selectedIcon : notSelectedIcon),
+          Text(title, maxLines: 1, style: const TextStyle(fontSize: 10)),
         ],
       ),
     );

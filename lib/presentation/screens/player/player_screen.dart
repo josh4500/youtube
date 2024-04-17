@@ -982,27 +982,27 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
   }
 
-  void _onDragInfoUp(PointerUpEvent event) {
+  Future<void> _onDragInfoUp(PointerUpEvent event) async {
     if (_allowInfoDrag && additionalHeight > 0) {
       if (additionalHeight > midAdditionalHeight) {
+        await _animateAdditionalHeight(maxAdditionalHeight);
         ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.enterExpanded,
         ]);
-
-        _animateAdditionalHeight(maxAdditionalHeight);
       } else {
+        if (_isResizableExpandingMode &&
+            additionalHeight > midAdditionalHeight / 2) {
+          await _animateAdditionalHeight(midAdditionalHeight);
+        } else {
+          await _animateAdditionalHeight(0);
+        }
+
         ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.exitExpanded,
           PlayerSignal.showPlaybackProgress,
         ]);
 
         _infoScrollPhysics.canScroll(true);
-        if (_isResizableExpandingMode &&
-            additionalHeight > midAdditionalHeight / 2) {
-          _animateAdditionalHeight(midAdditionalHeight);
-        } else {
-          _animateAdditionalHeight(0);
-        }
       }
     } else if (_allowInfoDrag && additionalHeight == 0) {
       ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[

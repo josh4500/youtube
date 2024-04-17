@@ -67,22 +67,21 @@ class PlayableContent extends StatelessWidget {
               height: height,
               child: Column(
                 children: <Widget>[
-                  if (isPlaylist) ...<Widget>[
-                    Container(
-                      height: 4,
-                      margin: const EdgeInsets.symmetric(
+                  // TODO(josh4500): Refactor later
+                  if (isPlaylist)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
                         vertical: 1,
                         horizontal: 6,
                       ),
-                      decoration: const BoxDecoration(
-                        color: Colors.white60,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.elliptical(16, 8),
-                          topRight: Radius.elliptical(16, 8),
+                      child: ClipPath(
+                        clipper: ClipEdgeClipper(),
+                        child: const ColoredBox(
+                          color: Colors.white60,
+                          child: SizedBox(width: double.infinity, height: 4.2),
                         ),
                       ),
                     ),
-                  ],
                   Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
@@ -186,4 +185,26 @@ class PlayableContent extends StatelessWidget {
       ),
     );
   }
+}
+
+class ClipEdgeClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final Path path = Path();
+    path.moveTo(0, size.height);
+    path.arcToPoint(
+      const Offset(8, 0),
+      radius: const Radius.circular(8),
+    );
+    path.lineTo(size.width - 8, 0);
+    path.arcToPoint(
+      Offset(size.width, size.height),
+      radius: const Radius.circular(8),
+    );
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

@@ -98,8 +98,10 @@ class _CustomActionChipState extends State<CustomActionChip>
           scale: animation,
           child: Container(
             alignment: widget.alignment,
-            padding:
-                widget.padding ?? const EdgeInsets.symmetric(horizontal: 12),
+            padding: widget.padding ??
+                const EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
             margin: widget.margin,
             decoration: BoxDecoration(
               color: widget.backgroundColor,

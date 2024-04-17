@@ -81,17 +81,9 @@ class AccountSection extends StatelessWidget {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
-                          Text(
-                            'View channel',
-                            style: TextStyle(
-                              fontSize: 12,
-                            ),
-                          ),
+                          Text('View channel', style: TextStyle(fontSize: 12)),
                           Center(
-                            child: Icon(
-                              YTIcons.chevron_right,
-                              size: 14,
-                            ),
+                            child: Icon(YTIcons.chevron_right, size: 14),
                           ),
                         ],
                       ),

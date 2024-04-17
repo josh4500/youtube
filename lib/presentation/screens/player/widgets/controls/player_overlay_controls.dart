@@ -42,7 +42,6 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../providers/player_expanded_state_provider.dart';
 import '../../providers/player_viewstate_provider.dart';
-import 'player_notifications.dart';
 import 'player_actions_control.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';
@@ -53,6 +52,7 @@ import 'player_fullscreen.dart';
 import 'player_loading.dart';
 import 'player_minimize.dart';
 import 'player_next.dart';
+import 'player_notifications.dart';
 import 'player_play_pause_restart.dart';
 import 'player_previous.dart';
 import 'player_seek_slide_frame.dart';

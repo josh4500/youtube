@@ -180,8 +180,9 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                           child: SizedBox(
                             height: 48,
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 4.0,
+                              ),
                               child: DynamicTab(
                                 initialIndex: 0,
                                 leadingWidth: 7.5,
@@ -191,10 +192,14 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                                   child: Consumer(
                                     builder: (context, ref, child) {
                                       return CustomActionChip(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                        ),
                                         borderRadius: BorderRadius.circular(4),
                                         backgroundColor: Colors.white12,
                                         icon: const Icon(
-                                            YTIcons.discover_outlined),
+                                          YTIcons.discover_outlined,
+                                        ),
                                         onTap: () {
                                           ref
                                               .read(homeRepositoryProvider)
@@ -257,8 +262,9 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                             return ViewableVideoContent(
                               onTap: () async {
                                 if (context.orientation.isLandscape) {
-                                  await context
-                                      .goto(AppRoutes.playerLandscapeScreen);
+                                  await context.goto(
+                                    AppRoutes.playerLandscapeScreen,
+                                  );
                                 }
                                 ref
                                     .read(playerRepositoryProvider)
@@ -307,7 +313,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                                       ),
                                       title: 'Don\'t recommend channel',
                                       dependents: [
-                                        DynamicSheetItemDependent.auth
+                                        DynamicSheetItemDependent.auth,
                                       ],
                                     ),
                                     const DynamicSheetItem(
@@ -316,7 +322,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                                       ),
                                       title: 'Listened with YouTube music',
                                       trailing: Icon(
-                                        YTIcons.external_link_outlined,
+                                        YTIcons.external_link_rounded_outlined,
                                         size: 20,
                                       ),
                                     ),

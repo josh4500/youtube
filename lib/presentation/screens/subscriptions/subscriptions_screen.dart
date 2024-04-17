@@ -246,8 +246,9 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                                   dependents: [DynamicSheetItemDependent.auth],
                                 ),
                                 const DynamicSheetItem(
-                                  leading:
-                                      Icon(YTIcons.not_interested_outlined),
+                                  leading: Icon(
+                                    YTIcons.not_interested_outlined,
+                                  ),
                                   title: 'Hide',
                                   dependents: [DynamicSheetItemDependent.auth],
                                 ),
