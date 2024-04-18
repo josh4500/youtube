@@ -26,7 +26,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router.dart';
@@ -81,6 +80,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                     ),
                   ],
                   floating: true,
+                  // TODO(josh4500): Fix rebuild caused by bottom
                   bottom: PreferredSize(
                     preferredSize: const Size(double.infinity, 125 + 44),
                     child: Column(
@@ -416,7 +416,7 @@ class SubscriptionsIncognitoScreen extends StatelessWidget {
               const Expanded(
                 child: Column(
                   children: <Widget>[
-                    if (false) Center(child: CircularProgressIndicator()),
+                    Center(child: CircularProgressIndicator()),
                   ],
                 ),
               ),

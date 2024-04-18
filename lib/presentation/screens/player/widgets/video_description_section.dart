@@ -26,9 +26,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class VideoDescriptionSection extends StatelessWidget {
   const VideoDescriptionSection({super.key, this.onTap});
@@ -62,29 +63,18 @@ class VideoDescriptionSection extends StatelessWidget {
                 SizedBox(height: 8),
                 Row(
                   children: [
-                    Text(
-                      '189k views 10y ago',
+                    Text.rich(
+                      TextSpan(
+                        text: '189k views 10y ago ',
+                        children: [
+                          IconSpan(YTIcons.shopping_bag_outlined),
+                          TextSpan(text: ' Shop '),
+                        ],
+                      ),
                       style: TextStyle(
                         color: Color(0xFFAAAAAA),
                         fontSize: 13,
                       ),
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(width: 4),
-                        Icon(
-                          YTIcons.shopping_bag_outlined,
-                          color: Color(0xFFAAAAAA),
-                          size: 14,
-                        ),
-                        Text(
-                          ' Shop ',
-                          style: TextStyle(
-                            color: Color(0xFFAAAAAA),
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
                     ),
                     SizedBox(width: 6),
                     Text(

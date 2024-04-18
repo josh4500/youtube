@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
+import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class VideoChannelSection extends StatelessWidget {
   const VideoChannelSection({super.key});
@@ -14,7 +14,7 @@ class VideoChannelSection extends StatelessWidget {
           top: 8,
           right: 12,
           child: VideoChannelActionButtons(),
-        )
+        ),
       ],
     );
   }
@@ -30,13 +30,22 @@ class VideoChannelButton extends StatelessWidget {
         vertical: 4,
         horizontal: 12,
       ),
-      borderRadius: BorderRadius.zero,
       child: Row(
         children: [
           AccountAvatar(size: 40, name: 'John Jackson'),
           SizedBox(width: 12),
-          Text(
-            'Harris Craycraft',
+          Text.rich(
+            TextSpan(
+              text: 'Harris Craycraft ',
+              children: [
+                IconSpan(
+                  YTIcons.verified_filled,
+                  color: Color(0xFFAAAAAA),
+                ),
+              ],
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
