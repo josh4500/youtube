@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/providers/player_viewstate_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class PlayerChapterControl extends ConsumerWidget {
   const PlayerChapterControl({
@@ -40,8 +41,10 @@ class PlayerChapterControl extends ConsumerWidget {
                     color: Colors.white,
                     fontWeight: FontWeight.w400,
                   ),
+                  children: [
+                    IconSpan(YTIcons.chevron_right),
+                  ],
                 ),
-                WidgetSpan(child: Icon(YTIcons.chevron_right, size: 14))
               ],
             ),
             maxLines: 1,

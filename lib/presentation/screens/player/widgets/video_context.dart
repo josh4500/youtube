@@ -28,6 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class VideoContext extends StatelessWidget {
   const VideoContext({super.key});
@@ -56,13 +57,7 @@ class VideoContext extends StatelessWidget {
                   TextSpan(
                     text: 'Wikipedia ',
                     children: [
-                      WidgetSpan(
-                        child: Icon(
-                          YTIcons.external_link_outlined,
-                          color: Color(0xFF3EA6FF),
-                          size: 12,
-                        ),
-                      ),
+                      IconSpan(YTIcons.external_link_outlined),
                     ],
                     style: TextStyle(fontSize: 12, color: Color(0xFF3EA6FF)),
                   ),
