@@ -27,9 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-
-import 'custom_action_chip.dart';
-import 'over_scroll_glow_behavior.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class GroupedViewBuilder extends StatelessWidget {
   const GroupedViewBuilder({
@@ -63,10 +61,28 @@ class GroupedViewBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Stack(
-          children: <Widget>[
-            ListTile(
-              title: Row(
+        TappableArea(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
+          onTap: onTap,
+          stackedPosition: StackedPosition(top: 6, right: 12),
+          stackedChild: CustomActionChip(
+            title: 'View all',
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.symmetric(
+              vertical: 8,
+              horizontal: 12,
+            ),
+            border: const Border.fromBorderSide(
+              BorderSide(color: Colors.white12),
+            ),
+            onTap: onTap,
+          ),
+          child: Column(
+            children: [
+              Row(
                 children: [
                   Expanded(
                     child: Text(
@@ -82,34 +98,13 @@ class GroupedViewBuilder extends StatelessWidget {
                   const SizedBox(width: 80),
                 ],
               ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-              ),
-              subtitle: subtitle != null
-                  ? Text(
-                      subtitle!,
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    )
-                  : null,
-              onTap: onTap,
-            ),
-            Positioned(
-              top: 12,
-              right: 12,
-              child: CustomActionChip(
-                title: 'View all',
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 12,
+              if (subtitle != null)
+                Text(
+                  subtitle!,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
-                border: const Border.fromBorderSide(
-                  BorderSide(color: Colors.white12),
-                ),
-                onTap: onTap,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
         SizedBox(
           width: width,

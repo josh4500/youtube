@@ -76,15 +76,8 @@ class AccountsScreen extends StatelessWidget {
           return CustomScrollView(
             scrollBehavior: const OverScrollGlowBehavior(enabled: false),
             slivers: <Widget>[
-              SliverToBoxAdapter(
-                child: AccountSection(
-                  onTapIncognito: () {},
-                  onTapChannelInfo: () {
-                    context.goto(AppRoutes.accountChannel);
-                  },
-                  onTapSwitchAccount: () {},
-                  onTapGoogleAccount: () {},
-                ),
+              const SliverToBoxAdapter(
+                child: AccountSection(),
               ),
               SliverList(
                 delegate: SliverChildListDelegate(

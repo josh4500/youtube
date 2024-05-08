@@ -28,29 +28,25 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:youtube_clone/presentation/screens/settings/data_saving_settings_screen.dart';
-import 'package:youtube_clone/presentation/screens/settings/downloads_settings_screen.dart';
-import 'package:youtube_clone/presentation/screens/settings/general_settings_screen.dart';
-import 'package:youtube_clone/presentation/screens/settings/notifications_settings_screen.dart';
-import 'package:youtube_clone/presentation/screens/settings/privacy_settings_screen.dart';
-import 'package:youtube_clone/presentation/screens/settings/video_quality_settings_screen.dart';
-import 'package:youtube_clone/presentation/screens/settings/widgets/settings_popup_container.dart';
-import 'package:youtube_clone/presentation/screens/settings/widgets/settings_tile.dart';
-import 'package:youtube_clone/presentation/theme/app_theme.dart';
+import 'package:youtube_clone/generated/l10n.dart';
 import 'package:youtube_clone/presentation/theme/relative_size.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/lazy_indexed_stack.dart';
 
-import '../../../generated/l10n.dart';
-import '../../theme/device_theme.dart';
-import '../../widgets/builders/orientation_builder.dart';
 import 'about_screen.dart';
 import 'accessibility_settings_screen.dart';
 import 'auto_play_settings_screen.dart';
 import 'bills_and_payments_screen.dart';
+import 'data_saving_settings_screen.dart';
+import 'downloads_settings_screen.dart';
+import 'general_settings_screen.dart';
 import 'live_chat_settings_screen.dart';
+import 'notifications_settings_screen.dart';
+import 'privacy_settings_screen.dart';
+import 'video_quality_settings_screen.dart';
 import 'widgets/settings_list_view.dart';
+import 'widgets/settings_popup_container.dart';
+import 'widgets/settings_tile.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

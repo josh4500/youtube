@@ -27,6 +27,26 @@ class CustomText extends StatelessWidget {
     this.formatterActions = const <TextFormatter, FormatterAction>{},
   }) : textSpan = null;
 
+  const CustomText.rich(
+    InlineSpan this.textSpan, {
+    super.key,
+    this.style,
+    this.strutStyle,
+    this.textAlign,
+    this.textDirection,
+    this.locale,
+    this.softWrap,
+    this.overflow,
+    this.textScaler,
+    this.maxLines,
+    this.semanticsLabel,
+    this.textWidthBasis,
+    this.textHeightBehavior,
+    this.selectionColor,
+    this.formatters = const <TextFormatter>[],
+    this.formatterActions = const <TextFormatter, FormatterAction>{},
+  }) : data = null;
+
   /// The text_widgets to display.
   ///
   /// This will be null if a [textSpan] is provided instead.
@@ -212,7 +232,7 @@ class CustomText extends StatelessWidget {
 }
 
 enum TextFormatter {
-  hashTag,
   url,
   timage,
+  hashTag,
 }

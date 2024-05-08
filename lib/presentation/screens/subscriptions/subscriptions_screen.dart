@@ -27,7 +27,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/provider/repository/account_repository_provider.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -341,11 +343,11 @@ class UnAuthenticatedSubscriptionScreen extends StatelessWidget {
   }
 }
 
-class SubscriptionsIncognitoScreen extends StatelessWidget {
+class SubscriptionsIncognitoScreen extends ConsumerWidget {
   const SubscriptionsIncognitoScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -398,12 +400,15 @@ class SubscriptionsIncognitoScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    const TappableArea(
-                      padding: EdgeInsets.symmetric(
+                    TappableArea(
+                      onTap: () {
+                        ref.read(accountRepositoryProvider).turnOffIncognito();
+                      },
+                      padding: const EdgeInsets.symmetric(
                         vertical: 6.0,
                         horizontal: 12,
                       ),
-                      child: Text(
+                      child: const Text(
                         'Turn off Incognito',
                         style: TextStyle(
                           color: Color(0xFF3EA6FF),
@@ -413,10 +418,15 @@ class SubscriptionsIncognitoScreen extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 24),
               const Expanded(
                 child: Column(
                   children: <Widget>[
-                    Center(child: CircularProgressIndicator()),
+                    Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF3EA6FF),
+                      ),
+                    ),
                   ],
                 ),
               ),

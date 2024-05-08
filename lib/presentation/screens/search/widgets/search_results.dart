@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'search_result_in_chapter.dart';
@@ -51,7 +53,60 @@ class SearchResults extends StatelessWidget {
             (BuildContext context, int index) {
               return Column(
                 children: [
-                  const ViewableVideoContent(),
+                  ViewableVideoContent(
+                    onMore: () {
+                      showDynamicSheet(
+                        context,
+                        items: [
+                          DynamicSheetItem(
+                            leading: const Icon(
+                              YTIcons.playlist_play_outlined,
+                            ),
+                            title: 'Play next in queue',
+                            trailing: ClipRRect(
+                              borderRadius: BorderRadius.circular(2),
+                              child: Image.asset(
+                                AssetsPath.ytPAccessIcon48,
+                                width: 18,
+                                height: 18,
+                              ),
+                            ),
+                          ),
+                          const DynamicSheetItem(
+                            leading: Icon(YTIcons.watch_later_outlined),
+                            title: 'Save to Watch later',
+                          ),
+                          const DynamicSheetItem(
+                            leading: Icon(YTIcons.save_outlined_1),
+                            title: 'Save to playlist',
+                          ),
+                          const DynamicSheetItem(
+                            leading: Icon(YTIcons.share_outlined),
+                            title: 'Share',
+                          ),
+                          const DynamicSheetItem(
+                            leading: Icon(YTIcons.reload_outlined),
+                            title: 'Remix',
+                          ),
+                          const DynamicSheetItem(
+                            leading: Icon(
+                              YTIcons.youtube_music_outlined,
+                            ),
+                            title: 'Listened with YouTube music',
+                            trailing: Icon(
+                              YTIcons.external_link_rounded_outlined,
+                              size: 20,
+                            ),
+                          ),
+                          const DynamicSheetItem(
+                            leading: Icon(YTIcons.report_outlined),
+                            title: 'Report',
+                            dependents: [DynamicSheetItemDependent.auth],
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                   if (random.nextBool())
                     const SizedBox()
                   else

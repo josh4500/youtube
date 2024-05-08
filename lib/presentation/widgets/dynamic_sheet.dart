@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/core.dart';
 
+import '../../infrastructure.dart';
 import 'custom_ink_well.dart';
 import 'over_scroll_glow_behavior.dart';
 
@@ -87,8 +88,8 @@ class DynamicSheetItem<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget child = CustomInkWell(
-      onTap: () => context.pop(value),
+    Widget child = CustomInkWell(
+      onTap: () => Navigator.of(context).pop(value),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 18.0,
@@ -125,17 +126,23 @@ class DynamicSheetItem<T> extends StatelessWidget {
         ),
       ),
     );
-    // TODO(josh4500): Revisit to fix
-    // final uniqueDependents = dependents.toSet();
-    // for (final dependent in uniqueDependents) {
-    //   if (dependent == DynamicSheetItemDependent.auth) {
-    //     child = Builder(
-    //       builder: (BuildContext context) {
-    //         return child;
-    //       },
-    //     );
-    //   }
-    // }
+
+    // Note: Avoid using builder widgets
+    final uniqueDependents = dependents.toSet();
+    for (final dependent in uniqueDependents) {
+      if (dependent == DynamicSheetItemDependent.auth) {
+        child = Visibility(
+          visible: AuthState.authenticated.isAuthenticated,
+          child: child,
+        );
+      } else if (dependent == DynamicSheetItemDependent.network) {
+        child = Visibility(
+          visible: InternetConnectivity.instance.state.isConnected,
+          child: child,
+        );
+      }
+    }
+
     return child;
   }
 }

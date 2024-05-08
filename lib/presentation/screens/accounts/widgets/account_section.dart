@@ -27,65 +27,73 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/provider/repository/account_repository_provider.dart';
+import 'package:youtube_clone/presentation/provider/state/account_state_provider.dart';
+import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-class AccountSection extends StatelessWidget {
-  const AccountSection({
-    super.key,
-    this.onTapChannelInfo,
-    this.onTapSwitchAccount,
-    this.onTapGoogleAccount,
-    this.onTapIncognito,
-  });
-  final VoidCallback? onTapChannelInfo;
-  final VoidCallback? onTapSwitchAccount;
-  final VoidCallback? onTapGoogleAccount;
-  final VoidCallback? onTapIncognito;
-
+class AccountSection extends ConsumerWidget {
+  const AccountSection({super.key});
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final account = ref.watch(accountStateProvider);
+    final isChannel = account.isChannel;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
         children: <Widget>[
           GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: onTapChannelInfo,
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            onTap: () {
+              if (isChannel) {
+                context.goto(AppRoutes.accountChannel);
+              } else {
+                // TODO(josh4500): Create account
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               child: Row(
                 children: <Widget>[
-                  AccountAvatar(size: 76),
-                  SizedBox(width: 14),
+                  const AccountAvatar(size: 76),
+                  const SizedBox(width: 14),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
+                      const Text(
                         'Josh',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      Row(
-                        children: <Widget>[
-                          Text('@josh4500', style: TextStyle(fontSize: 12)),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 4.0,
-                              horizontal: 6.0,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 4.0,
+                        ),
+                        child: Row(
+                          children: [
+                            Text.rich(
+                              TextSpan(
+                                text:
+                                    isChannel ? '@josh4500' : 'Create channel',
+                                children: [
+                                  if (isChannel) ...[
+                                    const TextSpan(text: ' · '),
+                                    const TextSpan(text: 'View channel'),
+                                  ],
+                                ],
+                              ),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFFAAAAAA),
+                              ),
                             ),
-                            child: Text(
-                              '·',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Text('View channel', style: TextStyle(fontSize: 12)),
-                          Center(
-                            child: Icon(YTIcons.chevron_right, size: 14),
-                          ),
-                        ],
+                            const Icon(YTIcons.chevron_right, size: 16),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -104,21 +112,23 @@ class AccountSection extends StatelessWidget {
                 children: <Widget>[
                   CustomActionChip(
                     title: 'Switch account',
-                    onTap: onTapSwitchAccount,
+                    onTap: () {},
                     icon: const Icon(YTIcons.switch_accounts, size: 16),
                     backgroundColor: const Color(0xFF272727),
                   ),
                   const SizedBox(width: 8),
                   CustomActionChip(
                     title: 'Google Account',
-                    onTap: onTapGoogleAccount,
+                    onTap: () {},
                     icon: const Icon(YTIcons.google, size: 16),
                     backgroundColor: const Color(0xFF272727),
                   ),
                   const SizedBox(width: 8),
                   CustomActionChip(
                     title: 'Turn on incognito',
-                    onTap: onTapIncognito,
+                    onTap: () {
+                      ref.read(accountRepositoryProvider).turnOnIncognito();
+                    },
                     icon: const Icon(Icons.privacy_tip, size: 16),
                     backgroundColor: const Color(0xFF272727),
                   ),

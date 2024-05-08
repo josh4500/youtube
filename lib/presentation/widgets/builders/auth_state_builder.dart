@@ -27,15 +27,16 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
+import 'package:youtube_clone/presentation/provider/state/auth_state_provider.dart';
 
-class AuthStateBuilder extends StatelessWidget {
+class AuthStateBuilder extends ConsumerWidget {
   const AuthStateBuilder({super.key, required this.builder});
   final Widget Function(BuildContext context, AuthState state) builder;
 
   @override
-  Widget build(BuildContext context) {
-    // TODO(josh4500): Complete implementation
-    return builder(context, AuthState.authenticated);
+  Widget build(BuildContext context, WidgetRef ref) {
+    return builder(context, ref.watch(authStateProvider));
   }
 }
