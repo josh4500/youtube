@@ -28,6 +28,8 @@ class AssetsPath {
       '${_iconPrefix}yt_premium_access_icon_48.png';
   static const String ytKidsIcon24 = '${_iconPrefix}yt_kids_icon_24.png';
 
+  static const String download130 = '${_imagePrefix}download_130.png';
+  static const String download260 = '${_imagePrefix}download_260.png';
   static const String downloadWillAppear =
       '${_imagePrefix}download_will_appear.png';
   static const String searchVoiceRequest =

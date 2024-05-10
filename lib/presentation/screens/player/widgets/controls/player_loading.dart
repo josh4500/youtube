@@ -97,6 +97,7 @@ class _PlayerLoadingIndicatorState extends ConsumerState<PlayerLoadingIndicator>
         height: 60,
         child: CircularProgressIndicator(
           color: Colors.white,
+          strokeWidth: 2.0,
         ),
       ),
     );

@@ -29,24 +29,62 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../providers.dart';
 import '../screens.dart' show PlayerScreen;
 import '../widgets/home/home_drawer.dart';
 import '../widgets/home/home_navigation_bar.dart';
 
-class HomePage extends ConsumerStatefulWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key, required this.child});
   final StatefulNavigationShell child;
 
   @override
-  ConsumerState<HomePage> createState() => _HomePageState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scaffoldKey = ref.read(homeRepositoryProvider).scaffoldKey;
+    final overlayKey = ref.read(homeRepositoryProvider).overlayKey;
+    return Scaffold(
+      key: scaffoldKey,
+      drawerEnableOpenDragGesture: false,
+      drawer: const HomeDrawer(),
+      body: SafeArea(
+        bottom: false,
+        child: HomeOverlayWrapper(key: overlayKey, child: child),
+      ),
+      bottomNavigationBar: HomeNavigatorBar(
+        selectedIndex: child.currentIndex,
+        onChangeIndex: (int index) {
+          child.goBranch(
+            index,
+            initialLocation: index == child.currentIndex,
+          );
+        },
+      ),
+    );
+  }
 }
 
-class _HomePageState extends ConsumerState<HomePage>
+class HomeOverlayWrapper extends ConsumerStatefulWidget {
+  const HomeOverlayWrapper({super.key, required this.child});
+
+  final StatefulNavigationShell child;
+
+  @override
+  ConsumerState<HomeOverlayWrapper> createState() => HomeOverlayWrapperState();
+}
+
+class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
     with TickerProviderStateMixin {
   late final AnimationController _overlayPlayerController;
   late final Animation<Offset> _overlayPlayerAnimation;
+
+  late final AnimationController _overlayDnotifController;
+  late final Animation<double> _overlayDnotifAnimation;
+
+  bool _preventShowingExploreDownloads = true;
 
   @override
   void initState() {
@@ -67,6 +105,19 @@ class _HomePageState extends ConsumerState<HomePage>
         reverseCurve: Curves.easeInCubic,
       ),
     );
+
+    _overlayDnotifController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+
+    _overlayDnotifAnimation = CurvedAnimation(
+      parent: _overlayDnotifController,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+
+    _resetExploreDownloadsPrevention();
   }
 
   @override
@@ -75,7 +126,7 @@ class _HomePageState extends ConsumerState<HomePage>
   }
 
   @override
-  void didUpdateWidget(covariant HomePage oldWidget) {
+  void didUpdateWidget(covariant HomeOverlayWrapper oldWidget) {
     super.didUpdateWidget(oldWidget);
     final int index = widget.child.currentIndex;
     if (index == 1) {
@@ -98,6 +149,35 @@ class _HomePageState extends ConsumerState<HomePage>
     });
   }
 
+  void showExploreDownloads() {
+    if (!_preventShowingExploreDownloads) {
+      _overlayDnotifController.forward();
+    }
+  }
+
+  void hideExploreDownloads() => _overlayDnotifController.reverse();
+
+  void onNoThanks() {
+    _resetExploreDownloadsPrevention();
+    hideExploreDownloads();
+  }
+
+  void _resetExploreDownloadsPrevention() {
+    _preventShowingExploreDownloads = true;
+    Future.delayed(
+      const Duration(minutes: 3),
+      () => _preventShowingExploreDownloads = false,
+    );
+  }
+
+  void onGotoDownloads() {
+    hideExploreDownloads();
+    _resetExploreDownloadsPrevention();
+
+    widget.child.goBranch(3);
+    context.goto(AppRoutes.downloads);
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.listen(playerOverlayStateProvider, (bool? previous, bool next) {
@@ -105,18 +185,14 @@ class _HomePageState extends ConsumerState<HomePage>
         _overlayPlayerController.forward();
       }
     });
-    final scaffoldKey = ref.read(homeRepositoryProvider).scaffoldKey;
-    return Scaffold(
-      key: scaffoldKey,
-      drawerEnableOpenDragGesture: false,
-      // resizeToAvoidBottomInset: false,
-      drawer: const HomeDrawer(),
-      body: SafeArea(
-        bottom: false,
-        child: Stack(
-          children: <Widget>[
-            widget.child,
-            SlideTransition(
+
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        widget.child,
+        LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return SlideTransition(
               position: _overlayPlayerAnimation,
               child: Consumer(
                 builder: (
@@ -124,34 +200,112 @@ class _HomePageState extends ConsumerState<HomePage>
                   WidgetRef ref,
                   Widget? childWidget,
                 ) {
-                  if (ref.watch(playerOverlayStateProvider)) {
-                    return childWidget!;
-                  }
-                  return const SizedBox();
+                  final showPlayer = ref.watch(playerOverlayStateProvider);
+                  return Visibility(
+                    visible: showPlayer,
+                    child: PlayerScreen(height: constraints.maxHeight),
+                  );
                 },
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: LayoutBuilder(
-                    builder: (BuildContext context, BoxConstraints c) {
-                      return PlayerScreen(
-                        height: c.maxHeight,
-                      );
-                    },
-                  ),
-                ),
+              ),
+            );
+          },
+        ),
+        Visibility(
+          visible: widget.child.currentIndex != 1,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: SizeTransition(
+              sizeFactor: _overlayDnotifAnimation,
+              child: ExploreDownloadsOverlay(
+                onNoThanks: onNoThanks,
+                onGotoDownloads: onGotoDownloads,
               ),
             ),
-          ],
+          ),
         ),
-      ),
-      bottomNavigationBar: HomeNavigatorBar(
-        selectedIndex: widget.child.currentIndex,
-        onChangeIndex: (int index) {
-          widget.child.goBranch(
-            index,
-            initialLocation: index == widget.child.currentIndex,
-          );
-        },
+      ],
+    );
+  }
+}
+
+class ExploreDownloadsOverlay extends StatelessWidget {
+  const ExploreDownloadsOverlay({
+    super.key,
+    required this.onNoThanks,
+    required this.onGotoDownloads,
+  });
+
+  final VoidCallback onNoThanks;
+  final VoidCallback onGotoDownloads;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFF212121),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Image.asset(AssetsPath.download130, width: 36, height: 36),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'You\'re offline. Explore downloads?',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFFF1F1F1),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                const Text(
+                  'Pick videos that will download automatically the next time you\'re online.',
+                  style: TextStyle(color: Color(0xFFAAAAAA)),
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TappableArea(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 12,
+                      ),
+                      onTap: onNoThanks,
+                      child: const Text(
+                        'No thanks',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF3EA6FF),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    CustomActionChip(
+                      title: 'Go to Downloads',
+                      onTap: onGotoDownloads,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 12,
+                      ),
+                      backgroundColor: const Color(0xFF3EA6FF),
+                      textStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
