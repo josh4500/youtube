@@ -62,7 +62,7 @@ class SubscriptionTile extends StatelessWidget {
         ),
         const Positioned(
           right: 8,
-          child: NotificationOption(),
+          child: SubscribedChannelButton(),
         ),
       ],
     );

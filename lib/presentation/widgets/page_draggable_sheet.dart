@@ -9,6 +9,7 @@ import 'custom_scroll_physics.dart';
 import 'dynamic_tab.dart';
 import 'over_scroll_glow_behavior.dart';
 import 'persistent_header_delegate.dart';
+import 'sheet_drag_indicator.dart';
 
 class PageDraggableSheet extends StatefulWidget {
   const PageDraggableSheet({
@@ -232,14 +233,9 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       if (widget.showDragIndicator)
-                        Container(
-                          height: 4,
-                          width: 45,
-                          margin: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(32),
-                          ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: SheetDragIndicator(),
                         )
                       else
                         const SizedBox(height: 16),

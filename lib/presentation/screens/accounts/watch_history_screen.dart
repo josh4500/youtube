@@ -86,11 +86,11 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
     showDynamicSheet(
       context,
       items: [
-        const DynamicSheetItem(
+        const DynamicSheetOptionItem(
           leading: Icon(YTIcons.delete_outlined),
           title: 'Remove from watch history',
         ),
-        DynamicSheetItem(
+        DynamicSheetOptionItem(
           leading: const Icon(
             YTIcons.playlist_play_outlined,
           ),
@@ -104,21 +104,21 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
             ),
           ),
         ),
-        const DynamicSheetItem(
+        const DynamicSheetOptionItem(
           leading: Icon(
             YTIcons.watch_later_outlined,
           ),
           title: 'Save to Watch later',
         ),
-        const DynamicSheetItem(
+        const DynamicSheetOptionItem(
           leading: Icon(YTIcons.save_outlined_1),
           title: 'Save to playlist',
         ),
-        const DynamicSheetItem(
+        const DynamicSheetOptionItem(
           leading: Icon(YTIcons.download_outlined),
           title: 'Download video',
         ),
-        const DynamicSheetItem(
+        const DynamicSheetOptionItem(
           leading: Icon(YTIcons.share_outlined),
           title: 'Share',
         ),

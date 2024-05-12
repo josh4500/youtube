@@ -92,9 +92,8 @@ class _PlayerLoadingIndicatorState extends ConsumerState<PlayerLoadingIndicator>
           child: childWidget,
         );
       },
-      child: const SizedBox(
-        width: 60,
-        height: 60,
+      child: const SizedBox.square(
+        dimension: 60,
         child: CircularProgressIndicator(
           color: Colors.white,
           strokeWidth: 2.0,

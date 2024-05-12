@@ -27,10 +27,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/theme/icon/y_t_icons_icons.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/custom_action_button.dart';
-import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class VideoActions extends StatelessWidget {
   const VideoActions({super.key});
@@ -82,12 +81,13 @@ class VideoActions extends StatelessWidget {
               margin: EdgeInsets.symmetric(horizontal: 4),
               icon: Icon(YTIcons.shared_filled, size: 18),
             ),
-            const CustomActionChip(
+            CustomActionChip(
               title: 'Remix',
-              backgroundColor: Color(0xFF272727),
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              margin: EdgeInsets.symmetric(horizontal: 4),
-              icon: Icon(Icons.wifi_channel_outlined, size: 18),
+              backgroundColor: const Color(0xFF272727),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              icon: const Icon(Icons.wifi_channel_outlined, size: 18),
+              onTap: () => onRemixClicked(context),
             ),
             const CustomActionChip(
               title: 'Thanks',
@@ -96,12 +96,13 @@ class VideoActions extends StatelessWidget {
               margin: EdgeInsets.symmetric(horizontal: 4),
               icon: Icon(YTIcons.thanks_outlined, size: 18),
             ),
-            const CustomActionButton(
+            CustomActionButton(
               title: 'Download',
-              backgroundColor: Color(0xFF272727),
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              margin: EdgeInsets.symmetric(horizontal: 4),
-              icon: Icon(YTIcons.download_outlined, size: 18),
+              backgroundColor: const Color(0xFF272727),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              icon: const Icon(YTIcons.download_outlined, size: 18),
+              onTap: () => onDownloadClicked(context),
             ),
             const CustomActionChip(
               title: 'Clip',
@@ -110,12 +111,13 @@ class VideoActions extends StatelessWidget {
               margin: EdgeInsets.symmetric(horizontal: 4),
               icon: Icon(YTIcons.clip_outlined, size: 18),
             ),
-            const CustomActionChip(
+            CustomActionChip(
               title: 'Save',
-              backgroundColor: Color(0xFF272727),
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              margin: EdgeInsets.symmetric(horizontal: 4),
-              icon: Icon(YTIcons.save_outlined, size: 18),
+              backgroundColor: const Color(0xFF272727),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              icon: const Icon(YTIcons.save_outlined, size: 18),
+              onTap: () => onSaveClicked(context),
             ),
             const CustomActionChip(
               title: 'Report',
@@ -127,6 +129,245 @@ class VideoActions extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> onRemixClicked(BuildContext context) async {
+    await showDynamicSheet(
+      context,
+      title: const Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+        child: Text(
+          'Remix',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+      ),
+      items: [
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.music_outlined),
+          title: 'Sound',
+          subtitle: 'Use the sound from this video',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(Icons.people_outline),
+          title: 'Collab',
+          subtitle: 'Create alongside this video',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(Icons.person_2_outlined),
+          title: 'Green Screen',
+          subtitle: 'Use this video as a background',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(Icons.vertical_split_rounded),
+          title: 'Cut',
+          subtitle: 'use a segment from this video',
+        ),
+      ],
+    );
+  }
+
+  Future<void> onSaveClicked(BuildContext context) async {
+    await showDynamicSheet(
+      context,
+      title: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                const SizedBox(width: 16),
+                const Text(
+                  'Save video to...',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const Spacer(),
+                TappableArea(
+                  borderRadius: BorderRadius.circular(24),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: const Row(
+                    children: [
+                      Icon(YTIcons.save_outlined, color: Color(0xFF3EA6FF)),
+                      SizedBox(width: 8),
+                      Text(
+                        'New playlist',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF3EA6FF),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(thickness: 1, height: 0),
+        ],
+      ),
+      trailing: Column(
+        children: [
+          const Divider(thickness: 1, height: 0),
+          CustomInkWell(
+            onTap: () {},
+            child: const Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              child: Row(
+                children: [
+                  Icon(YTIcons.check_outlined),
+                  SizedBox(width: 16),
+                  Text('Done', style: TextStyle(fontSize: 16)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      items: [
+        const DynamicSheetOptionItem(
+          leading: CustomCheckBox(selected: true),
+          title: 'Watch later',
+          trailing: Icon(YTIcons.private_circle_outlined),
+          useTappable: true,
+          exitOnTap: false,
+        ),
+      ],
+    );
+  }
+
+  Future<void> onDownloadClicked(BuildContext context) async {
+    await showDynamicSheet(
+      context,
+      title: const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Text('Download quality', style: TextStyle(fontSize: 18)),
+      ),
+      trailing: Column(
+        children: [
+          const Divider(thickness: 1, height: 0),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: CustomActionChip(
+                    onTap: () {},
+                    title: 'Cancel',
+                    alignment: Alignment.center,
+                    backgroundColor: Colors.transparent,
+                    border: Border.all(color: Colors.white12),
+                    padding: const EdgeInsets.all(8),
+                    borderRadius: BorderRadius.circular(64),
+                    textStyle: const TextStyle(
+                      fontSize: 15,
+                      color: Color(0xFF3EA6FF),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: CustomActionChip(
+                    onTap: () {},
+                    title: 'Download',
+                    alignment: Alignment.center,
+                    backgroundColor: const Color(0xFF3EA6FF),
+                    border: Border.all(color: Colors.white12),
+                    padding: const EdgeInsets.all(8),
+                    borderRadius: BorderRadius.circular(64),
+                    textStyle: const TextStyle(
+                      fontSize: 15,
+                      color: Color(0xFF0F0F0F),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      items: [
+        const DynamicSheetOptionItem(
+          leading: CustomRadio(selected: true),
+          title: 'Medium(360p)',
+          useTappable: true,
+          exitOnTap: false,
+          trailing: Text(
+            '162 MB',
+            style: TextStyle(fontSize: 16, color: Color(0xFFAAAAAA)),
+          ),
+        ),
+        const DynamicSheetOptionItem(
+          leading: CustomRadio(selected: false),
+          title: 'Low(144p)',
+          useTappable: true,
+          exitOnTap: false,
+          trailing: Text(
+            '96 MB',
+            style: TextStyle(fontSize: 16, color: Color(0xFFAAAAAA)),
+          ),
+        ),
+        DynamicSheetSection(
+          child: Column(
+            children: [
+              const Divider(thickness: 1, height: 0),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.asset(
+                      AssetsPath.ytFullLogoMediumDark,
+                      fit: BoxFit.fitHeight,
+                      height: 32,
+                    ),
+                    const Text(
+                      'For high quality unlimited downloads, ad-free and background play, get YouTube Premium.',
+                      style: TextStyle(color: Color(0xffaaaaaa)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const DynamicSheetOptionItem(
+          leading: CustomRadio(selected: false),
+          title: 'Full HD (1080p)',
+          useTappable: true,
+          exitOnTap: false,
+          trailing: Text(
+            '505 MB',
+            style: TextStyle(fontSize: 16, color: Color(0xFFAAAAAA)),
+          ),
+        ),
+        const DynamicSheetOptionItem(
+          leading: CustomRadio(selected: false),
+          title: 'High (720p)',
+          useTappable: true,
+          exitOnTap: false,
+          trailing: Text(
+            '326 MB',
+            style: TextStyle(fontSize: 16, color: Color(0xFFAAAAAA)),
+          ),
+        ),
+        const DynamicSheetSection(child: Divider(thickness: 1, height: 0)),
+        const DynamicSheetOptionItem(
+          leading: CustomCheckBox(selected: false),
+          title: 'Remember my settings for 30 days',
+          useTappable: true,
+          exitOnTap: false,
+        ),
+      ],
     );
   }
 }

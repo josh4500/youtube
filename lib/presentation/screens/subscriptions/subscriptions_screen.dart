@@ -212,7 +212,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                             showDynamicSheet(
                               context,
                               items: [
-                                DynamicSheetItem(
+                                DynamicSheetOptionItem(
                                   leading: const Icon(
                                     YTIcons.playlist_play_outlined,
                                   ),
@@ -226,28 +226,28 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                                     ),
                                   ),
                                 ),
-                                const DynamicSheetItem(
+                                const DynamicSheetOptionItem(
                                   leading: Icon(YTIcons.watch_later_outlined),
                                   title: 'Save to Watch later',
                                 ),
-                                const DynamicSheetItem(
+                                const DynamicSheetOptionItem(
                                   leading: Icon(YTIcons.save_outlined_1),
                                   title: 'Save to playlist',
                                 ),
-                                const DynamicSheetItem(
+                                const DynamicSheetOptionItem(
                                   leading: Icon(YTIcons.download_outlined),
                                   title: 'Download video',
                                 ),
-                                const DynamicSheetItem(
+                                const DynamicSheetOptionItem(
                                   leading: Icon(YTIcons.share_outlined),
                                   title: 'Share',
                                 ),
-                                const DynamicSheetItem(
+                                const DynamicSheetOptionItem(
                                   leading: Icon(YTIcons.close_circle_outlined),
                                   title: 'Unsubscribe',
                                   dependents: [DynamicSheetItemDependent.auth],
                                 ),
-                                const DynamicSheetItem(
+                                const DynamicSheetOptionItem(
                                   leading: Icon(
                                     YTIcons.not_interested_outlined,
                                   ),

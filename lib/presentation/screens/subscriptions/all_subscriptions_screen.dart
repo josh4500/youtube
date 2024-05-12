@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -51,6 +52,7 @@ class AllSubscriptionsScreen extends StatelessWidget {
             return const Text('All subscriptions');
           },
         ),
+        leading: CustomBackButton(onPressed: context.pop),
         actions: <Widget>[
           AppbarAction(
             icon: YTIcons.cast_outlined,

@@ -43,6 +43,7 @@ export 'widgets/connection_snackbar.dart';
 export 'widgets/custom_action_button.dart';
 export 'widgets/custom_action_chip.dart';
 export 'widgets/custom_backbutton.dart';
+export 'widgets/custom_checkbox.dart';
 export 'widgets/custom_ink_well.dart';
 export 'widgets/custom_scroll_physics.dart';
 export 'widgets/download_storage_usage.dart';

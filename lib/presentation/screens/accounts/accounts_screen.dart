@@ -95,7 +95,7 @@ class AccountsScreen extends StatelessWidget {
                               showDynamicSheet(
                                 context,
                                 items: [
-                                  DynamicSheetItem(
+                                  DynamicSheetOptionItem(
                                     leading: const Icon(
                                       YTIcons.playlist_play_outlined,
                                     ),
@@ -109,25 +109,25 @@ class AccountsScreen extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  const DynamicSheetItem(
+                                  const DynamicSheetOptionItem(
                                     leading: Icon(
                                       YTIcons.watch_later_outlined,
                                     ),
                                     title: 'Save to Watch later',
                                   ),
-                                  const DynamicSheetItem(
+                                  const DynamicSheetOptionItem(
                                     leading: Icon(YTIcons.save_outlined_1),
                                     title: 'Save to playlist',
                                   ),
-                                  const DynamicSheetItem(
+                                  const DynamicSheetOptionItem(
                                     leading: Icon(YTIcons.download_outlined),
                                     title: 'Download',
                                   ),
-                                  const DynamicSheetItem(
+                                  const DynamicSheetOptionItem(
                                     leading: Icon(YTIcons.share_outlined),
                                     title: 'Share',
                                   ),
-                                  const DynamicSheetItem(
+                                  const DynamicSheetOptionItem(
                                     leading: Icon(YTIcons.delete_outlined),
                                     title: 'Remove from watch history',
                                   ),
@@ -156,7 +156,7 @@ class AccountsScreen extends StatelessWidget {
                                     showDynamicSheet(
                                       context,
                                       items: [
-                                        DynamicSheetItem(
+                                        DynamicSheetOptionItem(
                                           leading: const Icon(
                                             YTIcons.playlist_play_outlined,
                                           ),

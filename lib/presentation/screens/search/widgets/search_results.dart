@@ -58,7 +58,7 @@ class SearchResults extends StatelessWidget {
                       showDynamicSheet(
                         context,
                         items: [
-                          DynamicSheetItem(
+                          DynamicSheetOptionItem(
                             leading: const Icon(
                               YTIcons.playlist_play_outlined,
                             ),
@@ -72,23 +72,23 @@ class SearchResults extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const DynamicSheetItem(
+                          const DynamicSheetOptionItem(
                             leading: Icon(YTIcons.watch_later_outlined),
                             title: 'Save to Watch later',
                           ),
-                          const DynamicSheetItem(
+                          const DynamicSheetOptionItem(
                             leading: Icon(YTIcons.save_outlined_1),
                             title: 'Save to playlist',
                           ),
-                          const DynamicSheetItem(
+                          const DynamicSheetOptionItem(
                             leading: Icon(YTIcons.share_outlined),
                             title: 'Share',
                           ),
-                          const DynamicSheetItem(
+                          const DynamicSheetOptionItem(
                             leading: Icon(YTIcons.reload_outlined),
                             title: 'Remix',
                           ),
-                          const DynamicSheetItem(
+                          const DynamicSheetOptionItem(
                             leading: Icon(
                               YTIcons.youtube_music_outlined,
                             ),
@@ -98,7 +98,7 @@ class SearchResults extends StatelessWidget {
                               size: 20,
                             ),
                           ),
-                          const DynamicSheetItem(
+                          const DynamicSheetOptionItem(
                             leading: Icon(YTIcons.report_outlined),
                             title: 'Report',
                             dependents: [DynamicSheetItemDependent.auth],

@@ -29,10 +29,11 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import 'dynamic_sheet.dart';
 import 'tappable_area.dart';
 
-class NotificationOption extends StatelessWidget {
-  const NotificationOption({
+class SubscribedChannelButton extends StatelessWidget {
+  const SubscribedChannelButton({
     super.key,
     this.title,
     this.alignment,
@@ -52,6 +53,7 @@ class NotificationOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TappableArea(
+      onTap: () => onButtonClicked(context),
       padding: EdgeInsets.zero,
       borderRadius: borderRadius ?? BorderRadius.circular(16),
       child: Container(
@@ -68,7 +70,7 @@ class NotificationOption extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Icon(YTIcons.notification_all_filled),
+            Icon(SubscriptionNotificationType.all.icon),
             if (title != null) ...<Widget>[
               const SizedBox(width: 4),
               Text(title!, style: textStyle),
@@ -82,5 +84,56 @@ class NotificationOption extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> onButtonClicked(BuildContext context) async {
+    await showDynamicSheet<SubscriptionNotificationType>(
+      context,
+      title: const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Text(
+          'Notification',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+      ),
+      items: [
+        for (final type in SubscriptionNotificationType.values)
+          DynamicSheetOptionItem<SubscriptionNotificationType>(
+            value: type,
+            title: type.text,
+            leading: Icon(type.icon),
+            trailing: DynamicSheetItemCheck(
+              selected: type == SubscriptionNotificationType.all,
+              color: const Color(0xFFAAAAAA),
+              size: 18,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+enum SubscriptionNotificationType {
+  all,
+  personalized,
+  none,
+  unsubscribe;
+
+  String get text {
+    return switch (this) {
+      all => 'All',
+      personalized => 'Personalized',
+      none => 'None',
+      unsubscribe => 'Unsubscribe',
+    };
+  }
+
+  IconData get icon {
+    return switch (this) {
+      all => YTIcons.notification_all_filled,
+      personalized => YTIcons.notification_outlined,
+      none => YTIcons.notifications_off_outlined,
+      unsubscribe => YTIcons.unsubscribe_outlined,
+    };
   }
 }

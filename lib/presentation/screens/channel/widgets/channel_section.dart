@@ -153,7 +153,7 @@ class ChannelSection extends StatelessWidget {
               Row(
                 children: <Widget>[
                   Expanded(
-                    child: NotificationOption(
+                    child: SubscribedChannelButton(
                       title: 'Subscribed',
                       alignment: Alignment.center,
                       backgroundColor: Colors.white12,

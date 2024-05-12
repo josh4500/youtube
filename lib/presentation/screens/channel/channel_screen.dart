@@ -364,7 +364,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                 showDynamicSheet(
                   context,
                   items: [
-                    const DynamicSheetItem(
+                    const DynamicSheetOptionItem(
                       leading: Icon(YTIcons.feedbck_outlined),
                       title: 'Send feedback',
                       dependents: [DynamicSheetItemDependent.auth],
@@ -461,7 +461,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                   showDynamicSheet(
                     context,
                     items: [
-                      DynamicSheetItem(
+                      DynamicSheetOptionItem(
                         leading: const Icon(YTIcons.playlist_play_outlined),
                         title: 'Play next in queue',
                         trailing: ClipRRect(
@@ -473,11 +473,11 @@ class _ChannelScreenState extends State<ChannelScreen> {
                           ),
                         ),
                       ),
-                      const DynamicSheetItem(
+                      const DynamicSheetOptionItem(
                         leading: Icon(YTIcons.save_outlined_1),
                         title: 'Save to library',
                       ),
-                      const DynamicSheetItem(
+                      const DynamicSheetOptionItem(
                         leading: Icon(YTIcons.share_outlined),
                         title: 'Share',
                       ),
@@ -506,7 +506,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                 showDynamicSheet(
                   context,
                   items: [
-                    const DynamicSheetItem(
+                    const DynamicSheetOptionItem(
                       leading: Icon(YTIcons.report_outlined),
                       title: 'Report',
                     ),

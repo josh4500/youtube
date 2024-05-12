@@ -35,6 +35,36 @@ class PersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
+class FixedHeightHeaderDelegate extends SliverPersistentHeaderDelegate {
+  const FixedHeightHeaderDelegate({
+    required this.height,
+    required this.child,
+  });
+
+  final double height;
+  final Widget child;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return child;
+  }
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  double get minExtent => height;
+
+  @override
+  bool shouldRebuild(covariant FixedHeightHeaderDelegate oldDelegate) {
+    return height != oldDelegate.height;
+  }
+}
+
 class FadingSliverPersistentHeaderDelegate
     extends SliverPersistentHeaderDelegate {
   FadingSliverPersistentHeaderDelegate({
