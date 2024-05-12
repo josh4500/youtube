@@ -25,3 +25,73 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
+
+import '../../network_image/custom_network_image.dart';
+
+class ViewableSlidesContext extends StatefulWidget {
+  const ViewableSlidesContext({super.key});
+
+  @override
+  State<ViewableSlidesContext> createState() => _ViewableSlidesContextState();
+}
+
+class _ViewableSlidesContextState extends State<ViewableSlidesContext> {
+  final pageController = PageController(viewportFraction: 0.92);
+  int slideCount = 4;
+  final ValueNotifier<int> slidePageIndex = ValueNotifier(0);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 320,
+      child: PageView.builder(
+        itemCount: slideCount,
+        controller: pageController,
+        onPageChanged: (int index) => slidePageIndex.value = index,
+        itemBuilder: (BuildContext context, int slideIndex) {
+          return Container(
+            margin: const EdgeInsets.only(right: 12),
+            decoration: BoxDecoration(
+              color: Colors.white38,
+              borderRadius: BorderRadius.circular(8),
+              image: const DecorationImage(
+                image: CustomNetworkImage('https://picsum.photos/450/900'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: ListenableBuilder(
+              listenable: slidePageIndex,
+              builder: (context, _) {
+                return Visibility(
+                  visible: slidePageIndex.value == slideIndex,
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      margin: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        '${slideIndex + 1}/$slideCount',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

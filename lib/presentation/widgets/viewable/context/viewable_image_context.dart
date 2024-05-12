@@ -25,3 +25,25 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+import 'package:flutter/material.dart';
+
+import '../../network_image/custom_network_image.dart';
+
+class ViewableImageContext extends StatelessWidget {
+  const ViewableImageContext({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 320,
+      decoration: const BoxDecoration(
+        color: Colors.white38,
+        image: DecorationImage(
+          image: CustomNetworkImage('https://picsum.photos/450/900'),
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+}

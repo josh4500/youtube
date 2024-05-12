@@ -26,14 +26,20 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../account_avatar.dart';
 import '../custom_ink_well.dart';
 import '../dynamic_sheet.dart';
-import '../network_image/custom_network_image.dart';
 import '../tappable_area.dart';
+import 'context/viewable_answer_context.dart';
+import 'context/viewable_image_context.dart';
+import 'context/viewable_slides_context.dart';
+import 'context/viewable_video_context.dart';
+import 'context/viewable_vote_context.dart';
 
 class ViewablePostContent extends StatelessWidget {
   const ViewablePostContent({super.key, this.onMore});
@@ -44,7 +50,7 @@ class ViewablePostContent extends StatelessWidget {
     // TODO(Josh): Be able to hide more button
     return Column(
       children: <Widget>[
-        const Divider(thickness: 1, height: 0),
+        const Divider(thickness: .92, height: 0),
         Padding(
           padding: const EdgeInsets.only(
             left: 4.0,
@@ -88,15 +94,15 @@ class ViewablePostContent extends StatelessWidget {
                       showDynamicSheet(
                         context,
                         items: [
-                          const DynamicSheetItem(
+                          const DynamicSheetOptionItem(
                             leading: Icon(YTIcons.report_outlined),
                             title: 'Report',
                           ),
-                          const DynamicSheetItem(
+                          const DynamicSheetOptionItem(
                             leading: Icon(YTIcons.not_interested_outlined),
                             title: 'Not interested',
                           ),
-                          const DynamicSheetItem(
+                          const DynamicSheetOptionItem(
                             leading: Icon(YTIcons.not_interested_outlined),
                             title: 'Don\'t recommend posts from channel',
                             dependents: [DynamicSheetItemDependent.auth],
@@ -122,16 +128,13 @@ class ViewablePostContent extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Container(
-          height: 320,
-          decoration: const BoxDecoration(
-            color: Colors.white38,
-            image: DecorationImage(
-              image: CustomNetworkImage('https://picsum.photos/450/900'),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
+        const [
+          ViewableVoteContext(),
+          ViewableImageContext(),
+          ViewableVideoContext(),
+          ViewableSlidesContext(),
+          ViewableAnswerContext(),
+        ][Random().nextInt(5)],
         Padding(
           padding: const EdgeInsets.all(6.0),
           child: Row(
