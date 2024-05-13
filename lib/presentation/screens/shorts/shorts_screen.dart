@@ -192,24 +192,60 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
               appBar: historyOff
                   ? null
                   : AppBar(
-                      title: Text(
-                        _isSubscriptionScreen
-                            ? 'Subscriptions'
-                            : _isLiveScreen
-                                ? 'Live'
-                                : 'Shorts',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      title: ValueListenableBuilder<bool>(
+                        valueListenable: _showViewerDiscretion,
+                        builder: (
+                          BuildContext context,
+                          bool showViewerDiscretion,
+                          Widget? _,
+                        ) {
+                          return Visibility(
+                            visible: showViewerDiscretion == false,
+                            child: Text(
+                              _isSubscriptionScreen
+                                  ? 'Subscriptions'
+                                  : _isLiveScreen
+                                      ? 'Live'
+                                      : 'Shorts',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                       backgroundColor: Colors.transparent,
-                      actions: const <Widget>[
-                        AppbarAction(
-                          icon: YTIcons.shorts_search,
+                      actions: <Widget>[
+                        ValueListenableBuilder<bool>(
+                          valueListenable: _showViewerDiscretion,
+                          builder: (
+                            BuildContext context,
+                            bool showViewerDiscretion,
+                            Widget? _,
+                          ) {
+                            return Visibility(
+                              visible: showViewerDiscretion == false,
+                              child: const AppbarAction(
+                                icon: YTIcons.shorts_search,
+                              ),
+                            );
+                          },
                         ),
-                        AppbarAction(
-                          icon: YTIcons.more_vert_outlined,
+                        ValueListenableBuilder<bool>(
+                          valueListenable: _showViewerDiscretion,
+                          builder: (
+                            BuildContext context,
+                            bool showViewerDiscretion,
+                            Widget? _,
+                          ) {
+                            return Visibility(
+                              visible: showViewerDiscretion == false,
+                              child: const AppbarAction(
+                                icon: YTIcons.more_vert_outlined,
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
