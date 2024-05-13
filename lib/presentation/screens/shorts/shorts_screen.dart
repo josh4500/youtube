@@ -37,6 +37,7 @@ import 'widgets/shorts_comments_bottom_sheet.dart';
 import 'widgets/shorts_history_off.dart';
 import 'widgets/shorts_info_section.dart';
 import 'widgets/shorts_player_view.dart';
+import 'widgets/shorts_viewer_discretion.dart';
 
 class ShortsScreen extends ConsumerStatefulWidget {
   const ShortsScreen({
@@ -53,9 +54,8 @@ class ShortsScreen extends ConsumerStatefulWidget {
 
 class _ShortsScreenState extends ConsumerState<ShortsScreen> {
   final PageController _pageController = PageController();
-  final ValueNotifier<bool> _progressVisibilityNotifier = ValueNotifier<bool>(
-    true,
-  );
+  final _showProgressNotifier = ValueNotifier<bool>(true);
+  final _showViewerDiscretion = ValueNotifier<bool>(false);
 
   int _currentIndex = 0;
   final ValueNotifier<bool> _isPaused = ValueNotifier<bool>(false);
@@ -87,6 +87,24 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
     _currentIndex = index;
     // Reset state for new page
     _isPaused.value = false;
+
+    // TODO(josh4500): This should not behave this way. The discretion should be stack on top video with the discretion
+    if (index == 2) {
+      _showViewerDiscretion.value = true;
+    } else {
+      _showViewerDiscretion.value = false;
+    }
+  }
+
+  void closeViewerDiscretion() {
+    _showViewerDiscretion.value = false;
+  }
+
+  void skipViewerDiscretion() {
+    _pageController.nextPage(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInCubic,
+    );
   }
 
   void _pausePlay() {
@@ -150,6 +168,15 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
     super.dispose();
   }
 
+  bool onScrollShortsNotification(ScrollNotification notification) {
+    if (notification is ScrollEndNotification) {
+      _showProgressNotifier.value = true;
+    } else if (notification is ScrollUpdateNotification) {
+      _showProgressNotifier.value = false;
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     const historyOff = 0 != 0;
@@ -163,7 +190,7 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
               extendBodyBehindAppBar: true,
               resizeToAvoidBottomInset: false,
               appBar: historyOff
-                  ? AppBar()
+                  ? null
                   : AppBar(
                       title: Text(
                         _isSubscriptionScreen
@@ -191,74 +218,102 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
                   if (historyOff) {
                     return const ShortsHistoryOff();
                   }
+
+                  final bottomSpaceWidget = ValueListenableBuilder<double>(
+                    valueListenable: playerBottomPadding,
+                    builder: (
+                      BuildContext context,
+                      double value,
+                      Widget? _,
+                    ) {
+                      return SizedBox(
+                        height: value,
+                        width: double.infinity,
+                      );
+                    },
+                  );
+
                   return Stack(
                     children: <Widget>[
                       ScrollConfiguration(
                         behavior: const OverScrollGlowBehavior(enabled: false),
                         child: NotificationListener<ScrollNotification>(
-                          onNotification: (ScrollNotification notification) {
-                            if (notification is ScrollEndNotification) {
-                              _progressVisibilityNotifier.value = true;
-                            } else if (notification
-                                is ScrollUpdateNotification) {
-                              _progressVisibilityNotifier.value = false;
-                            }
-                            return false;
-                          },
+                          onNotification: onScrollShortsNotification,
                           child: PageView.builder(
                             physics: physics,
+                            controller: _pageController,
                             scrollDirection: Axis.vertical,
                             itemBuilder: (BuildContext context, int index) {
-                              return Stack(
-                                children: <Widget>[
-                                  Column(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: _pausePlay,
-                                          child: ShortsPlayerView(
-                                            isSubscriptionScreen:
-                                                _isSubscriptionScreen,
-                                            isLiveScreen: _isLiveScreen,
-                                          ),
-                                        ),
+                              final playerView = Expanded(
+                                child: ValueListenableBuilder<bool>(
+                                  valueListenable: _showViewerDiscretion,
+                                  builder: (
+                                    BuildContext context,
+                                    bool showViewerDiscretion,
+                                    Widget? _,
+                                  ) {
+                                    if (showViewerDiscretion) {
+                                      return ShortsViewerDiscretion(
+                                        onClickContinue: closeViewerDiscretion,
+                                        onClickSkipVideo: skipViewerDiscretion,
+                                      );
+                                    }
+
+                                    return GestureDetector(
+                                      onTap: _pausePlay,
+                                      child: ShortsPlayerView(
+                                        isSubscriptionScreen:
+                                            _isSubscriptionScreen,
+                                        isLiveScreen: _isLiveScreen,
                                       ),
-                                      ValueListenableBuilder<double>(
-                                        valueListenable: playerBottomPadding,
-                                        builder: (
-                                          BuildContext context,
-                                          double value,
-                                          _,
-                                        ) {
-                                          return SizedBox(
-                                            height: value,
-                                            width: double.infinity,
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: ShortsInfoSection(
-                                      onTapComment: _openCommentSheet,
-                                    ),
-                                  ),
-                                  ListenableBuilder(
-                                    listenable: _isPaused,
-                                    builder: (
-                                      BuildContext context,
-                                      Widget? childWidget,
-                                    ) {
-                                      if (_showCategoryActions &&
-                                          index == _currentIndex) {
-                                        return childWidget!;
-                                      }
-                                      return const SizedBox();
-                                    },
+                                    );
+                                  },
+                                ),
+                              );
+
+                              final infoWidget = Align(
+                                alignment: Alignment.bottomCenter,
+                                child: ShortsInfoSection(
+                                  onTapComment: _openCommentSheet,
+                                ),
+                              );
+
+                              final actionsWidget = ListenableBuilder(
+                                listenable: _isPaused,
+                                builder: (
+                                  BuildContext context,
+                                  Widget? childWidget,
+                                ) {
+                                  return Visibility(
+                                    visible: _showCategoryActions &&
+                                        index == _currentIndex,
                                     child: const ShortsCategoryActions(),
-                                  ),
-                                ],
+                                  );
+                                },
+                              );
+
+                              return ValueListenableBuilder<bool>(
+                                valueListenable: _showViewerDiscretion,
+                                builder: (
+                                  BuildContext context,
+                                  bool showViewerDiscretion,
+                                  Widget? _,
+                                ) {
+                                  return Stack(
+                                    children: <Widget>[
+                                      Column(
+                                        children: <Widget>[
+                                          playerView,
+                                          bottomSpaceWidget,
+                                        ],
+                                      ),
+                                      if (showViewerDiscretion == false) ...[
+                                        infoWidget,
+                                        actionsWidget,
+                                      ],
+                                    ],
+                                  );
+                                },
                               );
                             },
                             onPageChanged: _onPageIndexChange,
@@ -271,18 +326,26 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: ValueListenableBuilder<bool>(
-                          valueListenable: _progressVisibilityNotifier,
+                          valueListenable: _showProgressNotifier,
                           builder: (
                             BuildContext context,
                             bool visible,
                             Widget? childWidget,
                           ) {
-                            return Visibility(
-                              visible: visible,
-                              child: childWidget!,
+                            return ValueListenableBuilder<bool>(
+                              valueListenable: _showViewerDiscretion,
+                              builder: (
+                                BuildContext context,
+                                bool showViewerDiscretion,
+                                Widget? childWidget,
+                              ) {
+                                return Visibility(
+                                  visible: showViewerDiscretion == false,
+                                  child: const PlaybackProgress(),
+                                );
+                              },
                             );
                           },
-                          child: const PlaybackProgress(),
                         ),
                       ),
                     ],
