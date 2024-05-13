@@ -208,7 +208,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                       items: const <SlidableItem>[
                         SlidableItem(
                           icon: Icon(
-                            YTIcons.delete_outlined,
+                            Icons.delete,
                             color: Colors.black,
                           ),
                         ),
@@ -242,7 +242,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                       items: const <SlidableItem>[
                         SlidableItem(
                           icon: Icon(
-                            YTIcons.delete_outlined,
+                            Icons.delete,
                             color: Colors.black,
                           ),
                         ),

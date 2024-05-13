@@ -84,7 +84,7 @@ class AccountsScreen extends StatelessWidget {
                   <Widget>[
                     GroupedViewBuilder(
                       title: 'History',
-                      height: 170,
+                      height: 160,
                       onTap: () => context.goto(AppRoutes.watchHistory),
                       itemBuilder: (BuildContext context, int index) {
                         return TappableArea(

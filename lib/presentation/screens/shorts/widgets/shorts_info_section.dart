@@ -29,8 +29,8 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 
+import 'shorts_action_button.dart';
 import 'shorts_audio_button.dart';
 import 'shorts_context_info.dart';
 
@@ -54,34 +54,10 @@ class ShortsInfoSection extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       ...<Widget>[
-                        CustomInkWell(
-                          onTap: () {},
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 6,
-                              horizontal: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(2),
-                              color: Colors.black45,
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Icon(YTIcons.paid_promotion_outlined),
-                                SizedBox(width: 4),
-                                Text(
-                                  'Includes Paid Promotions',
-                                  style: TextStyle(fontWeight: FontWeight.w500),
-                                ),
-                                SizedBox(width: 4),
-                                Icon(YTIcons.chevron_right, size: 14),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
+                        const AlteredVideoButton(),
+                        const SizedBox(height: 12),
+                        const IncludePromotionButton(),
+                        const SizedBox(height: 12),
                       ],
                       ...<Widget>[
                         CustomInkWell(
@@ -212,39 +188,71 @@ class ShortsInfoSection extends StatelessWidget {
   }
 }
 
-class ShortsActionButton extends StatelessWidget {
-  const ShortsActionButton({
+class IncludePromotionButton extends StatelessWidget {
+  const IncludePromotionButton({
     super.key,
-    required this.title,
-    required this.summary,
-    required this.onTap,
   });
-  final Widget title;
-  final String summary;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(64),
+    return CustomInkWell(
+      onTap: () {},
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        child: CustomInkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(64),
-          padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16),
-          child: Column(
-            children: <Widget>[
-              title,
-              const SizedBox(height: 8),
-              Text(
-                summary,
-                style: const TextStyle(
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
+        padding: const EdgeInsets.symmetric(
+          vertical: 6,
+          horizontal: 12,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(2),
+          color: Colors.black45,
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(YTIcons.paid_promotion_outlined),
+            SizedBox(width: 4),
+            Text(
+              'Includes Paid Promotions',
+              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500),
+            ),
+            SizedBox(width: 4),
+            Icon(YTIcons.chevron_right, size: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AlteredVideoButton extends StatelessWidget {
+  const AlteredVideoButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomInkWell(
+      onTap: () {},
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(2),
+          color: Colors.black45,
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ColoredBox(
+              color: Color(0xFF3EA6FF),
+              child: SizedBox(width: 4, height: 32),
+            ),
+            SizedBox(width: 8),
+            Text(
+              'Altered or synthetic content',
+              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500),
+            ),
+            SizedBox(width: 4),
+            Icon(YTIcons.chevron_right, size: 16),
+            SizedBox(width: 4),
+          ],
         ),
       ),
     );

@@ -34,7 +34,9 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'widgets/shorts_category_actions.dart';
 import 'widgets/shorts_comments_bottom_sheet.dart';
+import 'widgets/shorts_history_off.dart';
 import 'widgets/shorts_info_section.dart';
+import 'widgets/shorts_player_view.dart';
 
 class ShortsScreen extends ConsumerStatefulWidget {
   const ShortsScreen({
@@ -170,7 +172,7 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
                                 ? 'Live'
                                 : 'Shorts',
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -178,9 +180,6 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
                       actions: const <Widget>[
                         AppbarAction(
                           icon: YTIcons.shorts_search,
-                        ),
-                        AppbarAction(
-                          icon: Icons.camera_alt_outlined,
                         ),
                         AppbarAction(
                           icon: YTIcons.more_vert_outlined,
@@ -311,95 +310,6 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
               );
             },
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class ShortsPlayerView extends StatelessWidget {
-  const ShortsPlayerView({
-    super.key,
-    required bool isSubscriptionScreen,
-    required bool isLiveScreen,
-  })  : _isSubscriptionScreen = isSubscriptionScreen,
-        _isLiveScreen = isLiveScreen;
-
-  // TODO(Josh): Will be provider vlues
-  final bool _isSubscriptionScreen;
-  final bool _isLiveScreen;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: const Color(0xFF656565),
-        image: DecorationImage(
-          image: _isSubscriptionScreen
-              ? const CustomNetworkImage(
-                  'https://picsum.photos/360/700',
-                )
-              : _isLiveScreen
-                  ? const CustomNetworkImage(
-                      'https://picsum.photos/400/800',
-                    )
-                  : const CustomNetworkImage(
-                      'https://picsum.photos/444/800',
-                    ),
-          fit: BoxFit.fitHeight,
-        ),
-      ),
-    );
-  }
-}
-
-class ShortsHistoryOff extends StatelessWidget {
-  const ShortsHistoryOff({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 22),
-          Align(
-            alignment: Alignment.centerRight,
-            child: GestureDetector(
-              onTap: () {},
-              child: const Icon(YTIcons.shorts_search, size: 36),
-            ),
-          ),
-          const Spacer(),
-          const Text(
-            'Shorts recommendation are off',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 22),
-          const Text(
-            'Your watch history is off, and we rely on watch history to tailor your Shorts feed. You can change your setting at any time, or try searching for Shorts instead. Learn more.',
-            style: TextStyle(fontSize: 14),
-          ),
-          const SizedBox(height: 24),
-          CustomActionChip(
-            title: 'Update setting',
-            padding: const EdgeInsets.all(12),
-            borderRadius: BorderRadius.circular(24),
-            backgroundColor: Colors.white,
-            alignment: Alignment.center,
-            textStyle: const TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
-            onTap: () {},
-          ),
-          const SizedBox(height: 18),
         ],
       ),
     );

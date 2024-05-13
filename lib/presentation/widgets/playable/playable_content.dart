@@ -151,19 +151,22 @@ class PlayableContent extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          'CNC',
+                          isPlaylist
+                              ? 'CNC'
+                              : 'One Piece: Wano Country Arc Trailer',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Text(
-                          'Public . Playlist',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                          isPlaylist ? 'Public . Playlist' : 'Zigalot',
+                          style:
+                              const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ],
                     ),

@@ -37,12 +37,14 @@ class ShortsCategoryActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(28.0),
-      child: Column(
-        children: <Widget>[
-          const SizedBox(height: kToolbarHeight * 1.2),
-          Row(
+    return Column(
+      children: <Widget>[
+        const SizedBox(height: kToolbarHeight * 1.4),
+        SizedBox(
+          height: 36,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             children: <Widget>[
               CustomActionChip(
                 onTap: () => context.goto(AppRoutes.shortsSubscription),
@@ -57,8 +59,8 @@ class ShortsCategoryActions extends StatelessWidget {
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
               ),
-              const SizedBox(width: 8),
               CustomActionChip(
                 onTap: () => context.goto(AppRoutes.shortsLive),
                 padding: const EdgeInsets.symmetric(
@@ -72,11 +74,27 @@ class ShortsCategoryActions extends StatelessWidget {
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+              ),
+              CustomActionChip(
+                onTap: () => context.goto(AppRoutes.shortsLive),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 6,
+                  horizontal: 16,
+                ),
+                icon: const Icon(YTIcons.shopping_bag_outlined),
+                backgroundColor: Colors.white10,
+                title: 'Shopping',
+                textStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

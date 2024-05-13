@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/constants/values.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -77,27 +76,18 @@ class PlayerSettings extends StatelessWidget {
           await showDynamicSheet(
             context,
             title: const Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Text.rich(
                 TextSpan(
                   text: 'Quality for current video',
                   children: [
                     TextSpan(
                       text: ' $kDotSeparator ',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFFAAAAAA),
-                      ),
+                      style: TextStyle(fontSize: 16, color: Color(0xFFAAAAAA)),
                     ),
                     TextSpan(
                       text: '360',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFFAAAAAA),
-                      ),
+                      style: TextStyle(fontSize: 16, color: Color(0xFFAAAAAA)),
                     ),
                   ],
                   style: TextStyle(fontSize: 16),
@@ -131,47 +121,43 @@ class PlayerSettings extends StatelessWidget {
               ],
             ),
             items: [
-              const DynamicSheetOptionItem(
-                leading: DynamicSheetItemCheck(selected: true),
-                title: 'Auto (recommended)',
-                subtitle:
-                    'Adjust to give the best experience for your conditions',
-              ),
-              const DynamicSheetOptionItem(
-                leading: DynamicSheetItemCheck(selected: false),
-                title: 'Higher picture quality',
-                subtitle: 'Uses more data',
-              ),
-              const DynamicSheetOptionItem(
-                leading: DynamicSheetItemCheck(selected: false),
-                title: 'Data saver',
-                subtitle: 'Lower picture quality',
-              ),
-              const DynamicSheetOptionItem(
-                leading: DynamicSheetItemCheck(selected: false),
-                title: 'Advanced',
-                subtitle: 'Select a specific resolution',
-              ),
+              for (final (title, subtitle) in <(String, String)>[
+                (
+                  'Auto (recommended)',
+                  'Adjust to give the best experience for your conditions',
+                ),
+                ('Higher picture quality', 'Uses more data'),
+                ('Data saver', 'Lower picture quality'),
+                ('Advanced', 'Select a specific resolution'),
+              ])
+                DynamicSheetOptionItem(
+                  leading: DynamicSheetItemCheck(
+                    selected: title == 'Auto (recommended)',
+                  ),
+                  title: title,
+                  subtitle: subtitle,
+                ),
             ],
           );
         } else if (selection == 'Playback speed' && context.mounted) {
           await showDynamicSheet(
             context,
             items: [
-              '0.25x',
-              '0.5x',
-              '0.75x',
-              'Normal',
-              '1.25x',
-              '1.5x',
-              '1.75x',
-              '2x',
-            ].map((speed) {
-              return DynamicSheetOptionItem(
-                leading: DynamicSheetItemCheck(selected: speed == 'Normal'),
-                title: speed,
-              );
-            }).toList(),
+              for (final speed in [
+                '0.25x',
+                '0.5x',
+                '0.75x',
+                'Normal',
+                '1.25x',
+                '1.5x',
+                '1.75x',
+                '2x',
+              ])
+                DynamicSheetOptionItem(
+                  leading: DynamicSheetItemCheck(selected: speed == 'Normal'),
+                  title: speed,
+                ),
+            ],
           );
         } else if (selection == 'Captions' && context.mounted) {
           await showDynamicSheet(
@@ -180,14 +166,8 @@ class PlayerSettings extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  child: Text(
-                    'Captions',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Text('Captions', style: TextStyle(fontSize: 16)),
                 ),
                 Divider(thickness: 1, height: 0),
               ],
@@ -196,10 +176,7 @@ class PlayerSettings extends StatelessWidget {
               children: [
                 Divider(thickness: 1, height: 0),
                 Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text.rich(
                     TextSpan(
                       text:
@@ -216,17 +193,18 @@ class PlayerSettings extends StatelessWidget {
               ],
             ),
             items: [
-              'Turn off captions',
-              'English (auto-generated)',
-              'Auto translate',
-            ].map((title) {
-              return DynamicSheetOptionItem(
-                leading: DynamicSheetItemCheck(
-                  selected: title == 'Turn off captions',
+              for (final title in [
+                'Turn off captions',
+                'English (auto-generated)',
+                'Auto translate',
+              ])
+                DynamicSheetOptionItem(
+                  leading: DynamicSheetItemCheck(
+                    selected: title == 'Turn off captions',
+                  ),
+                  title: title,
                 ),
-                title: title,
-              );
-            }).toList(),
+            ],
           );
         } else if (selection == 'Additional settings' && context.mounted) {
           await showDynamicSheet(
