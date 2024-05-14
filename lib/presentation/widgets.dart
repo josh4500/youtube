@@ -51,6 +51,7 @@ export 'widgets/dynamic_sheet.dart';
 export 'widgets/dynamic_tab.dart';
 export 'widgets/error_overlay.dart';
 export 'widgets/grouped_view_builder.dart';
+export 'widgets/info_buttons.dart';
 export 'widgets/lazy_indexed_stack.dart';
 export 'widgets/marquee.dart';
 

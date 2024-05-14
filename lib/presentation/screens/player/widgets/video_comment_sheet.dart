@@ -92,7 +92,14 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
                   if (index == 0) {
                     return const VideoCommentGuidelines();
                   }
-                  return CommentTile(openReply: _replyController.open);
+                  return CommentTile(
+                    openReply: _replyController.open,
+                    pinned: index == 1,
+                    byCreator: index == 1,
+                    creatorLikes: index == 1,
+                    creatorReply: index == 1,
+                    showReplies: index == 1,
+                  );
                 },
                 itemCount: 20,
               ),

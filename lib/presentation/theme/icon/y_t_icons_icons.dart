@@ -54,6 +54,8 @@ class YTIcons {
   static const IconData youtube_music_outlined = IconData(0xe81e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData podcast_outlined = IconData(0xe81f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData shopping_bag_outlined = IconData(0xe820, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData heart_filled = IconData(0xe821, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData pinned_outlined = IconData(0xe822, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData settings_filled = IconData(0xe825, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData live_outlined = IconData(0xe826, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData cast_outlined = IconData(0xe827, fontFamily: _kFontFam, fontPackage: _kFontPkg);
@@ -117,7 +119,6 @@ class YTIcons {
   static const IconData phone_outlined = IconData(0xe869, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData subscribers_outlined = IconData(0xe86a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData trending_up_outlined = IconData(0xe86b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData close_circle_outlined_1 = IconData(0xe86c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData share_outlined = IconData(0xe86d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData ambient_mode_outlined = IconData(0xe86e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData annotation_outlined = IconData(0xe86f, fontFamily: _kFontFam, fontPackage: _kFontPkg);

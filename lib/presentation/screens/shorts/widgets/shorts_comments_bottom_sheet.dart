@@ -69,6 +69,8 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet> {
                 controller: scrollController,
                 itemBuilder: (BuildContext context, int index) {
                   return CommentTile(
+                    pinned: index == 0,
+                    creatorLikes: index == 0,
                     openReply: () {},
                   );
                 },

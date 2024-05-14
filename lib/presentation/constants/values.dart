@@ -10,4 +10,4 @@ const double minVideoViewPortWidth = 0.33;
 const double maxPlayerScale = 8.0;
 const double minPlayerScale = 1.0;
 
-const String kDotSeparator = ' · ';
+const String kDotSeparator = '\u00A0\u00A0\u00B7\u00A0\u00A0';

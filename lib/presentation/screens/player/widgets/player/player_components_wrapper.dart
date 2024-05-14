@@ -28,10 +28,13 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../controls/player_notifications.dart';
 import '../controls/player_overlay_controls.dart';
+import '../infographics/video_card_teaser.dart';
 import '../infographics/video_channel_watermark.dart';
 
 class PlayerComponentsWrapper extends StatelessWidget {
@@ -55,15 +58,17 @@ class PlayerComponentsWrapper extends StatelessWidget {
         return true;
       },
       child: Stack(
-        alignment: Alignment.center,
         clipBehavior: Clip.none,
         children: [
           child,
           // Shows video channel watermark image in fullscreen mode
           const VideoChannelWatermark(),
-          const Positioned.fill(
-            child: PlayerOverlayControls(),
-          ),
+          const Positioned.fill(child: PlayerOverlayControls()),
+          // const IncludePromotionButton(margin: EdgeInsets.all(8)),
+          // const Align(
+          //   alignment: Alignment.topRight,
+          //   child: VideoCardTeaser(),
+          // ),
         ],
       ),
     );
