@@ -82,7 +82,7 @@ class PlayerSettings extends StatelessWidget {
                   text: 'Quality for current video',
                   children: [
                     TextSpan(
-                      text: ' $kDotSeparator ',
+                      text: kDotSeparator,
                       style: TextStyle(fontSize: 16, color: Color(0xFFAAAAAA)),
                     ),
                     TextSpan(

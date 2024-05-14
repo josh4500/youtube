@@ -126,6 +126,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                         if (tabName == 'Videos') ..._buildVideos(),
                         if (tabName == 'Shorts') ..._buildShorts(),
                         if (tabName == 'Live') ..._buildLives(),
+                        if (tabName == 'Podcasts') ..._buildPodcasts(),
                         if (tabName == 'Playlists') ..._buildPlaylists(),
                         if (tabName == 'Community') ..._buildCommunity(),
                       ],
@@ -305,7 +306,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
         child: Padding(
           padding: EdgeInsets.all(8.0),
           child: SizedBox(
-            height: 45,
+            height: 40,
             child: DynamicTab(
               initialIndex: 0,
               options: <String>['Latest', 'Popular', 'Oldest'],
@@ -343,7 +344,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
         child: Padding(
           padding: EdgeInsets.all(8.0),
           child: SizedBox(
-            height: 45,
+            height: 40,
             child: DynamicTab(
               initialIndex: 0,
               options: <String>['Latest', 'Popular'],
@@ -391,17 +392,80 @@ class _ChannelScreenState extends State<ChannelScreen> {
       const SliverToBoxAdapter(
         child: SizedBox(height: 8),
       ),
+      const SliverToBoxAdapter(
+        child: SizedBox(
+          height: 40,
+          child: DynamicTab(
+            initialIndex: 0,
+            options: ['Latest', 'Popular', 'Oldest'],
+          ),
+        ),
+      ),
       SliverList(
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
-            return const TappableArea(
-              padding: EdgeInsets.symmetric(
+            return TappableArea(
+              padding: const EdgeInsets.symmetric(
                 vertical: 8.0,
                 horizontal: 12,
               ),
-              child: PlayableVideoContent(
+              child: PlayableLiveContent(
                 height: 112,
                 width: 180,
+                completed: index != 0,
+              ),
+            );
+          },
+          childCount: 10,
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> _buildPodcasts() {
+    return <Widget>[
+      const SliverToBoxAdapter(child: SizedBox(height: 8)),
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (BuildContext context, int index) {
+            return TappableArea(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 12,
+              ),
+              child: PlayableContent(
+                width: 180,
+                height: 112,
+                direction: Axis.horizontal,
+                isPlaylist: true,
+                isPodcasts: true,
+                onMore: () {
+                  showDynamicSheet(
+                    context,
+                    items: [
+                      DynamicSheetOptionItem(
+                        leading: const Icon(YTIcons.playlist_play_outlined),
+                        title: 'Play next in queue',
+                        trailing: ClipRRect(
+                          borderRadius: BorderRadius.circular(2),
+                          child: Image.asset(
+                            AssetsPath.ytPAccessIcon48,
+                            width: 18,
+                            height: 18,
+                          ),
+                        ),
+                      ),
+                      const DynamicSheetOptionItem(
+                        leading: Icon(YTIcons.save_outlined_1),
+                        title: 'Save to library',
+                      ),
+                      const DynamicSheetOptionItem(
+                        leading: Icon(YTIcons.share_outlined),
+                        title: 'Share',
+                      ),
+                    ],
+                  );
+                },
               ),
             );
           },

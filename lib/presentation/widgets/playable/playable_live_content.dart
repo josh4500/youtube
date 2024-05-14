@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../network_image/custom_network_image.dart';
@@ -50,8 +51,8 @@ class PlayableLiveContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Add bool to hide live/duration indicator
-    // TODO: Can be completed or upcoming or currently live
+    // TODO(josh4500): Add bool to hide live/duration indicator
+    // TODO(josh4500): Can be completed or upcoming or currently live
     return Container(
       margin: margin,
       child: Flex(
@@ -139,31 +140,29 @@ class PlayableLiveContent extends StatelessWidget {
                           style: TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                         const SizedBox(height: 2),
-                        if (completed)
-                          const Row(
+                        Text.rich(
+                          TextSpan(
+                            text: '',
                             children: [
-                              Text(
-                                'Streamed 2 days ago ',
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
-                              ),
-                              Text(
-                                ' . ',
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
-                              ),
-                              Text(
-                                '7.6K views ',
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
-                              ),
+                              if (completed)
+                                const TextSpan(text: '7.6K views')
+                              else
+                                const TextSpan(text: '11k watching'),
+                              if (completed) ...[
+                                const TextSpan(text: kDotSeparator),
+                                const TextSpan(text: 'Streamed 2 days ago'),
+                                const TextSpan(text: kDotSeparator),
+                                // const TextSpan(text: ' 7.6K views '),
+                              ],
                             ],
                           ),
-                        if (!completed)
-                          const Text(
-                            '11k watching',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
                           ),
+                        ),
                       ],
                     ),
                   ),

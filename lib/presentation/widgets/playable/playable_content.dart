@@ -38,12 +38,14 @@ class PlayableContent extends StatelessWidget {
     this.width,
     this.height,
     this.isPlaylist = false,
+    this.isPodcasts = false,
     this.direction = Axis.vertical,
     this.margin,
     this.onMore,
   });
 
   final bool isPlaylist;
+  final bool isPodcasts;
   final Axis direction;
   final EdgeInsets? margin;
   final VoidCallback? onMore;
@@ -113,19 +115,21 @@ class PlayableContent extends StatelessWidget {
                                 color: Colors.black54,
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
                                   Icon(
-                                    YTIcons.playlists_outlined,
-                                    size: 18,
+                                    isPodcasts
+                                        ? YTIcons.podcast_outlined
+                                        : YTIcons.playlists_outlined,
+                                    size: 16,
                                   ),
-                                  SizedBox(width: 2),
-                                  Text(
+                                  const SizedBox(width: 2),
+                                  const Text(
                                     '2',
                                     style: TextStyle(
                                       fontSize: 13,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ],

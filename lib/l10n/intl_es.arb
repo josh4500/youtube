@@ -1,5 +1,9 @@
 {
   "@@locale": "es",
   "language": "Espanol",
-  "helloWorld": "¡Hola Mundo!"
+  "helloWorld": "¡Hola Mundo!",
+  "@helloWorld": {
+    "description": "The conventional newborn programmer greeting"
+  },
+  "general" : "General"
 }
