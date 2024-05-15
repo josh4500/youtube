@@ -303,7 +303,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     });
   }
 
-  StreamSubscription? _subscription;
+  StreamSubscription<PlayerSignal>? _subscription;
 
   @override
   void dispose() {

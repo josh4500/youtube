@@ -48,21 +48,12 @@ class PlayerView extends ConsumerWidget {
 
     final controller = ref.watch(playerRepositoryProvider).videoController;
 
-    return Container(
-      color: Colors.transparent,
-      constraints: BoxConstraints(
-        minWidth: 135,
-        maxWidth: screenWidth,
-        maxHeight: screenHeight * playerSizing.maxHeight,
-        minHeight: screenHeight * playerSizing.minHeight,
-      ),
-      child: Video(
-        controller: controller,
-        fit: BoxFit.fitWidth,
-        fill: Colors.transparent,
-        filterQuality: FilterQuality.none,
-        controls: null,
-      ),
+    return Video(
+      controller: controller,
+      fit: BoxFit.fitWidth,
+      fill: Colors.transparent,
+      filterQuality: FilterQuality.none,
+      controls: null,
     );
   }
 }

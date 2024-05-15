@@ -26,7 +26,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -38,18 +37,18 @@ class VideoCardTeaser extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.all(8),
       width: MediaQuery.sizeOf(context).width * .45,
       decoration: BoxDecoration(
-        color: Colors.black26,
+        color: Colors.black45,
         borderRadius: BorderRadius.circular(4),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AccountAvatar(size: 16),
-          SizedBox(width: 8),
-          Expanded(
+          const SizedBox(width: 8),
+          const AccountAvatar(size: 16),
+          const SizedBox(width: 8),
+          const Expanded(
             child: Text(
               'Check more of this video',
               maxLines: 1,
@@ -58,8 +57,13 @@ class VideoCardTeaser extends StatelessWidget {
               style: TextStyle(fontSize: 12.5),
             ),
           ),
-          SizedBox(width: 8),
-          Icon(YTIcons.close_outlined, size: 14),
+          const SizedBox(width: 4),
+          CustomInkWell(
+            onTap: () {},
+            padding: const EdgeInsets.all(8),
+            borderRadius: BorderRadius.circular(16),
+            child: const Icon(YTIcons.close_outlined, size: 14),
+          ),
         ],
       ),
     );

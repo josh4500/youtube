@@ -11,9 +11,10 @@ class IncludePromotionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: margin,
-      child: CustomInkWell(
-        onTap: () {},
-        child: ClipRRect(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: CustomInkWell(
+          onTap: () {},
           borderRadius: BorderRadius.circular(4),
           child: const ColoredBox(
             color: Colors.black45,
@@ -48,10 +49,10 @@ class AlteredVideoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomInkWell(
-      onTap: () {},
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(4),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4),
+      child: CustomInkWell(
+        onTap: () {},
         child: const ColoredBox(
           color: Colors.black45,
           child: Row(

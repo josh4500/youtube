@@ -27,12 +27,94 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
-class VideoProduct extends StatelessWidget {
+class VideoProduct extends StatefulWidget {
   const VideoProduct({super.key});
 
   @override
+  State<VideoProduct> createState() => _VideoProductState();
+}
+
+class _VideoProductState extends State<VideoProduct>
+    with TickerProviderStateMixin {
+  late AnimationController sizeController;
+  late Animation<double> sizeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    sizeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+    sizeAnimation = CurvedAnimation(
+      parent: sizeController,
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
+  @override
+  void dispose() {
+    sizeController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return GestureDetector(
+      onTap: () => sizeAnimation.value == 0
+          ? sizeController.forward()
+          : sizeController.reverse(),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+        decoration: BoxDecoration(
+          color: Colors.black54,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white54, width: .85),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 18,
+              height: 18,
+              margin: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.white54,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            SizeTransition(
+              axis: Axis.horizontal,
+              sizeFactor: sizeAnimation,
+              axisAlignment: 1,
+              fixedCrossAxisSizeFactor: 1,
+              child: Row(
+                children: [
+                  const SizedBox(width: 4),
+                  const Text(
+                    'View Products',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    child: const Icon(
+                      YTIcons.close_circle_outlined,
+                      size: 16,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
