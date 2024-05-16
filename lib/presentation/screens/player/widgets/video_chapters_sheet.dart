@@ -48,7 +48,7 @@ class _VideoChaptersSheetState extends State<VideoChaptersSheet> {
           itemCount: 6,
         );
       },
-      baseHeight: 1 - avgVideoViewPortHeight,
+      baseHeight: 1 - kAvgVideoViewPortHeight,
     );
   }
 }

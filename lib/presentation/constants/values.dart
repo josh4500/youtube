@@ -1,13 +1,15 @@
+// TODO: Fix this
 const double kMiniPlayerHeight = 56;
 
-const double maxVideoViewPortHeight = 0.7;
-const double avgVideoViewPortHeight = 0.273;
-const double minVideoViewPortHeight = 0.07;
+const double kMaxVideoViewPortHeight = 0.7;
+const double kAvgVideoViewPortHeight = 0.273;
 
-const double maxVideoViewPortWidth = 1;
-const double minVideoViewPortWidth = 0.33;
+const double kMaxVideoViewPortWidth = 1;
+const double kMinVideoViewPortWidth = 0.33;
 
-const double maxPlayerScale = 8.0;
-const double minPlayerScale = 1.0;
+const double kMinPlayerHeight = 0.07;
+
+const double kMaxPlayerScale = 8.0;
+const double kMinPlayerScale = 1.0;
 
 const String kDotSeparator = '\u00A0\u00A0\u00B7\u00A0\u00A0';

@@ -116,7 +116,7 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
           ],
         );
       },
-      baseHeight: 1 - avgVideoViewPortHeight,
+      baseHeight: 1 - kAvgVideoViewPortHeight,
       overlayChildren: [
         PageDraggableOverlayChild(
           controller: _replyController,

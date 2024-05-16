@@ -39,13 +39,12 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../constants.dart';
 import '../../providers.dart';
-import '../../view_models/playback/player_sizing.dart';
 import 'providers/player_view_state_provider.dart';
 import 'widgets/controls/player_ambient.dart';
 import 'widgets/controls/player_notifications.dart';
 import 'widgets/player/mini_player.dart';
-import 'widgets/player/player.dart';
 import 'widgets/player/player_components_wrapper.dart';
+import 'widgets/player/player_view.dart';
 import 'widgets/video_actions.dart';
 import 'widgets/video_channel_section.dart';
 import 'widgets/video_chapters_sheet.dart';
@@ -108,12 +107,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   double get screenHeight => widget.height;
 
   double get heightRatio {
-    return avgVideoViewPortHeight;
+    return kAvgVideoViewPortHeight;
   }
 
   double get videoViewHeight {
     // TODO(Josh): Determine value from Video Size either avg or max height
-    return avgVideoViewPortHeight;
+    return kAvgVideoViewPortHeight;
   }
 
   // TODO(Josh): Compute bool value
@@ -141,7 +140,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// [MiniPlayer] PlaybackProgress indicator opacity value
   double get miniPlayerOpacity => const Interval(
-        minVideoViewPortWidth,
+        kMinVideoViewPortWidth,
         1,
         curve: Curves.easeInCubic,
       ).transform(_widthNotifier.value).invertByOne;
@@ -225,7 +224,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _additionalHeightNotifier = ValueNotifier<double>(
       clampDouble(
-        (screenHeight * (1 - avgVideoViewPortHeight)) -
+        (screenHeight * (1 - kAvgVideoViewPortHeight)) -
             (screenHeight * (1 - videoViewHeight)),
         0,
         maxAdditionalHeight,
@@ -252,8 +251,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     });
 
     _marginNotifier = ValueNotifier<double>(0);
-    _widthNotifier = ValueNotifier<double>(minVideoViewPortWidth);
-    _heightNotifier = ValueNotifier<double>(minVideoViewPortHeight);
+    _widthNotifier = ValueNotifier<double>(kMinVideoViewPortWidth);
+    _heightNotifier = ValueNotifier<double>(kMinPlayerHeight);
 
     _animateWidth(1);
     _animateHeight(1);
@@ -263,7 +262,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _heightNotifier,
         transformer: (v) => v.clamp(0.5, 1),
       ),
-      curve: const Interval(minVideoViewPortHeight, 1),
+      curve: const Interval(kMinPlayerHeight, 1),
     );
 
     if (additionalHeight > 0) {
@@ -278,7 +277,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _transformationController.addListener(() {
       final double scale = _transformationController.value.getMaxScaleOnAxis();
 
-      if (scale != minPlayerScale) {
+      if (scale != kMinPlayerScale) {
         _activeZoomPanning = true;
       } else {
         _activeZoomPanning = false;
@@ -287,7 +286,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _descDraggableController.addListener(() {
       final double size = _descDraggableController.size;
-      if (size == 0 && _heightNotifier.value != minVideoViewPortHeight) {
+      if (size == 0 && _heightNotifier.value != kMinPlayerHeight) {
         _descIsOpened = false;
       }
       _changeInfoOpacityOnDraggable(size);
@@ -296,7 +295,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _commentDraggableController.addListener(() {
       final double size = _commentDraggableController.size;
-      if (size == 0 && _heightNotifier.value != minVideoViewPortHeight) {
+      if (size == 0 && _heightNotifier.value != kMinPlayerHeight) {
         _commentIsOpened = false;
       }
       _changeInfoOpacityOnDraggable(size);
@@ -305,7 +304,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _chaptersDraggableController.addListener(() {
       final double size = _chaptersDraggableController.size;
-      if (size == 0 && _heightNotifier.value != minVideoViewPortHeight) {
+      if (size == 0 && _heightNotifier.value != kMinPlayerHeight) {
         _chaptersIsOpened = false;
       }
       _changeInfoOpacityOnDraggable(size);
@@ -461,7 +460,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _wasTempPaused = true;
         ref.read(playerRepositoryProvider).pauseVideo();
       }
-    } else if (size <= 1 - avgVideoViewPortHeight) {
+    } else if (size <= 1 - kAvgVideoViewPortHeight) {
       if (_wasTempPaused) {
         ref.read(playerRepositoryProvider).playVideo();
       }
@@ -479,14 +478,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Callback to show or hide home screen navigation bar
   void _showHideNavigationBar(double value) {
     ref.read(homeRepositoryProvider).updateNavBarPosition(
-          value.normalize(minVideoViewPortHeight, 1).invertByOne,
+          value.normalize(kMinPlayerHeight, 1).invertByOne,
         );
   }
 
   /// Callback to change Draggable heights when the Player height changes (via [_heightNotifier])
   void _recomputeDraggableOpacityAndHeight(double value) {
     final double newSizeValue = clampDouble(
-      (value - minVideoViewPortHeight) - (value * 0.135),
+      (value - kMinPlayerHeight) - (value * 0.135),
       0,
       1 - heightRatio,
     );
@@ -504,7 +503,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     /***************************** Height Changes *****************************/
     // Changes Comment Draggable height
     if (_commentIsOpened) {
-      if (_heightNotifier.value == minVideoViewPortHeight) {
+      if (_heightNotifier.value == kMinPlayerHeight) {
         _commentDraggableController.jumpTo(0);
       } else {
         _commentDraggableController.jumpTo(newSizeValue);
@@ -513,7 +512,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     // Changes Description Draggable height
     if (_descIsOpened) {
-      if (_heightNotifier.value == minVideoViewPortHeight) {
+      if (_heightNotifier.value == kMinPlayerHeight) {
         _descDraggableController.jumpTo(0);
       } else {
         _descDraggableController.jumpTo(newSizeValue);
@@ -522,7 +521,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     // Changes Chapters Draggable height
     if (_chaptersIsOpened) {
-      if (_heightNotifier.value == minVideoViewPortHeight) {
+      if (_heightNotifier.value == kMinPlayerHeight) {
         _descDraggableController.jumpTo(0);
       } else {
         _descDraggableController.jumpTo(newSizeValue);
@@ -540,17 +539,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _transformationController.value.getMaxScaleOnAxis();
 
     // Check if the last scale value is below a certain threshold
-    if (lastScaleValue <= minPlayerScale + 0.5) {
+    if (lastScaleValue <= kMinPlayerScale + 0.5) {
       // Ensure a minimum scale to avoid zooming in too much
       scaleFactor = clampDouble(
         lastScaleValue + scaleFactor,
-        minPlayerScale,
-        minPlayerScale + 0.5,
+        kMinPlayerScale,
+        kMinPlayerScale + 0.5,
       );
 
       // Create a new identity matrix and apply scaling
       final Matrix4 updatedMatrix = Matrix4.identity();
-      updatedMatrix.scale(minPlayerScale * scaleFactor);
+      updatedMatrix.scale(kMinPlayerScale * scaleFactor);
 
       // Update the transformation controller with the new matrix
       _transformationController.value = updatedMatrix;
@@ -753,16 +752,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _isPlayerDraggingDown ??= details.delta.dy > 0;
 
     if (!_preventPlayerDismiss) {
-      if (details.delta.dy > 0 &&
-          _heightNotifier.value == minVideoViewPortHeight) {
+      if (details.delta.dy > 0 && _heightNotifier.value == kMinPlayerHeight) {
         // Ensures that the first drag down by the from [minVideoViewPortHeight]
         // will be dismissing player if user pointer was recently released
         _isDismissing = true && _releasedPlayerPointer;
       }
 
       if (_isDismissing) {
-        final val =
-            details.delta.dy * 1.3 / (minVideoViewPortHeight * screenHeight);
+        final val = details.delta.dy * 1.3 / (kMinPlayerHeight * screenHeight);
         _playerDismissController.value += val;
         return;
       }
@@ -775,13 +772,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       // Adjust height and width based on the drag delta
       _heightNotifier.value = clampDouble(
         _heightNotifier.value - (details.delta.dy / screenHeight),
-        minVideoViewPortHeight,
+        kMinPlayerHeight,
         1,
       );
 
       _widthNotifier.value = clampDouble(
         _heightNotifier.value / heightRatio,
-        minVideoViewPortWidth,
+        kMinVideoViewPortWidth,
         1,
       );
     } else {
@@ -847,18 +844,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
       if (latestHeightVal >= 0.5) {
         await Future.wait([
-          _animateHeight(velocityY >= 200 ? minVideoViewPortHeight : 1),
-          _animateWidth(velocityY >= 200 ? minVideoViewPortWidth : 1),
+          _animateHeight(velocityY >= 200 ? kMinPlayerHeight : 1),
+          _animateWidth(velocityY >= 200 ? kMinVideoViewPortWidth : 1),
         ]);
       } else {
         await Future.wait([
-          _animateHeight(velocityY <= -150 ? 1 : minVideoViewPortHeight),
-          _animateWidth(velocityY <= -150 ? 1 : minVideoViewPortWidth),
+          _animateHeight(velocityY <= -150 ? 1 : kMinPlayerHeight),
+          _animateWidth(velocityY <= -150 ? 1 : kMinVideoViewPortWidth),
         ]);
       }
     }
 
-    if (_heightNotifier.value > minVideoViewPortHeight) {
+    if (_heightNotifier.value > kMinPlayerHeight) {
       _isPlayerDraggingDown = null;
       _preventPlayerDismiss = true;
     } else {
@@ -872,7 +869,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _playerDismissController.value = 0;
     }
 
-    if (_widthNotifier.value == minVideoViewPortWidth) {
+    if (_widthNotifier.value == kMinVideoViewPortWidth) {
       ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
         PlayerSignal.minimize,
         PlayerSignal.hidePlaybackProgress,
@@ -940,8 +937,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     // Reversing zoom due to swiping up
     final lastScaleValue = _transformationController.value.getMaxScaleOnAxis();
-    if (lastScaleValue <= minPlayerScale + 0.5 && lastScaleValue > 1.0) {
-      if (lastScaleValue == minPlayerScale + 0.5) _openFullscreenPlayer();
+    if (lastScaleValue <= kMinPlayerScale + 0.5 && lastScaleValue > 1.0) {
+      if (lastScaleValue == kMinPlayerScale + 0.5) _openFullscreenPlayer();
       await _reverseZoomPan();
     }
 
@@ -1167,8 +1164,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           _isPlayerDraggingDown = true;
           _preventPlayerDismiss = false;
 
-          _animateHeight(minVideoViewPortHeight);
-          _animateWidth(minVideoViewPortWidth);
+          _animateHeight(kMinPlayerHeight);
+          _animateWidth(kMinVideoViewPortWidth);
 
           ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
             PlayerSignal.minimize,
@@ -1213,29 +1210,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         listenable: _transformationController,
         builder: (BuildContext context, Widget? childWidget) {
           return InteractiveViewer(
-            minScale: minPlayerScale,
-            maxScale: maxPlayerScale,
+            minScale: kMinPlayerScale,
+            maxScale: kMaxPlayerScale,
             alignment: Alignment.center,
             transformationController: _transformationController,
             child: childWidget!,
           );
         },
-        child: Hero(
-          tag: 'player',
-          child: ProviderScope(
-            overrides: <Override>[
-              playerSizingProvider.overrideWithValue(
-                PlayerSizing(
-                  minHeight: minVideoViewPortHeight,
-                  maxHeight: heightRatio,
-                ),
-              ),
-            ],
-            child: const KeyedSubtree(
-              child: PlayerView(),
-            ),
-          ),
-        ),
+        child: const PlayerView(),
       ),
     );
 
@@ -1384,8 +1366,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                         opacity: miniPlayerOpacity,
                                         child: MiniPlayer(
                                           space: screenWidth * widthValue,
-                                          height: screenHeight *
-                                              minVideoViewPortHeight,
+                                          height:
+                                              screenHeight * kMinPlayerHeight,
                                         ),
                                       ),
                                     ),
@@ -1398,6 +1380,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                           double marginValue,
                                           _,
                                         ) {
+                                          print(heightValue);
                                           return Container(
                                             margin: EdgeInsets.only(
                                               top: marginValue,
@@ -1410,7 +1393,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                                     maxHeight: screenHeight *
                                                         heightRatio,
                                                     minHeight: screenHeight *
-                                                        minVideoViewPortHeight,
+                                                        kMinPlayerHeight,
                                                   ),
                                             height: screenHeight * heightValue,
                                             width: screenWidth * widthValue,
@@ -1469,7 +1452,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                   snap: true,
                   minChildSize: 0,
                   initialChildSize: 0,
-                  snapSizes: const <double>[0.0, (1 - avgVideoViewPortHeight)],
+                  snapSizes: const <double>[0.0, (1 - kAvgVideoViewPortHeight)],
                   shouldCloseOnMinExtent: false,
                   controller: _commentDraggableController,
                   snapAnimationDuration: const Duration(milliseconds: 300),
@@ -1484,7 +1467,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                       },
                       child: VideoCommentsSheet(
                         controller: controller,
-                        maxHeight: avgVideoViewPortHeight,
+                        maxHeight: kAvgVideoViewPortHeight,
                         closeComment: _sendCloseCommentSheetSignal,
                         replyNotifier: _replyIsOpenedNotifier,
                         draggableController: _commentDraggableController,
@@ -1514,7 +1497,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                     initialChildSize: 0,
                     snapSizes: const <double>[
                       0.0,
-                      (1 - avgVideoViewPortHeight),
+                      (1 - kAvgVideoViewPortHeight),
                     ],
                     shouldCloseOnMinExtent: false,
                     controller: _descDraggableController,
@@ -1552,7 +1535,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                     initialChildSize: 0,
                     snapSizes: const <double>[
                       0.0,
-                      (1 - avgVideoViewPortHeight),
+                      (1 - kAvgVideoViewPortHeight),
                     ],
                     shouldCloseOnMinExtent: false,
                     controller: _chaptersDraggableController,

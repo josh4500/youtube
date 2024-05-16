@@ -701,7 +701,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       final isExpanded =
           ref.read(playerRepositoryProvider).playerViewState.isExpanded;
       final possibleVideoHeight =
-          (isExpanded ? 1 : avgVideoViewPortHeight) * screenHeight;
+          (isExpanded ? 1 : kAvgVideoViewPortHeight) * screenHeight;
 
       const greyArea = 65;
       final localY = details.localPosition.dy;

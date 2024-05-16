@@ -38,10 +38,9 @@ import 'package:youtube_clone/presentation/widgets/custom_scroll_physics.dart';
 
 import '../../constants.dart';
 import '../../providers.dart';
-import '../../view_models/playback/player_sizing.dart';
-import 'widgets/player/player.dart';
-import 'widgets/player/player_components_wrapper.dart';
 import 'widgets/controls/player_notifications.dart';
+import 'widgets/player/player_components_wrapper.dart';
+import 'widgets/player/player_view.dart';
 
 class PlayerLandscapeScreen extends ConsumerStatefulWidget {
   const PlayerLandscapeScreen({super.key});
@@ -285,29 +284,14 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
         listenable: _transformationController,
         builder: (BuildContext context, Widget? childWidget) {
           return InteractiveViewer(
-            minScale: minPlayerScale,
-            maxScale: maxPlayerScale,
+            minScale: kMinPlayerScale,
+            maxScale: kMaxPlayerScale,
             alignment: Alignment.center,
             transformationController: _transformationController,
             child: childWidget!,
           );
         },
-        child: Hero(
-          tag: 'player',
-          child: ProviderScope(
-            overrides: <Override>[
-              playerSizingProvider.overrideWithValue(
-                PlayerSizing(
-                  minHeight: 1,
-                  maxHeight: 1,
-                ),
-              ),
-            ],
-            child: const KeyedSubtree(
-              child: PlayerView(),
-            ),
-          ),
-        ),
+        child: const PlayerView(),
       ),
     );
 

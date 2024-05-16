@@ -308,7 +308,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
           ],
         );
       },
-      baseHeight: 1 - avgVideoViewPortHeight,
+      baseHeight: 1 - kAvgVideoViewPortHeight,
       overlayChildren: [
         PageDraggableOverlayChild(
           controller: _tScriptController,

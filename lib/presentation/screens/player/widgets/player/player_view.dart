@@ -30,11 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
-import 'package:youtube_clone/presentation/view_models/playback/player_sizing.dart';
-
-final playerSizingProvider = Provider<PlayerSizing>(
-  (ref) => throw UnimplementedError(),
-);
 
 class PlayerView extends ConsumerWidget {
   const PlayerView({super.key});
@@ -42,12 +37,15 @@ class PlayerView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = ref.watch(playerRepositoryProvider);
-    return Video(
-      controller: provider.videoController,
-      fit: BoxFit.fitWidth,
-      fill: Colors.transparent,
-      filterQuality: FilterQuality.none,
-      controls: null,
+    return Hero(
+      tag: 'player',
+      child: Video(
+        controller: provider.videoController,
+        fit: BoxFit.fitWidth,
+        fill: Colors.transparent,
+        filterQuality: FilterQuality.none,
+        controls: null,
+      ),
     );
   }
 }
