@@ -1058,6 +1058,7 @@ class _TopControl extends StatelessWidget {
       children: [
         Row(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             PlayerMinimize(),
             Expanded(

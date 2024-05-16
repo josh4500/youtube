@@ -66,9 +66,12 @@ class PlayerDescription extends ConsumerWidget {
           PlayerSignal.openDescription,
         ]);
       },
-      child: const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: showOnFullscreen ? 8 : 0,
+        ),
+        child: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
