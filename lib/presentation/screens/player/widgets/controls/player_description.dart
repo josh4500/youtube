@@ -4,7 +4,7 @@ import 'package:youtube_clone/presentation/provider/repository/player_repository
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../providers/player_signal_provider.dart';
-import '../../providers/player_viewstate_provider.dart';
+import '../../providers/player_view_state_provider.dart';
 import 'player_notifications.dart';
 
 class PlayerDescription extends ConsumerWidget {

@@ -105,7 +105,7 @@ class CommentTile extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 4),
                             ],
                             Row(
                               children: [
@@ -209,40 +209,26 @@ class CommentTile extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    TappableArea(
-                      onTap: () {},
-                      padding: const EdgeInsets.all(8),
-                      borderRadius: BorderRadius.circular(24),
-                      child: const Icon(
-                        YTIcons.like_outlined,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 34,
-                      child: Text(
-                        '69',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ),
                     CustomInkWell(
                       onTap: () {},
                       padding: const EdgeInsets.all(8),
                       borderRadius: BorderRadius.circular(24),
-                      child: const Icon(
-                        YTIcons.dislike_outlined,
-                        size: 18,
-                      ),
+                      child: const Icon(YTIcons.like_outlined, size: 18),
+                    ),
+                    const Text('69', style: TextStyle(fontSize: 12)),
+                    const SizedBox(width: 16),
+                    CustomInkWell(
+                      onTap: () {},
+                      padding: const EdgeInsets.all(8),
+                      borderRadius: BorderRadius.circular(24),
+                      child: const Icon(YTIcons.dislike_outlined, size: 18),
                     ),
                     const SizedBox(width: 16),
                     CustomInkWell(
                       onTap: () {},
                       padding: const EdgeInsets.all(8),
                       borderRadius: BorderRadius.circular(24),
-                      child: const Icon(
-                        YTIcons.reply_outlined,
-                        size: 18,
-                      ),
+                      child: const Icon(YTIcons.reply_outlined, size: 18),
                     ),
                     const SizedBox(width: 16),
                     if (creatorLikes)

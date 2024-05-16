@@ -192,12 +192,7 @@ class _TappableAreaState extends State<TappableArea>
       children: <Widget>[
         GestureDetector(
           behavior: widget.behavior,
-          onTap: () {
-            // _controller
-            //     .forward(from: .6)
-            //     .then((value) => _controller.reverse(from: .4));
-            widget.onTap?.call();
-          },
+          onTap: widget.onTap,
           onLongPress: widget.onLongPress,
           onTapDown: (details) async {
             widget.onTapDown?.call(details);

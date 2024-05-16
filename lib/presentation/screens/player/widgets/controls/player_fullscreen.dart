@@ -31,7 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
-import '../../providers/player_viewstate_provider.dart';
+import '../../providers/player_view_state_provider.dart';
 import 'player_control.dart';
 import 'player_notifications.dart';
 

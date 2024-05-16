@@ -41,15 +41,9 @@ class PlayerView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerSizing = ref.watch(playerSizingProvider);
-    // TODO(josh4500): Avoid using context here, just pass value from above
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    final screenWidth = MediaQuery.sizeOf(context).width;
-
-    final controller = ref.watch(playerRepositoryProvider).videoController;
-
+    final provider = ref.watch(playerRepositoryProvider);
     return Video(
-      controller: controller,
+      controller: provider.videoController,
       fit: BoxFit.fitWidth,
       fill: Colors.transparent,
       filterQuality: FilterQuality.none,

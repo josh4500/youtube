@@ -29,29 +29,34 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import 'account_avatar.dart';
 import 'custom_ink_well.dart';
+import 'tappable_area.dart';
 
 class ReplyTile extends StatelessWidget {
-  const ReplyTile({super.key});
+  const ReplyTile({super.key, this.creatorLikes = false});
 
+  final bool creatorLikes;
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const SizedBox(width: 60),
-              const CircleAvatar(
-                backgroundColor: Colors.grey,
-                maxRadius: 16,
+              const SizedBox(width: 52),
+              CustomInkWell(
+                onTap: () {},
+                padding: const EdgeInsets.all(8),
+                borderRadius: BorderRadius.circular(32),
+                child: const AccountAvatar(size: 32),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 8),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -75,24 +80,51 @@ class ReplyTile extends StatelessWidget {
                         'OMG This is so fun 😂',
                       ),
                       const SizedBox(height: 16),
-                      const Row(
+                      Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          Icon(
-                            YTIcons.like_outlined,
-                            size: 18,
+                          CustomInkWell(
+                            onTap: () {},
+                            padding: const EdgeInsets.all(8),
+                            borderRadius: BorderRadius.circular(24),
+                            child: const Icon(
+                              YTIcons.like_outlined,
+                              size: 18,
+                            ),
                           ),
-                          SizedBox(width: 4),
-                          Text(
-                            '69',
-                            style: TextStyle(fontSize: 12),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          const Text('7', style: TextStyle(fontSize: 12)),
+                          const SizedBox(width: 16),
+                          CustomInkWell(
+                            onTap: () {},
+                            padding: const EdgeInsets.all(8),
+                            borderRadius: BorderRadius.circular(24),
+                            child: const Icon(
+                              YTIcons.dislike_outlined,
+                              size: 18,
+                            ),
                           ),
-                          Icon(
-                            YTIcons.dislike_outlined,
-                            size: 18,
-                          ),
+                          const SizedBox(width: 16),
+                          if (creatorLikes)
+                            CustomInkWell(
+                              onTap: () {},
+                              padding: const EdgeInsets.all(8),
+                              borderRadius: BorderRadius.circular(24),
+                              child: const Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  AccountAvatar(size: 18),
+                                  Positioned(
+                                    top: 9,
+                                    left: 9,
+                                    child: Icon(
+                                      YTIcons.heart_filled,
+                                      size: 14,
+                                      color: Color(0xFFFF0000),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                         ],
                       ),
                     ],

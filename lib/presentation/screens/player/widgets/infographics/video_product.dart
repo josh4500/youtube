@@ -26,8 +26,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
+
+import 'infographics_notification.dart';
 
 class VideoProduct extends StatefulWidget {
   const VideoProduct({super.key});
@@ -62,47 +66,59 @@ class _VideoProductState extends State<VideoProduct>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => sizeAnimation.value == 0
-          ? sizeController.forward()
-          : sizeController.reverse(),
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
-        decoration: BoxDecoration(
-          color: Colors.black54,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white54, width: .85),
-        ),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.black54,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white54, width: .85),
+      ),
+      child: CustomInkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: () => sizeAnimation.value == 0
+            ? sizeController.forward()
+            : sizeController.reverse(),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const SizedBox(width: 8),
             Container(
-              width: 18,
-              height: 18,
-              margin: const EdgeInsets.all(2),
+              width: 16,
+              height: 16,
               decoration: BoxDecoration(
                 color: Colors.white54,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
+            const SizedBox(width: 8),
             SizeTransition(
               axis: Axis.horizontal,
               sizeFactor: sizeAnimation,
               axisAlignment: 1,
               fixedCrossAxisSizeFactor: 1,
-              child: Row(
+              child: Stack(
+                alignment: Alignment.centerRight,
                 children: [
-                  const SizedBox(width: 4),
-                  const Text(
-                    'View Products',
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'View Products',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      SizedBox(width: 24),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
+                  CustomInkWell(
+                    padding: const EdgeInsets.all(8),
+                    borderRadius: BorderRadius.circular(24),
+                    onTap: () {
+                      CloseInfographicsNotification().dispatch(context);
+                    },
                     child: const Icon(
                       YTIcons.close_circle_outlined,
                       size: 16,

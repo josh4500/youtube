@@ -57,12 +57,11 @@ class PlayerComponentsWrapper extends StatelessWidget {
       },
       child: Stack(
         clipBehavior: Clip.none,
-        alignment: Alignment.center,
         children: [
           child,
           // Shows video channel watermark image in fullscreen mode
           const VideoChannelWatermark(),
-          const Positioned.fill(child: PlayerOverlayControls()),
+          const PlayerOverlayControls(),
         ],
       ),
     );

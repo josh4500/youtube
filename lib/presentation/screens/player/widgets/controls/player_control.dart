@@ -29,13 +29,6 @@
 import 'package:flutter/material.dart';
 
 class PlayerControl extends StatefulWidget {
-  final VoidCallback onTap;
-  final bool enabled;
-  final double verticalPadding;
-  final double horizontalPadding;
-  final Color color;
-  final Widget Function(BuildContext context, Animation animation) builder;
-
   const PlayerControl({
     super.key,
     this.enabled = true,
@@ -45,6 +38,13 @@ class PlayerControl extends StatefulWidget {
     required this.onTap,
     required this.builder,
   });
+
+  final VoidCallback onTap;
+  final bool enabled;
+  final double verticalPadding;
+  final double horizontalPadding;
+  final Color color;
+  final Widget Function(BuildContext context, Animation animation) builder;
 
   @override
   State<PlayerControl> createState() => PlayerControlState();

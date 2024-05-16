@@ -31,6 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../providers.dart';
@@ -187,29 +188,30 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
       }
     });
 
+    final screenSize = MediaQuery.sizeOf(context);
+
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
         widget.child,
-        LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            return SlideTransition(
-              position: _overlayPlayerAnimation,
-              child: Consumer(
-                builder: (
-                  BuildContext context,
-                  WidgetRef ref,
-                  Widget? childWidget,
-                ) {
-                  final showPlayer = ref.watch(playerOverlayStateProvider);
-                  return Visibility(
-                    visible: showPlayer,
-                    child: PlayerScreen(height: constraints.maxHeight),
-                  );
-                },
-              ),
-            );
-          },
+        SlideTransition(
+          position: _overlayPlayerAnimation,
+          child: Consumer(
+            builder: (
+              BuildContext context,
+              WidgetRef ref,
+              Widget? childWidget,
+            ) {
+              final showPlayer = ref.watch(playerOverlayStateProvider);
+              return Visibility(
+                visible: showPlayer,
+                child: PlayerScreen(
+                  width: screenSize.width,
+                  height: screenSize.height,
+                ),
+              );
+            },
+          ),
         ),
         Visibility(
           visible: widget.child.currentIndex != 1,

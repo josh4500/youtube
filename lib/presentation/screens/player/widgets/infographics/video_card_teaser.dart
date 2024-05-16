@@ -30,6 +30,8 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import 'infographics_notification.dart';
+
 class VideoCardTeaser extends StatelessWidget {
   const VideoCardTeaser({super.key});
 
@@ -59,7 +61,7 @@ class VideoCardTeaser extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           CustomInkWell(
-            onTap: () {},
+            onTap: () => CloseInfographicsNotification().dispatch(context),
             padding: const EdgeInsets.all(8),
             borderRadius: BorderRadius.circular(16),
             child: const Icon(YTIcons.close_outlined, size: 14),

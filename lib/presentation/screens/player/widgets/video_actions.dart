@@ -36,98 +36,96 @@ class VideoActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 2.5),
-      child: SizedBox(
-        height: 32,
-        child: ListView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 12,
-          ),
-          scrollDirection: Axis.horizontal,
-          children: <Widget>[
-            Container(
-              margin: const EdgeInsets.only(right: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF272727),
-                borderRadius: BorderRadius.circular(32),
-              ),
-              child: const Row(
-                children: [
-                  CustomActionButton(
-                    title: '336',
-                    leadingWidth: 4,
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    icon: Icon(YTIcons.like_outlined, size: 18),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 6.0),
-                    child: RotatedBox(
-                      quarterTurns: 1,
-                      child: Divider(height: 0, thickness: 1),
-                    ),
-                  ),
-                  CustomActionButton(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    icon: Icon(YTIcons.dislike_outlined, size: 18),
-                  ),
-                ],
-              ),
-            ),
-            const CustomActionChip(
-              title: 'Share',
-              backgroundColor: Color(0xFF272727),
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              margin: EdgeInsets.symmetric(horizontal: 4),
-              icon: Icon(YTIcons.shared_filled, size: 18),
-            ),
-            CustomActionChip(
-              title: 'Remix',
-              backgroundColor: const Color(0xFF272727),
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              icon: const Icon(Icons.wifi_channel_outlined, size: 18),
-              onTap: () => onRemixClicked(context),
-            ),
-            const CustomActionChip(
-              title: 'Thanks',
-              backgroundColor: Color(0xFF272727),
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              margin: EdgeInsets.symmetric(horizontal: 4),
-              icon: Icon(YTIcons.thanks_outlined, size: 18),
-            ),
-            CustomActionButton(
-              title: 'Download',
-              backgroundColor: const Color(0xFF272727),
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              icon: const Icon(YTIcons.download_outlined, size: 18),
-              onTap: () => onDownloadClicked(context),
-            ),
-            const CustomActionChip(
-              title: 'Clip',
-              backgroundColor: Color(0xFF272727),
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              margin: EdgeInsets.symmetric(horizontal: 4),
-              icon: Icon(YTIcons.clip_outlined, size: 18),
-            ),
-            CustomActionChip(
-              title: 'Save',
-              backgroundColor: const Color(0xFF272727),
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              icon: const Icon(YTIcons.save_outlined, size: 18),
-              onTap: () => onSaveClicked(context),
-            ),
-            const CustomActionChip(
-              title: 'Report',
-              backgroundColor: Color(0xFF272727),
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              margin: EdgeInsets.symmetric(horizontal: 4),
-              icon: Icon(YTIcons.report_outlined, size: 18),
-            ),
-          ],
+    return SizedBox(
+      height: 36,
+      child: ListView(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 2.5,
         ),
+        scrollDirection: Axis.horizontal,
+        children: <Widget>[
+          Container(
+            margin: const EdgeInsets.only(right: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFF272727),
+              borderRadius: BorderRadius.circular(32),
+            ),
+            child: const Row(
+              children: [
+                CustomActionButton(
+                  title: '336',
+                  leadingWidth: 4,
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  icon: Icon(YTIcons.like_outlined, size: 18),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 6.0),
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: Divider(height: 0, thickness: 1),
+                  ),
+                ),
+                CustomActionButton(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  icon: Icon(YTIcons.dislike_outlined, size: 18),
+                ),
+              ],
+            ),
+          ),
+          const CustomActionChip(
+            title: 'Share',
+            backgroundColor: Color(0xFF272727),
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            margin: EdgeInsets.symmetric(horizontal: 4),
+            icon: Icon(YTIcons.shared_filled, size: 18),
+          ),
+          CustomActionChip(
+            title: 'Remix',
+            backgroundColor: const Color(0xFF272727),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            icon: const Icon(Icons.wifi_channel_outlined, size: 18),
+            onTap: () => onRemixClicked(context),
+          ),
+          const CustomActionChip(
+            title: 'Thanks',
+            backgroundColor: Color(0xFF272727),
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            margin: EdgeInsets.symmetric(horizontal: 4),
+            icon: Icon(YTIcons.thanks_outlined, size: 18),
+          ),
+          CustomActionButton(
+            title: 'Download',
+            backgroundColor: const Color(0xFF272727),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            icon: const Icon(YTIcons.download_outlined, size: 18),
+            onTap: () => onDownloadClicked(context),
+          ),
+          const CustomActionChip(
+            title: 'Clip',
+            backgroundColor: Color(0xFF272727),
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            margin: EdgeInsets.symmetric(horizontal: 4),
+            icon: Icon(YTIcons.clip_outlined, size: 18),
+          ),
+          CustomActionChip(
+            title: 'Save',
+            backgroundColor: const Color(0xFF272727),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            icon: const Icon(YTIcons.save_outlined, size: 18),
+            onTap: () => onSaveClicked(context),
+          ),
+          const CustomActionChip(
+            title: 'Report',
+            backgroundColor: Color(0xFF272727),
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            margin: EdgeInsets.symmetric(horizontal: 4),
+            icon: Icon(YTIcons.report_outlined, size: 18),
+          ),
+        ],
       ),
     );
   }

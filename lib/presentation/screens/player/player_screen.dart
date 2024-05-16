@@ -40,7 +40,7 @@ import 'package:youtube_clone/presentation/widgets.dart';
 import '../../constants.dart';
 import '../../providers.dart';
 import '../../view_models/playback/player_sizing.dart';
-import 'providers/player_viewstate_provider.dart';
+import 'providers/player_view_state_provider.dart';
 import 'widgets/controls/player_ambient.dart';
 import 'widgets/controls/player_notifications.dart';
 import 'widgets/player/mini_player.dart';
@@ -57,8 +57,13 @@ import 'widgets/video_description_section.dart';
 import 'widgets/video_description_sheet.dart';
 
 class PlayerScreen extends ConsumerStatefulWidget {
-  const PlayerScreen({super.key, required this.height});
+  const PlayerScreen({
+    super.key,
+    required this.width,
+    required this.height,
+  });
   final double height;
+  final double width;
 
   @override
   ConsumerState<PlayerScreen> createState() => _PlayerScreenState();
@@ -105,7 +110,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   bool _controlWasTempHidden = false;
 
-  double get screenWidth => MediaQuery.sizeOf(context).width;
+  double get screenWidth => widget.width;
   double get screenHeight => widget.height;
 
   // TODO(josh4500): Needs to be computed
@@ -448,27 +453,33 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   bool _allowInfoDrag = true;
 
   Future<void> _animateHeight(double to) async {
-    await _tweenAnimateNotifier(
-      notifier: _screenHeightNotifier,
-      controller: _heightController,
-      value: to,
-    );
+    if (_screenHeightNotifier.value != to) {
+      await _tweenAnimateNotifier(
+        notifier: _screenHeightNotifier,
+        controller: _heightController,
+        value: to,
+      );
+    }
   }
 
   Future<void> _animateWidth(double to) async {
-    await _tweenAnimateNotifier(
-      notifier: _playerWidthNotifier,
-      controller: _widthController,
-      value: to,
-    );
+    if (_playerWidthNotifier.value != to) {
+      await _tweenAnimateNotifier(
+        notifier: _playerWidthNotifier,
+        controller: _widthController,
+        value: to,
+      );
+    }
   }
 
   Future<void> _animateAdditionalHeight(double to) async {
-    await _tweenAnimateNotifier(
-      notifier: _playerAddedHeightNotifier,
-      controller: _additionalHeightController,
-      value: to,
-    );
+    if (_playerAddedHeightNotifier.value != to) {
+      await _tweenAnimateNotifier(
+        notifier: _playerAddedHeightNotifier,
+        controller: _additionalHeightController,
+        value: to,
+      );
+    }
   }
 
   Future<void> _tweenAnimateNotifier({
@@ -1206,7 +1217,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   void handlePlayerControlNotification(PlayerNotification notification) {
-    if (notification is MinimizePlayerNotification) {
+    if (notification is PlayerTapNotification) {
+      _onTapPlayer();
+    } else if (notification is MinimizePlayerNotification) {
       // Note: Do not remove
       // We set to true to emulate player was dragged down to minimize
       _isPlayerDraggingDown = true;
@@ -1259,30 +1272,34 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   @override
   Widget build(BuildContext context) {
-    final interactivePlayerView = ListenableBuilder(
-      listenable: _transformationController,
-      builder: (BuildContext context, Widget? childWidget) {
-        return InteractiveViewer(
-          minScale: minPlayerScale,
-          maxScale: maxPlayerScale,
-          alignment: Alignment.center,
-          transformationController: _transformationController,
-          child: childWidget!,
-        );
-      },
-      child: Hero(
-        tag: 'player',
-        child: ProviderScope(
-          overrides: <Override>[
-            playerSizingProvider.overrideWithValue(
-              PlayerSizing(
-                minHeight: minVideoViewPortHeight,
-                maxHeight: playerHeightToScreenRatio,
+    final interactivePlayerView = PlayerComponentsWrapper(
+      key: _interactivePlayerKey,
+      handleNotification: handlePlayerControlNotification,
+      child: ListenableBuilder(
+        listenable: _transformationController,
+        builder: (BuildContext context, Widget? childWidget) {
+          return InteractiveViewer(
+            minScale: minPlayerScale,
+            maxScale: maxPlayerScale,
+            alignment: Alignment.center,
+            transformationController: _transformationController,
+            child: childWidget!,
+          );
+        },
+        child: Hero(
+          tag: 'player',
+          child: ProviderScope(
+            overrides: <Override>[
+              playerSizingProvider.overrideWithValue(
+                PlayerSizing(
+                  minHeight: minVideoViewPortHeight,
+                  maxHeight: playerHeightToScreenRatio,
+                ),
               ),
+            ],
+            child: const KeyedSubtree(
+              child: PlayerView(),
             ),
-          ],
-          child: const KeyedSubtree(
-            child: PlayerView(),
           ),
         ),
       ),
@@ -1396,114 +1413,103 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
               builder: (
                 BuildContext context,
                 double screenHeightMul,
-                Widget? screenInfoView,
+                Widget? screenWidget,
               ) {
-                final availablePlayerHeight = screenHeight * screenHeightMul;
                 return SizedBox(
-                  height: availablePlayerHeight,
-                  child: Material(
-                    color: Colors.black,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        PlayerInfographicsWrapper(
-                          show: screenHeightMul == 1,
-                          child: GestureDetector(
-                            key: _portraitPlayerKey,
-                            onTap: _onTapPlayer,
-                            onVerticalDragUpdate: _onDragPlayer,
-                            onVerticalDragEnd: _onDragPlayerEnd,
-                            behavior: HitTestBehavior.opaque,
-                            child: PlayerComponentsWrapper(
-                              key: _interactivePlayerKey,
-                              handleNotification:
-                                  handlePlayerControlNotification,
-                              child: Stack(
-                                children: [
-                                  ListenableBuilder(
-                                    listenable: _playerWidthNotifier,
-                                    builder: (
-                                      BuildContext context,
-                                      Widget? _,
-                                    ) {
-                                      return Align(
-                                        alignment: Alignment.topRight,
-                                        child: Opacity(
-                                          opacity: miniPlayerOpacity,
-                                          child: MiniPlayer(
-                                            space: playerWidth,
-                                            height: playerMinHeight,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  ListenableBuilder(
-                                    listenable: Listenable.merge([
-                                      _playerWidthNotifier,
-                                      _playerAddedHeightNotifier,
-                                      _playerMarginNotifier,
-                                    ]),
-                                    builder: (
-                                      BuildContext context,
-                                      Widget? __,
-                                    ) {
-                                      return SizedBox(
-                                        height: screenHeightMul < 1
-                                            ? null
-                                            : playerFullHeight +
-                                                playerAddedHeight,
-                                        child: Container(
-                                          margin: EdgeInsets.only(
-                                            top: playerMargin,
-                                            left: playerMargin.clamp(0, 10),
-                                            right: playerMargin.clamp(0, 10),
-                                          ),
-                                          width: playerWidth,
-                                          height: availablePlayerHeight,
-                                          constraints: BoxConstraints(
-                                            maxWidth: playerWidth,
-                                            minHeight: playerMinHeight,
-                                            maxHeight: playerMaxHeight,
-                                          ),
-                                          child: interactivePlayerView,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  Positioned(
-                                    left: 0,
-                                    bottom: 0,
-                                    child: miniPlayerProgress,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        screenInfoView!,
-                      ],
-                    ),
-                  ),
+                  height: screenHeight * screenHeightMul,
+                  child: screenWidget,
                 );
               },
-              child: Flexible(
-                child: Listener(
-                  onPointerMove: _onDragInfo,
-                  onPointerUp: _onDragInfoUp,
-                  child: AnimatedBuilder(
-                    animation: _infoOpacityAnimation,
-                    builder: (
-                      BuildContext context,
-                      Widget? childWidget,
-                    ) {
-                      return Opacity(
-                        opacity: _infoOpacityAnimation.value,
-                        child: childWidget,
-                      );
-                    },
-                    child: infoScrollview,
-                  ),
+              child: Material(
+                key: _portraitPlayerKey,
+                color: Colors.black,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    PlayerInfographicsWrapper(
+                      child: GestureDetector(
+                        onVerticalDragUpdate: _onDragPlayer,
+                        onVerticalDragEnd: _onDragPlayerEnd,
+                        behavior: HitTestBehavior.opaque,
+                        child: Stack(
+                          children: [
+                            ListenableBuilder(
+                              listenable: _playerWidthNotifier,
+                              builder: (
+                                BuildContext context,
+                                Widget? _,
+                              ) {
+                                return Align(
+                                  alignment: Alignment.topRight,
+                                  child: Opacity(
+                                    opacity: miniPlayerOpacity,
+                                    child: MiniPlayer(
+                                      space: playerWidth,
+                                      height: playerMinHeight,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            ListenableBuilder(
+                              listenable: Listenable.merge([
+                                _playerWidthNotifier,
+                                _playerAddedHeightNotifier,
+                                _playerMarginNotifier,
+                              ]),
+                              builder: (
+                                BuildContext context,
+                                Widget? childWidget,
+                              ) {
+                                return SizedBox(
+                                  height: playerAddedHeight == 0
+                                      ? null
+                                      : playerFullHeight + playerAddedHeight,
+                                  width: playerWidth,
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                      minHeight: playerMinHeight,
+                                      maxHeight: playerMaxHeight,
+                                    ),
+                                    margin: EdgeInsets.only(
+                                      top: playerMargin,
+                                      left: playerMargin.clamp(0, 10),
+                                      right: playerMargin.clamp(0, 10),
+                                    ),
+                                    child: interactivePlayerView,
+                                  ),
+                                );
+                              },
+                            ),
+                            Positioned(
+                              left: 0,
+                              bottom: 0,
+                              child: miniPlayerProgress,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: Listener(
+                        onPointerMove: _onDragInfo,
+                        onPointerUp: _onDragInfoUp,
+                        child: AnimatedBuilder(
+                          animation: _infoOpacityAnimation,
+                          builder: (
+                            BuildContext context,
+                            Widget? childWidget,
+                          ) {
+                            return Opacity(
+                              opacity: _infoOpacityAnimation.value,
+                              child: childWidget,
+                            );
+                          },
+                          child: infoScrollview,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -1639,104 +1645,3 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     );
   }
 }
-
-// Column(
-// children: <Widget>[
-// GestureDetector(
-// onTap: _onTapPlayer,
-// onVerticalDragUpdate: _onDragPlayer,
-// onVerticalDragEnd: _onDragPlayerEnd,
-// behavior: HitTestBehavior.opaque,
-// child: ValueListenableBuilder<double>(
-// valueListenable: _additionalHeightNotifier,
-// builder: (
-// BuildContext context,
-// double addHeightValue,
-// Widget? childWidget,
-// ) {
-// return SizedBox(
-// height: screenHeightMul < 1
-// ? null
-//     : (screenHeight * heightRatio) +
-// addHeightValue,
-// child: ValueListenableBuilder<double>(
-// valueListenable: _widthNotifier,
-// builder: (
-// BuildContext context,
-// double widthValue,
-// _,
-// ) {
-// return Stack(
-// clipBehavior: Clip.none,
-// children: <Widget>[
-// Align(
-// alignment: Alignment.topRight,
-// child: Opacity(
-// opacity: miniPlayerOpacity,
-// child: MiniPlayer(
-// space: screenWidth * widthValue,
-// height: screenHeight *
-// minVideoViewPortHeight,
-// ),
-// ),
-// ),
-// Align(
-// alignment: Alignment.centerLeft,
-// child: ValueListenableBuilder<double>(
-// valueListenable: _marginNotifier,
-// builder: (
-// BuildContext context,
-// double marginValue,
-// Widget? marginNotifierWidget,
-// ) {
-// return Container(
-// alignment: Alignment.center,
-// margin: EdgeInsets.only(
-// top: marginValue,
-// left:
-// marginValue.clamp(0, 10),
-// right:
-// marginValue.clamp(0, 10),
-// ),
-// child: interactivePlayerView,
-// );
-// },
-// child: Container(
-// constraints: addHeightValue > 0
-// ? null
-//     : BoxConstraints(
-// maxHeight: screenHeight *
-// heightRatio,
-// minHeight: screenHeight *
-// minVideoViewPortHeight,
-// ),
-// height:
-// screenHeight * screenHeightMul,
-// width: screenWidth * widthValue,
-// child: interactivePlayerView,
-// ),
-// ),
-// ),
-// Positioned(
-// left: 0,
-// bottom: 0,
-// width: screenWidth,
-// child: Visibility(
-// visible: miniPlayerOpacity > 0,
-// child: Opacity(
-// opacity: miniPlayerOpacity,
-// child: miniPlayerProgress,
-// ),
-// ),
-// ),
-// ],
-// );
-// },
-// ),
-// );
-// },
-// ),
-// ),
-// heightChildWidget!,
-// ],
-// ),

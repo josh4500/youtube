@@ -42,22 +42,20 @@ const int kPingableInterval = 7000;
 
 /// Represents a server that can be pinged to check internet connectivity.
 class _Pingable {
+  _Pingable({required this.host, required this.port});
   final String host;
   final int port;
-
-  _Pingable({required this.host, required this.port});
 }
 
 /// Singleton class that manages internet connectivity and emits state changes.
 final class InternetConnectivity {
+  factory InternetConnectivity() {
+    return _instance;
+  }
   InternetConnectivity._();
 
   static final InternetConnectivity _instance = InternetConnectivity._();
   static InternetConnectivity get instance => _instance;
-
-  factory InternetConnectivity() {
-    return _instance;
-  }
 
   final _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _subscription;

@@ -41,7 +41,7 @@ import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../providers/player_expanded_state_provider.dart';
-import '../../providers/player_viewstate_provider.dart';
+import '../../providers/player_view_state_provider.dart';
 import 'player_actions_control.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';
@@ -460,6 +460,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                 },
               ),
               GestureDetector(
+                onTap: () => PlayerTapNotification().dispatch(context),
                 onDoubleTapDown: _onDoubleTapDown,
                 onLongPressStart: _onLongPressStart,
                 onLongPressEnd: _onLongPressEnd,

@@ -26,6 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 
@@ -66,11 +67,13 @@ class VideoHighlightedLiveComment extends StatelessWidget {
       children: [
         Icon(Icons.chat_bubble_outline),
         SizedBox(width: 8),
-        Text(
-          'See what others said about this video while it was live',
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontSize: 12),
+        Expanded(
+          child: Text(
+            'See what others said about this video while it was live',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 12),
+          ),
         )
       ],
     );
