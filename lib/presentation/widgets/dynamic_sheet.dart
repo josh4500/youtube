@@ -56,8 +56,6 @@ class _DynamicSheetState extends State<DynamicSheet>
     );
   }
 
-  int get additionalIndex => (widget.title == null ? 0 : 1);
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -92,14 +90,10 @@ class _DynamicSheetState extends State<DynamicSheet>
                     child: ListView(
                       shrinkWrap: true,
                       controller: scrollController,
-                      children: List.generate(
-                        widget.children.length + additionalIndex,
-                        (index) {
-                          return index == 0 && widget.title != null
-                              ? widget.title!
-                              : widget.children[index - additionalIndex];
-                        },
-                      ),
+                      children: [
+                        if (widget.title != null) widget.title!,
+                        ...widget.children,
+                      ],
                     ),
                   ),
                 ),
