@@ -460,7 +460,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                 },
               ),
               GestureDetector(
-                onTap: () => PlayerTapNotification().dispatch(context),
                 onDoubleTapDown: _onDoubleTapDown,
                 onLongPressStart: _onLongPressStart,
                 onLongPressEnd: _onLongPressEnd,

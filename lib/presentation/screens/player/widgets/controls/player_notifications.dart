@@ -30,8 +30,6 @@ import 'package:flutter/cupertino.dart';
 
 abstract class PlayerNotification extends Notification {}
 
-class PlayerTapNotification extends PlayerNotification {}
-
 class MinimizePlayerNotification extends PlayerNotification {}
 
 class EnterFullscreenPlayerNotification extends PlayerNotification {}

@@ -128,17 +128,37 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     return screenHeight * minVideoViewPortHeight;
   }
 
-  /// Player View Height
-  double get playerFullHeight {
-    return playerHeightToScreenRatio * screenHeight;
-  }
-
   /// Player View width
   ///
   /// NOTE: Depends on [_playerWidthNotifier], make to wrap with [ListenableBuilder]
   /// to see changes.
   double get playerWidth {
     return _playerWidthNotifier.value * screenWidth;
+  }
+
+  /// Player Height
+  ///
+  /// See [_onDragNotExpandedPlayer]
+  ///
+  /// The [_playerWidthNotifier.value] is a rate change of [_screenHeightNotifier]  to
+  /// [playerHeightToScreenRatio], So we got back [_screenHeightNotifier] value by multiplying
+  /// [_playerWidthNotifier] value by [playerHeightToScreenRatio].
+  ///
+  /// NOTE: Depends on [_playerWidthNotifier], make to wrap with [ListenableBuilder]
+  /// to see changes.
+  double? get playerHeight {
+    return playerWidth != screenWidth
+        ? (_playerWidthNotifier.value * playerHeightToScreenRatio) *
+            playerMaxHeight
+        : null;
+  }
+
+  /// Player parent box height with added height
+  ///
+  /// NOTE: Depends on [_playerAddedHeightNotifier], make to wrap with [ListenableBuilder]
+  /// to see changes.
+  double? get playerBoxHeight {
+    return playerAddedHeight == 0 ? null : playerMaxHeight + playerAddedHeight;
   }
 
   /// Player Added Height
@@ -149,18 +169,22 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     return _playerAddedHeightNotifier.value;
   }
 
-  /// to see changes.
+  /// Player Margin
+  ///
+  /// See [_onDragExpandedPlayer]
+  /// NOTE: Depends on [_playerMarginNotifier], make to wrap with [ListenableBuilder]
   double get playerMargin {
     return _playerMarginNotifier.value;
   }
 
-  double get videoViewHeight {
-    // TODO(Josh): Determine value from Video Size either avg or max height
+  double get videoHeightToScreenRatio {
+    // TODO(Josh): Determine value from Video Size between avg and max height
     return avgVideoViewPortHeight;
   }
 
-  // TODO(Josh): Compute bool value
-  bool get _isResizableExpandingMode => false;
+  bool get _isResizableExpandingMode {
+    return playerHeightToScreenRatio == maxVideoViewPortHeight;
+  }
 
   double get maxVerticalMargin {
     return screenHeight * (1 - playerHeightToScreenRatio);
@@ -271,7 +295,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _playerAddedHeightNotifier = ValueNotifier<double>(
       clampDouble(
         (screenHeight * (1 - avgVideoViewPortHeight)) -
-            (screenHeight * (1 - videoViewHeight)),
+            (screenHeight * (1 - videoHeightToScreenRatio)),
         0,
         maxAdditionalHeight,
       ),
@@ -705,8 +729,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     // Adjust additional height if within limits
     if (additionalHeight < midAdditionalHeight) {
-      // Check if video view height is not equal to height ratio
-      if (videoViewHeight != playerHeightToScreenRatio) {
+      // Check if video view height is not equal to player height ratio
+      if (videoHeightToScreenRatio != playerHeightToScreenRatio) {
         // If comments are opened, animate to the appropriate position
         if (_commentIsOpened) {
           _commentDraggableController.animateTo(
@@ -1014,7 +1038,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   void _onDragInfo(PointerMoveEvent event) {
     if (_infoScrollController.offset == 0 ||
-        (videoViewHeight > playerHeightToScreenRatio && event.delta.dy < 0)) {
+        (videoHeightToScreenRatio > playerHeightToScreenRatio &&
+            event.delta.dy < 0)) {
       if (_allowInfoDrag) {
         _infoScrollPhysics.canScroll(false);
         _playerAddedHeightNotifier.value = clampDouble(
@@ -1087,7 +1112,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (wait) {
       await Future<void>.delayed(const Duration(milliseconds: 150));
     }
-    if (videoViewHeight != playerHeightToScreenRatio && additionalHeight > 0) {
+    if (videoHeightToScreenRatio != playerHeightToScreenRatio &&
+        additionalHeight > 0) {
       _animateAdditionalHeight(0);
     }
 
@@ -1127,7 +1153,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (wait) {
       await Future<void>.delayed(const Duration(milliseconds: 150));
     }
-    if (videoViewHeight != playerHeightToScreenRatio && additionalHeight > 0) {
+    if (videoHeightToScreenRatio != playerHeightToScreenRatio &&
+        additionalHeight > 0) {
       _animateAdditionalHeight(0);
     }
     _descDraggableController.animateTo(
@@ -1167,7 +1194,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
 
     // Changes the additional heights to zero on Expanded mode
-    if (videoViewHeight != playerHeightToScreenRatio && additionalHeight > 0) {
+    if (videoHeightToScreenRatio != playerHeightToScreenRatio &&
+        additionalHeight > 0) {
       _animateAdditionalHeight(0);
     }
 
@@ -1217,9 +1245,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   void handlePlayerControlNotification(PlayerNotification notification) {
-    if (notification is PlayerTapNotification) {
-      _onTapPlayer();
-    } else if (notification is MinimizePlayerNotification) {
+    if (notification is MinimizePlayerNotification) {
       // Note: Do not remove
       // We set to true to emulate player was dragged down to minimize
       _isPlayerDraggingDown = true;
@@ -1428,6 +1454,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                   children: [
                     PlayerInfographicsWrapper(
                       child: GestureDetector(
+                        onTap: _onTapPlayer,
                         onVerticalDragUpdate: _onDragPlayer,
                         onVerticalDragEnd: _onDragPlayerEnd,
                         behavior: HitTestBehavior.opaque,
@@ -1462,9 +1489,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                 Widget? childWidget,
                               ) {
                                 return SizedBox(
-                                  height: playerAddedHeight == 0
-                                      ? null
-                                      : playerFullHeight + playerAddedHeight,
+                                  height: playerBoxHeight,
                                   width: playerWidth,
                                   child: Container(
                                     constraints: BoxConstraints(
@@ -1476,6 +1501,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                       left: playerMargin.clamp(0, 10),
                                       right: playerMargin.clamp(0, 10),
                                     ),
+                                    height: playerHeight,
                                     child: interactivePlayerView,
                                   ),
                                 );
