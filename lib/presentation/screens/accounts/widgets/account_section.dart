@@ -114,6 +114,7 @@ class AccountSection extends ConsumerWidget {
                     title: 'Switch account',
                     onTap: () {},
                     icon: const Icon(YTIcons.switch_accounts, size: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     backgroundColor: const Color(0xFF272727),
                   ),
                   const SizedBox(width: 8),
@@ -121,6 +122,7 @@ class AccountSection extends ConsumerWidget {
                     title: 'Google Account',
                     onTap: () {},
                     icon: const Icon(YTIcons.google, size: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     backgroundColor: const Color(0xFF272727),
                   ),
                   const SizedBox(width: 8),
@@ -130,6 +132,7 @@ class AccountSection extends ConsumerWidget {
                       ref.read(accountRepositoryProvider).turnOnIncognito();
                     },
                     icon: const Icon(Icons.privacy_tip, size: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     backgroundColor: const Color(0xFF272727),
                   ),
                 ],
