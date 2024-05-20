@@ -67,7 +67,7 @@ class SeekIndicatorClipper extends CustomClipper<Path> {
   final bool forward;
   @override
   Path getClip(Size size) {
-    Path path = Path();
+    final Path path = Path();
 
     if (forward) {
       path.moveTo(size.width, 0);

@@ -37,7 +37,8 @@ class PlayerNext extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return PlayerControl(
+    return PlayerControlButton(
+      horizontalPadding: 0,
       onTap: () {
         ref.read(playerRepositoryProvider).sendPlayerSignal(
           [PlayerSignal.showControls],

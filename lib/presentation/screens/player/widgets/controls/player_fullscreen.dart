@@ -43,7 +43,7 @@ class PlayerFullscreen extends ConsumerWidget {
     // TODO: Check if Expanded or Fullscreen control mode
     const bool expandedMode = false;
 
-    return PlayerControl(
+    return PlayerControlButton(
       onTap: () {
         final isExpanded = ref.read(playerViewStateProvider).isExpanded;
         if (expandedMode || isExpanded) {
@@ -67,7 +67,7 @@ class PlayerFullscreen extends ConsumerWidget {
         }
       },
       color: Colors.transparent,
-      horizontalPadding: 0,
+      horizontalPadding: 8,
       verticalPadding: 10,
       builder: (context, _) {
         final isExpanded = ref.read(playerViewStateProvider).isExpanded;

@@ -59,8 +59,6 @@ class PlayerComponentsWrapper extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           child,
-          // Shows video channel watermark image in fullscreen mode
-          const VideoChannelWatermark(),
           const PlayerOverlayControls(),
         ],
       ),

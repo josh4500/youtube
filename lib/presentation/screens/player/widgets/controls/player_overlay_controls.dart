@@ -33,7 +33,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
-import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -323,196 +322,215 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Stack(
+      clipBehavior: Clip.none,
       children: [
-        Expanded(
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Align(
+        Align(
+          alignment: Alignment.topCenter,
+          child: SeekIndicator(
+            valueListenable: _showForward2XIndicator,
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('2X'),
+                SizedBox(width: 4),
+                Icon(Icons.fast_forward),
+              ],
+            ),
+          ),
+        ),
+        Align(
+          alignment: Alignment.lerp(
+            Alignment.center,
+            Alignment.bottomCenter,
+            0.75,
+          )!,
+          child: ValueListenableBuilder<bool>(
+            valueListenable: _showSlideFrame,
+            builder: (BuildContext _, bool showingSlideFrame, Widget? __) {
+              return Visibility(
+                visible: showingSlideFrame == false,
+                child: _buildShowSlideSeekDuration(),
+              );
+            },
+          ),
+        ),
+        AnimatedBuilder(
+          animation: _showDoubleTapSeekAnimation,
+          builder: (BuildContext context, Widget? childWidget) {
+            return Visibility(
+              visible: _showDoubleTapSeekAnimation.value != 0,
+              child: Opacity(
+                opacity: _showDoubleTapSeekAnimation.value,
+                child: childWidget,
+              ),
+            );
+          },
+          child: ValueListenableBuilder(
+            valueListenable: _isForwardSeek,
+            builder: (_, isForwardSeek, childWidget) {
+              return Align(
+                alignment: isForwardSeek
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
+                child: ClipPath(
+                  clipper: SeekIndicatorClipper(forward: isForwardSeek),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                    ),
+                    width: MediaQuery.sizeOf(context).width / 2,
+                    decoration: const BoxDecoration(
+                      color: Colors.black12,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (isForwardSeek)
+                          const Icon(Icons.fast_forward)
+                        else
+                          const Icon(Icons.fast_rewind),
+                        const SizedBox(height: 8),
+                        ValueListenableBuilder(
+                          valueListenable: _seekRate,
+                          builder: (context, value, __) {
+                            return Text(
+                              '${isForwardSeek ? '' : '-'}$value seconds',
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        ValueListenableBuilder(
+          valueListenable: _showSlidingReleaseIndicator,
+          builder: (context, value, _) {
+            return AnimatedCrossFade(
+              firstChild: Align(
                 alignment: Alignment.topCenter,
                 child: SeekIndicator(
-                  valueListenable: _showForward2XIndicator,
-                  child: const Row(
+                  valueListenable: _showSlidingSeekIndicator,
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('2X'),
-                      SizedBox(width: 4),
-                      Icon(Icons.fast_forward),
+                      if (_showPullUp)
+                        const Icon(Icons.expand_less)
+                      else
+                        const Icon(Icons.linear_scale),
+                      const SizedBox(width: 4),
+                      Text(
+                        _showPullUp
+                            ? 'Pull up for precise seeking'
+                            : 'Slide left or right to seek',
+                      ),
                     ],
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.lerp(
-                  Alignment.center,
-                  Alignment.bottomCenter,
-                  0.75,
-                )!,
-                child: ValueListenableBuilder(
-                  valueListenable: _showSlideFrame,
-                  builder: (_, show, __) {
-                    if (show) return const SizedBox();
-                    return _buildShowSlideSeekDuration();
-                  },
+              secondChild: Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  height: 24,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4,
+                    horizontal: 16,
+                  ),
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                  child: const Text('Release to cancel'),
                 ),
               ),
-              AnimatedBuilder(
-                animation: _showDoubleTapSeekAnimation,
-                builder: (context, childWidget) {
-                  return Opacity(
-                    opacity: _showDoubleTapSeekAnimation.value,
-                    child: childWidget,
-                  );
-                },
-                child: ValueListenableBuilder(
-                  valueListenable: _isForwardSeek,
-                  builder: (_, isForwardSeek, childWidget) {
-                    return Align(
-                      alignment: isForwardSeek
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
-                      child: ClipPath(
-                        clipper: SeekIndicatorClipper(forward: isForwardSeek),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                          ),
-                          width: MediaQuery.sizeOf(context).width / 2,
-                          decoration: const BoxDecoration(
-                            color: Colors.black12,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (isForwardSeek)
-                                const Icon(Icons.fast_forward)
-                              else
-                                const Icon(Icons.fast_rewind),
-                              const SizedBox(height: 8),
-                              ValueListenableBuilder(
-                                valueListenable: _seekRate,
-                                builder: (context, value, __) {
-                                  return Text(
-                                    '${isForwardSeek ? '' : '-'}$value seconds',
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              ValueListenableBuilder(
-                valueListenable: _showSlidingReleaseIndicator,
-                builder: (context, value, _) {
-                  return AnimatedCrossFade(
-                    firstChild: Align(
-                      alignment: Alignment.topCenter,
-                      child: SeekIndicator(
-                        valueListenable: _showSlidingSeekIndicator,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (_showPullUp)
-                              const Icon(Icons.expand_less)
-                            else
-                              const Icon(Icons.linear_scale),
-                            const SizedBox(width: 4),
-                            Text(
-                              _showPullUp
-                                  ? 'Pull up for precise seeking'
-                                  : 'Slide left or right to seek',
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    secondChild: Align(
-                      alignment: Alignment.topCenter,
-                      child: Container(
-                        height: 24,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 4,
-                          horizontal: 16,
-                        ),
-                        margin: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(32),
-                        ),
-                        child: const Text('Release to cancel'),
-                      ),
-                    ),
-                    crossFadeState: value
-                        ? CrossFadeState.showSecond
-                        : CrossFadeState.showFirst,
-                    duration: const Duration(milliseconds: 150),
-                  );
-                },
-              ),
-              GestureDetector(
-                onDoubleTapDown: _onDoubleTapDown,
-                onLongPressStart: _onLongPressStart,
-                onLongPressEnd: _onLongPressEnd,
-                onLongPressMoveUpdate: _onLongPressMoveUpdate,
-                child: AnimatedBuilder(
-                  animation: _controlsAnimation,
-                  builder: (context, childWidget) {
-                    return Container(
-                      color: Colors.transparent,
-                      height: double.infinity,
-                      width: double.infinity,
-                      child: ValueListenableBuilder(
-                        valueListenable: _showSlideFrame,
-                        builder: (_, showSlideFrame, __) {
-                          return Visibility(
-                            visible: _controlsAnimation.value != 0 &&
-                                !showSlideFrame,
-                            child: Opacity(
-                              opacity: _controlsAnimation.value,
-                              child: childWidget,
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
+              crossFadeState:
+                  value ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 150),
+            );
+          },
+        ),
+        Stack(
+          children: [
+            ValueListenableBuilder<bool>(
+              valueListenable: _showSlideFrame,
+              builder: (
+                BuildContext context,
+                bool showSlideFrame,
+                Widget? childWidget,
+              ) {
+                return Visibility(
+                  visible: showSlideFrame,
                   child: const ColoredBox(
                     color: Colors.black54,
-                    child: _GroupControl(),
+                    child: SizedBox.expand(),
+                  ),
+                );
+              },
+            ),
+            GestureDetector(
+              onLongPressEnd: _onLongPressEnd,
+              onDoubleTapDown: _onDoubleTapDown,
+              onLongPressStart: _onLongPressStart,
+              onLongPressMoveUpdate: _onLongPressMoveUpdate,
+              child: Container(
+                color: Colors.transparent,
+                height: double.infinity,
+                width: double.infinity,
+                child: ControlsVisibility(
+                  animation: _controlsAnimation,
+                  alignment: Alignment.topCenter,
+                  child: const ColoredBox(
+                    color: Colors.black54,
+                    child: SizedBox.expand(),
                   ),
                 ),
               ),
-              PlayerSeekSlideFrame(
-                animation: _slideFrameController,
-                frameHeight: slideFrameHeight,
-                valueListenable: _showSlideFrame,
-                onClose: _onEndSlideFrameSeek,
-                seekDurationIndicator: _buildShowSlideSeekDuration(),
-              ),
-              // Shows loading indicator, regardless if controls are shown/hidden
-              const Center(child: PlayerLoadingIndicator()),
-              _OverlayProgress(
-                slideAnimation: _slideAnimation,
-                showPlaybackProgress: _showPlaybackProgress,
-                progressAnimation: _progressAnimation,
-                bufferAnimation: _bufferAnimation,
-                onTap: _onPlaybackProgressTap,
-                onDragStart: _onPlaybackProgressDragStart,
-                onChangePosition: _onPlaybackProgressPositionChanged,
-                onDragEnd: _onPlaybackProgressDragEnd,
-              ),
-            ],
-          ),
+            ),
+            ControlsVisibility(
+              animation: _controlsAnimation,
+              alignment: Alignment.topCenter,
+              child: const _TopControl(),
+            ),
+            ControlsVisibility(
+              animation: _controlsAnimation,
+              alignment: Alignment.center,
+              child: const _MiddleControl(),
+            ),
+            ControlsVisibility(
+              animation: _controlsAnimation,
+              alignment: Alignment.bottomCenter,
+              child: const _BottomControl(),
+            ),
+            // Shows loading indicator, regardless if controls are shown/hidden
+            const Center(child: PlayerLoadingIndicator()),
+          ],
+        ),
+        PlayerSeekSlideFrame(
+          animation: _slideFrameController,
+          frameHeight: slideFrameHeight,
+          valueListenable: _showSlideFrame,
+          onClose: _onEndSlideFrameSeek,
+          seekDurationIndicator: _buildShowSlideSeekDuration(),
+        ),
+        _OverlayProgress(
+          slideAnimation: _slideAnimation,
+          showPlaybackProgress: _showPlaybackProgress,
+          progressAnimation: _progressAnimation,
+          bufferAnimation: _bufferAnimation,
+          onTap: _onPlaybackProgressTap,
+          onDragStart: _onPlaybackProgressDragStart,
+          onChangePosition: _onPlaybackProgressPositionChanged,
+          onDragEnd: _onPlaybackProgressDragEnd,
         ),
       ],
     );
@@ -665,9 +683,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   void _onDoubleTapDown(TapDownDetails details) {
     if (_preventCommonControlGestures) return;
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final greyArea = screenWidth * 0.2;
-    final isForward = details.localPosition.dx > (screenWidth / 2) + greyArea;
-    final isRewind = details.localPosition.dx < (screenWidth / 2) - greyArea;
+    final isForward = details.localPosition.dx > (screenWidth / 2);
+    final isRewind = details.localPosition.dx < (screenWidth / 2);
 
     if (isForward) {
       ForwardSeekPlayerNotification().dispatch(context);
@@ -693,28 +710,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _longPressXUpdatePosition = details.localPosition.dx;
     _slideSeekDuration =
         ref.read(playerRepositoryProvider).currentVideoPosition;
-
-    if (!_controlsHidden) {
-      final screenWidth = MediaQuery.sizeOf(context).width;
-      final screenHeight = MediaQuery.sizeOf(context).height;
-
-      final isExpanded =
-          ref.read(playerRepositoryProvider).playerViewState.isExpanded;
-      final possibleVideoHeight =
-          (isExpanded ? 1 : kAvgVideoViewPortHeight) * screenHeight;
-
-      const greyArea = 65;
-      final localY = details.localPosition.dy;
-      final localX = details.localPosition.dx;
-
-      final left = localX + greyArea < screenWidth / 2;
-      final right = localX - greyArea > screenWidth / 2;
-
-      final top = localY + (greyArea / 2) < possibleVideoHeight / 2;
-      final bottom = localY > (possibleVideoHeight / 2) + (greyArea / 2);
-
-      if ((!right && !left) && (!top && !bottom)) return;
-    }
 
     _startedOnLongPress = true;
 
@@ -1024,31 +1019,6 @@ class _OverlayProgress extends StatelessWidget {
   }
 }
 
-class _GroupControl extends StatelessWidget {
-  const _GroupControl();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        Expanded(
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: _TopControl(),
-          ),
-        ),
-        _MiddleControl(),
-        Expanded(
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: _BottomControl(),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _TopControl extends StatelessWidget {
   const _TopControl();
 
@@ -1085,7 +1055,7 @@ class _MiddleControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         PlayerPrevious(),
         PlayPauseRestartControl(),
@@ -1116,6 +1086,37 @@ class _BottomControl extends StatelessWidget {
           PlayerActionsControl(),
         ],
       ),
+    );
+  }
+}
+
+class ControlsVisibility extends StatelessWidget {
+  const ControlsVisibility({
+    super.key,
+    required this.animation,
+    required this.alignment,
+    required this.child,
+  });
+
+  final Animation<double> animation;
+  final Alignment alignment;
+  final Widget child;
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (BuildContext context, Widget? childWidget) {
+        return Visibility(
+          visible: animation.value != 0,
+          child: Align(
+            alignment: alignment,
+            child: Opacity(
+              opacity: animation.value,
+              child: child,
+            ),
+          ),
+        );
+      },
     );
   }
 }

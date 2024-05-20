@@ -62,7 +62,7 @@ class _PlayerDurationControlState extends ConsumerState<PlayerDurationControl> {
         },
         onPortrait: (context, childWidget) {
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: childWidget,
           );
         },
@@ -79,18 +79,21 @@ class _PlayerDurationControlState extends ConsumerState<PlayerDurationControl> {
                   reversed
                       ? '-${position.hoursMinutesSeconds}'
                       : position.hoursMinutesSeconds,
+                  style: const TextStyle(fontSize: 11.5),
                 );
               },
             ),
             const Text(
               ' / ',
               style: TextStyle(
+                fontSize: 11.5,
                 color: Colors.white60,
               ),
             ),
             Text(
               videoDuration.hoursMinutesSeconds,
               style: const TextStyle(
+                fontSize: 11.5,
                 color: Colors.white60,
               ),
             ),

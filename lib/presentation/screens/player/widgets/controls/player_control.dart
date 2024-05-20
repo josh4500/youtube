@@ -28,13 +28,13 @@
 
 import 'package:flutter/material.dart';
 
-class PlayerControl extends StatefulWidget {
-  const PlayerControl({
+class PlayerControlButton extends StatefulWidget {
+  const PlayerControlButton({
     super.key,
     this.enabled = true,
     this.color = Colors.black26,
     this.verticalPadding = 0,
-    this.horizontalPadding = 16,
+    this.horizontalPadding = 0,
     required this.onTap,
     required this.builder,
   });
@@ -47,10 +47,10 @@ class PlayerControl extends StatefulWidget {
   final Widget Function(BuildContext context, Animation animation) builder;
 
   @override
-  State<PlayerControl> createState() => PlayerControlState();
+  State<PlayerControlButton> createState() => PlayerControlButtonState();
 }
 
-class PlayerControlState extends State<PlayerControl>
+class PlayerControlButtonState extends State<PlayerControlButton>
     with TickerProviderStateMixin {
   late AnimationController _controller;
   late AnimationController _bgController;

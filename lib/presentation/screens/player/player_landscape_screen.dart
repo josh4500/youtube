@@ -34,13 +34,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:youtube_clone/presentation/widgets/custom_scroll_physics.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../constants.dart';
 import '../../providers.dart';
 import 'widgets/controls/player_notifications.dart';
 import 'widgets/player/player_components_wrapper.dart';
+import 'widgets/player/player_infographics_wrapper.dart';
 import 'widgets/player/player_view.dart';
+import 'widgets/video_comment_sheet.dart';
+import 'widgets/video_description_sheet.dart';
 
 class PlayerLandscapeScreen extends ConsumerStatefulWidget {
   const PlayerLandscapeScreen({super.key});
@@ -296,53 +299,56 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
     );
 
     return Material(
-      child: Row(
-        children: [
-          Expanded(
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: GestureDetector(
-                  onTap: _onTapPlayer,
-                  onVerticalDragUpdate: _onDragPlayer,
-                  onVerticalDragEnd: _onDragPlayerEnd,
-                  behavior: HitTestBehavior.opaque,
-                  child: interactivePlayerView,
+      child: PlayerInfographicsWrapper(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: GestureDetector(
+                    onTap: _onTapPlayer,
+                    onVerticalDragUpdate: _onDragPlayer,
+                    onVerticalDragEnd: _onDragPlayerEnd,
+                    behavior: HitTestBehavior.opaque,
+                    child: interactivePlayerView,
+                  ),
                 ),
               ),
             ),
-          ),
-          // SizeTransition(
-          //   sizeFactor: _descAnimation,
-          //   axis: Axis.horizontal,
-          //   child: ConstrainedBox(
-          //     constraints: BoxConstraints(
-          //       maxWidth: MediaQuery.sizeOf(context).width * .4,
-          //     ),
-          //     child: VideoDescriptionSheet(
-          //       transcriptNotifier: _transcriptionNotifier,
-          //       closeDescription: _closeDesc,
-          //       showDragIndicator: false,
-          //     ),
-          //   ),
-          // ),
-          // SizeTransition(
-          //   sizeFactor: _commentAnimation,
-          //   axis: Axis.horizontal,
-          //   child: ConstrainedBox(
-          //     constraints: BoxConstraints(
-          //       maxWidth: MediaQuery.sizeOf(context).width * .4,
-          //     ),
-          //     child: VideoCommentsSheet(
-          //       replyNotifier: _replyNotifier,
-          //       closeComment: _closeComment,
-          //       showDragIndicator: false,
-          //       maxHeight: 0,
-          //     ),
-          //   ),
-          // ),
-        ],
+            // SizeTransition(
+            //   sizeFactor: _descAnimation,
+            //   axis: Axis.horizontal,
+            //   child: ConstrainedBox(
+            //     constraints: BoxConstraints(
+            //       maxWidth: MediaQuery.sizeOf(context).width * .4,
+            //     ),
+            //     child: VideoDescriptionSheet(
+            //       transcriptNotifier: _transcriptionNotifier,
+            //       closeDescription: _closeDesc,
+            //       showDragIndicator: false,
+            //     ),
+            //   ),
+            // ),
+            // SizeTransition(
+            //   sizeFactor: _commentAnimation,
+            //   axis: Axis.horizontal,
+            //   child: ConstrainedBox(
+            //     constraints: BoxConstraints(
+            //       maxWidth: MediaQuery.sizeOf(context).width * .4,
+            //     ),
+            //     child: VideoCommentsSheet(
+            //       replyNotifier: _replyNotifier,
+            //       closeComment: _closeComment,
+            //       showDragIndicator: false,
+            //       maxHeight: 0,
+            //     ),
+            //   ),
+            // ),
+          ],
+        ),
       ),
     );
   }

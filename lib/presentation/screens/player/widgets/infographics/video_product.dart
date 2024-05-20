@@ -26,7 +26,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -67,7 +66,7 @@ class _VideoProductState extends State<VideoProduct>
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.black54,
         borderRadius: BorderRadius.circular(24),
@@ -83,8 +82,8 @@ class _VideoProductState extends State<VideoProduct>
           children: [
             const SizedBox(width: 8),
             Container(
-              width: 16,
-              height: 16,
+              width: 20,
+              height: 20,
               decoration: BoxDecoration(
                 color: Colors.white54,
                 borderRadius: BorderRadius.circular(4),
@@ -103,10 +102,9 @@ class _VideoProductState extends State<VideoProduct>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'View Products',
+                        'View products',
                         style: TextStyle(
                           fontSize: 12.5,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       SizedBox(width: 8),
@@ -114,14 +112,14 @@ class _VideoProductState extends State<VideoProduct>
                     ],
                   ),
                   CustomInkWell(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(6),
                     borderRadius: BorderRadius.circular(24),
                     onTap: () {
                       CloseInfographicsNotification().dispatch(context);
                     },
                     child: const Icon(
                       YTIcons.close_circle_outlined,
-                      size: 16,
+                      size: 14,
                       color: Colors.white70,
                     ),
                   ),

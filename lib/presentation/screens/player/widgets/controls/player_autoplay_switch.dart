@@ -40,31 +40,34 @@ class PlayerAutoplaySwitch extends ConsumerWidget {
     final autoPlay = ref.watch(
       preferencesProvider.select((value) => value.autoplay),
     );
-    return Switch(
-      value: autoPlay,
-      onChanged: (value) {
-        ref.read(preferencesProvider.notifier).autoPlay = value;
-        ref.read(playerRepositoryProvider).sendPlayerSignal(
-          [PlayerSignal.showControls],
-        );
-      },
-      activeColor: Colors.white,
-      activeTrackColor: Colors.white30,
-      inactiveTrackColor: Colors.white30,
-      inactiveThumbColor: const Color(0xFF606060),
-      thumbIcon: MaterialStateProperty.resolveWith(
-        (states) {
-          if (states.contains(MaterialState.selected)) {
-            return const Icon(
-              YTIcons.play_arrow,
-              color: Colors.black,
-            );
-          }
-          return const Icon(
-            YTIcons.pause,
-            color: Colors.white,
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: Switch(
+        value: autoPlay,
+        onChanged: (value) {
+          ref.read(preferencesProvider.notifier).autoPlay = value;
+          ref.read(playerRepositoryProvider).sendPlayerSignal(
+            [PlayerSignal.showControls],
           );
         },
+        activeColor: Colors.white,
+        activeTrackColor: Colors.white30,
+        inactiveTrackColor: Colors.white30,
+        inactiveThumbColor: const Color(0xFF606060),
+        thumbIcon: MaterialStateProperty.resolveWith(
+          (states) {
+            if (states.contains(MaterialState.selected)) {
+              return const Icon(
+                YTIcons.play_arrow,
+                color: Colors.black,
+              );
+            }
+            return const Icon(
+              YTIcons.pause,
+              color: Colors.white,
+            );
+          },
+        ),
       ),
     );
   }

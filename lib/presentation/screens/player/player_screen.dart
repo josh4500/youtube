@@ -94,18 +94,20 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   late final AnimationController _draggableOpacityController;
   late final Animation<double> _draggableOpacityAnimation;
 
-  late final AnimationController _additionalHeightController;
+  late final AnimationController _playerAddedHeightAnimationController;
   late final ValueNotifier<double> _playerAddedHeightNotifier;
 
   late final ValueNotifier<double> _playerMarginNotifier;
 
-  late final AnimationController _heightController;
+  late final AnimationController _screenHeightAnimationController;
   late final ValueNotifier<double> _screenHeightNotifier;
 
-  late final AnimationController _widthController;
+  late final AnimationController _playerWidthAnimationController;
   late final ValueNotifier<double> _playerWidthNotifier;
 
   late final Animation<double> sizeAnimation;
+
+  late final ValueNotifier<bool> _hideGraphicsNotifier;
 
   bool _controlWasTempHidden = false;
 
@@ -204,7 +206,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   double get additionalHeight => _playerAddedHeightNotifier.value;
 
   /// PlayerSignal StreamSubscription
-  StreamSubscription<PlayerSignal>? _subscription;
+  StreamSubscription<PlayerSignal>? _playerSignalSubscription;
 
   /// Whether video was temporary paused
   bool _wasTempPaused = false;
@@ -239,16 +241,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   void initState() {
     super.initState();
 
-    _widthController = AnimationController(
+    _playerWidthAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 125),
     );
-    _heightController = AnimationController(
+    _screenHeightAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 125),
     );
 
-    _additionalHeightController = AnimationController(
+    _playerAddedHeightAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 125),
     );
@@ -326,6 +328,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _playerMarginNotifier = ValueNotifier<double>(0);
     _playerWidthNotifier = ValueNotifier<double>(kMinVideoViewPortWidth);
     _screenHeightNotifier = ValueNotifier<double>(kMinPlayerHeight);
+    _hideGraphicsNotifier = ValueNotifier<bool>(false);
 
     _animateWidth(1);
     _animateHeight(1);
@@ -343,6 +346,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
 
     _screenHeightNotifier.addListener(() {
+      _hideGraphicsNotifier.value = _screenHeightNotifier.value < 1;
       _showHideNavigationBar(_screenHeightNotifier.value);
       _recomputeDraggableOpacityAndHeight(_screenHeightNotifier.value);
     });
@@ -394,49 +398,70 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
       // Listens to PlayerSignal events related to description and comments
       // Events are usually sent from PlayerLandscapeScreen
-      _subscription =
-          playerRepo.playerSignalStream.listen((PlayerSignal signal) {
-        if (signal == PlayerSignal.openDescription) {
-          _openDescSheet(); // Opens description sheet in this screen
-        } else if (signal == PlayerSignal.closeDescription) {
-          _closeDescSheet(); // Closes description sheet in this screen
-        } else if (signal == PlayerSignal.openComments) {
-          _openCommentSheet(); // Opens comment sheet in this screen
-        } else if (signal == PlayerSignal.closeComments) {
-          _closeCommentSheet(); // Closes comment sheet in this screen
-        } else if (signal == PlayerSignal.openChapters) {
-          _openChaptersSheet(); // Opens chapters sheet in this screen
-        } else if (signal == PlayerSignal.closeChapters) {
-          _closeChaptersSheet(); // Closes chapters sheet in this screen
-        } else if (signal == PlayerSignal.enterExpanded) {
-          SystemChrome.setEnabledSystemUIMode(
-            SystemUiMode.immersive,
-            overlays: <SystemUiOverlay>[],
-          );
-        } else if (signal == PlayerSignal.exitExpanded) {
-          SystemChrome.setEnabledSystemUIMode(
-            SystemUiMode.manual,
-            overlays: SystemUiOverlay.values,
-          );
-        }
-      });
+      _playerSignalSubscription = playerRepo.playerSignalStream.listen(
+        (PlayerSignal signal) {
+          if (signal == PlayerSignal.openDescription) {
+            _openDescSheet(); // Opens description sheet in this screen
+          } else if (signal == PlayerSignal.closeDescription) {
+            _closeDescSheet(); // Closes description sheet in this screen
+          } else if (signal == PlayerSignal.openComments) {
+            _openCommentSheet(); // Opens comment sheet in this screen
+          } else if (signal == PlayerSignal.closeComments) {
+            _closeCommentSheet(); // Closes comment sheet in this screen
+          } else if (signal == PlayerSignal.openChapters) {
+            _openChaptersSheet(); // Opens chapters sheet in this screen
+          } else if (signal == PlayerSignal.closeChapters) {
+            _closeChaptersSheet(); // Closes chapters sheet in this screen
+          } else if (signal == PlayerSignal.enterExpanded) {
+            SystemChrome.setEnabledSystemUIMode(
+              SystemUiMode.immersive,
+              overlays: <SystemUiOverlay>[],
+            );
+          } else if (signal == PlayerSignal.exitExpanded) {
+            SystemChrome.setEnabledSystemUIMode(
+              SystemUiMode.manual,
+              overlays: SystemUiOverlay.values,
+            );
+          }
+        },
+      );
     });
   }
 
   @override
   void dispose() {
-    _subscription?.cancel();
+    _playerSignalSubscription?.cancel();
+    _hideGraphicsNotifier.dispose();
+    _playerDismissController.dispose();
+
     _draggableOpacityController.dispose();
     _zoomPanAnimationController.dispose();
     _transformationController.dispose();
-    _commentDraggableController.dispose();
+
     _descDraggableController.dispose();
-    _showCommentDraggable.dispose();
+    _commentDraggableController.dispose();
+    _chaptersDraggableController.dispose();
+
     _showDescDraggable.dispose();
-    _replyIsOpenedNotifier.dispose();
+    _showCommentDraggable.dispose();
+    _showChaptersDraggable.dispose();
+
     _transcriptNotifier.dispose();
+    _replyIsOpenedNotifier.dispose();
+
     _infoScrollController.dispose();
     _infoOpacityController.dispose();
+    _hideGraphicsNotifier.dispose();
+
+    _playerWidthAnimationController.dispose();
+    _screenHeightAnimationController.dispose();
+    _playerAddedHeightAnimationController.dispose();
+
+    _playerWidthNotifier.dispose();
+    _screenHeightNotifier.dispose();
+    _playerMarginNotifier.dispose();
+    _playerAddedHeightNotifier.dispose();
+
     super.dispose();
   }
 
@@ -483,7 +508,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (_screenHeightNotifier.value != to) {
       await _tweenAnimateNotifier(
         notifier: _screenHeightNotifier,
-        controller: _heightController,
+        controller: _screenHeightAnimationController,
         value: to,
       );
     }
@@ -493,7 +518,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (_playerWidthNotifier.value != to) {
       await _tweenAnimateNotifier(
         notifier: _playerWidthNotifier,
-        controller: _widthController,
+        controller: _playerWidthAnimationController,
         value: to,
       );
     }
@@ -503,7 +528,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (_playerAddedHeightNotifier.value != to) {
       await _tweenAnimateNotifier(
         notifier: _playerAddedHeightNotifier,
-        controller: _additionalHeightController,
+        controller: _playerAddedHeightAnimationController,
         value: to,
       );
     }
@@ -1440,6 +1465,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     PlayerInfographicsWrapper(
+                      hideGraphicsNotifier: _hideGraphicsNotifier,
                       child: GestureDetector(
                         onTap: _onTapPlayer,
                         onVerticalDragUpdate: _onDragPlayer,

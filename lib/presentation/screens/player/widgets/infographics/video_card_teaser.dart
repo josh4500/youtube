@@ -42,7 +42,7 @@ class VideoCardTeaser extends StatelessWidget {
       width: MediaQuery.sizeOf(context).width * .45,
       decoration: BoxDecoration(
         color: Colors.black45,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(2),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

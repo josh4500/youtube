@@ -39,13 +39,14 @@ class PlayerMinimize extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return PlayerControl(
+    return PlayerControlButton(
       onTap: () {
         if (ref.read(playerRepositoryProvider).playerViewState.isExpanded) {
           DeExpandPlayerNotification().dispatch(context);
         }
         MinimizePlayerNotification().dispatch(context);
       },
+      verticalPadding: 8,
       horizontalPadding: 14,
       color: Colors.transparent,
       builder: (context, _) {

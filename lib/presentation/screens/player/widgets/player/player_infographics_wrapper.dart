@@ -32,7 +32,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/screens/player/providers/player_expanded_state_provider.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/infographics/infographics_notification.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/infographics/video_channel_watermark.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../providers/player_view_state_provider.dart';
@@ -42,11 +44,11 @@ import '../infographics/video_product.dart';
 class PlayerInfographicsWrapper extends StatefulWidget {
   const PlayerInfographicsWrapper({
     super.key,
-    this.show = false,
+    this.hideGraphicsNotifier,
     required this.child,
   });
   final Widget child;
-  final bool show;
+  final ValueNotifier<bool>? hideGraphicsNotifier;
 
   @override
   State<PlayerInfographicsWrapper> createState() =>
@@ -59,15 +61,17 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
   @override
   void initState() {
     super.initState();
-    if (widget.show == false) listenable.pauseVisuals(notify: false);
-  }
-
-  @override
-  void didUpdateWidget(covariant PlayerInfographicsWrapper oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.show != widget.show) {
-      widget.show ? listenable.continueVisuals() : listenable.pauseVisuals();
+    if (widget.hideGraphicsNotifier?.value == true) {
+      listenable.pauseVisuals(notify: false);
     }
+
+    widget.hideGraphicsNotifier?.addListener(() {
+      if (widget.hideGraphicsNotifier?.value == true) {
+        listenable.pauseVisuals();
+      } else {
+        listenable.continueVisuals();
+      }
+    });
   }
 
   @override
@@ -98,15 +102,50 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
               child: const VideoCardTeaser(),
             ),
             Positioned.fill(
-              child: InfographicVisibility(
-                visible: listenable.showVisuals,
-                alignment: Alignment.bottomLeft,
-                visibleControlAlignment: Alignment.lerp(
-                  Alignment.centerLeft,
-                  Alignment.bottomLeft,
-                  0.65,
-                ),
-                child: const VideoProduct(),
+              child: Consumer(
+                builder: (context, ref, child) {
+                  ref.watch(playerExpandedStateProvider);
+                  print(ref.read(playerViewStateProvider).isExpanded
+                      ? 0.95
+                      : ref.read(playerViewStateProvider).isFullscreen
+                          ? 0.5
+                          : 0.65);
+                  return InfographicVisibility(
+                    visible: listenable.showVisuals,
+                    alignment: Alignment.bottomLeft,
+                    visibleControlAlignment: Alignment.lerp(
+                      Alignment.centerLeft,
+                      Alignment.bottomLeft,
+                      ref.read(playerViewStateProvider).isExpanded
+                          ? 1
+                          : ref.read(playerViewStateProvider).isFullscreen
+                              ? 0.5
+                              : 0.65,
+                    ),
+                    child: const VideoProduct(),
+                  );
+                },
+              ),
+            ),
+            Positioned.fill(
+              child: Consumer(
+                builder: (context, ref, child) {
+                  ref.watch(playerExpandedStateProvider);
+                  return InfographicVisibility(
+                    visible: listenable.showVisuals,
+                    alignment: Alignment.bottomLeft,
+                    visibleControlAlignment: Alignment.lerp(
+                      Alignment.centerRight,
+                      Alignment.bottomRight,
+                      ref.read(playerViewStateProvider).isExpanded
+                          ? 0.8
+                          : ref.read(playerViewStateProvider).isFullscreen
+                              ? 0.5
+                              : 0.65,
+                    ),
+                    child: const VideoChannelWatermark(),
+                  );
+                },
               ),
             ),
           ],

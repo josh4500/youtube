@@ -33,7 +33,7 @@ import 'package:flutter/material.dart';
 import '../../../view_models/progress.dart';
 
 /// Default size of the tappable area for seeking playback.
-const double defaultPlaybackProgressTapSize = 10.0;
+const double kDefaultPlaybackProgressTapSize = 10.0;
 
 /// Equivalent value between 0 - 1 of Position and Buffer duration to the full
 /// length duration of the playback
@@ -62,7 +62,7 @@ typedef ProgressValue = (double, double);
 class PlaybackProgress extends StatefulWidget {
   const PlaybackProgress({
     super.key,
-    this.tapSize = defaultPlaybackProgressTapSize,
+    this.tapSize = kDefaultPlaybackProgressTapSize,
     this.color = const Color(0xFFFF0000),
     this.animation,
     this.bufferAnimation,
@@ -175,7 +175,7 @@ class _PlaybackProgressState extends State<PlaybackProgress>
   }
 
   /// Progress Indicators minimum height
-  double get _indicatorHeight => widget.keyConcepts.isEmpty ? 2 : 4;
+  double get _indicatorHeight => widget.keyConcepts.isEmpty ? 1.75 : 4;
 
   /// Equivalent value between 0 - 1 of the KeyConcepts duration positions
   List<double> get _keyConceptPositions => widget.keyConcepts
@@ -335,16 +335,25 @@ class _PlaybackProgressState extends State<PlaybackProgress>
                         snapshot.data ?? Progress.zero,
                       );
                       final double positionValue = data.$1;
+                      final animation = widget.animation!.drive(
+                        Tween<double>(begin: -0.175, end: -6),
+                      );
 
-                      // TODO(Josh): When begin at _indicatorHeight, animate bottom based on _thumbSizeAnimation
-                      return Positioned(
-                        bottom: -6,
-                        left: clampDouble(
-                          (positionValue * constraint.maxWidth) - 4,
-                          0,
-                          constraint.maxWidth - 12,
-                        ),
-                        child: thumbIndicator!,
+                      return AnimatedBuilder(
+                        animation: animation,
+                        builder: (context, _) {
+                          return Positioned(
+                            bottom: animation.value,
+                            left: clampDouble(
+                              (positionValue * constraint.maxWidth) +
+                                  animation.value -
+                                  1,
+                              0,
+                              constraint.maxWidth - 12,
+                            ),
+                            child: thumbIndicator!,
+                          );
+                        },
                       );
                     },
                   ),

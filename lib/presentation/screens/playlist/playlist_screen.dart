@@ -227,10 +227,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                       sharedSlidableState: _slidableState,
                       items: const <SlidableItem>[
                         SlidableItem(
-                          icon: Icon(
-                            YTIcons.delete_outlined,
-                            color: Colors.black,
-                          ),
+                          icon: Icon(Icons.delete, color: Colors.black),
                         ),
                       ],
                       child: CustomInkWell(
@@ -241,8 +238,8 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                               Icon(YTIcons.move_outlined),
                               Expanded(
                                 child: PlayableVideoContent(
-                                  width: 180,
-                                  height: 112,
+                                  width: 145,
+                                  height: 88,
                                   margin: EdgeInsets.symmetric(
                                     vertical: 4,
                                     horizontal: 8,
