@@ -2,18 +2,27 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'player_state_provider.g.dart';
 
-class PlayerState {
-  final bool loading;
-  final bool buffering;
-  final bool playing;
-  final bool ended;
+// enum PlayerStateEnum{
+//   ended,
+//   playing,
+//   loading,
+//   buffering,
+//   hasNext,
+//   hasPrevious,
+// }
 
+class PlayerState {
   const PlayerState({
     required this.loading,
     required this.buffering,
     required this.playing,
     required this.ended,
   });
+
+  final bool loading;
+  final bool buffering;
+  final bool playing;
+  final bool ended;
 
   @override
   bool operator ==(Object other) =>

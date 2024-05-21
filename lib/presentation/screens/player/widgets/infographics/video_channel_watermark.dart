@@ -27,26 +27,24 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-class VideoChannelWatermark extends StatelessWidget {
+class VideoChannelWatermark extends ConsumerWidget {
   const VideoChannelWatermark({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return CustomOrientationBuilder(
-      onLandscape: (context, _) {
-        return Align(
-          alignment: Alignment.bottomRight,
-          child: Container(
-            width: 50,
-            height: 50,
-            color: Colors.red.shade400,
-            margin: const EdgeInsets.all(16),
-          ),
-        );
-      },
-      onPortrait: (_, __) => const SizedBox(),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playerViewState = ref.watch(playerViewStateProvider);
+    return Visibility(
+      visible: playerViewState.isExpanded || playerViewState.isFullscreen,
+      child: Container(
+        width: 50,
+        height: 50,
+        color: Colors.red.shade400,
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+      ),
     );
   }
 }

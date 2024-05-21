@@ -39,7 +39,7 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../constants.dart';
 import '../../providers.dart';
-import 'providers/player_view_state_provider.dart';
+import '../../provider/state/player_view_state_provider.dart';
 import 'widgets/controls/player_ambient.dart';
 import 'widgets/controls/player_notifications.dart';
 import 'widgets/player/mini_player.dart';
@@ -369,12 +369,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Indicates whether the player is expanded or not.
   bool get _expanded {
-    return ref.read(playerRepositoryProvider).playerViewState.isExpanded;
+    return ref.read(playerViewStateProvider).isExpanded;
   }
 
   /// Indicates whether the player is minimized or not.
   bool get _isMinimized {
-    return ref.read(playerRepositoryProvider).playerViewState.isMinimized;
+    return ref.read(playerViewStateProvider).isMinimized;
   }
 
   /// Indicates whether active zoom panning is in progress.
@@ -588,8 +588,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Hides the player controls and save state whether control will be temporary
   /// hidden.
   void _hideControls([bool force = false]) {
-    final bool hide =
-        ref.read(playerRepositoryProvider).playerViewState.showControls;
+    final bool hide = ref.read(playerViewStateProvider).showControls;
     if (hide || force) {
       _controlWasTempHidden = true && !force;
       ref
@@ -610,7 +609,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Toggles the visibility of player controls based on the current state.
   void _toggleControls() {
     // Check if player controls are currently visible
-    if (ref.read(playerRepositoryProvider).playerViewState.showControls) {
+    if (ref.read(playerViewStateProvider).showControls) {
       // If visible, send a signal to hide controls
       ref
           .read(playerRepositoryProvider)
@@ -1380,7 +1379,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                           double marginValue,
                                           _,
                                         ) {
-                                          print(heightValue);
                                           return Container(
                                             margin: EdgeInsets.only(
                                               top: marginValue,

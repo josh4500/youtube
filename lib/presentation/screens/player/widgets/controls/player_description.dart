@@ -4,7 +4,7 @@ import 'package:youtube_clone/presentation/provider/repository/player_repository
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../providers/player_signal_provider.dart';
-import '../../providers/player_view_state_provider.dart';
+import '../../../../provider/state/player_view_state_provider.dart';
 import 'player_notifications.dart';
 
 class PlayerDescription extends ConsumerWidget {
@@ -25,40 +25,23 @@ class PlayerDescription extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(
-      playerSignalProvider.select(
-        (value) {
-          final event = value.value;
-          if (showOnExpanded) {
-            return event == PlayerSignal.enterExpanded ||
-                event == PlayerSignal.exitExpanded;
-          }
-
-          return event == PlayerSignal.enterFullscreen ||
-              event == PlayerSignal.exitFullscreen ||
-              event == PlayerSignal.openDescription ||
-              event == PlayerSignal.closeDescription ||
-              event == PlayerSignal.openComments ||
-              event == PlayerSignal.closeComments;
-        },
-      ),
-    );
+    final playerViewState = ref.watch(playerViewStateProvider);
 
     if (showOnExpanded) {
-      if (!ref.read(playerViewStateProvider).isExpanded) {
+      if (!playerViewState.isExpanded) {
         return const SizedBox();
       }
     } else {
-      if (!ref.read(playerViewStateProvider).isFullscreen) {
+      if (!playerViewState.isFullscreen) {
         return const SizedBox();
-      } else if (ref.read(playerViewStateProvider).showDescription) {
+      } else if (playerViewState.showDescription) {
         return const SizedBox();
       }
     }
 
     return GestureDetector(
       onTap: () {
-        if (ref.read(playerViewStateProvider).isExpanded) {
+        if (playerViewState.isExpanded) {
           DeExpandPlayerNotification().dispatch(context);
         }
         ref.read(playerRepositoryProvider).sendPlayerSignal([

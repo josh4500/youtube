@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/providers/player_view_state_provider.dart';
+import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -38,7 +38,7 @@ class PlayerChapterControl extends ConsumerWidget {
                 TextSpan(
                   text: 'Intro',
                   style: TextStyle(
-                    fontSize: 11.5,
+                    fontSize: 12,
                     color: Colors.white,
                     fontWeight: FontWeight.w400,
                   ),

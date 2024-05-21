@@ -319,18 +319,21 @@ class VideoActions extends StatelessWidget {
             children: [
               const Divider(thickness: 1, height: 0),
               Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Image.asset(
-                      AssetsPath.ytFullLogoMediumDark,
+                      AssetsPath.ytPremiumFullLogoDarkBig,
                       fit: BoxFit.fitHeight,
                       height: 32,
                     ),
-                    const Text(
-                      'For high quality unlimited downloads, ad-free and background play, get YouTube Premium.',
-                      style: TextStyle(color: Color(0xffaaaaaa)),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        'For high quality unlimited downloads, ad-free and background play, get YouTube Premium.',
+                        style: TextStyle(color: Color(0xffaaaaaa)),
+                      ),
                     ),
                   ],
                 ),

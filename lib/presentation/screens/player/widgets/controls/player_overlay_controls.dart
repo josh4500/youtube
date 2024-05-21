@@ -39,8 +39,7 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../providers/player_expanded_state_provider.dart';
-import '../../providers/player_view_state_provider.dart';
+import '../../../../provider/state/player_view_state_provider.dart';
 import 'player_actions_control.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';
@@ -58,6 +57,8 @@ import 'player_seek_slide_frame.dart';
 import 'player_settings.dart';
 import 'seek_indicator.dart';
 
+const double kSlideFrameHeight = 80;
+
 class PlayerOverlayControls extends ConsumerStatefulWidget {
   const PlayerOverlayControls({super.key});
 
@@ -72,8 +73,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   Timer? _controlHideTimer;
   late final AnimationController _controlsVisibilityController;
   late final Animation<double> _controlsAnimation;
-
-  static const double slideFrameHeight = 80;
 
   final _showSlideFrame = ValueNotifier<bool>(false);
   late final AnimationController _slideFrameController;
@@ -171,7 +170,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
     _slideAnimation = _slideFrameController.drive(
       Tween<Offset>(
-        begin: const Offset(0, slideFrameHeight),
+        begin: const Offset(0, kSlideFrameHeight),
         end: Offset.zero,
       ),
     );
@@ -228,8 +227,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       _subscription = playerRepo.playerSignalStream.listen(
         (signal) async {
           if (signal == PlayerSignal.showControls) {
-            final isExpanded =
-                ref.read(playerRepositoryProvider).playerViewState.isExpanded;
+            final isExpanded = ref.read(playerViewStateProvider).isExpanded;
             if (context.orientation.isLandscape || isExpanded) {
               _showPlaybackProgress.value = true;
             }
@@ -254,10 +252,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                 // Reversing before sending signal, animates the reverse on
                 // auto hide
                 await _controlsVisibilityController.reverse();
-                final isExpanded = ref
-                    .read(playerRepositoryProvider)
-                    .playerViewState
-                    .isExpanded;
+                final isExpanded = ref.read(playerViewStateProvider).isExpanded;
                 // Hides PlaybackProgress
                 if (mounted && context.orientation.isLandscape || isExpanded) {
                   _showPlaybackProgress.value = false;
@@ -281,8 +276,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
             // _controlsVisibilityController is used for progress color indicator
             await _controlsVisibilityController.reverse(from: 0);
 
-            final isExpanded =
-                ref.read(playerRepositoryProvider).playerViewState.isExpanded;
+            final isExpanded = ref.read(playerViewStateProvider).isExpanded;
             // Hides PlaybackProgress while in landscape mode, when controls are
             // hidden
             if (mounted && context.orientation.isLandscape || isExpanded) {
@@ -517,7 +511,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
         ),
         PlayerSeekSlideFrame(
           animation: _slideFrameController,
-          frameHeight: slideFrameHeight,
+          frameHeight: kSlideFrameHeight,
           valueListenable: _showSlideFrame,
           onClose: _onEndSlideFrameSeek,
           seekDurationIndicator: _buildShowSlideSeekDuration(),
@@ -806,7 +800,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
         _showSlidingSeekIndicator.value = false;
 
         _slideFrameController.value = clampDouble(
-          (_longPressYStartPosition - 30 - localY) / slideFrameHeight,
+          (_longPressYStartPosition - 30 - localY) / kSlideFrameHeight,
           0,
           1,
         );
@@ -967,9 +961,8 @@ class _OverlayProgress extends StatelessWidget {
                 WidgetRef ref,
                 Widget? _,
               ) {
-                ref.watch(playerExpandedStateProvider);
-                final isExpanded = ref.read(playerViewStateProvider).isExpanded;
-                if (isExpanded) {
+                final playerViewState = ref.watch(playerViewStateProvider);
+                if (playerViewState.isExpanded) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(
                       vertical: 58,

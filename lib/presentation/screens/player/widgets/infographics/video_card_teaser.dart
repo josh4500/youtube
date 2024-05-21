@@ -39,7 +39,7 @@ class VideoCardTeaser extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(8),
-      width: MediaQuery.sizeOf(context).width * .45,
+      width: 185,
       decoration: BoxDecoration(
         color: Colors.black45,
         borderRadius: BorderRadius.circular(2),

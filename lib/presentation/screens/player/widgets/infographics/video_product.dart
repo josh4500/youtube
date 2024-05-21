@@ -70,7 +70,7 @@ class _VideoProductState extends State<VideoProduct>
       decoration: BoxDecoration(
         color: Colors.black54,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white54, width: .85),
+        border: Border.all(color: Colors.white54),
       ),
       child: CustomInkWell(
         borderRadius: BorderRadius.circular(24),
@@ -80,14 +80,22 @@ class _VideoProductState extends State<VideoProduct>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(width: 8),
+            const SizedBox(width: 10),
             Container(
               width: 20,
               height: 20,
               decoration: BoxDecoration(
-                color: Colors.white54,
+                color: const Color(0xFF66615C),
+                image: const DecorationImage(
+                  image: CustomNetworkImage('https://picsum.photos/200/2000'),
+                ),
                 borderRadius: BorderRadius.circular(4),
               ),
+              // alignment: Alignment.center,
+              // child: const Icon(
+              //   YTIcons.shopping_bag_outlined,
+              //   size: 16,
+              // ),
             ),
             const SizedBox(width: 8),
             SizeTransition(
@@ -95,37 +103,32 @@ class _VideoProductState extends State<VideoProduct>
               sizeFactor: sizeAnimation,
               axisAlignment: 1,
               fixedCrossAxisSizeFactor: 1,
-              child: Stack(
-                alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'View products',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      SizedBox(width: 24),
-                    ],
+                  const Text(
+                    'View products',
+                    style: TextStyle(
+                      fontSize: 12,
+                    ),
                   ),
+                  const SizedBox(width: 4),
                   CustomInkWell(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(4),
                     borderRadius: BorderRadius.circular(24),
                     onTap: () {
                       CloseInfographicsNotification().dispatch(context);
                     },
                     child: const Icon(
                       YTIcons.close_circle_outlined,
-                      size: 14,
+                      size: 16,
                       color: Colors.white70,
                     ),
                   ),
                 ],
               ),
             ),
+            const SizedBox(width: 2),
           ],
         ),
       ),

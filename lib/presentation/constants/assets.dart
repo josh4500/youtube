@@ -19,6 +19,11 @@ class AssetsPath {
   static const String ytFullLogoSmallLight =
       '${_logoPrefix}yt_full_logo_light_small.png';
 
+  static const String ytPremiumFullLogoDarkBig =
+      '${_logoPrefix}yt_premium_full_logo_dark_big.png';
+  static const String ytPremiumFullLogoLightBig =
+      '${_logoPrefix}yt_premium_full_logo_light_big.png';
+
   static const String ytIcon24 = '${_iconPrefix}yt_icon_24.png';
   static const String ytMusicIcon24 = '${_iconPrefix}yt_music_icon_24.png';
   static const String ytStudioIcon24 = '${_iconPrefix}yt_studio_icon_24.png';

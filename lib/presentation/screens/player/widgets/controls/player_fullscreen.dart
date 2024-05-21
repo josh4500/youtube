@@ -31,7 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
-import '../../providers/player_view_state_provider.dart';
+import '../../../../provider/state/player_view_state_provider.dart';
 import 'player_control.dart';
 import 'player_notifications.dart';
 
@@ -43,11 +43,11 @@ class PlayerFullscreen extends ConsumerWidget {
     // TODO: Check if Expanded or Fullscreen control mode
     const bool expandedMode = false;
 
+    final playerViewState = ref.watch(playerViewStateProvider);
     return PlayerControlButton(
       onTap: () {
-        final isExpanded = ref.read(playerViewStateProvider).isExpanded;
-        if (expandedMode || isExpanded) {
-          if (!isExpanded) {
+        if (expandedMode || playerViewState.isExpanded) {
+          if (!playerViewState.isExpanded) {
             ExpandPlayerNotification().dispatch(context);
           } else {
             DeExpandPlayerNotification().dispatch(context);
@@ -56,10 +56,7 @@ class PlayerFullscreen extends ConsumerWidget {
             [PlayerSignal.showControls],
           );
         } else {
-          if (!ref
-              .read(playerRepositoryProvider)
-              .playerViewState
-              .isFullscreen) {
+          if (!playerViewState.isFullscreen) {
             EnterFullscreenPlayerNotification().dispatch(context);
           } else {
             ExitFullscreenPlayerNotification().dispatch(context);
@@ -70,9 +67,7 @@ class PlayerFullscreen extends ConsumerWidget {
       horizontalPadding: 8,
       verticalPadding: 10,
       builder: (context, _) {
-        final isExpanded = ref.read(playerViewStateProvider).isExpanded;
-        final isFullscreen = ref.read(playerViewStateProvider).isFullscreen;
-        return isExpanded || isFullscreen
+        return playerViewState.isExpanded || playerViewState.isFullscreen
             ? const Icon(YTIcons.exit_fullscreen_outlined)
             : const Icon(YTIcons.fullscreen);
       },

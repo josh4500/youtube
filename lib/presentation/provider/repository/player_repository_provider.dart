@@ -33,9 +33,11 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:youtube_clone/core/utils/progress.dart';
-import 'package:youtube_clone/infrastructure/services/cache/in_memory_cache.dart';
-import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
+import 'package:youtube_clone/infrastructure.dart';
 import 'package:youtube_clone/presentation/view_models/progress.dart';
+
+import '../state/player_state_provider.dart';
+import '../state/player_view_state_provider.dart';
 
 part 'player_repository_provider.g.dart';
 
@@ -55,26 +57,6 @@ final playerOverlayStateProvider = Provider(
 @Riverpod(keepAlive: true, dependencies: [])
 PlayerRepository playerRepository(PlayerRepositoryRef ref) {
   return PlayerRepository(ref: ref);
-}
-
-enum PlayerViewState {
-  expanded,
-  minimized,
-  fullscreen,
-  visibleAmbient,
-  visibleControls,
-  visibleChapters,
-  visibleDescription;
-}
-
-extension PlayerViewStateExtension on Set<PlayerViewState> {
-  bool get isExpanded => contains(PlayerViewState.expanded);
-  bool get isMinimized => contains(PlayerViewState.minimized);
-  bool get isFullscreen => contains(PlayerViewState.fullscreen);
-  bool get showAmbient => contains(PlayerViewState.visibleAmbient);
-  bool get showControls => contains(PlayerViewState.visibleControls);
-  bool get showChapters => contains(PlayerViewState.visibleChapters);
-  bool get showDescription => contains(PlayerViewState.visibleDescription);
 }
 
 enum PlayerSignal {
@@ -99,7 +81,7 @@ enum PlayerSignal {
   closeChapters;
 }
 
-enum PlayerLock {
+enum PlayerLockReason {
   progress;
 }
 
@@ -109,7 +91,7 @@ class PlayerRepository {
 
     _videoPlayer.stream.completed.listen((hasEnded) {
       if (hasEnded) {
-        if (!_playerViewState.isMinimized) {
+        if (!ref.read(playerViewStateProvider).isMinimized) {
           sendPlayerSignal([PlayerSignal.showControls]);
         }
 
@@ -135,7 +117,7 @@ class PlayerRepository {
 
     _videoPlayerProgressStream.listen((progress) {
       _positionMemory.write('video', progress);
-      if (!_lock.contains(PlayerLock.progress)) {
+      if (!_lock.contains(PlayerLockReason.progress)) {
         _progressController.sink.add(progress);
       }
     });
@@ -161,22 +143,20 @@ class PlayerRepository {
   final _progressController = StreamController<Progress>.broadcast();
   Stream<Progress> get videoProgressStream => _progressController.stream;
 
-  // TODO(Josh): May use a Riverpod provider (It may deprecate the use of playerNotifierProvider)
-  final Set<PlayerViewState> _playerViewState = <PlayerViewState>{};
-  Set<PlayerViewState> get playerViewState => _playerViewState;
-
   // TODO(Josh): May use a Riverpod provider
-  final Set<PlayerLock> _lock = <PlayerLock>{};
+  final Set<PlayerLockReason> _lock = <PlayerLockReason>{};
 
   // TODO(Josh): Should be able open video
-  void openPlayerScreen() {
+  Future<void> openPlayerScreen() async {
     _ref.read(_playerOverlayStateProvider.notifier).state = true;
+    if (_ref.read(playerViewStateProvider).isMinimized) {
+      sendPlayerSignal([PlayerSignal.maximize]);
+    }
   }
 
   void closePlayerScreen() {
     _lock.clear();
     _videoPlayer.stop();
-    _playerViewState.clear();
     _ref.read(playerNotifierProvider.notifier).reset();
     _ref.read(_playerOverlayStateProvider.notifier).state = false;
   }
@@ -234,9 +214,9 @@ class PlayerRepository {
 
   void updatePosition(Duration position, {bool lockProgress = true}) {
     if (lockProgress) {
-      _lock.add(PlayerLock.progress);
+      _lock.add(PlayerLockReason.progress);
     } else {
-      _lock.remove(PlayerLock.progress);
+      _lock.remove(PlayerLockReason.progress);
     }
     final lastProgress = _positionMemory.read('video') ?? Progress.zero;
     _progressController.sink.add(
@@ -255,43 +235,71 @@ class PlayerRepository {
   void sendPlayerSignal(List<PlayerSignal> signals) {
     for (final signal in signals) {
       if (signal case PlayerSignal.minimize) {
-        _playerViewState.add(PlayerViewState.minimized);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .addState(ViewState.minimized);
       } else if (signal case PlayerSignal.maximize) {
-        _playerViewState.remove(PlayerViewState.minimized);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .removeState(ViewState.minimized);
       } else if (signal case PlayerSignal.enterExpanded) {
-        _playerViewState.add(PlayerViewState.expanded);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .addState(ViewState.expanded);
       } else if (signal case PlayerSignal.exitExpanded) {
-        _playerViewState.remove(PlayerViewState.expanded);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .removeState(ViewState.expanded);
       } else if (signal case PlayerSignal.enterFullscreen) {
-        _playerViewState.add(PlayerViewState.fullscreen);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .addState(ViewState.fullscreen);
       } else if (signal case PlayerSignal.exitFullscreen) {
-        _playerViewState.remove(PlayerViewState.fullscreen);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .removeState(ViewState.fullscreen);
       } else if (signal case PlayerSignal.showControls) {
-        _playerViewState.add(PlayerViewState.visibleControls);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .addState(ViewState.visibleControls);
       } else if (signal case PlayerSignal.hideControls) {
-        _playerViewState.remove(PlayerViewState.visibleControls);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .removeState(ViewState.visibleControls);
       } else if (signal case PlayerSignal.showAmbient) {
-        _playerViewState.add(PlayerViewState.visibleAmbient);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .addState(ViewState.visibleAmbient);
       } else if (signal case PlayerSignal.hideAmbient) {
-        _playerViewState.remove(PlayerViewState.visibleAmbient);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .removeState(ViewState.visibleAmbient);
       } else if (signal case PlayerSignal.openDescription) {
-        _playerViewState.add(PlayerViewState.visibleDescription);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .addState(ViewState.visibleDescription);
       } else if (signal case PlayerSignal.closeDescription) {
-        _playerViewState.remove(PlayerViewState.visibleDescription);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .removeState(ViewState.visibleDescription);
       } else if (signal case PlayerSignal.openComments) {
-        _playerViewState.add(PlayerViewState.visibleDescription);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .addState(ViewState.visibleDescription);
       } else if (signal case PlayerSignal.closeComments) {
-        _playerViewState.remove(PlayerViewState.visibleDescription);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .removeState(ViewState.visibleDescription);
       } else if (signal case PlayerSignal.openChapters) {
-        _playerViewState.add(PlayerViewState.visibleChapters);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .addState(ViewState.visibleChapters);
       } else if (signal case PlayerSignal.closeChapters) {
-        _playerViewState.remove(PlayerViewState.visibleChapters);
+        _ref
+            .read(playerViewStateProvider.notifier)
+            .removeState(ViewState.visibleChapters);
       }
       _playerSignalController.sink.add(signal);
     }
   }
 }
-
-// late final _shortsPlayer = Player();
-// late final _shortsController = VideoController(_shortsPlayer);
-// VideoController get shortsController => _shortsController;

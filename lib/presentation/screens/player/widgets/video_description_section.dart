@@ -73,13 +73,13 @@ class VideoDescriptionSection extends StatelessWidget {
                       ),
                       style: TextStyle(
                         color: Color(0xFFAAAAAA),
-                        fontSize: 13,
+                        fontSize: 12,
                       ),
                     ),
                     SizedBox(width: 6),
                     Text(
                       '...more',
-                      style: TextStyle(fontSize: 13),
+                      style: TextStyle(fontSize: 12),
                     ),
                   ],
                 ),

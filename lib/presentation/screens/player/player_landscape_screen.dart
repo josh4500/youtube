@@ -34,6 +34,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../constants.dart';
@@ -190,7 +191,7 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
   /// Handles tap events on the player.
   Future<void> _onTapPlayer() async {
     // Check if player controls are currently visible
-    if (ref.read(playerRepositoryProvider).playerViewState.showControls) {
+    if (ref.read(playerViewStateProvider).showControls) {
       // If visible, send a signal to hide controls
       ref
           .read(playerRepositoryProvider)

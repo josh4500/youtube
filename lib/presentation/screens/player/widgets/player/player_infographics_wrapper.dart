@@ -30,15 +30,15 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
 import 'package:youtube_clone/presentation/providers.dart';
-import 'package:youtube_clone/presentation/screens/player/providers/player_expanded_state_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/infographics/infographics_notification.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/infographics/video_channel_watermark.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../providers/player_view_state_provider.dart';
+import '../infographics/infographics_notification.dart';
 import '../infographics/video_card_teaser.dart';
+import '../infographics/video_channel_watermark.dart';
 import '../infographics/video_product.dart';
 
 class PlayerInfographicsWrapper extends StatefulWidget {
@@ -104,21 +104,16 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
             Positioned.fill(
               child: Consumer(
                 builder: (context, ref, child) {
-                  ref.watch(playerExpandedStateProvider);
-                  print(ref.read(playerViewStateProvider).isExpanded
-                      ? 0.95
-                      : ref.read(playerViewStateProvider).isFullscreen
-                          ? 0.5
-                          : 0.65);
+                  final playerViewState = ref.watch(playerViewStateProvider);
                   return InfographicVisibility(
                     visible: listenable.showVisuals,
                     alignment: Alignment.bottomLeft,
                     visibleControlAlignment: Alignment.lerp(
                       Alignment.centerLeft,
                       Alignment.bottomLeft,
-                      ref.read(playerViewStateProvider).isExpanded
-                          ? 1
-                          : ref.read(playerViewStateProvider).isFullscreen
+                      playerViewState.isExpanded
+                          ? 0.8
+                          : playerViewState.isFullscreen
                               ? 0.5
                               : 0.65,
                     ),
@@ -130,19 +125,10 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
             Positioned.fill(
               child: Consumer(
                 builder: (context, ref, child) {
-                  ref.watch(playerExpandedStateProvider);
+                  final playerViewState = ref.watch(playerViewStateProvider);
                   return InfographicVisibility(
                     visible: listenable.showVisuals,
-                    alignment: Alignment.bottomLeft,
-                    visibleControlAlignment: Alignment.lerp(
-                      Alignment.centerRight,
-                      Alignment.bottomRight,
-                      ref.read(playerViewStateProvider).isExpanded
-                          ? 0.8
-                          : ref.read(playerViewStateProvider).isFullscreen
-                              ? 0.5
-                              : 0.65,
-                    ),
+                    alignment: Alignment.bottomRight,
                     child: const VideoChannelWatermark(),
                   );
                 },
@@ -214,7 +200,7 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
   late final Animation<double> visibilityAnimation;
 
   late final AnimationController alignmentController;
-  late final Animation<Alignment> alignmentAnimation;
+  late Animation<Alignment> alignmentAnimation;
 
   final controlVisibilityNotifier = ValueNotifier<bool>(false);
   final showNotifier = ValueNotifier<bool>(false);
@@ -294,6 +280,13 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
 
     if (oldWidget.visible != widget.visible) {
       showNotifier.value = widget.visible && !hiddenPermanently;
+    }
+
+    if (oldWidget.visibleControlAlignment != widget.visibleControlAlignment) {
+      AlignmentTween(
+        begin: widget.alignment,
+        end: widget.visibleControlAlignment ?? widget.alignment,
+      ).animate(alignmentController);
     }
   }
 

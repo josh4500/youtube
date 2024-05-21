@@ -96,7 +96,7 @@ class _PlayerLoadingIndicatorState extends ConsumerState<PlayerLoadingIndicator>
         dimension: 60,
         child: CircularProgressIndicator(
           color: Colors.white,
-          strokeWidth: 2.0,
+          strokeWidth: 2.5,
         ),
       ),
     );

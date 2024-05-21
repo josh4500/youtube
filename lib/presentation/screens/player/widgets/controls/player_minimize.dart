@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../controls/player_control.dart';
@@ -41,7 +42,7 @@ class PlayerMinimize extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return PlayerControlButton(
       onTap: () {
-        if (ref.read(playerRepositoryProvider).playerViewState.isExpanded) {
+        if (ref.read(playerViewStateProvider).isExpanded) {
           DeExpandPlayerNotification().dispatch(context);
         }
         MinimizePlayerNotification().dispatch(context);
