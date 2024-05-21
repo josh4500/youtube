@@ -68,6 +68,7 @@ class _PlayerDurationControlState extends ConsumerState<PlayerDurationControl> {
         },
         child: Row(
           children: [
+            const SizedBox(width: 8),
             StreamBuilder<Duration>(
               stream: positionStream,
               initialData: videoPosition,
@@ -79,21 +80,21 @@ class _PlayerDurationControlState extends ConsumerState<PlayerDurationControl> {
                   reversed
                       ? '-${position.hoursMinutesSeconds}'
                       : position.hoursMinutesSeconds,
-                  style: const TextStyle(fontSize: 12),
+                  style: const TextStyle(fontSize: 11.5),
                 );
               },
             ),
             const Text(
               ' / ',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11.5,
                 color: Colors.white60,
               ),
             ),
             Text(
               videoDuration.hoursMinutesSeconds,
               style: const TextStyle(
-                fontSize: 12,
+                fontSize: 11.5,
                 color: Colors.white60,
               ),
             ),

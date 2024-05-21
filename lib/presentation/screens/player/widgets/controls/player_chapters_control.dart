@@ -30,22 +30,20 @@ class PlayerChapterControl extends ConsumerWidget {
             TextSpan(
               text: kDotSeparator,
               style: TextStyle(
-                fontSize: 13.5,
+                fontSize: 11.5,
                 color: Colors.white,
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.bold,
               ),
               children: [
                 TextSpan(
                   text: 'Intro',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 11.5,
                     color: Colors.white,
                     fontWeight: FontWeight.w400,
                   ),
                   children: [
-                    IconSpan(
-                      YTIcons.chevron_right,
-                    ),
+                    IconSpan(YTIcons.chevron_right),
                   ],
                 ),
               ],

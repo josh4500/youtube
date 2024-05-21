@@ -28,11 +28,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../controls/player_control.dart';
 import 'player_notifications.dart';
 
 class PlayerMinimize extends ConsumerWidget {
@@ -40,19 +39,14 @@ class PlayerMinimize extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return PlayerControlButton(
+    return AppbarAction(
       onTap: () {
         if (ref.read(playerViewStateProvider).isExpanded) {
           DeExpandPlayerNotification().dispatch(context);
         }
         MinimizePlayerNotification().dispatch(context);
       },
-      verticalPadding: 8,
-      horizontalPadding: 14,
-      color: Colors.transparent,
-      builder: (context, _) {
-        return const Icon(YTIcons.chevron_down, size: 26);
-      },
+      icon: YTIcons.chevron_down,
     );
   }
 }
