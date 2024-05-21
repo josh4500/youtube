@@ -1459,7 +1459,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
               },
               child: Material(
                 key: _portraitPlayerKey,
-                color: Colors.black,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

@@ -26,6 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -318,25 +319,23 @@ class VideoActions extends StatelessWidget {
           child: Column(
             children: [
               const Divider(thickness: 1, height: 0),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Image.asset(
-                      AssetsPath.ytPremiumFullLogoDarkBig,
-                      fit: BoxFit.fitHeight,
-                      height: 32,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.asset(
+                    AssetsPath.ytPremiumFullLogoDarkBig,
+                    fit: BoxFit.fitHeight,
+                    height: 40,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      'For high quality unlimited downloads, ad-free and background play, get YouTube Premium.',
+                      style: TextStyle(color: Color(0xffaaaaaa)),
                     ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text(
-                        'For high quality unlimited downloads, ad-free and background play, get YouTube Premium.',
-                        style: TextStyle(color: Color(0xffaaaaaa)),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
               ),
             ],
           ),
