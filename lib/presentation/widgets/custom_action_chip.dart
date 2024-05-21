@@ -111,13 +111,19 @@ class _CustomActionChipState extends State<CustomActionChip>
               children: [
                 if (widget.icon != null) ...[
                   widget.icon!,
-                  if (widget.title != null) const SizedBox(width: 6),
+                  if (widget.title != null) const SizedBox(width: 4),
                 ],
-                if (widget.title != null)
+                if (widget.title != null) ...[
                   Text(
                     widget.title!,
-                    style: widget.textStyle ?? const TextStyle(fontSize: 12),
+                    style: widget.textStyle ??
+                        const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                   ),
+                  const SizedBox(width: 4),
+                ],
               ],
             ),
           ),

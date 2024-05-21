@@ -67,7 +67,7 @@ class GroupedViewBuilder extends StatelessWidget {
             vertical: 12,
           ),
           onTap: onTap,
-          stackedPosition: StackedPosition(top: 6, right: 12),
+          stackedPosition: StackedPosition(top: 6, right: 16),
           stackedChild: CustomActionChip(
             title: 'View all',
             alignment: Alignment.centerRight,

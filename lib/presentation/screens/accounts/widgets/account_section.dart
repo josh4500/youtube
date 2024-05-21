@@ -103,7 +103,7 @@ class AccountSection extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: 30,
+            height: 32,
             child: ScrollConfiguration(
               behavior: const OverScrollGlowBehavior(enabled: false),
               child: ListView(
@@ -114,7 +114,7 @@ class AccountSection extends ConsumerWidget {
                     title: 'Switch account',
                     onTap: () {},
                     icon: const Icon(YTIcons.switch_accounts, size: 16),
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.55),
                     backgroundColor: const Color(0xFF272727),
                   ),
                   const SizedBox(width: 8),
@@ -122,7 +122,7 @@ class AccountSection extends ConsumerWidget {
                     title: 'Google Account',
                     onTap: () {},
                     icon: const Icon(YTIcons.google, size: 16),
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.55),
                     backgroundColor: const Color(0xFF272727),
                   ),
                   const SizedBox(width: 8),
@@ -132,7 +132,7 @@ class AccountSection extends ConsumerWidget {
                       ref.read(accountRepositoryProvider).turnOnIncognito();
                     },
                     icon: const Icon(Icons.privacy_tip, size: 16),
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.55),
                     backgroundColor: const Color(0xFF272727),
                   ),
                 ],

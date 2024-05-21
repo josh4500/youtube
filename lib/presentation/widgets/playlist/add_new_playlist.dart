@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class AddNewPlaylist extends StatelessWidget {
   const AddNewPlaylist({super.key});
@@ -40,12 +41,12 @@ class AddNewPlaylist extends StatelessWidget {
         children: <Widget>[
           Container(
             alignment: Alignment.center,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             decoration: const BoxDecoration(
+              color: Colors.white10,
               shape: BoxShape.circle,
-              color: Colors.white12,
             ),
-            child: const Icon(Icons.add, size: 30),
+            child: const Icon(YTIcons.save_outlined, size: 24),
           ),
           const SizedBox(height: 24),
           const Padding(

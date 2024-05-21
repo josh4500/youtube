@@ -61,6 +61,11 @@ class HomeDrawer extends StatelessWidget {
                           onTap: () => context.goto(AppRoutes.sports),
                         ),
                         HomeDrawerItem(
+                          title: 'Podcast',
+                          icon: const Icon(YTIcons.podcasts_outlined),
+                          onTap: () => context.goto(AppRoutes.learning),
+                        ),
+                        HomeDrawerItem(
                           title: 'Learning',
                           icon: const Icon(YTIcons.learning_outlined),
                           onTap: () => context.goto(AppRoutes.learning),
@@ -118,13 +123,13 @@ class HomeDrawer extends StatelessWidget {
               style: TextStyle(fontSize: 12, color: Colors.white60),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(4.0),
-            child: Text(
-              'YouTube, a Google company',
-              style: TextStyle(fontSize: 12, color: Colors.white60),
-            ),
-          ),
+          // const Padding(
+          //   padding: EdgeInsets.all(4.0),
+          //   child: Text(
+          //     'YouTube, a Google company',
+          //     style: TextStyle(fontSize: 12, color: Colors.white60),
+          //   ),
+          // ),
         ],
       ),
     );

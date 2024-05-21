@@ -84,12 +84,13 @@ class AccountsScreen extends StatelessWidget {
                   <Widget>[
                     GroupedViewBuilder(
                       title: 'History',
-                      height: 175,
+                      height: 160,
                       onTap: () => context.goto(AppRoutes.watchHistory),
                       itemBuilder: (BuildContext context, int index) {
                         return TappableArea(
                           child: PlayableContent(
-                            width: 160,
+                            width: 145,
+                            height: 88,
                             margin: const EdgeInsets.only(bottom: 16),
                             onMore: () {
                               showDynamicSheet(
@@ -149,7 +150,8 @@ class AccountsScreen extends StatelessWidget {
                           child: index == 7
                               ? const AddNewPlaylist()
                               : PlayableContent(
-                                  width: 160,
+                                  width: 145,
+                                  height: 88,
                                   isPlaylist: true,
                                   margin: const EdgeInsets.only(bottom: 16),
                                   onMore: () {

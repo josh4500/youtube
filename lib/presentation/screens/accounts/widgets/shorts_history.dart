@@ -30,9 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
-
-import '../../../widgets/playable/playable_shorts_content.dart';
 
 class ShortsHistory extends StatelessWidget {
   const ShortsHistory({super.key});
@@ -45,7 +42,7 @@ class ShortsHistory extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.symmetric(
             vertical: 8.0,
-            horizontal: 12,
+            horizontal: 16,
           ),
           child: Text(
             'Today',
@@ -58,7 +55,7 @@ class ShortsHistory extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(
             vertical: 8,
-            horizontal: 12,
+            horizontal: 16,
           ),
           child: Row(
             children: [

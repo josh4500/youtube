@@ -164,8 +164,8 @@ class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
                         horizontal: 16,
                       ),
                       child: const PlayableContent(
-                        width: 180,
-                        height: 112,
+                        width: 145,
+                        height: 88,
                         direction: Axis.horizontal,
                         isPlaylist: true,
                       ),

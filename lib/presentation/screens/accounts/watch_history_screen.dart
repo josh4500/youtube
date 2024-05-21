@@ -82,7 +82,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
     super.dispose();
   }
 
-  void onMorePlaybleVideo() {
+  void onMorePlayableVideo() {
     showDynamicSheet(
       context,
       items: [
@@ -217,10 +217,13 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                         child: CustomInkWell(
                           onTap: () {},
                           child: PlayableVideoContent(
-                            width: 180,
-                            height: 104,
-                            margin: const EdgeInsets.all(12.0),
-                            onMore: onMorePlaybleVideo,
+                            width: 145,
+                            height: 88,
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 16.0,
+                            ),
+                            onMore: onMorePlayableVideo,
                           ),
                         ),
                       ),
@@ -251,10 +254,13 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                         child: CustomInkWell(
                           onTap: () {},
                           child: PlayableVideoContent(
-                            width: 180,
-                            height: 104,
-                            margin: const EdgeInsets.all(12.0),
-                            onMore: onMorePlaybleVideo,
+                            width: 145,
+                            height: 88,
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 16.0,
+                            ),
+                            onMore: onMorePlayableVideo,
                           ),
                         ),
                       ),

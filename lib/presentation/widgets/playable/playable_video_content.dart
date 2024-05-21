@@ -51,14 +51,20 @@ class PlayableVideoContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: margin,
-      child: Flex(
-        direction: direction,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Flexible(
-            flex: direction == Axis.vertical ? 1 : 0,
+    return Flex(
+      direction: direction,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Flexible(
+          flex: direction == Axis.vertical ? 1 : 0,
+          child: Container(
+            margin: direction == Axis.vertical
+                ? margin?.subtract(
+                    EdgeInsets.only(bottom: margin?.bottom ?? 0),
+                  )
+                : margin?.subtract(
+                    EdgeInsets.only(right: margin?.right ?? 0),
+                  ),
             child: Stack(
               alignment: Alignment.bottomRight,
               children: <Widget>[
@@ -100,14 +106,27 @@ class PlayableVideoContent extends StatelessWidget {
               ],
             ),
           ),
+        ),
+        if (direction == Axis.vertical)
+          const SizedBox(height: 8)
+        else
           const SizedBox(width: 8),
-          Flexible(
-            flex: direction == Axis.vertical ? 0 : 1,
-            child: SizedBox(
-              width: direction == Axis.vertical ? width : null,
-              child: Stack(
-                children: [
-                  Row(
+        Flexible(
+          flex: direction == Axis.vertical ? 0 : 1,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                margin: direction == Axis.vertical
+                    ? margin?.subtract(
+                        EdgeInsets.only(top: margin?.top ?? 0),
+                      )
+                    : margin?.subtract(
+                        EdgeInsets.only(left: margin?.left ?? 0),
+                      ),
+                child: SizedBox(
+                  width: direction == Axis.vertical ? width : null,
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -116,7 +135,7 @@ class PlayableVideoContent extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              'I found the BEST One Piece cast clips from their socials',
+                              'I found the BEST One Piece cast 2 clips from their socials',
                               maxLines: direction == Axis.horizontal ? 3 : 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -138,19 +157,30 @@ class PlayableVideoContent extends StatelessWidget {
                       const SizedBox(width: 22),
                     ],
                   ),
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: CustomInkWell(
-                      onTap: onMore,
-                      child: const Icon(YTIcons.more_vert_outlined, size: 15.5),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Padding(
+                  padding: direction == Axis.vertical
+                      ? const EdgeInsets.symmetric(horizontal: 4.0)
+                      : const EdgeInsets.symmetric(
+                          vertical: 4,
+                          horizontal: 2.0,
+                        ),
+                  child: CustomInkWell(
+                    onTap: () {},
+                    padding: const EdgeInsets.all(8),
+                    borderRadius: BorderRadius.circular(24),
+                    child: const Icon(YTIcons.more_vert_outlined, size: 16),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

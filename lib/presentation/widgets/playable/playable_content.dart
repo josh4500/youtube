@@ -31,6 +31,7 @@ import 'package:youtube_clone/presentation/themes.dart';
 
 import '../custom_ink_well.dart';
 import '../network_image/custom_network_image.dart';
+import '../tappable_area.dart';
 
 class PlayableContent extends StatelessWidget {
   const PlayableContent({
@@ -40,12 +41,15 @@ class PlayableContent extends StatelessWidget {
     this.isPlaylist = false,
     this.isPodcasts = false,
     this.direction = Axis.vertical,
+    this.useTappable = true,
     this.margin,
     this.onMore,
   });
 
   final bool isPlaylist;
   final bool isPodcasts;
+
+  final bool useTappable;
   final Axis direction;
   final EdgeInsets? margin;
   final VoidCallback? onMore;
@@ -92,7 +96,7 @@ class PlayableContent extends StatelessWidget {
                         children: <Widget>[
                           Container(
                             decoration: const BoxDecoration(
-                              color: Colors.white60,
+                              color: Colors.white10,
                               image: DecorationImage(
                                 image: CustomNetworkImage(
                                   'https://picsum.photos/300/300',
