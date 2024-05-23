@@ -29,10 +29,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-
-import 'video_action_notification.dart';
 
 class VideoDescriptionSection extends ConsumerWidget {
   const VideoDescriptionSection({super.key});
@@ -45,7 +44,11 @@ class VideoDescriptionSection extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TappableArea(
-            onTap: () => ShowDescriptionSheet().dispatch(context),
+            onTap: () {
+              ref
+                  .read(playerRepositoryProvider)
+                  .sendPlayerSignal([PlayerSignal.openDescription]);
+            },
             padding: const EdgeInsets.symmetric(
               vertical: 8,
               horizontal: 12,
