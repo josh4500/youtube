@@ -34,6 +34,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
 import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../infographics/infographics_notification.dart';
@@ -105,19 +106,23 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
               child: Consumer(
                 builder: (context, ref, child) {
                   final playerViewState = ref.watch(playerViewStateProvider);
-                  return InfographicVisibility(
-                    visible: listenable.showVisuals,
-                    alignment: Alignment.bottomLeft,
-                    visibleControlAlignment: Alignment.lerp(
-                      Alignment.centerLeft,
-                      Alignment.bottomLeft,
-                      playerViewState.isExpanded
-                          ? 0.8
-                          : playerViewState.isFullscreen
-                              ? 0.5
-                              : 0.65,
-                    ),
-                    child: const VideoProduct(),
+                  return OrientationBuilder(
+                    builder: (BuildContext context, Orientation orientation) {
+                      return InfographicVisibility(
+                        visible: listenable.showVisuals,
+                        alignment: Alignment.bottomLeft,
+                        visibleControlAlignment: Alignment.lerp(
+                          Alignment.centerLeft,
+                          Alignment.bottomLeft,
+                          playerViewState.isExpanded
+                              ? 0.8
+                              : orientation.isLandscape
+                                  ? 0.5
+                                  : 0.65,
+                        ),
+                        child: const VideoProduct(),
+                      );
+                    },
                   );
                 },
               ),

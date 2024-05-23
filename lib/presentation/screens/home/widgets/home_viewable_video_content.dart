@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
-import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -14,22 +13,13 @@ class HomeViewableVideoContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ViewableVideoContent(
-      onTap: () async {
-        if (context.orientation.isLandscape) {
-          await context.goto(
-            AppRoutes.playerLandscapeScreen,
-          );
-        }
-        ref.read(playerRepositoryProvider).openPlayerScreen();
-      },
+      onTap: ref.read(playerRepositoryProvider).openPlayerScreen,
       onMore: () {
         showDynamicSheet(
           context,
           items: [
             DynamicSheetOptionItem(
-              leading: const Icon(
-                YTIcons.playlist_play_outlined,
-              ),
+              leading: const Icon(YTIcons.playlist_play_outlined),
               title: 'Play next in queue',
               trailing: ClipRRect(
                 borderRadius: BorderRadius.circular(2),

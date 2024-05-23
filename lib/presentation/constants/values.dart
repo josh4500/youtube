@@ -12,4 +12,6 @@ const double kMinPlayerHeight = 0.07;
 const double kMaxPlayerScale = 8.0;
 const double kMinPlayerScale = 1.0;
 
+const double kPlayerDismissRate = 1.35;
+
 const String kDotSeparator = '\u00A0\u00A0\u00B7\u00A0\u00A0';

@@ -204,9 +204,13 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
               final showPlayer = ref.watch(playerOverlayStateProvider);
               return Visibility(
                 visible: showPlayer,
-                child: PlayerScreen(
-                  width: screenSize.width,
-                  height: screenSize.height,
+                child: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    return PlayerScreen(
+                      width: screenSize.width,
+                      height: constraints.maxHeight,
+                    );
+                  },
                 ),
               );
             },

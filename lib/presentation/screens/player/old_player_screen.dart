@@ -323,19 +323,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       // Events are usually sent from PlayerLandscapeScreen
       _subscription =
           playerRepo.playerSignalStream.listen((PlayerSignal signal) {
-        if (signal == PlayerSignal.openDescription) {
-          _openDescSheet(); // Opens description sheet in this screen
-        } else if (signal == PlayerSignal.closeDescription) {
-          _closeDescSheet(); // Closes description sheet in this screen
-        } else if (signal == PlayerSignal.openComments) {
-          _openCommentSheet(); // Opens comment sheet in this screen
-        } else if (signal == PlayerSignal.closeComments) {
-          _closeCommentSheet(); // Closes comment sheet in this screen
-        } else if (signal == PlayerSignal.openChapters) {
-          _openChaptersSheet(); // Opens chapters sheet in this screen
-        } else if (signal == PlayerSignal.closeChapters) {
-          _closeChaptersSheet(); // Closes chapters sheet in this screen
-        } else if (signal == PlayerSignal.enterExpanded) {
+        if (signal == PlayerSignal.enterExpanded) {
           SystemChrome.setEnabledSystemUIMode(
             SystemUiMode.immersive,
             overlays: <SystemUiOverlay>[],
@@ -1049,11 +1037,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     );
   }
 
-  void _sendCloseCommentSheetSignal() {
-    ref.read(playerRepositoryProvider).sendPlayerSignal(
-      <PlayerSignal>[PlayerSignal.closeComments],
-    );
-  }
+  void _sendCloseCommentSheetSignal() {}
 
   Future<void> _openDescSheet() async {
     _descIsOpened = true;
@@ -1088,9 +1072,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   void _sendCloseDescSheetSignal() {
-    ref.read(playerRepositoryProvider).sendPlayerSignal(
-      <PlayerSignal>[PlayerSignal.closeDescription],
-    );
+    // TODO(Josh): Implements
   }
 
   Future<void> _openChaptersSheet() async {
@@ -1124,9 +1106,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   void _sendCloseChapterSheetSignal() {
-    ref.read(playerRepositoryProvider).sendPlayerSignal(
-      <PlayerSignal>[PlayerSignal.closeChapters],
-    );
+    // TODO(Josh): Implements
   }
 
   // TODO(Josh): Will add Membership sheet too
@@ -1239,19 +1219,19 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           physics: _infoScrollPhysics,
           controller: _infoScrollController,
           slivers: <Widget>[
-            SliverToBoxAdapter(
+            const SliverToBoxAdapter(
               child: Stack(
                 clipBehavior: Clip.none,
                 children: <Widget>[
-                  const PlayerAmbient(),
+                  PlayerAmbient(),
                   Column(
                     children: <Widget>[
-                      VideoDescriptionSection(onTap: _openDescSheet),
-                      const VideoChannelSection(),
-                      const VideoContext(),
-                      const VideoActions(),
-                      VideoCommentSection(onTap: _openCommentSheet),
-                      const SizedBox(height: 12),
+                      VideoDescriptionSection(),
+                      VideoChannelSection(),
+                      VideoContext(),
+                      VideoActions(),
+                      VideoCommentSection(),
+                      SizedBox(height: 12),
                     ],
                   ),
                 ],

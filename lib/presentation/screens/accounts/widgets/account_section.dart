@@ -28,8 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/provider/repository/account_repository_provider.dart';
-import 'package:youtube_clone/presentation/provider/state/account_state_provider.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';

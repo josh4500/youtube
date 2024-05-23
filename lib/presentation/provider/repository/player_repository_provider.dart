@@ -64,8 +64,6 @@ enum PlayerSignal {
   hideControls,
   showAmbient,
   hideAmbient,
-  enterFullscreen,
-  exitFullscreen,
   minimize,
   maximize,
   enterExpanded,
@@ -149,9 +147,9 @@ class PlayerRepository {
   // TODO(Josh): Should be able open video
   Future<void> openPlayerScreen() async {
     _ref.read(_playerOverlayStateProvider.notifier).state = true;
-    if (_ref.read(playerViewStateProvider).isMinimized) {
-      sendPlayerSignal([PlayerSignal.maximize]);
-    }
+    // if (_ref.read(playerViewStateProvider).isMinimized) {
+    //   sendPlayerSignal([PlayerSignal.maximize]);
+    // }
   }
 
   void closePlayerScreen() {
@@ -250,14 +248,6 @@ class PlayerRepository {
         _ref
             .read(playerViewStateProvider.notifier)
             .removeState(ViewState.expanded);
-      } else if (signal case PlayerSignal.enterFullscreen) {
-        _ref
-            .read(playerViewStateProvider.notifier)
-            .addState(ViewState.fullscreen);
-      } else if (signal case PlayerSignal.exitFullscreen) {
-        _ref
-            .read(playerViewStateProvider.notifier)
-            .removeState(ViewState.fullscreen);
       } else if (signal case PlayerSignal.showControls) {
         _ref
             .read(playerViewStateProvider.notifier)

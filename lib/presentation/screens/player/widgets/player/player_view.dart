@@ -39,12 +39,15 @@ class PlayerView extends ConsumerWidget {
     final provider = ref.watch(playerRepositoryProvider);
     return Hero(
       tag: 'player',
-      child: Video(
-        controller: provider.videoController,
-        fit: BoxFit.fitWidth,
-        fill: Colors.transparent,
-        filterQuality: FilterQuality.none,
-        controls: null,
+      child: ColoredBox(
+        color: Colors.black,
+        child: Video(
+          controls: null,
+          fit: BoxFit.fitWidth,
+          fill: Colors.transparent,
+          filterQuality: FilterQuality.none,
+          controller: provider.videoController,
+        ),
       ),
     );
   }

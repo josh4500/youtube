@@ -140,10 +140,10 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
   void _scrollPhysicsCallback() {
     final double size = _draggableController.size;
     if (size > 0) {
-      ref.read(homeRepositoryProvider).hideNavBar();
+      ref.read(homeRepositoryProvider).lockNavBarPosition();
       physics.canScroll(false);
     } else {
-      ref.read(homeRepositoryProvider).showNavBar();
+      ref.read(homeRepositoryProvider).unlockNavBarPosition();
       physics.canScroll(true);
     }
   }

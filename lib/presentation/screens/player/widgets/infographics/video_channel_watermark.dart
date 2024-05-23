@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
+import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class VideoChannelWatermark extends ConsumerWidget {
@@ -37,14 +38,18 @@ class VideoChannelWatermark extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerViewState = ref.watch(playerViewStateProvider);
-    return Visibility(
-      visible: playerViewState.isExpanded || playerViewState.isFullscreen,
-      child: Container(
-        width: 50,
-        height: 50,
-        color: Colors.red.shade400,
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-      ),
+    return OrientationBuilder(
+      builder: (BuildContext context, Orientation orientation) {
+        return Visibility(
+          visible: playerViewState.isExpanded || orientation.isLandscape,
+          child: Container(
+            width: 50,
+            height: 50,
+            color: Colors.red.shade400,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+          ),
+        );
+      },
     );
   }
 }

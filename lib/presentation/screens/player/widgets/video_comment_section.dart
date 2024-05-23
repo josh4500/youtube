@@ -26,16 +26,18 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
+import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'video_highlighted_comment.dart';
 
 class VideoCommentSection extends ConsumerStatefulWidget {
-  const VideoCommentSection({super.key, this.onTap});
-  final VoidCallback? onTap;
+  const VideoCommentSection({super.key});
 
   @override
   ConsumerState<VideoCommentSection> createState() =>
@@ -52,15 +54,22 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
     super.dispose();
   }
 
+  void _openComment() {
+    ref.read(playerRepositoryProvider).sendPlayerSignal([
+      PlayerSignal.openComments,
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isRestrictedMode = ref.watch(
       preferencesProvider.select((value) => value.restrictedMode),
     );
     // TODO(Josh): Check for isLiveVideo
-    const isDisabled = false;
-    const isLiveVideo = true;
-    const showHighlighted = true;
+    final random = Random();
+    final isDisabled = random.nextBool();
+    final isLiveVideo = random.nextBool();
+    final showHighlighted = random.nextBool();
 
     final childWidget = Column(
       mainAxisSize: MainAxisSize.min,
@@ -122,15 +131,17 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
             style: TextStyle(fontSize: 14),
           )
         else
-          const SizedBox(
+          SizedBox(
             height: 45,
             child: isLiveVideo == false
                 ? Padding(
-                    padding: EdgeInsets.symmetric(
+                    padding: const EdgeInsets.symmetric(
                       horizontal: 16.0,
                       vertical: 8,
                     ),
-                    child: showHighlighted ? VideoHighlightedComment() : null,
+                    child: showHighlighted
+                        ? const VideoHighlightedComment()
+                        : null,
                   )
                 : null,
           ),
@@ -151,7 +162,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
         child: LayoutBuilder(
           builder: (context, c) {
             return TappableArea(
-              onTap: widget.onTap,
+              onTap: _openComment,
               padding: EdgeInsets.zero,
               borderRadius: BorderRadius.circular(16),
               stackedPosition: StackedPosition(bottom: 5),
@@ -166,7 +177,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
                             onPageChanged: (page) => currentPage = page,
                             children: [
                               TappableArea(
-                                onTap: widget.onTap,
+                                onTap: _openComment,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12.0,
                                   vertical: 8,
@@ -197,8 +208,9 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
                             horizontal: 12.0,
                             vertical: 4.0,
                           ),
+                          width: c.maxWidth - 24 - 8,
                           decoration: BoxDecoration(
-                            color: Colors.white12,
+                            color: Colors.white10,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: const Text(

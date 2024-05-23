@@ -29,12 +29,10 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../constants.dart';
@@ -43,8 +41,6 @@ import 'widgets/controls/player_notifications.dart';
 import 'widgets/player/player_components_wrapper.dart';
 import 'widgets/player/player_infographics_wrapper.dart';
 import 'widgets/player/player_view.dart';
-import 'widgets/video_comment_sheet.dart';
-import 'widgets/video_description_sheet.dart';
 
 class PlayerLandscapeScreen extends ConsumerStatefulWidget {
   const PlayerLandscapeScreen({super.key});
@@ -79,16 +75,6 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
   double get screenHeight => MediaQuery.sizeOf(context).height;
   double get screenWidth => MediaQuery.sizeOf(context).width;
 
-  bool _descIsOpened = false;
-  final ValueNotifier<bool> _transcriptionNotifier = ValueNotifier<bool>(false);
-  late final AnimationController _descController;
-  late final Animation<double> _descAnimation;
-
-  bool _commentIsOpened = false;
-  final ValueNotifier<bool> _replyNotifier = ValueNotifier<bool>(false);
-  late final AnimationController _commentController;
-  late final Animation<double> _commentAnimation;
-
   /// PlayerSignal StreamSubscription
   StreamSubscription<PlayerSignal>? _subscription;
 
@@ -110,47 +96,8 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
       Tween<double>(begin: 1, end: 0.95),
     );
 
-    _descController = AnimationController(
-      vsync: this,
-      value: 0,
-      duration: const Duration(milliseconds: 100),
-    );
-
-    _descAnimation = CurvedAnimation(
-      parent: _descController,
-      curve: Curves.bounceIn,
-      reverseCurve: Curves.bounceInOut,
-    );
-
-    _commentController = AnimationController(
-      vsync: this,
-      value: 0,
-      duration: const Duration(milliseconds: 100),
-    );
-
-    _commentAnimation = CurvedAnimation(
-      parent: _commentController,
-      curve: Curves.bounceIn,
-      reverseCurve: Curves.bounceInOut,
-    );
-
-    WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
-      ref.read(playerRepositoryProvider).sendPlayerSignal(
-        <PlayerSignal>[PlayerSignal.enterFullscreen],
-      );
-    });
-
     Future<void>(() async {
       await setLandscapeMode();
-      final PlayerRepository playerRepo = ref.read(playerRepositoryProvider);
-      _subscription =
-          playerRepo.playerSignalStream.listen((PlayerSignal signal) {
-        if (signal == PlayerSignal.openDescription) {
-          _openDesc(); // Opens description in this screen
-        } else if (signal == PlayerSignal.openComments) {
-          _openComment(); // Opens comments in this screen
-        }
-      });
     });
   }
 
@@ -160,32 +107,6 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
     _transformationController.dispose();
     _viewController.dispose();
     super.dispose();
-  }
-
-  void _openDesc() {
-    _descIsOpened = true;
-    _descController.forward();
-  }
-
-  void _closeDesc() {
-    ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-      PlayerSignal.hideControls,
-      PlayerSignal.closeDescription,
-    ]);
-    _descController.reverse();
-  }
-
-  void _openComment() {
-    _commentIsOpened = true;
-    _commentController.forward();
-  }
-
-  void _closeComment() {
-    ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-      PlayerSignal.hideControls,
-      PlayerSignal.closeComments,
-    ]);
-    _commentController.reverse();
   }
 
   /// Handles tap events on the player.
@@ -204,7 +125,7 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
     }
   }
 
-  void _onDragPlayer(DragUpdateDetails details) {
+  void _onDragFullscreenPlayer(DragUpdateDetails details) {
     // Check the direction of the drag
     // If dragging down
     _hideControls();
@@ -218,7 +139,7 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
     );
   }
 
-  void _onDragPlayerEnd(DragEndDetails details) {
+  void _onDragFullscreenPlayerEnd(DragEndDetails details) {
     if (_viewController.value >= 1) {
       _closeFullscreenPlayer();
     }
@@ -255,9 +176,6 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
 
   /// Closes the player in fullscreen mode by sending a player signal
   Future<void> _closeFullscreenPlayer() async {
-    ref.read(playerRepositoryProvider).sendPlayerSignal(
-      <PlayerSignal>[PlayerSignal.exitFullscreen],
-    );
     await resetOrientation();
     if (mounted) {
       context.pop();
@@ -311,43 +229,14 @@ class _PlayerLandscapeScreenState extends ConsumerState<PlayerLandscapeScreen>
                   scale: _scaleAnimation,
                   child: GestureDetector(
                     onTap: _onTapPlayer,
-                    onVerticalDragUpdate: _onDragPlayer,
-                    onVerticalDragEnd: _onDragPlayerEnd,
+                    onVerticalDragUpdate: _onDragFullscreenPlayer,
+                    onVerticalDragEnd: _onDragFullscreenPlayerEnd,
                     behavior: HitTestBehavior.opaque,
                     child: interactivePlayerView,
                   ),
                 ),
               ),
             ),
-            // SizeTransition(
-            //   sizeFactor: _descAnimation,
-            //   axis: Axis.horizontal,
-            //   child: ConstrainedBox(
-            //     constraints: BoxConstraints(
-            //       maxWidth: MediaQuery.sizeOf(context).width * .4,
-            //     ),
-            //     child: VideoDescriptionSheet(
-            //       transcriptNotifier: _transcriptionNotifier,
-            //       closeDescription: _closeDesc,
-            //       showDragIndicator: false,
-            //     ),
-            //   ),
-            // ),
-            // SizeTransition(
-            //   sizeFactor: _commentAnimation,
-            //   axis: Axis.horizontal,
-            //   child: ConstrainedBox(
-            //     constraints: BoxConstraints(
-            //       maxWidth: MediaQuery.sizeOf(context).width * .4,
-            //     ),
-            //     child: VideoCommentsSheet(
-            //       replyNotifier: _replyNotifier,
-            //       closeComment: _closeComment,
-            //       showDragIndicator: false,
-            //       maxHeight: 0,
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),

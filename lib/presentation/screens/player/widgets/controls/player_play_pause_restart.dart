@@ -83,7 +83,6 @@ class PlayPauseRestartControlState
     final isBuffering = playerNotifier.buffering;
 
     return PlayerControlButton(
-      horizontalPadding: 0,
       onTap: () {
         if (!isRestart) {
           if (isPlaying) {

@@ -26,8 +26,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+export './provider/repository/account_repository_provider.dart';
 export './provider/repository/home_repository_provider.dart';
 export './provider/repository/player_repository_provider.dart';
+
 export './provider/state/account_state_provider.dart';
 export './provider/state/auth_state_provider.dart';
 export './provider/state/player_state_provider.dart';
+export './provider/state/player_view_state_provider.dart';

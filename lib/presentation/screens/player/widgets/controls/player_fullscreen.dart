@@ -44,32 +44,39 @@ class PlayerFullscreen extends ConsumerWidget {
     const bool expandedMode = false;
 
     final playerViewState = ref.watch(playerViewStateProvider);
-    return PlayerControlButton(
-      onTap: () {
-        if (expandedMode || playerViewState.isExpanded) {
-          if (!playerViewState.isExpanded) {
-            ExpandPlayerNotification().dispatch(context);
-          } else {
-            DeExpandPlayerNotification().dispatch(context);
-          }
-          ref.read(playerRepositoryProvider).sendPlayerSignal(
-            [PlayerSignal.showControls],
-          );
-        } else {
-          if (!playerViewState.isFullscreen) {
-            EnterFullscreenPlayerNotification().dispatch(context);
-          } else {
-            ExitFullscreenPlayerNotification().dispatch(context);
-          }
-        }
-      },
-      color: Colors.transparent,
-      horizontalPadding: 8,
-      verticalPadding: 10,
-      builder: (context, _) {
-        return playerViewState.isExpanded || playerViewState.isFullscreen
-            ? const Icon(YTIcons.exit_fullscreen_outlined)
-            : const Icon(YTIcons.fullscreen);
+    return OrientationBuilder(
+      builder: (BuildContext context, Orientation orientation) {
+        print(orientation);
+        return PlayerControlButton(
+          onTap: () {
+            if (expandedMode || playerViewState.isExpanded) {
+              if (playerViewState.isExpanded) {
+                DeExpandPlayerNotification().dispatch(context);
+              } else {
+                ExpandPlayerNotification().dispatch(context);
+              }
+              ref.read(playerRepositoryProvider).sendPlayerSignal(
+                [PlayerSignal.showControls],
+              );
+            } else {
+              if (context.orientation.isPortrait) {
+                print('Enter fullscreen');
+                EnterFullscreenPlayerNotification().dispatch(context);
+              } else {
+                print('Exit fullscreen');
+                ExitFullscreenPlayerNotification().dispatch(context);
+              }
+            }
+          },
+          color: Colors.transparent,
+          horizontalPadding: 8,
+          verticalPadding: 10,
+          builder: (context, _) {
+            return playerViewState.isExpanded || context.orientation.isLandscape
+                ? const Icon(YTIcons.exit_fullscreen_outlined)
+                : const Icon(YTIcons.fullscreen);
+          },
+        );
       },
     );
   }

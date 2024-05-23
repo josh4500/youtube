@@ -28,22 +28,24 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-class VideoDescriptionSection extends StatelessWidget {
-  const VideoDescriptionSection({super.key, this.onTap});
-  final VoidCallback? onTap;
+import 'video_action_notification.dart';
+
+class VideoDescriptionSection extends ConsumerWidget {
+  const VideoDescriptionSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TappableArea(
-            onTap: onTap,
+            onTap: () => ShowDescriptionSheet().dispatch(context),
             padding: const EdgeInsets.symmetric(
               vertical: 8,
               horizontal: 12,

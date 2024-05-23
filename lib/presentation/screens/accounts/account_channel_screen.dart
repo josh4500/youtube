@@ -27,13 +27,11 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../providers.dart';
 import 'widgets/account_channel_section.dart';
 import 'widgets/popup/show_account_playlists_sort_menu.dart';
 
