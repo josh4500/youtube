@@ -106,23 +106,19 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
               child: Consumer(
                 builder: (context, ref, child) {
                   final playerViewState = ref.watch(playerViewStateProvider);
-                  return OrientationBuilder(
-                    builder: (BuildContext context, Orientation orientation) {
-                      return InfographicVisibility(
-                        visible: listenable.showVisuals,
-                        alignment: Alignment.bottomLeft,
-                        visibleControlAlignment: Alignment.lerp(
-                          Alignment.centerLeft,
-                          Alignment.bottomLeft,
-                          playerViewState.isExpanded
+                  return InfographicVisibility(
+                    visible: listenable.showVisuals,
+                    alignment: Alignment.bottomLeft,
+                    visibleControlAlignment: Alignment.lerp(
+                      Alignment.centerLeft,
+                      Alignment.bottomLeft,
+                      playerViewState.isExpanded
+                          ? 0.9
+                          : context.orientation.isPortrait
                               ? 0.8
-                              : orientation.isLandscape
-                                  ? 0.5
-                                  : 0.65,
-                        ),
-                        child: const VideoProduct(),
-                      );
-                    },
+                              : 0.5,
+                    ),
+                    child: const VideoProduct(),
                   );
                 },
               ),

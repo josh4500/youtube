@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -40,16 +41,15 @@ class PlayerFullscreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO: Check if Expanded or Fullscreen control mode
-    const bool expandedMode = false;
+    // TODO(josh4500): Check if Expanded mode is on
+    const bool _isResizableExpandedMode = false;
 
     final playerViewState = ref.watch(playerViewStateProvider);
     return OrientationBuilder(
       builder: (BuildContext context, Orientation orientation) {
-        print(orientation);
         return PlayerControlButton(
           onTap: () {
-            if (expandedMode || playerViewState.isExpanded) {
+            if (_isResizableExpandedMode || playerViewState.isExpanded) {
               if (playerViewState.isExpanded) {
                 DeExpandPlayerNotification().dispatch(context);
               } else {
@@ -60,10 +60,8 @@ class PlayerFullscreen extends ConsumerWidget {
               );
             } else {
               if (context.orientation.isPortrait) {
-                print('Enter fullscreen');
                 EnterFullscreenPlayerNotification().dispatch(context);
               } else {
-                print('Exit fullscreen');
                 ExitFullscreenPlayerNotification().dispatch(context);
               }
             }

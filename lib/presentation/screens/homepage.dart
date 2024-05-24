@@ -50,11 +50,9 @@ class HomePage extends ConsumerWidget {
     return Scaffold(
       key: scaffoldKey,
       drawerEnableOpenDragGesture: false,
+      extendBody: true,
       drawer: const HomeDrawer(),
-      body: SafeArea(
-        bottom: false,
-        child: HomeOverlayWrapper(key: overlayKey, child: child),
-      ),
+      body: HomeOverlayWrapper(key: overlayKey, child: child),
       bottomNavigationBar: HomeNavigatorBar(
         selectedIndex: child.currentIndex,
         onChangeIndex: (int index) {
@@ -187,49 +185,49 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
       }
     });
 
+    // TODO(josh4500): Investigate double rebuild
     final screenSize = MediaQuery.sizeOf(context);
 
-    return Stack(
-      alignment: Alignment.bottomCenter,
-      children: [
-        widget.child,
-        SlideTransition(
-          position: _overlayPlayerAnimation,
-          child: Consumer(
-            builder: (
-              BuildContext context,
-              WidgetRef ref,
-              Widget? childWidget,
-            ) {
-              final showPlayer = ref.watch(playerOverlayStateProvider);
-              return Visibility(
-                visible: showPlayer,
-                child: LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    return PlayerScreen(
-                      width: screenSize.width,
-                      height: constraints.maxHeight,
-                    );
-                  },
-                ),
-              );
-            },
+    print('Rebuild');
+    return SafeArea(
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          widget.child,
+          SlideTransition(
+            position: _overlayPlayerAnimation,
+            child: Consumer(
+              builder: (
+                BuildContext context,
+                WidgetRef ref,
+                Widget? childWidget,
+              ) {
+                final showPlayer = ref.watch(playerOverlayStateProvider);
+                return Visibility(
+                  visible: showPlayer,
+                  child: PlayerScreen(
+                    width: screenSize.width,
+                    height: screenSize.height,
+                  ),
+                );
+              },
+            ),
           ),
-        ),
-        Visibility(
-          visible: widget.child.currentIndex != 1,
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: SizeTransition(
-              sizeFactor: _overlayDnotifAnimation,
-              child: ExploreDownloadsOverlay(
-                onNoThanks: onNoThanks,
-                onGotoDownloads: onGotoDownloads,
+          Visibility(
+            visible: widget.child.currentIndex != 1,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: SizeTransition(
+                sizeFactor: _overlayDnotifAnimation,
+                child: ExploreDownloadsOverlay(
+                  onNoThanks: onNoThanks,
+                  onGotoDownloads: onGotoDownloads,
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

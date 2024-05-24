@@ -38,18 +38,14 @@ class VideoChannelWatermark extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerViewState = ref.watch(playerViewStateProvider);
-    return OrientationBuilder(
-      builder: (BuildContext context, Orientation orientation) {
-        return Visibility(
-          visible: playerViewState.isExpanded || orientation.isLandscape,
-          child: Container(
-            width: 50,
-            height: 50,
-            color: Colors.red.shade400,
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-          ),
-        );
-      },
+    return Visibility(
+      visible: playerViewState.isExpanded || context.orientation.isLandscape,
+      child: Container(
+        width: 45,
+        height: 45,
+        color: Colors.white30,
+        margin: const EdgeInsets.all(12),
+      ),
     );
   }
 }

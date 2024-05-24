@@ -66,7 +66,7 @@ class _VideoProductState extends State<VideoProduct>
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+      margin: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.black54,
         borderRadius: BorderRadius.circular(24),
@@ -80,9 +80,9 @@ class _VideoProductState extends State<VideoProduct>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(width: 10),
+            const SizedBox(width: 6),
             Container(
-              width: 20,
+              width: 18,
               height: 20,
               decoration: BoxDecoration(
                 color: const Color(0xFF66615C),
@@ -97,7 +97,7 @@ class _VideoProductState extends State<VideoProduct>
               //   size: 16,
               // ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 4),
             SizeTransition(
               axis: Axis.horizontal,
               sizeFactor: sizeAnimation,
