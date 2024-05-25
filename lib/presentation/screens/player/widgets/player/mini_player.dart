@@ -28,6 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -51,35 +52,33 @@ class MiniPlayer extends StatelessWidget {
         children: [
           SizedBox(
             width: space,
-            height: height,
+            height: MediaQuery.sizeOf(context).height * kMinPlayerHeight,
           ),
           const Expanded(
             flex: 2,
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Google Chromecast: Official Video',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      color: Color(0xFFF1F1F1),
-                    ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Google Chromecast: Official Video',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: Color(0xFFF1F1F1),
                   ),
-                  SizedBox(height: 6),
-                  Text(
-                    'Harris Craycraft',
-                    maxLines: 1,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      color: Color(0xFFAAAAAA),
-                    ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Harris Craycraft',
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: Color(0xFFAAAAAA),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           Expanded(

@@ -26,7 +26,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../account_avatar.dart';
@@ -87,7 +90,7 @@ class ViewableVideoContent extends StatelessWidget {
                                 const Text(
                                   'Future, Metro BoomIn - Like That (Official Audio)',
                                   style: TextStyle(
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w500,
                                     color: Color(0xFFF1F1F1),
                                   ),
                                 ),
@@ -98,14 +101,24 @@ class ViewableVideoContent extends StatelessWidget {
                                       text: const TextSpan(
                                         text: 'Future',
                                         children: <InlineSpan>[
-                                          TextSpan(text: ' · '),
+                                          TextSpan(
+                                            text: kDotSeparator,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
                                           TextSpan(text: '1.8M views'),
-                                          TextSpan(text: ' · '),
+                                          TextSpan(
+                                            text: kDotSeparator,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
                                           TextSpan(text: '1 day ago'),
                                         ],
                                         style: TextStyle(
                                           color: Color(0xFFAAAAAA),
-                                          fontSize: 12,
+                                          fontSize: 11,
                                         ),
                                       ),
                                     ),

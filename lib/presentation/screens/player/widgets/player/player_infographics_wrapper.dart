@@ -112,11 +112,11 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
                     visibleControlAlignment: Alignment.lerp(
                       Alignment.centerLeft,
                       Alignment.bottomLeft,
-                      playerViewState.isExpanded
-                          ? 0.9
-                          : context.orientation.isPortrait
-                              ? 0.8
-                              : 0.5,
+                      context.orientation.isPortrait
+                          ? playerViewState.isExpanded
+                              ? 0.9
+                              : 0.75
+                          : 0.45,
                     ),
                     child: const VideoProduct(),
                   );

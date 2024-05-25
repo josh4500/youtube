@@ -1,18 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-class PlayerActionsControl extends StatelessWidget {
+class PlayerActionsControl extends ConsumerWidget {
   const PlayerActionsControl({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return CustomOrientationBuilder(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playerViewState = ref.watch(playerViewStateProvider);
+    final childWidget = Row(
+      children: [
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const AppbarAction(icon: YTIcons.like_outlined),
+              const AppbarAction(icon: YTIcons.dislike_outlined),
+              AppbarAction(
+                icon: YTIcons.reply_outlined,
+                onTap: () {
+                  ref.read(playerRepositoryProvider).sendPlayerSignal([
+                    PlayerSignal.hideControls,
+                    PlayerSignal.exitExpanded,
+                    PlayerSignal.openComments,
+                  ]);
+                },
+              ),
+              const AppbarAction(icon: YTIcons.save_outlined),
+              const AppbarAction(icon: YTIcons.shared_filled),
+              AppbarAction(
+                onTap: () {
+                  ref.read(playerRepositoryProvider).sendPlayerSignal([
+                    PlayerSignal.hideControls,
+                    PlayerSignal.exitExpanded,
+                    PlayerSignal.openDescription,
+                  ]);
+                },
+                icon: YTIcons.more_horiz_outlined,
+              ),
+            ],
+          ),
+        ),
+        if (playerViewState.isExpanded == false) const Spacer(),
+        const PlayerMoreVideos(),
+      ],
+    );
+
+    if (context.orientation.isLandscape) {
+      // Hides Action controls when description or comments is show
+      if (playerViewState.showDescription) {
+        return const SizedBox();
+      }
+      return childWidget;
+    } else {
+      // Shows Action controls when player is expanded
+      if (playerViewState.isExpanded) {
+        return childWidget;
+      }
+      return const SizedBox();
+    }
+
+    CustomOrientationBuilder(
       onLandscape: (_, childWidget) {
         return Consumer(
           builder: (context, ref, child) {

@@ -420,7 +420,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       final screenHeight = _screenHeightNotifier.value;
 
       // TODO(josh4500): Find a way to apply roc
-      _playerHeightNotifier.value = screenHeight.normalize(kMinPlayerHeight, 1);
+      _playerHeightNotifier.value = screenHeight.cRoc(kMinPlayerHeight, 1);
 
       _showHideNavigationBar(screenHeight);
       _recomputeDraggableOpacityAndHeight(screenHeight);
@@ -527,11 +527,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           _openChaptersSheet();
         } else if (signal == PlayerSignal.closeChapters) {
           _closeChaptersSheet();
-        } else if (signal == PlayerSignal.exitExpanded) {
-          SystemChrome.setEnabledSystemUIMode(
-            SystemUiMode.manual,
-            overlays: SystemUiOverlay.values,
-          );
         }
       },
     );
@@ -549,10 +544,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         additionalHeight < maxAdditionalHeight) {
       if (display.size.width / display.devicePixelRatio <
           kOrientationLockBreakpoint) {
-        SystemChrome.setEnabledSystemUIMode(
-          SystemUiMode.manual,
-          overlays: SystemUiOverlay.values,
-        );
+        print((additionalHeight, maxAdditionalHeight));
+        // SystemChrome.setEnabledSystemUIMode(
+        //   SystemUiMode.manual,
+        //   overlays: SystemUiOverlay.values,
+        // );
       } else {
         SystemChrome.setEnabledSystemUIMode(
           SystemUiMode.immersiveSticky,
@@ -836,8 +832,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _hideControls();
     _hideGraphicsNotifier.value = true;
 
-    await _animateAdditionalHeight(maxAdditionalHeight);
-
     await setLandscapeMode();
 
     ref.read(playerRepositoryProvider).sendPlayerSignal(
@@ -862,7 +856,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _hideGraphicsNotifier.value = true;
     _infoOpacityController.reverse();
-    _animateAdditionalHeight(minAdditionalHeight);
     await resetOrientation();
 
     _showControls(true);
@@ -989,7 +982,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           maxVerticalMargin,
         );
       } else if (!_preventPlayerDragUp) {
-        // If not preventing drag up, adjust _additionalHeightNotifier
+        _hideGraphicsNotifier.value = true;
+        // If not preventing drag up, adjust _playerAddedHeightNotifier
         _playerAddedHeightNotifier.value = ui.clampDouble(
           _playerAddedHeightNotifier.value + details.delta.dy,
           minAdditionalHeight,
@@ -1087,35 +1081,20 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
   }
 
-  void _onDragEndExpandedPlayer(DragEndDetails details) {
-    if (additionalHeight > midAdditionalHeight) {
+  Future<void> _onDragEndExpandedPlayer(DragEndDetails details) async {
+    // This condition is for case when player is dragged down
+    if (_playerMarginNotifier.value > maxAdditionalHeight / 4) {
+      _exitExpanded();
+    }
+
+    // These conditions are for cases when player is dragged up
+    else if (additionalHeight > maxAdditionalHeight / 2) {
       _enterExpanded();
     } else {
-      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-        PlayerSignal.exitExpanded,
-        PlayerSignal.showPlaybackProgress,
-      ]);
-
-      if (_isResizableExpandingMode) {
-        _animateAdditionalHeight(midAdditionalHeight);
-      } else {
-        _animateAdditionalHeight(minAdditionalHeight);
-      }
+      _exitExpanded();
     }
 
-    if (_playerMarginNotifier.value > maxAdditionalHeight / 4) {
-      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-        PlayerSignal.exitExpanded,
-        PlayerSignal.showPlaybackProgress,
-      ]);
-
-      if (_isResizableExpandingMode) {
-        _animateAdditionalHeight(midAdditionalHeight);
-      } else {
-        _animateAdditionalHeight(minAdditionalHeight);
-      }
-    }
-
+    _hideGraphicsNotifier.value = false;
     _playerMarginNotifier.value = 0;
     _infoScrollPhysics.canScroll(true);
   }
@@ -1283,6 +1262,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           );
 
           _hideControls();
+          _hideGraphicsNotifier.value = true;
         }
       }
     }
@@ -1302,44 +1282,50 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
       PlayerSignal.enterExpanded,
     ]);
+    await _animateAdditionalHeight(maxAdditionalHeight);
+
     await SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.immersive,
       overlays: <SystemUiOverlay>[],
     );
-    await _animateAdditionalHeight(maxAdditionalHeight);
 
     // NOTE: Second call here is to ensure it reaches [maxAdditionalHeight]
     // Screen takes time to show effects of [SystemUiMode.immersive]
-    Future.delayed(
+    await Future.delayed(
       const Duration(milliseconds: 200),
       () => _animateAdditionalHeight(maxAdditionalHeight),
     );
+    _hideGraphicsNotifier.value = false;
+  }
+
+  Future<void> _exitExpanded() async {
+    if (_isResizableExpandingMode) {
+      _animateAdditionalHeight(midAdditionalHeight);
+    } else {
+      _animateAdditionalHeight(minAdditionalHeight);
+    }
+
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
+
+    ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+      PlayerSignal.exitExpanded,
+      PlayerSignal.showPlaybackProgress,
+    ]);
+
+    _hideGraphicsNotifier.value = false;
   }
 
   Future<void> _onDragInfoUp(PointerUpEvent event) async {
-    if (_allowInfoDrag && additionalHeight > 0) {
-      if (additionalHeight > midAdditionalHeight) {
+    if (_allowInfoDrag) {
+      if (additionalHeight > maxAdditionalHeight / 2) {
         _enterExpanded();
       } else {
-        if (_isResizableExpandingMode &&
-            additionalHeight > midAdditionalHeight / 2) {
-          await _animateAdditionalHeight(midAdditionalHeight);
-        } else {
-          await _animateAdditionalHeight(minAdditionalHeight);
-        }
-
-        ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-          PlayerSignal.exitExpanded,
-          PlayerSignal.showPlaybackProgress,
-        ]);
-
+        _exitExpanded();
         _infoScrollPhysics.canScroll(true);
       }
-    } else if (_allowInfoDrag && additionalHeight == 0) {
-      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-        PlayerSignal.exitExpanded,
-        PlayerSignal.showPlaybackProgress,
-      ]);
     }
 
     if (_infoScrollController.offset == 0) {
@@ -1464,11 +1450,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _allowInfoDrag = false;
 
         if (_playerAddedHeightNotifier.value > 0) {
-          _playerAddedHeightNotifier.value = midAdditionalHeight;
-          ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-            PlayerSignal.exitExpanded,
-            PlayerSignal.showPlaybackProgress,
-          ]);
+          // No need for animation
+          _playerAddedHeightNotifier.value = minAdditionalHeight;
         }
       } else if (notification is ScrollEndNotification) {
         _allowInfoDrag = true;
@@ -1495,18 +1478,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     } else if (notification is ExpandPlayerNotification) {
       _enterExpanded();
     } else if (notification is DeExpandPlayerNotification) {
-      _hideControls();
-
-      if (_isResizableExpandingMode) {
-        _animateAdditionalHeight(midAdditionalHeight);
-      } else {
-        _animateAdditionalHeight(minAdditionalHeight);
-      }
-
-      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-        PlayerSignal.exitExpanded,
-        PlayerSignal.showPlaybackProgress,
-      ]);
+      _exitExpanded();
     } else if (notification is EnterFullscreenPlayerNotification) {
       _openFullscreenPlayer();
     } else if (notification is ExitFullscreenPlayerNotification) {

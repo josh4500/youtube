@@ -188,30 +188,33 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
     // TODO(josh4500): Investigate double rebuild
     final screenSize = MediaQuery.sizeOf(context);
 
-    print('Rebuild');
     return SafeArea(
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
           widget.child,
-          SlideTransition(
-            position: _overlayPlayerAnimation,
-            child: Consumer(
-              builder: (
-                BuildContext context,
-                WidgetRef ref,
-                Widget? childWidget,
-              ) {
-                final showPlayer = ref.watch(playerOverlayStateProvider);
-                return Visibility(
-                  visible: showPlayer,
-                  child: PlayerScreen(
-                    width: screenSize.width,
-                    height: screenSize.height,
-                  ),
-                );
-              },
-            ),
+          LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return SlideTransition(
+                position: _overlayPlayerAnimation,
+                child: Consumer(
+                  builder: (
+                    BuildContext context,
+                    WidgetRef ref,
+                    Widget? childWidget,
+                  ) {
+                    final showPlayer = ref.watch(playerOverlayStateProvider);
+                    return Visibility(
+                      visible: showPlayer,
+                      child: PlayerScreen(
+                        width: constraints.maxWidth,
+                        height: constraints.maxHeight,
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
           ),
           Visibility(
             visible: widget.child.currentIndex != 1,

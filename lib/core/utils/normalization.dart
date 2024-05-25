@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' as math;
 
 double normalizeDouble(double value, double min, double max) {
   return (value - min) / (max - min);
@@ -11,8 +11,19 @@ extension NormalizeDoubleExtension on double {
 }
 
 extension RateOfChangeDoubleExtension on double {
-  double roc(double value) {
-    return max(0, min(1, this + value));
+  /// Exponential Rate of change
+  double eRoc(double min, double max) {
+    return max * (math.exp(9 * this));
+  }
+
+  /// Quadratic Rate of change
+  double qRoc(double min, double max) {
+    return (max - ((max - min) * this * this)).invertByOne;
+  }
+
+  /// Cubic Rate of change
+  double cRoc(double min, double max) {
+    return ((max - min) * ((3 * this * this) - (2 * this * this * this))) + min;
   }
 }
 
