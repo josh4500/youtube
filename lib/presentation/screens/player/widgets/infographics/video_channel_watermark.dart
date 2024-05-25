@@ -30,7 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
-import 'package:youtube_clone/presentation/widgets.dart';
 
 class VideoChannelWatermark extends ConsumerWidget {
   const VideoChannelWatermark({super.key});

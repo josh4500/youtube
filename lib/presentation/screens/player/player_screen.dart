@@ -225,8 +225,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     return ref.read(playerViewStateProvider).isExpanded;
   }
 
-  bool _isForcedFullscreen = false;
-  bool _ensuredForcedFullscreenKept = false;
+  static bool _isForcedFullscreen = false;
+  static bool _ensuredForcedFullscreenKept = false;
 
   /// Indicates whether the player is expanded or not.
   bool get _isFullscreen {
@@ -420,7 +420,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       final screenHeight = _screenHeightNotifier.value;
 
       // TODO(josh4500): Find a way to apply roc
-      _playerHeightNotifier.value = screenHeight.cRoc(kMinPlayerHeight, 1);
+      _playerHeightNotifier.value = screenHeight.normalize(kMinPlayerHeight, 1);
 
       _showHideNavigationBar(screenHeight);
       _recomputeDraggableOpacityAndHeight(screenHeight);
@@ -493,23 +493,28 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       reverseCurve: Curves.bounceInOut,
     );
 
+    Future(() {
+      // Initial changes
+      _showHideNavigationBar(_screenHeightNotifier.value);
+
+      final PlayerRepository playerRepo = ref.read(playerRepositoryProvider);
+
+      // TODO(josh4500): Reconsider to always call this method mount widget
+      playerRepo.openVideo(); // Opens and play video
+    });
+
     WidgetsBinding.instance.addObserver(this);
   }
 
   ui.FlutterView? _view;
   static const double kOrientationLockBreakpoint = 600;
+  static bool localExpanded = false;
 
   @override
   void didChangeDependencies() {
     _view = View.of(context);
 
-    // Initial changes
-    _showHideNavigationBar(_screenHeightNotifier.value);
-
     final PlayerRepository playerRepo = ref.read(playerRepositoryProvider);
-
-    // TODO(josh4500): Reconsider to always call this method mount widget
-    playerRepo.openVideo(); // Opens and play video
 
     // Listens to PlayerSignal events related to description and comments
     // Events are usually sent from PlayerLandscapeScreen
@@ -540,15 +545,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       return;
     }
 
-    if (_isForcedFullscreen == false &&
-        additionalHeight < maxAdditionalHeight) {
+    if (_isForcedFullscreen == false && localExpanded == false) {
       if (display.size.width / display.devicePixelRatio <
           kOrientationLockBreakpoint) {
-        print((additionalHeight, maxAdditionalHeight));
-        // SystemChrome.setEnabledSystemUIMode(
-        //   SystemUiMode.manual,
-        //   overlays: SystemUiOverlay.values,
-        // );
+        SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.manual,
+          overlays: SystemUiOverlay.values,
+        );
       } else {
         SystemChrome.setEnabledSystemUIMode(
           SystemUiMode.immersiveSticky,
@@ -558,14 +561,24 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
   }
 
+  final Set<ui.AppLifecycleState> _lastLifecycleStates = {};
+
   @override
   void didChangeAppLifecycleState(ui.AppLifecycleState state) {
-    if (state == ui.AppLifecycleState.resumed) {
+    _lastLifecycleStates.add(state);
+    final wasHidden = _lastLifecycleStates.contains(
+      ui.AppLifecycleState.hidden,
+    );
+    final wasPaused = _lastLifecycleStates.contains(
+      ui.AppLifecycleState.hidden,
+    );
+    if (state == ui.AppLifecycleState.resumed && (wasHidden || wasPaused)) {
       if (_isForcedFullscreen && !_ensuredForcedFullscreenKept) {
-        _closeFullscreenPlayer();
+        _exitFullscreenMode();
       } else if (_ensuredForcedFullscreenKept) {
         _ensuredForcedFullscreenKept = false;
       }
+      _lastLifecycleStates.clear();
     }
     super.didChangeAppLifecycleState(state);
   }
@@ -706,6 +719,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Callback to change Draggable heights when the Player height changes
   /// (via [_screenHeightNotifier])
   void _recomputeDraggableOpacityAndHeight(double value) {
+    // TODO(josh4500): Consider _isResizableExpandedMode
     final double newSizeValue = ui.clampDouble(
       (value - kMinPlayerHeight) - (value * 0.135),
       0,
@@ -821,7 +835,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Opens the player in fullscreen mode by sending a player signal to the
   /// repository.
-  Future<void> _openFullscreenPlayer() async {
+  Future<void> _enterFullscreenMode() async {
     _isForcedFullscreen = true;
     _ensuredForcedFullscreenKept = true;
 
@@ -841,7 +855,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _showControls();
   }
 
-  Future<void> _closeFullscreenPlayer() async {
+  Future<void> _exitFullscreenMode() async {
     if (_isForcedFullscreen == false) {
       // TODO(josh4500): Needs fix for when Fullscreen was not forced
       // If we change the Orientations to portraitUp this will make it permanent
@@ -932,6 +946,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     // Adjust additional height if within limits
     if (_isResizableExpandingMode) {
+      // TODO(josh4500): Consider _recomputeDraggableOpacityAndHeight method
+
+      // Set additional height to its maximum value
+      _animateAdditionalHeight(minAdditionalHeight);
+
       // If comments are opened, animate to the appropriate position
       if (_commentIsOpened) {
         _commentDraggableController.animateTo(
@@ -957,9 +976,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           curve: Curves.easeIn,
         );
       }
-
-      // Set additional height to its maximum value
-      _animateAdditionalHeight(maxAdditionalHeight);
     }
   }
 
@@ -1084,14 +1100,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   Future<void> _onDragEndExpandedPlayer(DragEndDetails details) async {
     // This condition is for case when player is dragged down
     if (_playerMarginNotifier.value > maxAdditionalHeight / 4) {
-      _exitExpanded();
+      _exitExpandedMode();
     }
 
     // These conditions are for cases when player is dragged up
     else if (additionalHeight > maxAdditionalHeight / 2) {
-      _enterExpanded();
+      _enterExpandedMode();
     } else {
-      _exitExpanded();
+      _exitExpandedMode();
     }
 
     _hideGraphicsNotifier.value = false;
@@ -1151,7 +1167,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (_activeZoomPanning) {
       final double velocityY = details.velocity.pixelsPerSecond.dy;
       if (velocityY < -200) {
-        _openFullscreenPlayer();
+        _enterFullscreenMode();
       }
     }
   }
@@ -1172,7 +1188,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   void _onDragFullscreenPlayerEnd(DragEndDetails details) {
     if (_viewController.value >= 1) {
-      _closeFullscreenPlayer();
+      _exitFullscreenMode();
     }
 
     _slideOffsetYValue = 0;
@@ -1236,7 +1252,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     // Reversing zoom due to swiping up
     final lastScaleValue = _transformationController.value.getMaxScaleOnAxis();
     if (lastScaleValue <= kMinPlayerScale + 0.5 && lastScaleValue > 1.0) {
-      if (lastScaleValue == kMinPlayerScale + 0.5) _openFullscreenPlayer();
+      if (lastScaleValue == kMinPlayerScale + 0.5) _enterFullscreenMode();
       await _reverseZoomPan();
     }
 
@@ -1276,7 +1292,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
   }
 
-  Future<void> _enterExpanded() async {
+  Future<void> _enterExpandedMode() async {
+    localExpanded = true;
     _hideControls();
 
     ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
@@ -1296,13 +1313,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       () => _animateAdditionalHeight(maxAdditionalHeight),
     );
     _hideGraphicsNotifier.value = false;
+    _showControls();
   }
 
-  Future<void> _exitExpanded() async {
+  Future<void> _exitExpandedMode() async {
+    localExpanded = false;
+    _hideControls();
     if (_isResizableExpandingMode) {
-      _animateAdditionalHeight(midAdditionalHeight);
+      await _animateAdditionalHeight(midAdditionalHeight);
     } else {
-      _animateAdditionalHeight(minAdditionalHeight);
+      await _animateAdditionalHeight(minAdditionalHeight);
     }
 
     SystemChrome.setEnabledSystemUIMode(
@@ -1316,14 +1336,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     ]);
 
     _hideGraphicsNotifier.value = false;
+    _showControls();
   }
 
   Future<void> _onDragInfoUp(PointerUpEvent event) async {
     if (_allowInfoDrag) {
       if (additionalHeight > maxAdditionalHeight / 2) {
-        _enterExpanded();
+        _enterExpandedMode();
       } else {
-        _exitExpanded();
+        _exitExpandedMode();
         _infoScrollPhysics.canScroll(true);
       }
     }
@@ -1331,8 +1352,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (_infoScrollController.offset == 0) {
       _allowInfoDrag = true;
     }
-
-    _showControls();
   }
 
   /// Callback to open Comments draggable sheets
@@ -1476,13 +1495,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         PlayerSignal.hidePlaybackProgress,
       ]);
     } else if (notification is ExpandPlayerNotification) {
-      _enterExpanded();
+      _enterExpandedMode();
     } else if (notification is DeExpandPlayerNotification) {
-      _exitExpanded();
+      _exitExpandedMode();
     } else if (notification is EnterFullscreenPlayerNotification) {
-      _openFullscreenPlayer();
+      _enterFullscreenMode();
     } else if (notification is ExitFullscreenPlayerNotification) {
-      _closeFullscreenPlayer();
+      _exitFullscreenMode();
     } else if (notification is SettingsPlayerNotification) {
       // TODO(Josh): Open settings
     } else if (notification is SeekStartPlayerNotification) {

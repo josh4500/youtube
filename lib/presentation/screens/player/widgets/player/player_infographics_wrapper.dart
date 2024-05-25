@@ -100,6 +100,7 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
             InfographicVisibility(
               visible: listenable.showVisuals,
               alignment: Alignment.topRight,
+              showOn: const Duration(seconds: 6),
               child: const VideoCardTeaser(),
             ),
             Positioned.fill(
@@ -124,15 +125,10 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
               ),
             ),
             Positioned.fill(
-              child: Consumer(
-                builder: (context, ref, child) {
-                  final playerViewState = ref.watch(playerViewStateProvider);
-                  return InfographicVisibility(
-                    visible: listenable.showVisuals,
-                    alignment: Alignment.bottomRight,
-                    child: const VideoChannelWatermark(),
-                  );
-                },
+              child: InfographicVisibility(
+                visible: listenable.showVisuals,
+                alignment: Alignment.bottomRight,
+                child: const VideoChannelWatermark(),
               ),
             ),
           ],
@@ -210,15 +206,17 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
   StreamSubscription<PlayerSignal>? _playerSignalSubscription;
 
   bool hiddenPermanently = false;
+  bool hiddenTemporary = false;
   Timer? permanentTimer;
+  Timer? temporaryTimer;
 
   @override
   void initState() {
     super.initState();
-    showNotifier.value = widget.visible;
+    showNotifier.value = widget.visible && widget.showOn == null;
     visibilityController = AnimationController(
       vsync: this,
-      value: 1,
+      value: showNotifier.value ? 1 : 0,
       duration: const Duration(milliseconds: 500),
       reverseDuration: const Duration(milliseconds: 350),
     );
@@ -258,7 +256,9 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
             alignmentController.forward();
           }
         } else if (event == PlayerSignal.hideControls) {
-          controlVisibilityNotifier.value = true && hiddenPermanently == false;
+          controlVisibilityNotifier.value =
+              !hiddenPermanently && !hiddenTemporary;
+
           if (widget.visibleControlAlignment != null) {
             alignmentController.reverse();
           }
@@ -268,9 +268,15 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
 
     if (widget.alwaysShow && widget.showOn == null && !hiddenPermanently) {
       permanentTimer ??= Timer(widget.hideDuration, permanentHide);
-    } else {
+    } else if (widget.showOn != null) {
       _videoDurationSubscription ??= playerRepo.positionStream.listen(
-        (event) {},
+        (event) {
+          if (event == widget.showOn) {
+            hiddenTemporary = false; // In case when duration was changed
+            showNotifier.value = true;
+            temporaryTimer ??= Timer(widget.hideDuration, temporaryHide);
+          }
+        },
       );
     }
   }
@@ -294,6 +300,7 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
   @override
   void dispose() {
     permanentTimer?.cancel();
+    temporaryTimer?.cancel();
     alignmentController.dispose();
     visibilityController.dispose();
     _playerSignalSubscription?.cancel();
@@ -309,6 +316,14 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
     });
     _playerSignalSubscription?.cancel();
     _videoDurationSubscription?.cancel();
+  }
+
+  void temporaryHide() {
+    hiddenTemporary = true;
+    visibilityController.reverse().then((value) {
+      showNotifier.value = false;
+      controlVisibilityNotifier.value = false;
+    });
   }
 
   @override
