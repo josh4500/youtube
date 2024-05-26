@@ -174,10 +174,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// NOTE: Depends on [_playerHeightNotifier], make to wrap with [ListenableBuilder]
   /// to see changes.
   double? get playerHeight {
-    return ui.lerpDouble(
+    return _playerHeightNotifier.value.normalizeRange(
       playerMinHeight,
       playerMaxHeight,
-      _playerHeightNotifier.value,
     );
   }
 
@@ -286,6 +285,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Allows or disallows dragging for info. Set to true by default.
   bool _allowInfoDrag = true;
+
+  bool _preventGestures = false;
 
   @override
   void initState() {
@@ -567,7 +568,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       ui.AppLifecycleState.hidden,
     );
     if (state == ui.AppLifecycleState.resumed && (wasHidden || wasPaused)) {
-      if (_isForcedFullscreen && !_ensuredForcedFullscreenKept) {
+      if (_isForcedFullscreen &&
+          !_ensuredForcedFullscreenKept &&
+          !_preventGestures) {
         _exitFullscreenMode();
       } else if (_ensuredForcedFullscreenKept) {
         _ensuredForcedFullscreenKept = false;
@@ -845,14 +848,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     await setLandscapeMode();
 
-    ref.read(playerRepositoryProvider).sendPlayerSignal(
-      [PlayerSignal.showPlaybackProgress],
-    );
     _hideGraphicsNotifier.value = false;
     _showControls();
   }
 
   Future<void> _exitFullscreenMode() async {
+    _preventGestures = false;
     if (_isForcedFullscreen == false) {
       // TODO(josh4500): Needs fix for when Fullscreen was not forced
       // If we change the Orientations to portraitUp this will make it permanent
@@ -880,9 +881,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     final bool hide = ref.read(playerViewStateProvider).showControls;
     if (hide || force) {
       _controlWasTempHidden = true && !force;
-      ref
-          .read(playerRepositoryProvider)
-          .sendPlayerSignal(<PlayerSignal>[PlayerSignal.hideControls]);
+      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+        PlayerSignal.hideControls,
+        if (context.orientation.isLandscape || _isExpanded)
+          PlayerSignal.hidePlaybackProgress,
+      ]);
     }
   }
 
@@ -893,11 +896,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (_controlWasTempHidden || force) {
       _controlWasTempHidden = false;
 
-      if (_isMinimized == false) {
-        ref
-            .read(playerRepositoryProvider)
-            .sendPlayerSignal(<PlayerSignal>[PlayerSignal.showControls]);
+      if (!_isMinimized && !_preventGestures) {
+        ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+          PlayerSignal.showControls,
+          if (context.orientation.isPortrait) PlayerSignal.showPlaybackProgress,
+        ]);
       }
+    } else if (context.orientation.isPortrait) {
+      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+        PlayerSignal.showPlaybackProgress,
+      ]);
     }
   }
 
@@ -916,6 +924,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Handles tap events on the player.
   Future<void> _onTapPlayer() async {
+    if (_preventGestures) {
+      ref.read(playerRepositoryProvider).sendPlayerSignal(
+        [PlayerSignal.showUnlock],
+      );
+      return;
+    }
+
     // If the player is fully expanded, show controls
     if (_screenHeightNotifier.value == 1) {
       _toggleControls();
@@ -936,7 +951,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
         ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.maximize,
-          PlayerSignal.showPlaybackProgress,
         ]);
       });
     }
@@ -1087,10 +1101,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     // Hide controls when the height falls below a certain threshold
     if (_screenHeightNotifier.value < 1) {
       _hideControls();
-
-      ref.read(playerRepositoryProvider).sendPlayerSignal(
-        <PlayerSignal>[PlayerSignal.hidePlaybackProgress],
-      );
     }
   }
 
@@ -1174,10 +1184,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     // If dragging down
     _hideControls();
 
-    ref.read(playerRepositoryProvider).sendPlayerSignal([
-      PlayerSignal.hidePlaybackProgress,
-    ]);
-
     _slideOffsetYValue += details.delta.dy;
 
     _viewController.value = ui.clampDouble(
@@ -1196,14 +1202,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _viewController.value = 0;
 
     _showControls();
-    ref.read(playerRepositoryProvider).sendPlayerSignal([
-      PlayerSignal.showPlaybackProgress,
-    ]);
   }
 
   /// Handles drag updates for the player, determining the drag behavior based on
   /// it state.
   void _onDragPlayer(DragUpdateDetails details) {
+    if (_preventGestures) return;
+
     // If active zoom panning is in progress, update zoom panning and return
     if (_activeZoomPanning) {
       _swipeZoomPan(
@@ -1235,6 +1240,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   Future<void> _onDragPlayerEnd(DragEndDetails details) async {
+    if (_preventGestures) return;
+
     _releasedPlayerPointer = true;
     if (!_isSeeking) {
       _preventPlayerDragUp = false;
@@ -1264,6 +1271,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   void _onDragInfo(PointerMoveEvent event) {
+    if (_preventGestures) return;
+
     if (_infoScrollController.offset == 0 ||
         (_isResizableExpandingMode && event.delta.dy < 0)) {
       if (_allowInfoDrag) {
@@ -1327,21 +1336,22 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       await _animateAdditionalHeight(minAdditionalHeight);
     }
 
-    SystemChrome.setEnabledSystemUIMode(
+    ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+      PlayerSignal.exitExpanded,
+    ]);
+
+    await SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
       overlays: SystemUiOverlay.values,
     );
-
-    ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-      PlayerSignal.exitExpanded,
-      PlayerSignal.showPlaybackProgress,
-    ]);
 
     _hideGraphicsNotifier.value = false;
     _showControls();
   }
 
   Future<void> _onDragInfoUp(PointerUpEvent event) async {
+    if (_preventGestures) return;
+
     if (_allowInfoDrag) {
       if (additionalHeight > maxAdditionalHeight / 2) {
         _enterExpandedMode();
@@ -1565,6 +1575,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         const DynamicSheetOptionItem(
           leading: Icon(YTIcons.private_circle_outlined),
           title: 'Lock screen',
+          value: 'Lock screen',
         ),
         const DynamicSheetOptionItem(
           leading: Icon(YTIcons.settings_outlined),
@@ -1579,7 +1590,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       ],
     );
 
-    if (selection == 'Quality' && context.mounted) {
+    if (selection == 'Lock screen' && context.mounted) {
+      _preventGestures = true;
+      ref.read(playerRepositoryProvider).sendPlayerSignal(
+        [PlayerSignal.lockScreen],
+      );
+      await Future.delayed(const Duration(milliseconds: 250));
+      await _enterFullscreenMode();
+    } else if (selection == 'Quality' && context.mounted) {
       await showDynamicSheet(
         context,
         title: const Padding(
