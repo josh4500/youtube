@@ -39,20 +39,15 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import 'widgets/controls/player_ambient.dart';
 import 'widgets/controls/player_notifications.dart';
 import 'widgets/controls/player_settings.dart';
 import 'widgets/player/mini_player.dart';
 import 'widgets/player/player_components_wrapper.dart';
 import 'widgets/player/player_infographics_wrapper.dart';
 import 'widgets/player/player_view.dart';
-import 'widgets/video_actions.dart';
-import 'widgets/video_channel_section.dart';
+import 'widgets/player_video_info.dart';
 import 'widgets/video_chapters_sheet.dart';
-import 'widgets/video_comment_section.dart';
 import 'widgets/video_comment_sheet.dart';
-import 'widgets/video_context.dart';
-import 'widgets/video_description_section.dart';
 import 'widgets/video_description_sheet.dart';
 
 class PlayerScreen extends ConsumerStatefulWidget {
@@ -119,6 +114,27 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   late final ValueNotifier<double> _playerHeightNotifier;
 
   late final ValueNotifier<bool> _hideGraphicsNotifier;
+
+  // Video Comment Sheet
+  bool _commentIsOpened = false;
+  late final AnimationController _commentSizeController;
+  late final Animation<double> _commentSizeAnimation;
+  final _showCommentDraggable = ValueNotifier<bool>(false);
+  final _replyIsOpenedNotifier = ValueNotifier<bool>(false);
+  final _commentDraggableController = DraggableScrollableController();
+
+  // Video Description Sheet
+  bool _descIsOpened = false;
+  late final AnimationController _descSizeController;
+  late final Animation<double> _descSizeAnimation;
+  final _showDescDraggable = ValueNotifier<bool>(false);
+  final _transcriptNotifier = ValueNotifier<bool>(false);
+  final _descDraggableController = DraggableScrollableController();
+
+  // Video Chapter Sheet
+  bool _chaptersIsOpened = false;
+  final _showChaptersDraggable = ValueNotifier<bool>(false);
+  final _chaptersDraggableController = DraggableScrollableController();
 
   /// PlayerSignal StreamSubscription
   StreamSubscription<PlayerSignal>? _playerSignalSubscription;
@@ -215,17 +231,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// [MiniPlayer] PlaybackProgress indicator opacity value
   ///
   /// NOTE: Value depends on WidthNotifier
-  double get miniPlayerOpacity => const Interval(
-        kMinVideoViewPortWidth,
-        1,
-        curve: Curves.easeInCubic,
-      ).transform(_playerWidthNotifier.value).invertByOne;
+  double get miniPlayerOpacity {
+    return const Interval(kMinVideoViewPortWidth, 1, curve: Curves.easeInCubic)
+        .transform(_playerWidthNotifier.value)
+        .invertByOne;
+  }
 
   /// Indicates whether the player is expanded or not.
   bool get _isExpanded {
     return ref.read(playerViewStateProvider).isExpanded;
   }
 
+  /// Indicates whether screen was forced to fullscreen
   static bool _isForcedFullscreen = false;
   static bool _ensuredForcedFullscreenKept = false;
 
@@ -251,7 +268,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Indicates whether pointer has been released since resizing player screen
   bool _releasedPlayerPointer = true;
 
-  /// Indicates the direction of player dragging. True if dragging down, otherwise null.
+  /// Indicates the direction of player dragging. True if dragging down,
+  /// otherwise null.
   bool? _isPlayerDraggingDown;
 
   /// Prevents player from being dragged up when set to true.
@@ -263,33 +281,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Prevents player margin changes
   bool _preventPlayerMarginUpdate = false;
 
+  /// Whether player is seeking
   bool _isSeeking = false;
 
   /// Allows or disallows dragging for info. Set to true by default.
   bool _allowInfoDrag = true;
-
-  // Video Comment Sheet
-  bool _commentIsOpened = false;
-  final _showCommentDraggable = ValueNotifier<bool>(false);
-  final _replyIsOpenedNotifier = ValueNotifier<bool>(false);
-  final _commentDraggableController = DraggableScrollableController();
-
-  late final AnimationController _descSizeController;
-  late final Animation<double> _descSizeAnimation;
-
-  late final AnimationController _commentSizeController;
-  late final Animation<double> _commentSizeAnimation;
-
-  // Video Description Sheet
-  bool _descIsOpened = false;
-  final _showDescDraggable = ValueNotifier<bool>(false);
-  final _transcriptNotifier = ValueNotifier<bool>(false);
-  final _descDraggableController = DraggableScrollableController();
-
-  // Video Chapter Sheet
-  bool _chaptersIsOpened = false;
-  final _showChaptersDraggable = ValueNotifier<bool>(false);
-  final _chaptersDraggableController = DraggableScrollableController();
 
   @override
   void initState() {
@@ -360,10 +356,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     );
 
     _playerOpacityAnimation = ReverseAnimation(
-      CurvedAnimation(
-        parent: _playerOpacityController,
-        curve: Curves.easeIn,
-      ),
+      CurvedAnimation(parent: _playerOpacityController, curve: Curves.easeIn),
     );
 
     _draggableOpacityController = AnimationController(
@@ -620,6 +613,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _descSizeController.dispose();
     _commentSizeController.dispose();
+
+    // TODO(josh4500): Might need to reset orientation
+    // if (_isForcedFullscreen) resetOrientation();
 
     super.dispose();
   }
@@ -1178,6 +1174,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     // If dragging down
     _hideControls();
 
+    ref.read(playerRepositoryProvider).sendPlayerSignal([
+      PlayerSignal.hidePlaybackProgress,
+    ]);
+
     _slideOffsetYValue += details.delta.dy;
 
     _viewController.value = ui.clampDouble(
@@ -1187,13 +1187,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     );
   }
 
-  void _onDragFullscreenPlayerEnd(DragEndDetails details) {
+  Future<void> _onDragFullscreenPlayerEnd(DragEndDetails details) async {
     if (_viewController.value >= 1) {
       _exitFullscreenMode();
     }
 
     _slideOffsetYValue = 0;
     _viewController.value = 0;
+
+    _showControls();
+    ref.read(playerRepositoryProvider).sendPlayerSignal([
+      PlayerSignal.showPlaybackProgress,
+    ]);
   }
 
   /// Handles drag updates for the player, determining the drag behavior based on
@@ -1201,7 +1206,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   void _onDragPlayer(DragUpdateDetails details) {
     // If active zoom panning is in progress, update zoom panning and return
     if (_activeZoomPanning) {
-      // Update zoom panning on swipe up or swipe down
       _swipeZoomPan(
         -(details.delta.dy / (screenHeight * playerHeightToScreenRatio)),
       );
@@ -1222,12 +1226,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (_isFullscreen) {
       _onDragFullscreenPlayer(details);
     } else {
-      // Determine the drag behavior based on the player's expanded  state
       if (_isExpanded) {
-        // If player is expanded, handle drag as per expanded player behavior
         _onDragExpandedPlayer(details);
       } else {
-        // If player is not expanded, handle drag as per not expanded player behavior
         _onDragNotExpandedPlayer(details);
       }
     }
@@ -2146,86 +2147,6 @@ class PlayerSideSheet extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class PlayerVideoInfo extends StatelessWidget {
-  const PlayerVideoInfo({
-    super.key,
-    this.physics,
-    this.controller,
-    required this.onScrollNotification,
-  });
-
-  final ScrollPhysics? physics;
-  final ScrollController? controller;
-  final bool Function(ScrollNotification notification) onScrollNotification;
-
-  @override
-  Widget build(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: onScrollNotification,
-      child: CustomScrollView(
-        physics: physics,
-        controller: controller,
-        scrollBehavior: const NoOverScrollGlowBehavior(),
-        slivers: <Widget>[
-          const SliverToBoxAdapter(
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: <Widget>[
-                PlayerAmbient(),
-                Column(
-                  children: <Widget>[
-                    VideoDescriptionSection(),
-                    VideoChannelSection(),
-                    VideoContext(),
-                    VideoActions(),
-                    VideoCommentSection(),
-                    SizedBox(height: 12),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: FadingSliverPersistentHeaderDelegate(
-              height: 48,
-              child: const Material(
-                child: Column(
-                  children: [
-                    Spacer(),
-                    SizedBox(
-                      height: 40,
-                      child: DynamicTab(
-                        initialIndex: 0,
-                        leadingWidth: 8,
-                        options: <String>[
-                          'All',
-                          'Something',
-                          'Related',
-                          'Recently uploaded',
-                          'Watched',
-                        ],
-                      ),
-                    ),
-                    Spacer(),
-                    Divider(height: 0, thickness: 1),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SliverToBoxAdapter(child: ViewableVideoContent()),
-          const SliverToBoxAdapter(child: ViewableVideoContent()),
-          const SliverToBoxAdapter(child: ViewableVideoContent()),
-          const SliverToBoxAdapter(child: ViewableVideoContent()),
-          const SliverToBoxAdapter(child: ViewableVideoContent()),
-          const SliverToBoxAdapter(child: ViewableVideoContent()),
-        ],
-      ),
     );
   }
 }
