@@ -32,7 +32,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -100,7 +99,7 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
             InfographicVisibility(
               visible: listenable.showVisuals,
               alignment: Alignment.topRight,
-              showOn: const Duration(seconds: 6),
+              showAt: const Duration(seconds: 6),
               child: const VideoCardTeaser(),
             ),
             Positioned.fill(
@@ -161,7 +160,7 @@ class InfographicsListenable extends ChangeNotifier {
 class InfographicVisibility extends ConsumerStatefulWidget {
   const InfographicVisibility({
     super.key,
-    this.showOn,
+    this.showAt,
     this.alwaysShow = false,
     this.hideDuration = const Duration(seconds: 5),
     this.alignment = Alignment.center,
@@ -170,9 +169,15 @@ class InfographicVisibility extends ConsumerStatefulWidget {
     required this.child,
   });
 
-  final Duration? showOn;
+  /// Duration at which child is shown
+  final Duration? showAt;
+
+  /// Duration at which child will be hidden after shown
   final Duration hideDuration;
 
+  /// Whether to always show child
+  ///
+  /// NOTE: Will still hide child when it reaches [hideDuration]
   final bool alwaysShow;
 
   /// Whether infographic is to be shown
@@ -193,16 +198,27 @@ class InfographicVisibility extends ConsumerStatefulWidget {
 
 class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
     with TickerProviderStateMixin {
+  /// Controller to animate opacity to visibility
   late final AnimationController visibilityController;
   late final Animation<double> visibilityAnimation;
 
+  /// Controller to animate alignment when Player Controls are shown
+  ///
+  /// Takes effect when [widget.visibleControlAlignment] is not null
   late final AnimationController alignmentController;
-  late Animation<Alignment> alignmentAnimation;
 
+  /// Hides child when Player Controls are shown
+  ///
+  /// Takes effect when [widget.visibleControlAlignment] is null
   final controlVisibilityNotifier = ValueNotifier<bool>(false);
+
+  /// Notifier to hide the child
   final showNotifier = ValueNotifier<bool>(false);
 
+  /// Duration listener for current video
   StreamSubscription<Duration>? _videoDurationSubscription;
+
+  /// Player Signal listener
   StreamSubscription<PlayerSignal>? _playerSignalSubscription;
 
   bool hiddenPermanently = false;
@@ -213,7 +229,7 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
   @override
   void initState() {
     super.initState();
-    showNotifier.value = widget.visible && widget.showOn == null;
+    showNotifier.value = widget.visible && widget.showAt == null;
     visibilityController = AnimationController(
       vsync: this,
       value: showNotifier.value ? 1 : 0,
@@ -229,11 +245,6 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
       vsync: this,
       duration: const Duration(milliseconds: 250),
     );
-
-    alignmentAnimation = AlignmentTween(
-      begin: widget.alignment,
-      end: widget.visibleControlAlignment ?? widget.alignment,
-    ).animate(alignmentController);
   }
 
   @override
@@ -243,7 +254,7 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
       controlVisibilityNotifier.value = false;
       if (widget.visibleControlAlignment != null) alignmentController.forward();
     } else {
-      controlVisibilityNotifier.value = true && hiddenPermanently == false;
+      controlVisibilityNotifier.value = !hiddenPermanently && !hiddenTemporary;
       if (widget.visibleControlAlignment != null) alignmentController.reverse();
     }
 
@@ -266,12 +277,12 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
       },
     );
 
-    if (widget.alwaysShow && widget.showOn == null && !hiddenPermanently) {
+    if (widget.alwaysShow && widget.showAt == null && !hiddenPermanently) {
       permanentTimer ??= Timer(widget.hideDuration, permanentHide);
-    } else if (widget.showOn != null) {
+    } else if (widget.showAt != null) {
       _videoDurationSubscription ??= playerRepo.positionStream.listen(
         (event) {
-          if (event == widget.showOn) {
+          if (event == widget.showAt) {
             hiddenTemporary = false; // In case when duration was changed
             showNotifier.value = true;
             temporaryTimer ??= Timer(widget.hideDuration, temporaryHide);
@@ -286,14 +297,10 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.visible != widget.visible) {
-      showNotifier.value = widget.visible && !hiddenPermanently;
-    }
-
-    if (oldWidget.visibleControlAlignment != widget.visibleControlAlignment) {
-      AlignmentTween(
-        begin: widget.alignment,
-        end: widget.visibleControlAlignment ?? widget.alignment,
-      ).animate(alignmentController);
+      showNotifier.value = widget.visible &&
+          widget.showAt == null &&
+          !hiddenPermanently &&
+          !hiddenTemporary;
     }
   }
 
@@ -360,7 +367,10 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
     if (widget.visibleControlAlignment != null &&
         widget.visibleControlAlignment != widget.alignment) {
       return AlignTransition(
-        alignment: alignmentAnimation,
+        alignment: AlignmentTween(
+          begin: widget.alignment,
+          end: widget.visibleControlAlignment ?? widget.alignment,
+        ).animate(alignmentController),
         child: child,
       );
     }
