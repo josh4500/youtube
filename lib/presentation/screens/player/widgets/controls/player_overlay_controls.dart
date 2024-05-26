@@ -28,7 +28,6 @@
 
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,7 +39,6 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../../../provider/state/player_view_state_provider.dart';
 import 'player_actions_control.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';
@@ -232,17 +230,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   @override
   void didChangeDependencies() {
-    // if (ref.read(playerNotifierProvider).loading) {
-    //   if (context.orientation.isPortrait) {
-    //     _controlsHidden = false;
-    //     _controlsVisibilityController.value = 1;
-    //   } else {
-    //     _controlsHidden = true;
-    //     _controlsVisibilityController.value = 0;
-    //     _showPlaybackProgress.value = false;
-    //   }
-    // }
-
     final playerRepo = ref.read(playerRepositoryProvider);
     _playerSignalSubscription ??= playerRepo.playerSignalStream.listen(
       (signal) async {

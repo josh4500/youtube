@@ -54,6 +54,7 @@ class MiniPlayer extends StatelessWidget {
             width: space,
             height: MediaQuery.sizeOf(context).height * kMinPlayerHeight,
           ),
+          const SizedBox(width: 8),
           const Expanded(
             flex: 2,
             child: Column(

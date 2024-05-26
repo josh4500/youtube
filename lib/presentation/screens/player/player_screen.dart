@@ -139,6 +139,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// PlayerSignal StreamSubscription
   StreamSubscription<PlayerSignal>? _playerSignalSubscription;
 
+  Timer? _orientationTimer;
+
   bool _controlWasTempHidden = false;
 
   double get screenWidth => widget.width;
@@ -582,6 +584,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   @override
   void dispose() {
+    _orientationTimer?.cancel();
     _viewController.dispose();
     _playerSignalSubscription?.cancel();
     _hideGraphicsNotifier.dispose();
@@ -836,14 +839,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Opens the player in fullscreen mode by sending a player signal to the
   /// repository.
   Future<void> _enterFullscreenMode() async {
+    _orientationTimer?.cancel(); // Cancel existing timer
+
     _isForcedFullscreen = true;
     _ensuredForcedFullscreenKept = true;
 
-    ref.read(playerRepositoryProvider).sendPlayerSignal(
-      [PlayerSignal.hidePlaybackProgress],
-    );
-
     _hideControls();
+
     _hideGraphicsNotifier.value = true;
 
     await setLandscapeMode();
@@ -855,12 +857,19 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   Future<void> _exitFullscreenMode() async {
     _preventGestures = false;
     if (_isForcedFullscreen == false) {
-      // TODO(josh4500): Needs fix for when Fullscreen was not forced
       // If we change the Orientations to portraitUp this will make it permanent
       // and player will not react when flipped to landscape
-      // await SystemChrome.setPreferredOrientations(
-      //   [DeviceOrientation.portraitUp],
-      // );
+      await SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp],
+      );
+
+      _orientationTimer?.cancel();
+      _orientationTimer = Timer(const Duration(seconds: 30), () {
+        SystemChrome.setPreferredOrientations(
+          DeviceOrientation.values,
+        );
+      });
+
       return;
     }
     _isForcedFullscreen = false;
@@ -883,8 +892,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _controlWasTempHidden = true && !force;
       ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
         PlayerSignal.hideControls,
-        if (context.orientation.isLandscape || _isExpanded)
-          PlayerSignal.hidePlaybackProgress,
+        PlayerSignal.hidePlaybackProgress,
       ]);
     }
   }
@@ -951,6 +959,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
         ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.maximize,
+          PlayerSignal.showPlaybackProgress,
         ]);
       });
     }
@@ -1327,13 +1336,20 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _showControls();
   }
 
-  Future<void> _exitExpandedMode() async {
+  /// Handles exiting expanded mode
+  ///
+  /// Use [animate] to determine if Additional Height value animates
+  Future<void> _exitExpandedMode([bool animate = true]) async {
     localExpanded = false;
     _hideControls();
     if (_isResizableExpandingMode) {
-      await _animateAdditionalHeight(midAdditionalHeight);
+      animate
+          ? await _animateAdditionalHeight(midAdditionalHeight)
+          : _playerAddedHeightNotifier.value = midAdditionalHeight;
     } else {
-      await _animateAdditionalHeight(minAdditionalHeight);
+      animate
+          ? await _animateAdditionalHeight(minAdditionalHeight)
+          : _playerAddedHeightNotifier.value = minAdditionalHeight;
     }
 
     ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
@@ -1498,14 +1514,26 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _isPlayerDraggingDown = true;
       _preventPlayerDismiss = false;
 
-      _animateHeight(kMinPlayerHeight);
-      _animateWidth(kMinVideoViewPortWidth);
+      if (context.orientation.isLandscape) {
+        _exitFullscreenMode();
+      }
 
-      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-        PlayerSignal.minimize,
-        PlayerSignal.hideControls,
-        PlayerSignal.hidePlaybackProgress,
-      ]);
+      if (_isExpanded) {
+        // Avoids animation by passing false
+        _exitExpandedMode(false);
+      }
+
+      _hideControls(true);
+
+      Future.wait([
+        _animateHeight(kMinPlayerHeight),
+        _animateWidth(kMinVideoViewPortWidth),
+      ]).then((value) {
+        ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+          PlayerSignal.minimize,
+          PlayerSignal.hidePlaybackProgress,
+        ]);
+      });
     } else if (notification is ExpandPlayerNotification) {
       _enterExpandedMode();
     } else if (notification is DeExpandPlayerNotification) {
