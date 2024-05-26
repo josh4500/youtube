@@ -13,17 +13,18 @@ extension NormalizeDoubleExtension on double {
 extension RateOfChangeDoubleExtension on double {
   /// Exponential Rate of change
   double eRoc(double min, double max) {
-    return max * (math.exp(9 * this));
+    return max * (math.exp(2.303 * math.log(min) * this));
   }
 
   /// Quadratic Rate of change
   double qRoc(double min, double max) {
-    return (max - ((max - min) * this * this)).invertByOne;
+    return max - ((max - min) * math.pow(this, 2));
   }
 
   /// Cubic Rate of change
   double cRoc(double min, double max) {
-    return ((max - min) * ((3 * this * this) - (2 * this * this * this))) + min;
+    return ((max - min) * ((3 * math.pow(this, 2)) - (2 * math.pow(this, 3)))) +
+        min;
   }
 }
 
