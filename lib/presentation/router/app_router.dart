@@ -413,29 +413,6 @@ class AppRouter {
         },
       ),
       GoRoute(
-        name: AppRoutes.playerLandscapeScreen.name,
-        path: AppRoutes.playerLandscapeScreen.path,
-        parentNavigatorKey: rootKey,
-        pageBuilder: (BuildContext context, GoRouterState state) {
-          return CustomTransitionPage(
-            transitionDuration: const Duration(milliseconds: 200),
-            reverseTransitionDuration: const Duration(milliseconds: 200),
-            transitionsBuilder: (
-              BuildContext context,
-              Animation<double> animation,
-              Animation<double> secAnimation,
-              Widget child,
-            ) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            child: const PlayerLandscapeScreen(),
-          );
-        },
-      ),
-      GoRoute(
         name: AppRoutes.searchVoiceRequest.name,
         path: AppRoutes.searchVoiceRequest.path,
         parentNavigatorKey: rootKey,

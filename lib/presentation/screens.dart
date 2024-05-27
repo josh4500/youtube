@@ -58,7 +58,6 @@ export 'screens/homepage.dart';
 export 'screens/notifications/notifications_screen.dart';
 
 // Player
-export 'screens/player/player_landscape_screen.dart';
 export 'screens/player/player_screen.dart';
 
 // Playlist

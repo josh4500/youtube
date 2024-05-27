@@ -194,15 +194,6 @@ class AppRoutes {
   );
 
   ///
-  /// Player
-  ///
-
-  static final RouteInfo playerLandscapeScreen = RouteInfo(
-    name: 'player',
-    path: '/player/landscape',
-  );
-
-  ///
   ///
   /// Search
   ///
