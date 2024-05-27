@@ -40,12 +40,14 @@ import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'widgets/controls/player_notifications.dart';
-import 'widgets/controls/player_settings.dart';
 import 'widgets/player/mini_player.dart';
 import 'widgets/player/player_components_wrapper.dart';
 import 'widgets/player/player_infographics_wrapper.dart';
 import 'widgets/player/player_view.dart';
 import 'widgets/player_video_info.dart';
+import 'widgets/sheet/player_draggable_sheet.dart';
+import 'widgets/sheet/player_settings_sheet.dart';
+import 'widgets/sheet/player_side_sheet.dart';
 import 'widgets/video_chapters_sheet.dart';
 import 'widgets/video_comment_sheet.dart';
 import 'widgets/video_description_sheet.dart';
@@ -66,7 +68,6 @@ class PlayerScreen extends ConsumerStatefulWidget {
 class _PlayerScreenState extends ConsumerState<PlayerScreen>
     with TickerProviderStateMixin, WidgetsBindingObserver {
   final GlobalKey _interactivePlayerKey = GlobalKey();
-  final GlobalKey _portraitPlayerKey = GlobalKey();
   final GlobalKey _commentSheetKey = GlobalKey();
   final GlobalKey _descSheetKey = GlobalKey();
   final GlobalKey _chaptersSheetKey = GlobalKey();
@@ -251,12 +252,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   ///
   /// NOTE: Value depends on WidthNotifier
   double get miniPlayerOpacity {
-    print((
-      context.orientation.isPortrait,
-      _playerWidthNotifier.value
-          .normalize(minVideoViewPortWidthRatio, 1)
-          .invertByOne
-    ));
     return context.orientation.isPortrait
         ? _playerWidthNotifier.value
             .normalize(minVideoViewPortWidthRatio, 1)
@@ -1012,7 +1007,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       Future.wait([
         _animateScreenHeight(1),
         _animatePlayerWidth(1),
-        if (context.orientation.isLandscape) _animateScreenWidth(1)
+        if (context.orientation.isLandscape) _animateScreenWidth(1),
       ]).then((value) {
         _showControls(ref.read(playerNotifierProvider).ended);
 
@@ -1213,13 +1208,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         await Future.wait([
           _animateScreenHeight(velocityY >= 200 ? minPlayerHeightRatio : 1),
           _animatePlayerWidth(
-              velocityY >= 200 ? minVideoViewPortWidthRatio : 1),
+            velocityY >= 200 ? minVideoViewPortWidthRatio : 1,
+          ),
         ]);
       } else {
         await Future.wait([
           _animateScreenHeight(velocityY <= -150 ? 1 : minPlayerHeightRatio),
           _animatePlayerWidth(
-              velocityY <= -150 ? 1 : minVideoViewPortWidthRatio),
+            velocityY <= -150 ? 1 : minVideoViewPortWidthRatio,
+          ),
         ]);
       }
     }
@@ -1626,68 +1623,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   Future<void> _openSettings() async {
-    final selection = await showDynamicSheet(
-      context,
-      items: [
-        const DynamicSheetOptionItem(
-          leading: Icon(YTIcons.tune_outlined),
-          title: 'Quality',
-          value: 'Quality',
-          trailing: Row(
-            children: [
-              Text(
-                'Auto (360p)',
-                style: TextStyle(color: Color(0xFFAAAAAA)),
-              ),
-              Icon(
-                YTIcons.chevron_right,
-                size: 16,
-                color: Color(0xFFAAAAAA),
-              ),
-            ],
-          ),
-        ),
-        const DynamicSheetOptionItem(
-          leading: Icon(YTIcons.playback_speed_outlined),
-          title: 'Playback speed',
-          value: 'Playback speed',
-          trailing: Row(
-            children: [
-              Text(
-                'Normal',
-                style: TextStyle(color: Color(0xFFAAAAAA)),
-              ),
-              Icon(
-                YTIcons.chevron_right,
-                size: 16,
-                color: Color(0xFFAAAAAA),
-              ),
-            ],
-          ),
-        ),
-        const DynamicSheetOptionItem(
-          leading: Icon(Icons.closed_caption_off),
-          title: 'Captions',
-          value: 'Captions',
-        ),
-        const DynamicSheetOptionItem(
-          leading: Icon(YTIcons.private_circle_outlined),
-          title: 'Lock screen',
-          value: 'Lock screen',
-        ),
-        const DynamicSheetOptionItem(
-          leading: Icon(YTIcons.settings_outlined),
-          title: 'Additional settings',
-          value: 'Additional settings',
-          trailing: Icon(
-            YTIcons.chevron_right,
-            size: 16,
-            color: Color(0xFFAAAAAA),
-          ),
-        ),
-      ],
-    );
-
+    // TODO(josh4500): Create Model for settings final option
+    final selection = await openSettingsSheet(context);
     if (selection == 'Lock screen' && context.mounted) {
       _preventGestures = true;
       ref.read(playerRepositoryProvider).sendPlayerSignal(
@@ -1695,187 +1632,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       );
       await Future.delayed(const Duration(milliseconds: 250));
       await _enterFullscreenMode();
-    } else if (selection == 'Quality' && context.mounted) {
-      await showDynamicSheet(
-        context,
-        title: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Text.rich(
-            TextSpan(
-              text: 'Quality for current video',
-              children: [
-                TextSpan(
-                  text: kDotSeparator,
-                  style: TextStyle(fontSize: 16, color: Color(0xFFAAAAAA)),
-                ),
-                TextSpan(
-                  text: '360',
-                  style: TextStyle(fontSize: 16, color: Color(0xFFAAAAAA)),
-                ),
-              ],
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
-        ),
-        trailing: const Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: Divider(thickness: 1, height: 0),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
-              child: Text.rich(
-                TextSpan(
-                  text:
-                      'This selection only applies to the current video. For all videos, go to',
-                  children: [
-                    TextSpan(
-                      text: ' Settings > Video Quality Preferences.',
-                      style: TextStyle(color: Color(0xFF3EA6FF)),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        items: [
-          for (final (title, subtitle) in <(String, String)>[
-            (
-              'Auto (recommended)',
-              'Adjust to give the best experience for your conditions',
-            ),
-            ('Higher picture quality', 'Uses more data'),
-            ('Data saver', 'Lower picture quality'),
-            ('Advanced', 'Select a specific resolution'),
-          ])
-            DynamicSheetOptionItem(
-              leading: DynamicSheetItemCheck(
-                selected: title == 'Auto (recommended)',
-              ),
-              title: title,
-              subtitle: subtitle,
-            ),
-        ],
-      );
-    } else if (selection == 'Playback speed' && context.mounted) {
-      await showDynamicSheet(
-        context,
-        items: [
-          for (final speed in [
-            '0.25x',
-            '0.5x',
-            '0.75x',
-            'Normal',
-            '1.25x',
-            '1.5x',
-            '1.75x',
-            '2x',
-          ])
-            DynamicSheetOptionItem(
-              leading: DynamicSheetItemCheck(selected: speed == 'Normal'),
-              title: speed,
-            ),
-        ],
-      );
-    } else if (selection == 'Captions' && context.mounted) {
-      await showDynamicSheet(
-        context,
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Text('Captions', style: TextStyle(fontSize: 16)),
-            ),
-            Divider(thickness: 1, height: 0),
-          ],
-        ),
-        trailing: const Column(
-          children: [
-            Divider(thickness: 1, height: 0),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text.rich(
-                TextSpan(
-                  text:
-                      'To keep captions on by default, adjust captions visibility in your',
-                  children: [
-                    TextSpan(
-                      text: ' device settings.',
-                      style: TextStyle(color: Color(0xFF3EA6FF)),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        items: [
-          for (final title in [
-            'Turn off captions',
-            'English (auto-generated)',
-            'Auto translate',
-          ])
-            DynamicSheetOptionItem(
-              leading: DynamicSheetItemCheck(
-                selected: title == 'Turn off captions',
-              ),
-              title: title,
-            ),
-        ],
-      );
-    } else if (selection == 'Additional settings' && context.mounted) {
-      await showDynamicSheet(
-        context,
-        trailing: const Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 4,
-          ),
-          child: Column(
-            children: [
-              Divider(thickness: 1, height: 0),
-              SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(YTIcons.help_outlined),
-                  SizedBox(width: 16),
-                  Text('Help & feedback', style: TextStyle(fontSize: 16)),
-                ],
-              ),
-              SizedBox(height: 8),
-            ],
-          ),
-        ),
-        items: [
-          const DynamicSheetOptionItem(
-            leading: Icon(YTIcons.loop_outlined),
-            title: 'Loop video',
-            trailing: PlayerSettingsSwitch(selected: false),
-          ),
-          const DynamicSheetOptionItem(
-            leading: Icon(YTIcons.ambient_mode_outlined),
-            title: 'Ambient mode',
-            trailing: PlayerSettingsSwitch(selected: false),
-          ),
-          const DynamicSheetOptionItem(
-            leading: Icon(Icons.video_stable),
-            title: 'Stable volume',
-            enabled: false,
-            trailing: PlayerSettingsSwitch(selected: true),
-          ),
-          const DynamicSheetOptionItem(
-            leading: Icon(YTIcons.youtube_music_outlined),
-            title: 'Listen with YouTube Music',
-            trailing: Icon(YTIcons.external_link_rounded_outlined),
-          ),
-        ],
-      );
     }
   }
 
@@ -2216,98 +1972,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           ),
         ],
       ],
-    );
-  }
-}
-
-class PlayerDraggableSheet extends StatelessWidget {
-  const PlayerDraggableSheet({
-    super.key,
-    required this.controller,
-    required this.opacity,
-    required this.visibleListenable,
-    required this.snapSizes,
-    required this.builder,
-  });
-
-  final DraggableScrollableController controller;
-  final Animation<double> opacity;
-  final ValueNotifier<bool> visibleListenable;
-  final List<double> snapSizes;
-  final Widget Function(
-    BuildContext context,
-    ScrollController scrollController,
-  ) builder;
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: visibleListenable,
-      builder: (
-        BuildContext context,
-        bool showSheet,
-        Widget? childWidget,
-      ) {
-        return Visibility(
-          visible: showSheet,
-          child: DraggableScrollableSheet(
-            snap: true,
-            minChildSize: 0,
-            initialChildSize: 0,
-            snapSizes: snapSizes,
-            shouldCloseOnMinExtent: false,
-            controller: controller,
-            snapAnimationDuration: const Duration(milliseconds: 300),
-            builder: (
-              BuildContext context,
-              ScrollController controller,
-            ) {
-              return FadeTransition(
-                opacity: opacity,
-                child: builder(context, controller),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-}
-
-class PlayerSideSheet extends StatelessWidget {
-  const PlayerSideSheet({
-    super.key,
-    required this.visibleListenable,
-    required this.sizeFactor,
-    required this.child,
-    required this.constraints,
-  });
-  final ValueNotifier<bool> visibleListenable;
-  final Animation<double> sizeFactor;
-  final BoxConstraints constraints;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: visibleListenable,
-      builder: (
-        BuildContext context,
-        bool showSheet,
-        Widget? childWidget,
-      ) {
-        return Visibility(
-          visible: showSheet,
-          child: SizeTransition(
-            sizeFactor: sizeFactor,
-            axis: Axis.horizontal,
-            child: ConstrainedBox(
-              constraints: constraints,
-              child: child,
-            ),
-          ),
-        );
-      },
     );
   }
 }
