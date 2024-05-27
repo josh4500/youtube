@@ -93,6 +93,7 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
               InfographicVisibility(
                 visible: listenable.showVisuals,
                 alwaysShow: true,
+                hideDuration: const Duration(seconds: 10),
                 alignment: Alignment.topLeft,
                 child: const IncludePromotionButton(margin: EdgeInsets.all(8)),
               ),
@@ -229,10 +230,10 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
   @override
   void initState() {
     super.initState();
-    showNotifier.value = widget.visible && widget.showAt == null;
+    showNotifier.value = widget.visible && widget.alwaysShow;
     visibilityController = AnimationController(
       vsync: this,
-      value: showNotifier.value ? 1 : 0,
+      value: showNotifier.value || widget.alwaysShow ? 1 : 0,
       duration: const Duration(milliseconds: 500),
       reverseDuration: const Duration(milliseconds: 350),
     );
@@ -282,10 +283,15 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
     } else if (widget.showAt != null) {
       _videoDurationSubscription ??= playerRepo.positionStream.listen(
         (event) {
-          if (event == widget.showAt) {
-            hiddenTemporary = false; // In case when duration was changed
+          final showing = showNotifier.value;
+          if (event.inSeconds == widget.showAt?.inSeconds) {
+            // In case when duration was changed and timer is still active
+            temporaryTimer?.cancel();
+            hiddenTemporary = false;
+
             showNotifier.value = true;
-            temporaryTimer ??= Timer(widget.hideDuration, temporaryHide);
+            visibilityController.forward();
+            temporaryTimer = Timer(widget.hideDuration, temporaryHide);
           }
         },
       );
@@ -297,10 +303,8 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.visible != widget.visible) {
-      showNotifier.value = widget.visible &&
-          widget.showAt == null &&
-          !hiddenPermanently &&
-          !hiddenTemporary;
+      showNotifier.value =
+          widget.visible && !hiddenPermanently && !hiddenTemporary;
     }
   }
 
@@ -308,8 +312,12 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
   void dispose() {
     permanentTimer?.cancel();
     temporaryTimer?.cancel();
+
+    showNotifier.dispose();
     alignmentController.dispose();
     visibilityController.dispose();
+    controlVisibilityNotifier.dispose();
+
     _playerSignalSubscription?.cancel();
     _videoDurationSubscription?.cancel();
     super.dispose();
@@ -354,7 +362,7 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
           child: NotificationListener<InfographicsNotification>(
             onNotification: (InfographicsNotification notification) {
               if (notification is CloseInfographicsNotification) {
-                permanentHide();
+                (widget.showAt != null) ? temporaryHide() : permanentHide();
               }
               return true;
             },

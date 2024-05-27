@@ -41,7 +41,7 @@ class VideoCardTeaser extends StatelessWidget {
       margin: const EdgeInsets.all(8),
       width: 185,
       decoration: BoxDecoration(
-        color: Colors.black45,
+        color: Colors.black54,
         borderRadius: BorderRadius.circular(2),
       ),
       child: Row(
