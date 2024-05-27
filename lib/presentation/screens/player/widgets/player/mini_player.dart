@@ -45,56 +45,62 @@ class MiniPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: space,
-            height: MediaQuery.sizeOf(context).height * kMinPlayerHeight,
-          ),
-          const SizedBox(width: 8),
-          const Expanded(
-            flex: 2,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Google Chromecast: Official Video',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    color: Color(0xFFF1F1F1),
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Harris Craycraft',
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    color: Color(0xFFAAAAAA),
-                  ),
-                ),
-              ],
+    final double minPlayerHeightRatio = context.orientation.isPortrait
+        ? kMinPlayerHeightPortrait
+        : kMinPlayerHeightLandscape;
+
+    return Material(
+      child: SizedBox(
+        height: height,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: space,
+              height: MediaQuery.sizeOf(context).height * minPlayerHeightRatio,
             ),
-          ),
-          Expanded(
-            child: ListView(
-              reverse: true,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              scrollDirection: Axis.horizontal,
-              children: const <Widget>[
-                _MiniPlayerCloseButton(),
-                _MiniPlayerPausePlayButton(),
-              ],
+            const SizedBox(width: 8),
+            const Expanded(
+              flex: 2,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Google Chromecast: Official Video',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: Color(0xFFF1F1F1),
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Harris Craycraft',
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: Color(0xFFAAAAAA),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: ListView(
+                reverse: true,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                children: const <Widget>[
+                  _MiniPlayerCloseButton(),
+                  _MiniPlayerPausePlayButton(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

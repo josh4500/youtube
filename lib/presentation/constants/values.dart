@@ -4,10 +4,11 @@ const double kMiniPlayerHeight = 56;
 const double kMaxVideoViewPortHeight = 0.7;
 const double kAvgVideoViewPortHeight = 0.273;
 
-const double kMaxVideoViewPortWidth = 1;
-const double kMinVideoViewPortWidth = 0.33;
+const double kMinVideoViewPortWidthPortrait = 0.33;
+const double kMinVideoViewPortWidthLandscape = 0.15;
 
-const double kMinPlayerHeight = 0.07;
+const double kMinPlayerHeightPortrait = 0.07;
+const double kMinPlayerHeightLandscape = 0.166;
 
 const double kMaxPlayerScale = 8.0;
 const double kMinPlayerScale = 1.0;
