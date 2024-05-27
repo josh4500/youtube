@@ -1667,9 +1667,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       ]),
       builder: (
         BuildContext context,
-        Widget? _,
+        Widget? childWidget,
       ) {
-        final PlayerRepository playerRepo = ref.read(playerRepositoryProvider);
         return Visibility(
           visible: miniPlayerOpacity > 0,
           child: SizedBox(
@@ -1678,19 +1677,25 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                 : screenWidth,
             child: Opacity(
               opacity: miniPlayerOpacity,
-              child: PlaybackProgress(
-                progress: playerRepo.videoProgressStream,
-                // TODO(Josh): Revisit this code
-                start: playerRepo.currentVideoProgress ?? Progress.zero,
-                // TODO(Josh): Get ready value
-                end: const Duration(minutes: 1),
-                showBuffer: false,
-                backgroundColor: Colors.transparent,
-              ),
+              child: childWidget,
             ),
           ),
         );
       },
+      child: Builder(
+        builder: (context) {
+          final playerRepo = ref.read(playerRepositoryProvider);
+          return PlaybackProgress(
+            progress: playerRepo.videoProgressStream,
+            // TODO(Josh): Revisit this code
+            start: playerRepo.currentVideoProgress ?? Progress.zero,
+            // TODO(Josh): Get ready value
+            end: const Duration(minutes: 1),
+            showBuffer: false,
+            backgroundColor: Colors.transparent,
+          );
+        },
+      ),
     );
 
     final miniPlayer = SlideTransition(
@@ -1804,63 +1809,67 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       onScrollNotification: _onScrollInfoScrollNotification,
     );
 
-    return Stack(
-      alignment: Alignment.bottomCenter,
-      clipBehavior: Clip.none,
-      children: [
-        SlideTransition(
-          position: _playerSlideAnimation,
-          child: FadeTransition(
-            opacity: _playerFadeAnimation,
-            child: ListenableBuilder(
-              listenable: Listenable.merge(
-                [
-                  if (context.orientation.isLandscape) _screenWidthNotifier,
-                  _screenHeightNotifier,
-                ],
-              ),
-              builder: (
-                BuildContext context,
-                Widget? screenWidget,
-              ) {
-                return SizedBox(
-                  width: context.orientation.isLandscape
-                      ? screenWidth * _screenWidthNotifier.value
-                      : null,
-                  height: screenHeight * _screenHeightNotifier.value,
-                  child: screenWidget,
-                );
-              },
-              child: Flex(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                direction: layoutDirection,
-                children: [
-                  Flexible(
-                    flex: orientation.isPortrait ? 0 : 1,
-                    fit: orientation.isPortrait ? FlexFit.tight : FlexFit.loose,
-                    child: FadeTransition(
-                      opacity: _playerOpacityAnimation,
-                      child: PlayerInfographicsWrapper(
-                        hideGraphicsNotifier: _hideGraphicsNotifier,
-                        child: GestureDetector(
-                          onTap: _onTapPlayer,
-                          onVerticalDragUpdate: _onDragPlayer,
-                          onVerticalDragEnd: _onDragPlayerEnd,
-                          behavior: HitTestBehavior.opaque,
-                          child: Stack(
-                            children: [
-                              miniPlayer,
-                              mainPlayer,
-                              Positioned(bottom: 0, child: miniPlayerProgress),
-                            ],
+    return Material(
+      color: orientation.isLandscape ? Colors.transparent : null,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        clipBehavior: Clip.none,
+        children: [
+          SlideTransition(
+            position: _playerSlideAnimation,
+            child: FadeTransition(
+              opacity: _playerFadeAnimation,
+              child: ListenableBuilder(
+                listenable: Listenable.merge(
+                  [
+                    if (context.orientation.isLandscape) _screenWidthNotifier,
+                    _screenHeightNotifier,
+                  ],
+                ),
+                builder: (
+                  BuildContext context,
+                  Widget? screenWidget,
+                ) {
+                  return SizedBox(
+                    width: context.orientation.isLandscape
+                        ? screenWidth * _screenWidthNotifier.value
+                        : null,
+                    height: screenHeight * _screenHeightNotifier.value,
+                    child: screenWidget,
+                  );
+                },
+                child: Flex(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  direction: layoutDirection,
+                  children: [
+                    Flexible(
+                      flex: orientation.isPortrait ? 0 : 1,
+                      fit: orientation.isPortrait
+                          ? FlexFit.tight
+                          : FlexFit.loose,
+                      child: FadeTransition(
+                        opacity: _playerOpacityAnimation,
+                        child: PlayerInfographicsWrapper(
+                          hideGraphicsNotifier: _hideGraphicsNotifier,
+                          child: GestureDetector(
+                            onTap: _onTapPlayer,
+                            onVerticalDragUpdate: _onDragPlayer,
+                            onVerticalDragEnd: _onDragPlayerEnd,
+                            behavior: HitTestBehavior.opaque,
+                            child: Stack(
+                              children: [
+                                miniPlayer,
+                                mainPlayer,
+                                Positioned(
+                                    bottom: 0, child: miniPlayerProgress),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  if (orientation.isPortrait)
-                    Flexible(
-                      child: Material(
+                    if (orientation.isPortrait)
+                      Flexible(
                         child: Listener(
                           onPointerMove: _onDragInfo,
                           onPointerUp: _onDragInfoUp,
@@ -1879,100 +1888,100 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                           ),
                         ),
                       ),
-                    ),
-                  if (orientation.isLandscape) ...[
-                    PlayerSideSheet(
-                      constraints: BoxConstraints(
-                        maxWidth: screenWidth * .4,
+                    if (orientation.isLandscape) ...[
+                      PlayerSideSheet(
+                        constraints: BoxConstraints(
+                          maxWidth: screenWidth * .4,
+                        ),
+                        sizeFactor: _descSizeAnimation,
+                        visibleListenable: _showDescDraggable,
+                        child: VideoDescriptionSheet(
+                          key: _descSheetKey,
+                          showDragIndicator: false,
+                          closeDescription: _closeDescSheet,
+                          transcriptNotifier: _transcriptNotifier,
+                          draggableController: _descDraggableController,
+                        ),
                       ),
-                      sizeFactor: _descSizeAnimation,
-                      visibleListenable: _showDescDraggable,
-                      child: VideoDescriptionSheet(
-                        key: _descSheetKey,
-                        showDragIndicator: false,
-                        closeDescription: _closeDescSheet,
-                        transcriptNotifier: _transcriptNotifier,
-                        draggableController: _descDraggableController,
+                      PlayerSideSheet(
+                        constraints: BoxConstraints(
+                          maxWidth: screenWidth * .4,
+                        ),
+                        sizeFactor: _commentSizeAnimation,
+                        visibleListenable: _showCommentDraggable,
+                        child: VideoCommentsSheet(
+                          key: _commentSheetKey,
+                          maxHeight: 0,
+                          showDragIndicator: false,
+                          closeComment: _closeCommentSheet,
+                          replyNotifier: _replyIsOpenedNotifier,
+                          draggableController: _commentDraggableController,
+                        ),
                       ),
-                    ),
-                    PlayerSideSheet(
-                      constraints: BoxConstraints(
-                        maxWidth: screenWidth * .4,
-                      ),
-                      sizeFactor: _commentSizeAnimation,
-                      visibleListenable: _showCommentDraggable,
-                      child: VideoCommentsSheet(
-                        key: _commentSheetKey,
-                        maxHeight: 0,
-                        showDragIndicator: false,
-                        closeComment: _closeCommentSheet,
-                        replyNotifier: _replyIsOpenedNotifier,
-                        draggableController: _commentDraggableController,
-                      ),
-                    ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),
-        ),
-        if (orientation.isPortrait) ...[
-          PlayerDraggableSheet(
-            builder: (BuildContext context, ScrollController controller) {
-              return VideoCommentsSheet(
-                key: _commentSheetKey,
-                controller: controller,
-                maxHeight: kAvgVideoViewPortHeight,
-                closeComment: _closeCommentSheet,
-                replyNotifier: _replyIsOpenedNotifier,
-                draggableController: _commentDraggableController,
-              );
-            },
-            opacity: _draggableOpacityAnimation,
-            controller: _commentDraggableController,
-            visibleListenable: _showCommentDraggable,
-            snapSizes: <double>[
-              0.0,
-              maxInitialDraggableSnapSize,
-            ],
-          ),
-          PlayerDraggableSheet(
-            builder: (BuildContext context, ScrollController controller) {
-              return VideoDescriptionSheet(
-                key: _descSheetKey,
-                controller: controller,
-                closeDescription: _closeDescSheet,
-                transcriptNotifier: _transcriptNotifier,
-                draggableController: _descDraggableController,
-              );
-            },
-            opacity: _draggableOpacityAnimation,
-            controller: _descDraggableController,
-            visibleListenable: _showDescDraggable,
-            snapSizes: <double>[
-              0.0,
-              maxInitialDraggableSnapSize,
-            ],
-          ),
-          PlayerDraggableSheet(
-            builder: (BuildContext context, ScrollController controller) {
-              return VideoChaptersSheet(
-                key: _chaptersSheetKey,
-                controller: controller,
-                closeChapter: _closeChaptersSheet,
-                draggableController: _chaptersDraggableController,
-              );
-            },
-            opacity: _draggableOpacityAnimation,
-            controller: _chaptersDraggableController,
-            visibleListenable: _showChaptersDraggable,
-            snapSizes: <double>[
-              0.0,
-              maxInitialDraggableSnapSize,
-            ],
-          ),
+          if (orientation.isPortrait) ...[
+            PlayerDraggableSheet(
+              builder: (BuildContext context, ScrollController controller) {
+                return VideoCommentsSheet(
+                  key: _commentSheetKey,
+                  controller: controller,
+                  maxHeight: kAvgVideoViewPortHeight,
+                  closeComment: _closeCommentSheet,
+                  replyNotifier: _replyIsOpenedNotifier,
+                  draggableController: _commentDraggableController,
+                );
+              },
+              opacity: _draggableOpacityAnimation,
+              controller: _commentDraggableController,
+              visibleListenable: _showCommentDraggable,
+              snapSizes: <double>[
+                0.0,
+                maxInitialDraggableSnapSize,
+              ],
+            ),
+            PlayerDraggableSheet(
+              builder: (BuildContext context, ScrollController controller) {
+                return VideoDescriptionSheet(
+                  key: _descSheetKey,
+                  controller: controller,
+                  closeDescription: _closeDescSheet,
+                  transcriptNotifier: _transcriptNotifier,
+                  draggableController: _descDraggableController,
+                );
+              },
+              opacity: _draggableOpacityAnimation,
+              controller: _descDraggableController,
+              visibleListenable: _showDescDraggable,
+              snapSizes: <double>[
+                0.0,
+                maxInitialDraggableSnapSize,
+              ],
+            ),
+            PlayerDraggableSheet(
+              builder: (BuildContext context, ScrollController controller) {
+                return VideoChaptersSheet(
+                  key: _chaptersSheetKey,
+                  controller: controller,
+                  closeChapter: _closeChaptersSheet,
+                  draggableController: _chaptersDraggableController,
+                );
+              },
+              opacity: _draggableOpacityAnimation,
+              controller: _chaptersDraggableController,
+              visibleListenable: _showChaptersDraggable,
+              snapSizes: <double>[
+                0.0,
+                maxInitialDraggableSnapSize,
+              ],
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
