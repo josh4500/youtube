@@ -536,6 +536,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       playerRepo.openVideo(); // Opens and play video
     });
 
+    // NOTE: Do not remove
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -623,6 +624,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   @override
   void dispose() {
+    // NOTE: Do not remove
+    WidgetsBinding.instance.removeObserver(this);
+
     _orientationTimer?.cancel();
     _viewController.dispose();
     _playerSignalSubscription?.cancel();
@@ -1658,7 +1662,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     final miniPlayerProgress = ListenableBuilder(
       listenable: Listenable.merge([
-        if (context.orientation.isLandscape) _screenWidthNotifier,
+        if (orientation.isLandscape) _screenWidthNotifier,
         _playerWidthNotifier,
       ]),
       builder: (

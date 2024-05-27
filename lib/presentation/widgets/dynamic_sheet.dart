@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:youtube_clone/core.dart';
+import 'package:youtube_clone/presentation/theme/device_theme.dart';
 
 import '../../infrastructure.dart';
 import '../theme/icon/y_t_icons_icons.dart';
@@ -36,7 +39,9 @@ class _DynamicSheetState extends State<DynamicSheet>
   }
 
   double get minSheetHeight {
-    return MediaQuery.sizeOf(context).height * .52;
+    return context.orientation.isPortrait
+        ? MediaQuery.sizeOf(context).height * .48
+        : MediaQuery.sizeOf(context).height;
   }
 
   double get maxSheetHeight {
@@ -46,14 +51,6 @@ class _DynamicSheetState extends State<DynamicSheet>
   @override
   void initState() {
     super.initState();
-    scrollController.addListener(animateHeight);
-  }
-
-  void animateHeight() {
-    heightNotifier.value = (minSheetHeight + scrollController.offset).clamp(
-      minSheetHeight,
-      maxSheetHeight,
-    );
   }
 
   @override
