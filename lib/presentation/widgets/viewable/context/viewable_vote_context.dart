@@ -147,34 +147,45 @@ class VoteOption extends StatelessWidget {
                           ),
                         ),
                       ),
-                    Container(
-                      width: votedSize,
-                      height: hasImage ? double.infinity : null,
-                      alignment: Alignment.centerLeft,
-                      margin: const EdgeInsets.all(.5),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: selected && voted
-                            ? const Color(0x203EA6FF)
-                            : voted
-                                ? Colors.white12
-                                : null,
-                        borderRadius: hasImage
-                            ? const BorderRadius.only(
-                                topRight: Radius.circular(4),
-                                bottomRight: Radius.circular(4),
-                              )
-                            : BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        text,
-                        style: TextStyle(
-                          color: selected && voted
-                              ? const Color(0xFF3EA6FF)
-                              : Colors.white54,
-                          fontWeight: FontWeight.w500,
+                    Stack(
+                      children: [
+                        Container(
+                          width: votedSize,
+                          height: hasImage ? double.infinity : 40,
+                          alignment: Alignment.centerLeft,
+                          margin: const EdgeInsets.all(.5),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: selected && voted
+                                ? const Color(0x203EA6FF)
+                                : voted
+                                    ? Colors.white12
+                                    : null,
+                            borderRadius: hasImage
+                                ? const BorderRadius.only(
+                                    topRight: Radius.circular(4),
+                                    bottomRight: Radius.circular(4),
+                                  )
+                                : BorderRadius.circular(4),
+                          ),
                         ),
-                      ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            margin: const EdgeInsets.all(.5),
+                            padding: const EdgeInsets.all(12),
+                            child: Text(
+                              text,
+                              style: TextStyle(
+                                color: selected && voted
+                                    ? const Color(0xFF3EA6FF)
+                                    : Colors.white54,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const Spacer(),
                   ],
