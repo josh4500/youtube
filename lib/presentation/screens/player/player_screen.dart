@@ -432,7 +432,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       kMinVideoViewPortWidthPortrait,
     );
     _playerHeightNotifier = ValueNotifier<double>(
-      kMinVideoViewPortWidthPortrait,
+      kMinVideoViewPortWidthPortrait.normalize(
+        kMinVideoViewPortWidthPortrait,
+        1,
+      ),
     );
     _screenHeightNotifier = ValueNotifier<double>(
       kMinVideoViewPortWidthPortrait,
@@ -540,18 +543,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   static const double kOrientationLockBreakpoint = 600;
   static bool localExpanded = false;
 
-  static bool _instantiatedValues = false;
-
   @override
   void didChangeDependencies() {
     _view = View.of(context);
 
-    if (_instantiatedValues == false) {
-      _instantiatedValues = true;
-
-      _animatePlayerWidth(1);
-      _animateScreenHeight(1);
-    }
+    _animatePlayerWidth(1);
+    _animateScreenHeight(1);
 
     final PlayerRepository playerRepo = ref.read(playerRepositoryProvider);
 
@@ -1847,10 +1844,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                             children: [
                               miniPlayer,
                               mainPlayer,
-                              Positioned(
-                                bottom: 0,
-                                child: miniPlayerProgress,
-                              ),
+                              Positioned(bottom: 0, child: miniPlayerProgress),
                             ],
                           ),
                         ),
