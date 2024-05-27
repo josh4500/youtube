@@ -160,6 +160,33 @@ class AppRoutes {
 
   ///
   ///
+  /// Create
+  ///
+  ///
+
+  static final RouteInfo create = RouteInfo(
+    name: 'create',
+    path: '/create',
+  );
+
+  ///
+  ///
+  /// Create
+  ///
+  ///
+
+  static final RouteInfo comments = RouteInfo(
+    name: 'comments',
+    path: '/comments',
+  );
+
+  static final RouteInfo replies = RouteInfo(
+    name: 'replies',
+    path: '/replies',
+  );
+
+  ///
+  ///
   /// Playlist
   ///
   ///

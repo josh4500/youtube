@@ -42,6 +42,16 @@ export 'screens/accounts/your_videos_screen.dart';
 export 'screens/channel/channel_description_screen.dart';
 export 'screens/channel/channel_screen.dart';
 
+// Comments
+export 'screens/comments/comments_screen.dart';
+export 'screens/comments/replies_screen.dart';
+
+// Create
+export 'screens/create/create_live_screen.dart';
+export 'screens/create/create_screen.dart';
+export 'screens/create/create_shorts_screen.dart';
+export 'screens/create/create_video_screen.dart';
+
 // Home
 export 'screens/home/fashion_and_beauty_screen.dart';
 export 'screens/home/gaming_screen.dart';
@@ -83,7 +93,6 @@ export 'screens/settings/settings_screen.dart';
 export 'screens/settings/video_quality_settings_screen.dart';
 
 // Shorts
-export 'screens/shorts/create_shorts_screen.dart';
 export 'screens/shorts/shorts_screen.dart';
 
 // Subscriptions

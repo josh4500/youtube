@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
 import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
+import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../account_avatar.dart';
@@ -188,7 +190,7 @@ class _NavCreateButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () {},
+      onPressed: () => context.goto(AppRoutes.create),
       padding: const EdgeInsets.symmetric(horizontal: 6),
       visualDensity: VisualDensity.standard,
       icon: const Icon(YTIcons.create_outlined, size: 32, weight: 0.8),

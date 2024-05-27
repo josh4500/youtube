@@ -442,6 +442,92 @@ class AppRouter {
           );
         },
       ),
+      GoRoute(
+        name: AppRoutes.create.name,
+        path: AppRoutes.create.path,
+        parentNavigatorKey: rootKey,
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          return CustomTransitionPage(
+            transitionsBuilder: (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secAnimation,
+              Widget child,
+            ) {
+              return SlideTransition(
+                key: state.pageKey,
+                position: animation.drive(
+                  animation.status == AnimationStatus.forward
+                      ? Tween<Offset>(
+                          begin: const Offset(0, 1),
+                          end: Offset.zero,
+                        )
+                      : Tween<Offset>(
+                          begin: const Offset(1, 0),
+                          end: Offset.zero,
+                        ),
+                ),
+                child: child,
+              );
+            },
+            child: const CreateScreen(),
+          );
+        },
+      ),
+      GoRoute(
+        name: AppRoutes.comments.name,
+        path: AppRoutes.comments.path,
+        parentNavigatorKey: rootKey,
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          return CustomTransitionPage(
+            transitionsBuilder: (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secAnimation,
+              Widget child,
+            ) {
+              return SlideTransition(
+                key: state.pageKey,
+                position: animation.drive(
+                  Tween<Offset>(
+                    begin: const Offset(1, 0),
+                    end: Offset.zero,
+                  ),
+                ),
+                child: child,
+              );
+            },
+            child: const CommentsScreen(),
+          );
+        },
+      ),
+      GoRoute(
+        name: AppRoutes.replies.name,
+        path: AppRoutes.replies.path,
+        parentNavigatorKey: rootKey,
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          return CustomTransitionPage(
+            transitionsBuilder: (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secAnimation,
+              Widget child,
+            ) {
+              return SlideTransition(
+                key: state.pageKey,
+                position: animation.drive(
+                  Tween<Offset>(
+                    begin: const Offset(1, 0),
+                    end: Offset.zero,
+                  ),
+                ),
+                child: child,
+              );
+            },
+            child: const RepliesScreen(),
+          );
+        },
+      ),
     ],
   );
 }
