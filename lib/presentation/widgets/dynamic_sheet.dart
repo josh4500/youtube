@@ -67,11 +67,11 @@ class _DynamicSheetState extends State<DynamicSheet>
           child: ListenableBuilder(
             listenable: heightNotifier,
             builder: (BuildContext context, Widget? childWidget) {
-              return SizedBox(
-                // constraints: BoxConstraints(
-                //   minHeight: minSheetHeight,
-                //   maxHeight: heightNotifier.value,
-                // ),
+              return ConstrainedBox(
+                constraints: const BoxConstraints(
+                    // minHeight: minSheetHeight,
+                    // maxHeight: heightNotifier.value,
+                    ),
                 child: childWidget,
               );
             },
@@ -224,6 +224,7 @@ Future<T?> showDynamicSheet<T>(
     shape: const RoundedRectangleBorder(),
     isScrollControlled: true,
     useRootNavigator: true,
+    constraints: const BoxConstraints(maxWidth: 500),
     backgroundColor: Colors.transparent,
     builder: (BuildContext context) {
       return DynamicSheet(
