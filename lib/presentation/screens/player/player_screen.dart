@@ -1657,7 +1657,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     );
 
     final miniPlayerProgress = ListenableBuilder(
-      listenable: _playerWidthNotifier,
+      listenable: Listenable.merge([
+        if (context.orientation.isLandscape) _screenWidthNotifier,
+        _playerWidthNotifier,
+      ]),
       builder: (
         BuildContext context,
         Widget? _,
@@ -1666,7 +1669,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         return Visibility(
           visible: miniPlayerOpacity > 0,
           child: SizedBox(
-            width: screenWidth,
+            width: orientation.isLandscape
+                ? screenWidth * _screenWidthNotifier.value
+                : screenWidth,
             child: Opacity(
               opacity: miniPlayerOpacity,
               child: PlaybackProgress(
@@ -1689,9 +1694,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _screenWidthNotifier,
         transformer: (incomingValue) {
           // TODO(josh4500): Avoid explicit value
-          return context.orientation.isLandscape
-              ? incomingValue.normalize(0.6, 1)
-              : 0;
+          return orientation.isLandscape ? incomingValue.normalize(0.6, 1) : 0;
         },
       ).drive(
         Tween<Offset>(
@@ -1701,7 +1704,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       ),
       child: ListenableBuilder(
         listenable: Listenable.merge([
-          if (context.orientation.isLandscape)
+          if (orientation.isLandscape)
             _screenWidthNotifier
           else
             _playerWidthNotifier,
@@ -1715,7 +1718,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
             child: Opacity(
               opacity: miniPlayerOpacity,
               child: MiniPlayer(
-                space: context.orientation.isLandscape
+                space: orientation.isLandscape
                     ? screenWidth * minVideoViewPortWidthRatio
                     : playerWidth,
                 height: playerMinHeight,
