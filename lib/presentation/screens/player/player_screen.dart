@@ -406,6 +406,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       ),
     );
 
+    _playerDismissController.addListener(() {
+      final value = _playerDismissController.value;
+      _changePlayerPitch(value);
+    });
+
     // Added a callback to animate info opacity when additional heights changes
     // (i.e when player going in or out of expanded mode)
     // Opacity of info does not need to be updated when either bottom sheets are open
@@ -745,6 +750,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         ref.read(playerRepositoryProvider).playVideo();
       }
     }
+  }
+
+  /// Callback to change Player's pitch when dismissing
+  void _changePlayerPitch(double value) {
+    ref.read(playerRepositoryProvider).setPitch(value);
   }
 
   /// Callback to updates the info opacity when draggable sheets changes its size

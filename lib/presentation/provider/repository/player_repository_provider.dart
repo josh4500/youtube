@@ -163,6 +163,7 @@ class PlayerRepository {
   }
 
   Future<void> openVideo() async {
+    _videoPlayer.setPitch(1);
     await _videoPlayer.open(
       Media(
         'https://user-images.githubusercontent.com/28951144/229373695-22f88f13-d18f-4288-9bf1-c3e078d83722.mp4',
@@ -205,6 +206,10 @@ class PlayerRepository {
 
   Future<void> setSpeed([double rate = 2]) async {
     await _videoPlayer.setRate(rate);
+  }
+
+  Future<void> setPitch(double pitch) async {
+    await _videoPlayer.setPitch(pitch);
   }
 
   Future<void> restartVideo() async {
