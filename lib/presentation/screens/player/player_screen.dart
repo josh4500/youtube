@@ -749,8 +749,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Callback to updates the info opacity when draggable sheets changes its size
   void _changePlayerOpacityOnDraggable(double size) {
-    _hideControls(true);
     if (size > maxInitialDraggableSnapSize) {
+      _hideControls(true);
+
       _playerOpacityController.value = size.normalize(
         maxInitialDraggableSnapSize,
         1,
@@ -911,6 +912,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   Future<void> _exitFullscreenMode() async {
     _preventGestures = false;
     if (_isForcedFullscreen == false) {
+      _hideControls();
       // If we change the Orientations to portraitUp this will make it permanent
       // and player will not react when flipped to landscape
       await SystemChrome.setPreferredOrientations(
@@ -924,8 +926,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         );
       });
 
+      _showControls(true);
       return;
     }
+
     _isForcedFullscreen = false;
     _hideControls();
 
@@ -948,6 +952,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         PlayerSignal.hideControls,
         PlayerSignal.hidePlaybackProgress,
       ]);
+    } else if (context.orientation.isPortrait) {
+      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+        PlayerSignal.hidePlaybackProgress,
+      ]);
     }
   }
 
@@ -957,14 +965,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   void _showControls([bool force = false]) {
     if (_controlWasTempHidden || force) {
       _controlWasTempHidden = false;
-
       if (!_isMinimized && !_preventGestures) {
         ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.showControls,
           if (context.orientation.isPortrait) PlayerSignal.showPlaybackProgress,
         ]);
       }
-    } else if (context.orientation.isPortrait) {
+    } else if (!_isMinimized && context.orientation.isPortrait) {
       ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
         PlayerSignal.showPlaybackProgress,
       ]);
@@ -1164,18 +1171,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     } else {
       if (_isMinimized) {
       } else {
-        // Hide controls before showing zoom pan
-        _hideControls();
         // Start zoom panning on swipe up
         _swipeZoomPan(
           -(details.delta.dy / (screenHeight * playerHeightToScreenRatio)),
         );
       }
-    }
-
-    // Hide controls when the height falls below a certain threshold
-    if (_screenHeightNotifier.value < 1) {
-      _hideControls();
     }
   }
 
@@ -1236,7 +1236,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _playerDismissController.value = 0;
     }
 
-    if (_playerWidthNotifier.value == minVideoViewPortWidthRatio) {
+    if (_screenHeightNotifier.value == minPlayerHeightRatio) {
       ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
         PlayerSignal.minimize,
         PlayerSignal.hidePlaybackProgress,
@@ -1259,10 +1259,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   void _onDragFullscreenPlayer(DragUpdateDetails details) {
-    // Check the direction of the drag
-    // If dragging down
-    _hideControls();
-
     _slideOffsetYValue += details.delta.dy;
 
     _viewController.value = ui.clampDouble(
@@ -1279,8 +1275,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _slideOffsetYValue = 0;
     _viewController.value = 0;
+  }
 
-    _showControls();
+  void _onDragPlayerStart(DragStartDetails details) {
+    if (_preventGestures) return;
+
+    // Hide controls
+    _hideControls();
   }
 
   /// Handles drag updates for the player, determining the drag behavior based on
@@ -1295,9 +1296,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       );
       return;
     }
-
-    // Hide controls
-    _hideControls();
 
     // If preventing player drag up or down, return without further processing
     if (details.delta.dy > 0 && _preventPlayerDragUp) {
@@ -1322,6 +1320,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (_preventGestures) return;
 
     _releasedPlayerPointer = true;
+
     if (!_isSeeking) {
       _preventPlayerDragUp = false;
       _preventPlayerDragDown = false;
@@ -1585,10 +1584,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _preventPlayerDismiss = false;
 
       if (_isExpanded) {
-        // Avoids animation by passing false
-        _exitExpandedMode(false);
+        _exitExpandedMode(false); // Avoids animation by passing false
       }
 
+      // Force hide after exiting expanded mode
       _hideControls(true);
 
       Future.wait([
@@ -1853,6 +1852,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                           hideGraphicsNotifier: _hideGraphicsNotifier,
                           child: GestureDetector(
                             onTap: _onTapPlayer,
+                            onVerticalDragStart: _onDragPlayerStart,
                             onVerticalDragUpdate: _onDragPlayer,
                             onVerticalDragEnd: _onDragPlayerEnd,
                             behavior: HitTestBehavior.opaque,
@@ -1861,7 +1861,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                                 miniPlayer,
                                 mainPlayer,
                                 Positioned(
-                                    bottom: 0, child: miniPlayerProgress),
+                                  bottom: 0,
+                                  child: miniPlayerProgress,
+                                ),
                               ],
                             ),
                           ),
