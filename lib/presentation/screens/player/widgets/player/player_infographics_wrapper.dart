@@ -292,6 +292,10 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
             temporaryTimer?.cancel();
             hiddenTemporary = false;
 
+            final isMinimized = ref.read(playerViewStateProvider).isMinimized;
+            // Avoid showing when minimized
+            controlVisibilityNotifier.value = !isMinimized;
+
             showNotifier.value = true;
             visibilityController.forward();
             temporaryTimer = Timer(widget.hideDuration, temporaryHide);
