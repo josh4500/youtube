@@ -3,6 +3,7 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'controls/player_ambient.dart';
 import 'video_actions.dart';
+import 'video_channel_context.dart';
 import 'video_channel_section.dart';
 import 'video_comment_section.dart';
 import 'video_context.dart';
@@ -37,8 +38,9 @@ class PlayerVideoInfo extends StatelessWidget {
                 Column(
                   children: <Widget>[
                     VideoDescriptionSection(),
-                    VideoChannelSection(),
                     VideoContext(),
+                    VideoChannelSection(),
+                    VideoChannelContext(),
                     VideoActions(),
                     VideoCommentSection(),
                     SizedBox(height: 12),

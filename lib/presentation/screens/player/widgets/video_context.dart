@@ -39,7 +39,7 @@ class VideoContext extends StatelessWidget {
     // return const SizedBox(height: 8);
     return Container(
       padding: const EdgeInsets.symmetric(
-        vertical: 12,
+        vertical: 8,
         horizontal: 16,
       ),
       margin: const EdgeInsets.only(left: 12, right: 12, top: 5, bottom: 12),
@@ -47,29 +47,76 @@ class VideoContext extends StatelessWidget {
         color: const Color(0xFF272727),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: RichText(
-              text: const TextSpan(
-                text: 'TRT is a Turkish public broadcast service. ',
-                children: [
-                  TextSpan(
-                    text: 'Wikipedia ',
-                    children: [
-                      IconSpan(YTIcons.external_link_outlined),
-                    ],
-                    style: TextStyle(fontSize: 12, color: Color(0xFF3EA6FF)),
-                  ),
-                ],
-                style: TextStyle(fontSize: 12),
+          const Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(Icons.content_paste, size: 18),
+                    SizedBox(width: 18),
+                    Text(
+                      'Context',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    )
+                  ],
+                ),
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-            ),
+              SizedBox(width: 24),
+              Icon(YTIcons.more_vert_outlined, size: 18),
+            ],
           ),
-          const SizedBox(width: 24),
-          const Icon(YTIcons.more_vert_outlined, size: 16),
+          const Divider(height: 24, thickness: 1),
+          RichText(
+            text: const TextSpan(
+              text: 'Holocaust ',
+              children: [
+                IconSpan(YTIcons.external_link_outlined),
+              ],
+              style: TextStyle(fontSize: 14, color: Color(0xFF3EA6FF)),
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+          ),
+          Row(
+            children: [
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Encyclopedia Britannica',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Holocaust, Hebrew Sho`ah, Yiddish and Hebrew Hurban ("Destruction"), the systematic state-sponsored killing of six million Jewish people',
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: Colors.white30,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
