@@ -117,13 +117,18 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   /// Sends a vibration when user slides over this value
   Duration? _lowerboundSlideDuration;
 
-  bool _showPullUp = false;
-  final _showSlidingSeekIndicator = ValueNotifier<bool>(false);
-  final _showSlidingReleaseIndicator = ValueNotifier<bool>(false);
-  final _showSlidingSeekDuration = ValueNotifier<bool>(false);
+  late final AnimationController _seekDurationIndicatorController;
+  late final Animation<double> _seekDurationIndicatorAnimation;
 
   /// Notifiers and variables for forward seeking at 2x speed
   final _showForward2XIndicator = ValueNotifier<bool>(false);
+
+  late final AnimationController _seekIndicatorController;
+  late final Animation<double> _seekIndicatorAnimation;
+
+  final _seekIndicatorNotifier = ValueNotifier<SeekNotificationType>(
+    SeekNotificationType.none,
+  );
 
   /// Rate of seeking on double tap
   final _seekRate = ValueNotifier<int>(0);
@@ -141,7 +146,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   /// Whether sliding seek is active
   bool get _isSlidingSeek {
-    return _showSlidingSeekIndicator.value || _showSlideFrame.value;
+    return _seekIndicatorNotifier.value.isSlide || _showSlideFrame.value;
   }
 
   /// Whether it was playing
@@ -163,6 +168,26 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
     _controlsAnimation = CurvedAnimation(
       parent: _controlsVisibilityController,
+      curve: Curves.easeIn,
+    );
+
+    _seekIndicatorController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 175),
+    );
+
+    _seekIndicatorAnimation = CurvedAnimation(
+      parent: _seekIndicatorController,
+      curve: Curves.easeIn,
+    );
+
+    _seekDurationIndicatorController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 175),
+    );
+
+    _seekDurationIndicatorAnimation = CurvedAnimation(
+      parent: _seekDurationIndicatorController,
       curve: Curves.easeIn,
     );
 
@@ -227,6 +252,14 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   StreamSubscription<PlayerSignal>? _playerSignalSubscription;
   Timer? _showUnlockTimer;
+
+  @override
+  void didUpdateWidget(covariant PlayerOverlayControls oldWidget) {
+    if (context.orientation.isLandscape && _controlsHidden) {
+      _showPlaybackProgress.value = false;
+    }
+    super.didUpdateWidget(oldWidget);
+  }
 
   @override
   void didChangeDependencies() {
@@ -325,13 +358,12 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _showUnlockTimer?.cancel();
     _controlHideTimer?.cancel();
     _controlsVisibilityController.dispose();
-    _showSlidingSeekIndicator.dispose();
+    _seekIndicatorNotifier.dispose();
     _showDoubleTapSeekIndicator.dispose();
     _showForward2XIndicator.dispose();
-    _showSlidingSeekDuration.dispose();
+    _seekDurationIndicatorController.dispose();
     _slideFrameController.dispose();
     _bufferController.dispose();
-    _showSlidingReleaseIndicator.dispose();
 
     super.dispose();
   }
@@ -341,137 +373,65 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Align(
-          alignment: Alignment.topCenter,
-          child: SeekIndicator(
-            valueListenable: _showForward2XIndicator,
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('2X'),
-                SizedBox(width: 4),
-                Icon(Icons.fast_forward),
-              ],
-            ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.lerp(
-            Alignment.center,
-            Alignment.bottomCenter,
-            0.75,
-          )!,
-          child: ValueListenableBuilder<bool>(
-            valueListenable: _showSlideFrame,
-            builder: (BuildContext _, bool showingSlideFrame, Widget? __) {
-              return Visibility(
-                visible: showingSlideFrame == false,
-                child: _buildShowSlideSeekDuration(),
-              );
-            },
-          ),
-        ),
-        AnimatedBuilder(
-          animation: _showDoubleTapSeekAnimation,
-          builder: (BuildContext context, Widget? childWidget) {
+        ValueListenableBuilder<bool>(
+          valueListenable: _showSlideFrame,
+          builder: (
+            BuildContext _,
+            bool showingSlideFrame,
+            Widget? childWidget,
+          ) {
             return Visibility(
-              visible: _showDoubleTapSeekAnimation.value != 0,
-              child: Opacity(
-                opacity: _showDoubleTapSeekAnimation.value,
-                child: childWidget,
+              visible: showingSlideFrame == false,
+              child: ControlsVisibility(
+                animation: _seekDurationIndicatorAnimation,
+                alignment: Alignment.lerp(
+                  Alignment.center,
+                  Alignment.bottomCenter,
+                  context.orientation.isPortrait ? 0.75 : 0.6,
+                )!,
+                child: _buildShowSlideSeekDuration(),
               ),
             );
           },
-          child: ValueListenableBuilder(
-            valueListenable: _isForwardSeek,
-            builder: (_, isForwardSeek, childWidget) {
-              return Align(
-                alignment: isForwardSeek
-                    ? Alignment.centerRight
-                    : Alignment.centerLeft,
-                child: ClipPath(
-                  clipper: SeekIndicatorClipper(forward: isForwardSeek),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                    ),
-                    width: MediaQuery.sizeOf(context).width / 2,
-                    decoration: const BoxDecoration(
-                      color: Colors.black12,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (isForwardSeek)
-                          const Icon(Icons.fast_forward)
-                        else
-                          const Icon(Icons.fast_rewind),
-                        const SizedBox(height: 8),
-                        ValueListenableBuilder(
-                          valueListenable: _seekRate,
-                          builder: (context, value, __) {
-                            return Text(
-                              '${isForwardSeek ? '' : '-'}$value seconds',
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
         ),
         ValueListenableBuilder(
-          valueListenable: _showSlidingReleaseIndicator,
-          builder: (context, value, _) {
-            return AnimatedCrossFade(
-              firstChild: Align(
-                alignment: Alignment.topCenter,
-                child: SeekIndicator(
-                  valueListenable: _showSlidingSeekIndicator,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+          valueListenable: _isForwardSeek,
+          builder: (
+            BuildContext context,
+            bool isForwardSeek,
+            Widget? childWidget,
+          ) {
+            return ControlsVisibility(
+              animation: _showDoubleTapSeekAnimation,
+              alignment: _isForwardSeek.value
+                  ? Alignment.centerRight
+                  : Alignment.centerLeft,
+              child: ClipPath(
+                clipper: SeekIndicatorClipper(forward: isForwardSeek),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  width: MediaQuery.sizeOf(context).width / 2,
+                  decoration: const BoxDecoration(color: Colors.black12),
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (_showPullUp)
-                        const Icon(Icons.expand_less)
+                      if (isForwardSeek)
+                        const Icon(Icons.fast_forward)
                       else
-                        const Icon(Icons.linear_scale),
-                      const SizedBox(width: 4),
-                      Text(
-                        _showPullUp
-                            ? 'Pull up for precise seeking'
-                            : 'Slide left or right to seek',
+                        const Icon(Icons.fast_rewind),
+                      const SizedBox(height: 8),
+                      ValueListenableBuilder(
+                        valueListenable: _seekRate,
+                        builder: (context, value, __) {
+                          return Text(
+                            '${isForwardSeek ? '' : '-'}$value seconds',
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
               ),
-              secondChild: Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                  height: 24,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 4,
-                    horizontal: 16,
-                  ),
-                  margin: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(32),
-                  ),
-                  child: const Text('Release to cancel'),
-                ),
-              ),
-              crossFadeState:
-                  value ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-              duration: const Duration(milliseconds: 150),
             );
           },
         ),
@@ -504,7 +464,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                 width: double.infinity,
                 child: ControlsVisibility(
                   animation: _controlsAnimation,
-                  alignment: Alignment.topCenter,
+                  alignment: Alignment.center,
                   child: const ColoredBox(
                     color: Colors.black54,
                     child: SizedBox.expand(),
@@ -540,6 +500,11 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
             const Center(child: PlayerLoadingIndicator()),
           ],
         ),
+        ControlsVisibility(
+          alignment: Alignment.topCenter,
+          animation: _seekIndicatorAnimation,
+          child: SeekIndicator(valueListenable: _seekIndicatorNotifier),
+        ),
         PlayerSeekSlideFrame(
           animation: _slideFrameController,
           frameHeight: kSlideFrameHeight,
@@ -562,19 +527,21 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   }
 
   Widget _buildShowSlideSeekDuration() {
-    return StreamBuilder<Progress>(
-      initialData: Progress.zero,
-      stream: ref.read(playerRepositoryProvider).videoProgressStream,
-      builder: (context, snapshot) {
-        return SeekIndicator(
-          valueListenable: _showSlidingSeekDuration,
-          child: SizedBox(
-            child: Text(
-              snapshot.data!.position.hoursMinutesSeconds,
-            ),
-          ),
-        );
-      },
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.black54,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: StreamBuilder<Progress>(
+        initialData: Progress.zero,
+        stream: ref.read(playerRepositoryProvider).videoProgressStream,
+        builder: (context, snapshot) {
+          return Text(
+            snapshot.data!.position.hoursMinutesSeconds,
+          );
+        },
+      ),
     );
   }
 
@@ -653,7 +620,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   /// Shows  sliding seek indicator and initiate necessary actions
   void _showSlideSeek() {
-    _showSlidingSeekIndicator.value = true;
+    _seekIndicatorNotifier.value = SeekNotificationType.slideLeftOrRight;
+    _seekIndicatorController.forward();
     _showPlaybackProgress.value = true;
     _controlsVisibilityController.reverse(from: 0);
     _showProgressIndicator();
@@ -662,7 +630,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   /// Hides the sliding seek indicator and perform related cleanup actions
   void _hideSlideSeek() {
     _preventCommonControlGestures = false;
-    _showSlidingSeekIndicator.value = false;
+    _seekIndicatorController.reverse();
 
     // If a sliding seek duration is set, perform seek operation to that duration
     // Release updating from player
@@ -673,15 +641,12 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     ref.read(playerRepositoryProvider).seekTo(_slideSeekDuration);
 
     // Reset sliding seek-related values and indicators
-    _showSlidingSeekDuration.value = false;
+    _seekDurationIndicatorController.reverse();
 
     // Reset duration variables for slide seeking
     _lastDuration = null;
     _upperboundSlideDuration = null;
     _lowerboundSlideDuration = null;
-
-    // Contingency to hide pull up message
-    _showPullUp = false;
 
     // If controls are not hidden, manage control visibility and progress indicator
     if (!_controlsHidden) {
@@ -722,10 +687,11 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   }
 
   void _showReleaseIndicator() {
-    _showSlidingReleaseIndicator.value = true;
+    _seekIndicatorNotifier.value = SeekNotificationType.release;
+    _seekIndicatorController.forward();
     _releaseTimer?.cancel();
     _releaseTimer = Timer(const Duration(seconds: 2), () {
-      _showSlidingReleaseIndicator.value = false;
+      _seekIndicatorController.reverse();
     });
   }
 
@@ -817,19 +783,20 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
         _checkOutOfBound(lastPosition, _slideSeekDuration);
 
-        _showSlidingSeekDuration.value = true;
+        _seekDurationIndicatorController.forward();
 
         // Updates and locks progress from player
         ref.read(playerRepositoryProvider).updatePosition(_slideSeekDuration);
       }
 
       if (localY < (_longPressYStartPosition - 30)) {
-        if (!_showSlidingSeekIndicator.value) {
+        if (!_seekIndicatorNotifier.value.isSlide) {
           HapticFeedback.selectionClick();
         }
 
         _showSlideFrame.value = true; // This disengages long press sliding seek
-        _showSlidingSeekIndicator.value = false;
+        _seekIndicatorNotifier.value = SeekNotificationType.slideLeftOrRight;
+        _seekIndicatorController.forward();
 
         _slideFrameController.value = clampDouble(
           (_longPressYStartPosition - 30 - localY) / kSlideFrameHeight,
@@ -891,8 +858,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     wasPlaying = ref.read(playerNotifierProvider).playing;
     if (wasPlaying) ref.read(playerRepositoryProvider).pauseVideo();
 
-    _showPullUp = true;
-    _showSlidingSeekDuration.value = true;
+    _seekDurationIndicatorController.forward();
     _slideSeekDuration = position;
 
     _showSlideSeek();
@@ -911,9 +877,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
           lockProgress: false, // Releases lock on player progress
         );
 
-    _showPullUp = false;
-    _showSlidingReleaseIndicator.value = false;
-    _showSlidingReleaseIndicator.value = false;
+    _seekIndicatorController.reverse();
     _hideSlideSeek();
 
     if (wasPlaying) ref.read(playerRepositoryProvider).playVideo();

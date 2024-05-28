@@ -29,35 +29,63 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+enum SeekNotificationType {
+  none,
+  fastForward,
+  pullUp,
+  slideLeftOrRight,
+  release;
+
+  bool get isSlide => this == slideLeftOrRight;
+}
+
 class SeekIndicator extends StatelessWidget {
   const SeekIndicator({
     super.key,
     required this.valueListenable,
-    required this.child,
   });
-  final ValueListenable<bool> valueListenable;
-  final Widget child;
+  final ValueListenable<SeekNotificationType> valueListenable;
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
+    return ValueListenableBuilder<SeekNotificationType>(
       valueListenable: valueListenable,
-      builder: (context, value, childWidget) {
-        return AnimatedOpacity(
-          duration: const Duration(milliseconds: 175),
-          opacity: value ? 1 : 0,
-          child: childWidget,
+      builder: (
+        BuildContext context,
+        SeekNotificationType type,
+        Widget? childWidget,
+      ) {
+        return Container(
+          margin: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (type == SeekNotificationType.fastForward) ...[
+                const Text('2X'),
+                const SizedBox(width: 4),
+                const Icon(Icons.fast_forward),
+              ] else if (type == SeekNotificationType.pullUp) ...[
+                const Icon(Icons.expand_less),
+                const SizedBox(width: 4),
+                const Text('Pull up for precise seeking'),
+              ] else if (type == SeekNotificationType.slideLeftOrRight) ...[
+                const Icon(Icons.linear_scale),
+                const SizedBox(width: 4),
+                const Text('Slide left or right to seek'),
+              ] else if (type == SeekNotificationType.release)
+                const Text('Release to cancel')
+              else
+                const SizedBox(width: 80),
+            ],
+          ),
         );
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.6),
-          borderRadius: BorderRadius.circular(32),
-        ),
-        child: child,
-      ),
     );
   }
 }

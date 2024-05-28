@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/constants/values.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_notifications.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
+
+import 'player_notifications.dart';
 
 class PlayerSettings extends StatelessWidget {
   const PlayerSettings({super.key});
@@ -20,7 +20,7 @@ class PlayerSettingsSwitch extends StatelessWidget {
   const PlayerSettingsSwitch({
     super.key,
     required this.selected,
-    this.thumbSize = 24,
+    this.thumbSize = 18,
   });
 
   final bool selected;
