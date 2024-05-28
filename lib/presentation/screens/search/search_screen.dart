@@ -34,15 +34,19 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    _textController.addListener(
-      () => _hasTextNotifier.value = _textController.text.isNotEmpty,
-    );
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        _showSearchResultNotifier.value = false;
-        ref.read(homeRepositoryProvider).lockNavBarPosition();
-      }
-    });
+    _textController.addListener(_textListenerCallback);
+    _focusNode.addListener(_focusListenerCallback);
+  }
+
+  void _textListenerCallback() {
+    _hasTextNotifier.value = _textController.text.isNotEmpty;
+  }
+
+  void _focusListenerCallback() {
+    if (_focusNode.hasFocus) {
+      _showSearchResultNotifier.value = false;
+      ref.read(homeRepositoryProvider).lockNavBarPosition();
+    }
   }
 
   @override
@@ -58,6 +62,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   @override
   void dispose() {
+    _focusNode.removeListener(_focusListenerCallback);
+    _textController.removeListener(_textListenerCallback);
+
     _focusNode.dispose();
     _textController.dispose();
     _hasTextNotifier.dispose();

@@ -43,7 +43,7 @@ class AccountPlaylistsScreen extends StatefulWidget {
 
 class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
     with TickerProviderStateMixin {
-  final ScrollController controller = ScrollController();
+  final ScrollController scrollController = ScrollController();
   final FocusNode focusNode = FocusNode();
   final TextEditingController textEditingController = TextEditingController();
 
@@ -60,17 +60,21 @@ class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
     );
     animation = CurvedAnimation(parent: opacityController, curve: Curves.ease);
 
-    controller.addListener(() {
-      if (controller.offset <= 250) {
-        opacityController.value = controller.offset / 250;
-      }
-    });
+    scrollController.addListener(scrollListener);
+  }
+
+  void scrollListener() {
+    if (scrollController.offset <= 250) {
+      opacityController.value = scrollController.offset / 250;
+    }
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    scrollController.removeListener(scrollListener);
+
     focusNode.dispose();
+    scrollController.dispose();
     opacityController.dispose();
     textEditingController.dispose();
     super.dispose();
@@ -122,7 +126,7 @@ class _AccountPlaylistsScreenState extends State<AccountPlaylistsScreen>
         child: ScrollConfiguration(
           behavior: const OverScrollGlowBehavior(enabled: false),
           child: CustomScrollView(
-            controller: controller,
+            controller: scrollController,
             slivers: <Widget>[
               const SliverToBoxAdapter(
                 child: Column(

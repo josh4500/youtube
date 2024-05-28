@@ -65,19 +65,22 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
       listenable.pauseVisuals(notify: false);
     }
 
-    widget.hideGraphicsNotifier?.addListener(() {
-      if (widget.hideGraphicsNotifier?.value == true) {
-        listenable.pauseVisuals();
-      } else {
-        listenable.continueVisuals();
-      }
-    });
+    widget.hideGraphicsNotifier?.addListener(changeCallback);
   }
 
   @override
   void dispose() {
+    widget.hideGraphicsNotifier?.removeListener(changeCallback);
     listenable.dispose();
     super.dispose();
+  }
+
+  void changeCallback() {
+    if (widget.hideGraphicsNotifier?.value == true) {
+      listenable.pauseVisuals();
+    } else {
+      listenable.continueVisuals();
+    }
   }
 
   @override
