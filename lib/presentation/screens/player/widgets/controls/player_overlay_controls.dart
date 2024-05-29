@@ -120,9 +120,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   late final AnimationController _seekDurationIndicatorController;
   late final Animation<double> _seekDurationIndicatorAnimation;
 
-  /// Notifiers and variables for forward seeking at 2x speed
-  final _showForward2XIndicator = ValueNotifier<bool>(false);
-
   late final AnimationController _seekIndicatorController;
   late final Animation<double> _seekIndicatorAnimation;
 
@@ -360,7 +357,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _controlsVisibilityController.dispose();
     _seekIndicatorNotifier.dispose();
     _showDoubleTapSeekIndicator.dispose();
-    _showForward2XIndicator.dispose();
     _seekDurationIndicatorController.dispose();
     _slideFrameController.dispose();
     _bufferController.dispose();
@@ -606,14 +602,15 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   // Method to show the 2x speed indicator and update player speed
   void _show2xSpeed() {
-    _showForward2XIndicator.value = true;
+    _seekIndicatorNotifier.value = SeekNotificationType.speedUp2X;
+    _seekIndicatorController.forward();
     _controlsVisibilityController.reverse(from: 0);
     ref.read(playerRepositoryProvider).setSpeed(); // Update player speed
   }
 
   /// Hide the 2x speed indicator and reset player speed to normal (1x)
   void _hide2xSpeed() {
-    _showForward2XIndicator.value = false;
+    _seekIndicatorController.reverse();
     // Reset player speed to normal (1x)
     ref.read(playerRepositoryProvider).setSpeed(1.0);
   }

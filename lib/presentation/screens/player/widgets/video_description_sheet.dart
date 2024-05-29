@@ -32,45 +32,30 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../../constants.dart';
 
-class VideoDescriptionSheet extends StatefulWidget {
+class VideoDescriptionSheet extends StatelessWidget {
   const VideoDescriptionSheet({
     super.key,
     this.controller,
     this.showDragIndicator = true,
-    required this.transcriptNotifier,
+    required this.transcriptController,
     required this.closeDescription,
     this.draggableController,
   });
   final ScrollController? controller;
   final bool showDragIndicator;
-  final ValueNotifier<bool> transcriptNotifier;
+  final PageDraggableOverlayChildController transcriptController;
   final VoidCallback closeDescription;
   final DraggableScrollableController? draggableController;
-
-  @override
-  State<VideoDescriptionSheet> createState() => _VideoDescriptionSheetState();
-}
-
-class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
-  final _tScriptController = PageDraggableOverlayChildController(
-    title: 'Transcript',
-  );
-
-  @override
-  void dispose() {
-    _tScriptController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Description',
       scrollTag: 'player_description',
-      controller: widget.controller ?? ScrollController(),
-      onClose: widget.closeDescription,
-      showDragIndicator: widget.showDragIndicator,
-      draggableController: widget.draggableController,
+      controller: controller ?? ScrollController(),
+      onClose: closeDescription,
+      showDragIndicator: showDragIndicator,
+      draggableController: draggableController,
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(12),
         topRight: Radius.circular(12),
@@ -230,7 +215,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                   alignment: Alignment.center,
                   padding: const EdgeInsets.all(12),
                   border: Border.all(color: Colors.grey, width: 0.7),
-                  onTap: _tScriptController.open,
+                  onTap: transcriptController.open,
                   textStyle: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -311,7 +296,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
       baseHeight: 1 - kAvgVideoViewPortHeight,
       overlayChildren: [
         PageDraggableOverlayChild(
-          controller: _tScriptController,
+          controller: transcriptController,
           builder: (context, controller, physics) {
             return ListView.builder(
               physics: physics,

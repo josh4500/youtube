@@ -31,7 +31,7 @@ import 'package:flutter/material.dart';
 
 enum SeekNotificationType {
   none,
-  fastForward,
+  speedUp2X,
   pullUp,
   slideLeftOrRight,
   release;
@@ -66,7 +66,7 @@ class SeekIndicator extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (type == SeekNotificationType.fastForward) ...[
+              if (type == SeekNotificationType.speedUp2X) ...[
                 const Text('2X'),
                 const SizedBox(width: 4),
                 const Icon(Icons.fast_forward),

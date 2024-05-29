@@ -122,8 +122,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   bool _commentIsOpened = false;
   late final AnimationController _commentSizeController;
   late final Animation<double> _commentSizeAnimation;
-  final _showCommentDraggable = ValueNotifier<bool>(false);
-  final _replyIsOpenedNotifier = ValueNotifier<bool>(false);
+  final _showCommentsDraggable = ValueNotifier<bool>(false);
+  final _replyController = PageDraggableOverlayChildController(
+    title: 'Replies',
+  );
   final _commentDraggableController = DraggableScrollableController();
 
   // Video Description Sheet
@@ -131,7 +133,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   late final AnimationController _descSizeController;
   late final Animation<double> _descSizeAnimation;
   final _showDescDraggable = ValueNotifier<bool>(false);
-  final _transcriptNotifier = ValueNotifier<bool>(false);
+  final _transcriptController = PageDraggableOverlayChildController(
+    title: 'Transcript',
+  );
   final _descDraggableController = DraggableScrollableController();
 
   // Video Chapter Sheet
@@ -454,17 +458,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
 
     _screenHeightNotifier.addListener(() {
-      final screenHeight = _screenHeightNotifier.value;
+      final screenHeightRatio = _screenHeightNotifier.value;
 
-      // TODO(josh4500): Find a way to apply roc
       _playerHeightNotifier.value =
-          screenHeight.normalize(minPlayerHeightRatio, 1);
+          screenHeightRatio.normalize(minPlayerHeightRatio, 1);
 
-      _showHideNavigationBar(screenHeight);
-      _recomputeDraggableOpacityAndHeight(screenHeight);
+      _showHideNavigationBar(screenHeightRatio);
+      // TODO(josh4500): Needs fix
+      _recomputeDraggableOpacityAndHeight(screenHeightRatio);
 
       // Hide or Show infographics
-      _hideGraphicsNotifier.value = screenHeight < 1;
+      _hideGraphicsNotifier.value = screenHeightRatio < 1;
     });
 
     _transformationController.addListener(() {
@@ -479,32 +483,26 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _descDraggableController.addListener(() {
       final double size = _descDraggableController.size;
-      if (size == 0 && _screenHeightNotifier.value != minPlayerHeightRatio) {
-        _descIsOpened = false;
-      }
-      _changePlayerOpacityOnDraggable(size);
-      _changeInfoOpacityOnDraggable(size);
-      _checkDraggableSizeToPause(size);
+      _descIsOpened = (size != 0 || (size == 0 && !localMinimized)) &&
+          _showDescDraggable.value &&
+          _descIsOpened;
+      if (_showDescDraggable.value) _commonDraggableListenerCallback(size);
     });
 
     _commentDraggableController.addListener(() {
       final double size = _commentDraggableController.size;
-      if (size == 0 && _screenHeightNotifier.value != minPlayerHeightRatio) {
-        _commentIsOpened = false;
-      }
-      _changePlayerOpacityOnDraggable(size);
-      _changeInfoOpacityOnDraggable(size);
-      _checkDraggableSizeToPause(size);
+      _commentIsOpened = (size != 0 || (size == 0 && !localMinimized)) &&
+          _showCommentsDraggable.value &&
+          _commentIsOpened;
+      if (_showCommentsDraggable.value) _commonDraggableListenerCallback(size);
     });
 
     _chaptersDraggableController.addListener(() {
       final double size = _chaptersDraggableController.size;
-      if (size == 0 && _screenHeightNotifier.value != minPlayerHeightRatio) {
-        _chaptersIsOpened = false;
-      }
-      _changePlayerOpacityOnDraggable(size);
-      _changeInfoOpacityOnDraggable(size);
-      _checkDraggableSizeToPause(size);
+      _chaptersIsOpened = (size != 0 || (size == 0 && !localMinimized)) &&
+          _showChaptersDraggable.value &&
+          _commentIsOpened;
+      if (_showChaptersDraggable.value) _commonDraggableListenerCallback(size);
     });
 
     _descSizeController = AnimationController(
@@ -548,6 +546,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   ui.FlutterView? _view;
   static const double kOrientationLockBreakpoint = 600;
   static bool localExpanded = false;
+  static bool localMinimized = false;
 
   @override
   void didChangeDependencies() {
@@ -647,11 +646,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _chaptersDraggableController.dispose();
 
     _showDescDraggable.dispose();
-    _showCommentDraggable.dispose();
+    _showCommentsDraggable.dispose();
     _showChaptersDraggable.dispose();
-
-    _transcriptNotifier.dispose();
-    _replyIsOpenedNotifier.dispose();
 
     _infoScrollController.dispose();
     _infoOpacityController.dispose();
@@ -669,10 +665,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _descSizeController.dispose();
     _commentSizeController.dispose();
 
-    // TODO(josh4500): Might need to reset orientation
+    _transcriptController.dispose();
+    _replyController.dispose();
+
     resetOrientation();
 
     super.dispose();
+  }
+
+  void _commonDraggableListenerCallback(double size) {
+    _changePlayerOpacityOnDraggable(size);
+    _changeInfoOpacityOnDraggable(size);
+    _checkDraggableSizeToPause(size);
   }
 
   Future<void> _animateScreenHeight(double to) async {
@@ -745,8 +749,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _wasTempPaused = true;
         ref.read(playerRepositoryProvider).pauseVideo();
       }
-    } else if (size <= 1 - kAvgVideoViewPortHeight) {
+    } else if (size <= 1 - minPlayerHeightRatio) {
       if (_wasTempPaused) {
+        _wasTempPaused = false;
         ref.read(playerRepositoryProvider).playVideo();
       }
     }
@@ -1021,6 +1026,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _preventPlayerDragDown = false;
       _preventPlayerDragUp = false;
 
+      localMinimized = false;
+
       // Set height and width to maximum
       Future.wait([
         _animateScreenHeight(1),
@@ -1252,6 +1259,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         PlayerSignal.hidePlaybackProgress,
       ]);
     } else {
+      localMinimized = false;
       ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
         PlayerSignal.maximize,
         PlayerSignal.showPlaybackProgress,
@@ -1444,6 +1452,33 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _showControls();
   }
 
+  void _enterMinimizedMode() {
+    localMinimized = true;
+    // Note: Do not remove
+    // We set to true to emulate player was dragged down to minimize
+    _isPlayerDraggingDown = true;
+    _preventPlayerDismiss = false;
+
+    if (_isExpanded) {
+      _exitExpandedMode(false); // Avoids animation by passing false
+    }
+
+    // Force hide after exiting expanded mode
+    _hideControls(true);
+
+    Future.wait([
+      _animateScreenHeight(minPlayerHeightRatio),
+      _animatePlayerWidth(minVideoViewPortWidthRatio),
+      if (context.orientation.isLandscape)
+        _animateScreenWidth(minScreenWidthRatio),
+    ]).then((value) {
+      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+        PlayerSignal.minimize,
+        PlayerSignal.hidePlaybackProgress,
+      ]);
+    });
+  }
+
   Future<void> _onDragInfoUp(PointerUpEvent event) async {
     if (_preventGestures) return;
 
@@ -1464,8 +1499,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Callback to open Comments draggable sheets
   Future<void> _openCommentSheet() async {
     _commentIsOpened = true;
-    final bool wait = !_showCommentDraggable.value;
-    _showCommentDraggable.value = true;
+    final bool wait = !_showCommentsDraggable.value;
+    _showCommentsDraggable.value = true;
 
     if (wait) {
       await Future<void>.delayed(const Duration(milliseconds: 150));
@@ -1486,8 +1521,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Callback to close Comments draggable sheets
   void _closeCommentSheet() {
-    if (_replyIsOpenedNotifier.value) {
-      _replyIsOpenedNotifier.value = false;
+    if (_replyController.isOpened) {
+      _replyController.close();
       return;
     }
 
@@ -1502,7 +1537,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   Future<void> _openDescSheet() async {
     _descIsOpened = true;
-    final bool wait = !_showCommentDraggable.value;
+    final bool wait = !_showCommentsDraggable.value;
     _showDescDraggable.value = true;
 
     if (wait) {
@@ -1521,8 +1556,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   void _closeDescSheet() {
-    if (_transcriptNotifier.value) {
-      _transcriptNotifier.value = false;
+    if (_transcriptController.isOpened) {
+      _transcriptController.close();
       return;
     }
 
@@ -1588,29 +1623,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   void handlePlayerControlNotification(PlayerNotification notification) {
     if (notification is MinimizePlayerNotification) {
-      // Note: Do not remove
-      // We set to true to emulate player was dragged down to minimize
-      _isPlayerDraggingDown = true;
-      _preventPlayerDismiss = false;
-
-      if (_isExpanded) {
-        _exitExpandedMode(false); // Avoids animation by passing false
-      }
-
-      // Force hide after exiting expanded mode
-      _hideControls(true);
-
-      Future.wait([
-        _animateScreenHeight(minPlayerHeightRatio),
-        _animatePlayerWidth(minVideoViewPortWidthRatio),
-        if (context.orientation.isLandscape)
-          _animateScreenWidth(minScreenWidthRatio),
-      ]).then((value) {
-        ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-          PlayerSignal.minimize,
-          PlayerSignal.hidePlaybackProgress,
-        ]);
-      });
+      _enterMinimizedMode();
     } else if (notification is ExpandPlayerNotification) {
       _enterExpandedMode();
     } else if (notification is DeExpandPlayerNotification) {
@@ -1642,6 +1655,24 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       );
       await Future.delayed(const Duration(milliseconds: 250));
       await _enterFullscreenMode();
+    }
+  }
+
+  /// Handles when back navigation system tries to pop route
+  Future<void> _handleBackButtonPressed(bool didPop) async {
+    if (_commentIsOpened) {
+      _closeCommentSheet();
+    } else if (_descIsOpened) {
+      _closeDescSheet();
+    } else if (_chaptersIsOpened) {
+      _closeChaptersSheet();
+    } else if (!_isMinimized) {
+      _enterMinimizedMode();
+    }
+
+    if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
+      // Closes screen when Player is minimized
+      if (_isMinimized) ref.read(playerRepositoryProvider).closePlayerScreen();
     }
   }
 
@@ -1818,181 +1849,188 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       onScrollNotification: _onScrollInfoScrollNotification,
     );
 
-    return Material(
-      color: orientation.isLandscape ? Colors.transparent : null,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        clipBehavior: Clip.none,
-        children: [
-          SlideTransition(
-            position: _playerSlideAnimation,
-            child: FadeTransition(
-              opacity: _playerFadeAnimation,
-              child: ListenableBuilder(
-                listenable: Listenable.merge(
-                  [
-                    if (context.orientation.isLandscape) _screenWidthNotifier,
-                    _screenHeightNotifier,
-                  ],
-                ),
-                builder: (
-                  BuildContext context,
-                  Widget? screenWidget,
-                ) {
-                  return SizedBox(
-                    width: context.orientation.isLandscape
-                        ? screenWidth * _screenWidthNotifier.value
-                        : null,
-                    height: screenHeight * _screenHeightNotifier.value,
-                    child: screenWidget,
-                  );
-                },
-                child: Flex(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  direction: layoutDirection,
-                  children: [
-                    Flexible(
-                      flex: orientation.isPortrait ? 0 : 1,
-                      fit: orientation.isPortrait
-                          ? FlexFit.tight
-                          : FlexFit.loose,
-                      child: FadeTransition(
-                        opacity: _playerOpacityAnimation,
-                        child: PlayerInfographicsWrapper(
-                          hideGraphicsNotifier: _hideGraphicsNotifier,
-                          child: GestureDetector(
-                            onTap: _onTapPlayer,
-                            onVerticalDragStart: _onDragPlayerStart,
-                            onVerticalDragUpdate: _onDragPlayer,
-                            onVerticalDragEnd: _onDragPlayerEnd,
-                            behavior: HitTestBehavior.opaque,
-                            child: Stack(
-                              children: [
-                                miniPlayer,
-                                mainPlayer,
-                                Positioned(
-                                  bottom: 0,
-                                  child: miniPlayerProgress,
-                                ),
-                              ],
+    return PopScope(
+      canPop: false,
+      onPopInvoked: _handleBackButtonPressed,
+      child: Material(
+        color: Colors.transparent,
+        type: MaterialType.transparency,
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          clipBehavior: Clip.none,
+          children: [
+            SlideTransition(
+              position: _playerSlideAnimation,
+              child: FadeTransition(
+                opacity: _playerFadeAnimation,
+                child: ListenableBuilder(
+                  listenable: Listenable.merge(
+                    [
+                      if (context.orientation.isLandscape) _screenWidthNotifier,
+                      _screenHeightNotifier,
+                    ],
+                  ),
+                  builder: (
+                    BuildContext context,
+                    Widget? screenWidget,
+                  ) {
+                    return SizedBox(
+                      width: context.orientation.isLandscape
+                          ? screenWidth * _screenWidthNotifier.value
+                          : null,
+                      height: screenHeight * _screenHeightNotifier.value,
+                      child: screenWidget,
+                    );
+                  },
+                  child: Flex(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    direction: layoutDirection,
+                    children: [
+                      Flexible(
+                        flex: orientation.isPortrait ? 0 : 1,
+                        fit: orientation.isPortrait
+                            ? FlexFit.tight
+                            : FlexFit.loose,
+                        child: FadeTransition(
+                          opacity: _playerOpacityAnimation,
+                          child: PlayerInfographicsWrapper(
+                            hideGraphicsNotifier: _hideGraphicsNotifier,
+                            child: GestureDetector(
+                              onTap: _onTapPlayer,
+                              onVerticalDragStart: _onDragPlayerStart,
+                              onVerticalDragUpdate: _onDragPlayer,
+                              onVerticalDragEnd: _onDragPlayerEnd,
+                              behavior: HitTestBehavior.opaque,
+                              child: Stack(
+                                children: [
+                                  miniPlayer,
+                                  mainPlayer,
+                                  Positioned(
+                                    bottom: 0,
+                                    child: miniPlayerProgress,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    if (orientation.isPortrait)
-                      Flexible(
-                        child: Listener(
-                          onPointerMove: _onDragInfo,
-                          onPointerUp: _onDragInfoUp,
-                          child: AnimatedBuilder(
-                            animation: _infoOpacityAnimation,
-                            builder: (
-                              BuildContext context,
-                              Widget? childWidget,
-                            ) {
-                              return Opacity(
-                                opacity: _infoOpacityAnimation.value,
-                                child: childWidget,
-                              );
-                            },
-                            child: infoScrollview,
+                      if (orientation.isPortrait)
+                        Flexible(
+                          child: Material(
+                            child: Listener(
+                              onPointerMove: _onDragInfo,
+                              onPointerUp: _onDragInfoUp,
+                              child: AnimatedBuilder(
+                                animation: _infoOpacityAnimation,
+                                builder: (
+                                  BuildContext context,
+                                  Widget? childWidget,
+                                ) {
+                                  return Opacity(
+                                    opacity: _infoOpacityAnimation.value,
+                                    child: childWidget,
+                                  );
+                                },
+                                child: infoScrollview,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    if (orientation.isLandscape) ...[
-                      PlayerSideSheet(
-                        constraints: BoxConstraints(
-                          maxWidth: screenWidth * .4,
+                      if (orientation.isLandscape) ...[
+                        PlayerSideSheet(
+                          constraints: BoxConstraints(
+                            maxWidth: screenWidth * .4,
+                          ),
+                          sizeFactor: _descSizeAnimation,
+                          visibleListenable: _showDescDraggable,
+                          child: VideoDescriptionSheet(
+                            key: _descSheetKey,
+                            showDragIndicator: false,
+                            closeDescription: _closeDescSheet,
+                            transcriptController: _transcriptController,
+                            draggableController: _descDraggableController,
+                          ),
                         ),
-                        sizeFactor: _descSizeAnimation,
-                        visibleListenable: _showDescDraggable,
-                        child: VideoDescriptionSheet(
-                          key: _descSheetKey,
-                          showDragIndicator: false,
-                          closeDescription: _closeDescSheet,
-                          transcriptNotifier: _transcriptNotifier,
-                          draggableController: _descDraggableController,
+                        PlayerSideSheet(
+                          constraints: BoxConstraints(
+                            maxWidth: screenWidth * .4,
+                          ),
+                          sizeFactor: _commentSizeAnimation,
+                          visibleListenable: _showCommentsDraggable,
+                          child: VideoCommentsSheet(
+                            key: _commentSheetKey,
+                            maxHeight: 0,
+                            showDragIndicator: false,
+                            closeComment: _closeCommentSheet,
+                            replyController: _replyController,
+                            draggableController: _commentDraggableController,
+                          ),
                         ),
-                      ),
-                      PlayerSideSheet(
-                        constraints: BoxConstraints(
-                          maxWidth: screenWidth * .4,
-                        ),
-                        sizeFactor: _commentSizeAnimation,
-                        visibleListenable: _showCommentDraggable,
-                        child: VideoCommentsSheet(
-                          key: _commentSheetKey,
-                          maxHeight: 0,
-                          showDragIndicator: false,
-                          closeComment: _closeCommentSheet,
-                          replyNotifier: _replyIsOpenedNotifier,
-                          draggableController: _commentDraggableController,
-                        ),
-                      ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-          if (orientation.isPortrait) ...[
-            PlayerDraggableSheet(
-              builder: (BuildContext context, ScrollController controller) {
-                return VideoCommentsSheet(
-                  key: _commentSheetKey,
-                  controller: controller,
-                  maxHeight: kAvgVideoViewPortHeight,
-                  closeComment: _closeCommentSheet,
-                  replyNotifier: _replyIsOpenedNotifier,
-                  draggableController: _commentDraggableController,
-                );
-              },
-              opacity: _draggableOpacityAnimation,
-              controller: _commentDraggableController,
-              visibleListenable: _showCommentDraggable,
-              snapSizes: <double>[
-                0.0,
-                maxInitialDraggableSnapSize,
-              ],
-            ),
-            PlayerDraggableSheet(
-              builder: (BuildContext context, ScrollController controller) {
-                return VideoDescriptionSheet(
-                  key: _descSheetKey,
-                  controller: controller,
-                  closeDescription: _closeDescSheet,
-                  transcriptNotifier: _transcriptNotifier,
-                  draggableController: _descDraggableController,
-                );
-              },
-              opacity: _draggableOpacityAnimation,
-              controller: _descDraggableController,
-              visibleListenable: _showDescDraggable,
-              snapSizes: <double>[
-                0.0,
-                maxInitialDraggableSnapSize,
-              ],
-            ),
-            PlayerDraggableSheet(
-              builder: (BuildContext context, ScrollController controller) {
-                return VideoChaptersSheet(
-                  key: _chaptersSheetKey,
-                  controller: controller,
-                  closeChapter: _closeChaptersSheet,
-                  draggableController: _chaptersDraggableController,
-                );
-              },
-              opacity: _draggableOpacityAnimation,
-              controller: _chaptersDraggableController,
-              visibleListenable: _showChaptersDraggable,
-              snapSizes: <double>[
-                0.0,
-                maxInitialDraggableSnapSize,
-              ],
-            ),
+            if (orientation.isPortrait) ...[
+              PlayerDraggableSheet(
+                builder: (BuildContext context, ScrollController controller) {
+                  return VideoCommentsSheet(
+                    key: _commentSheetKey,
+                    controller: controller,
+                    maxHeight: kAvgVideoViewPortHeight,
+                    closeComment: _closeCommentSheet,
+                    replyController: _replyController,
+                    draggableController: _commentDraggableController,
+                  );
+                },
+                opacity: _draggableOpacityAnimation,
+                controller: _commentDraggableController,
+                visibleListenable: _showCommentsDraggable,
+                snapSizes: <double>[
+                  0.0,
+                  maxInitialDraggableSnapSize,
+                ],
+              ),
+              PlayerDraggableSheet(
+                builder: (BuildContext context, ScrollController controller) {
+                  return VideoDescriptionSheet(
+                    key: _descSheetKey,
+                    controller: controller,
+                    closeDescription: _closeDescSheet,
+                    transcriptController: _transcriptController,
+                    draggableController: _descDraggableController,
+                  );
+                },
+                opacity: _draggableOpacityAnimation,
+                controller: _descDraggableController,
+                visibleListenable: _showDescDraggable,
+                snapSizes: <double>[
+                  0.0,
+                  maxInitialDraggableSnapSize,
+                ],
+              ),
+              PlayerDraggableSheet(
+                builder: (BuildContext context, ScrollController controller) {
+                  return VideoChaptersSheet(
+                    key: _chaptersSheetKey,
+                    controller: controller,
+                    closeChapter: _closeChaptersSheet,
+                    draggableController: _chaptersDraggableController,
+                  );
+                },
+                opacity: _draggableOpacityAnimation,
+                controller: _chaptersDraggableController,
+                visibleListenable: _showChaptersDraggable,
+                snapSizes: <double>[
+                  0.0,
+                  maxInitialDraggableSnapSize,
+                ],
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

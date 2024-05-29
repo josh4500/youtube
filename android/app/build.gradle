@@ -59,4 +59,9 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    def activity_version = "1.9.0"
+
+    // Kotlin
+    implementation "androidx.activity:activity-ktx:$activity_version"
+}

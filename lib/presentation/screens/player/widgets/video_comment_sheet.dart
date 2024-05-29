@@ -32,47 +32,32 @@ import 'package:youtube_clone/presentation/widgets.dart';
 import '../../../constants.dart';
 import 'video_comment_guidelines.dart';
 
-class VideoCommentsSheet extends StatefulWidget {
+class VideoCommentsSheet extends StatelessWidget {
   const VideoCommentsSheet({
     super.key,
     this.controller,
-    required this.replyNotifier,
+    required this.replyController,
     required this.closeComment,
     required this.maxHeight,
     this.draggableController,
     this.showDragIndicator = true,
   });
   final ScrollController? controller;
-  final ValueNotifier<bool> replyNotifier;
+  final PageDraggableOverlayChildController replyController;
   final VoidCallback closeComment;
   final double maxHeight;
   final bool showDragIndicator;
   final DraggableScrollableController? draggableController;
 
   @override
-  State<VideoCommentsSheet> createState() => _VideoCommentsSheetState();
-}
-
-class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
-  final _replyController = PageDraggableOverlayChildController(
-    title: 'Replies',
-  );
-
-  @override
-  void dispose() {
-    _replyController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Comments',
       scrollTag: 'player_comments',
-      controller: widget.controller ?? ScrollController(),
-      onClose: widget.closeComment,
-      showDragIndicator: widget.showDragIndicator,
-      draggableController: widget.draggableController,
+      controller: controller ?? ScrollController(),
+      onClose: closeComment,
+      showDragIndicator: showDragIndicator,
+      draggableController: draggableController,
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(12),
         topRight: Radius.circular(12),
@@ -93,7 +78,7 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
                     return const VideoCommentGuidelines();
                   }
                   return CommentTile(
-                    openReply: _replyController.open,
+                    openReply: replyController.open,
                     pinned: index == 1,
                     byCreator: index == 1,
                     creatorLikes: index == 1,
@@ -119,7 +104,7 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
       baseHeight: 1 - kAvgVideoViewPortHeight,
       overlayChildren: [
         PageDraggableOverlayChild(
-          controller: _replyController,
+          controller: replyController,
           builder: (context, controller, physics) {
             return ListView.builder(
               controller: controller,
