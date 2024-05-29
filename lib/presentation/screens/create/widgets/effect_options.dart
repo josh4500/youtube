@@ -41,7 +41,8 @@ class _EffectOptionsState extends State<EffectOptions>
 
   @override
   Widget build(BuildContext context) {
-    const EdgeInsets itemVerticalPadding = EdgeInsets.symmetric(vertical: 10);
+    const EdgeInsets itemVerticalMargin = EdgeInsets.symmetric(vertical: 10);
+    const EdgeInsets labelVerticalMargin = EdgeInsets.symmetric(vertical: 10);
     const TextStyle labelTextStyle = TextStyle(
       fontSize: 15,
       shadows: [Shadow(offset: Offset(1, 1), color: Colors.black54)],
@@ -73,7 +74,7 @@ class _EffectOptionsState extends State<EffectOptions>
                           children: [
                             for (int i = 0; i < maxInitialShown; i++)
                               Container(
-                                margin: itemVerticalPadding,
+                                margin: labelVerticalMargin,
                                 child: Text(
                                   widget.items[i].label,
                                   style: labelTextStyle,
@@ -91,7 +92,7 @@ class _EffectOptionsState extends State<EffectOptions>
                                     i < widget.items.length;
                                     i++)
                                   Container(
-                                    margin: itemVerticalPadding,
+                                    margin: labelVerticalMargin,
                                     child: Text(
                                       widget.items[i].label,
                                       style: labelTextStyle,
@@ -101,7 +102,7 @@ class _EffectOptionsState extends State<EffectOptions>
                             ),
                           ),
                           SizedBox(
-                            height: 24,
+                            height: 40,
                             child: Center(
                               child: Text(
                                 visible && controller.value == 0
@@ -133,7 +134,7 @@ class _EffectOptionsState extends State<EffectOptions>
                       for (int i = 0; i < maxInitialShown; i++)
                         CustomActionChip(
                           padding: EdgeInsets.zero,
-                          margin: itemVerticalPadding,
+                          margin: itemVerticalMargin,
                           onTap: widget.items[i].onTap,
                           icon: Icon(widget.items[i].icon, size: 18),
                         ),
@@ -149,7 +150,7 @@ class _EffectOptionsState extends State<EffectOptions>
                               i++)
                             CustomActionChip(
                               padding: EdgeInsets.zero,
-                              margin: itemVerticalPadding,
+                              margin: itemVerticalMargin,
                               onTap: widget.items[i].onTap,
                               icon: Icon(widget.items[i].icon, size: 18),
                             ),
@@ -164,7 +165,7 @@ class _EffectOptionsState extends State<EffectOptions>
                         turns: Tween(begin: 0.0, end: -.5).animate(controller),
                         child: Container(
                           padding: const EdgeInsets.all(2),
-                          margin: itemVerticalPadding,
+                          margin: itemVerticalMargin,
                           decoration: const BoxDecoration(
                             color: Colors.white30,
                             shape: BoxShape.circle,

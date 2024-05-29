@@ -26,7 +26,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -74,7 +73,7 @@ class CreateShortsScreen extends StatelessWidget {
                             children: [
                               CreateCloseButton(),
                               CustomActionChip(
-                                icon: Icon(YTIcons.music_outlined),
+                                icon: Icon(YTIcons.music),
                                 title: 'Add sound',
                                 padding: EdgeInsets.symmetric(
                                   vertical: 8,
@@ -95,37 +94,40 @@ class CreateShortsScreen extends StatelessWidget {
                                 SizedBox(),
                                 EffectOptions(
                                   items: [
-                                    EffectItem(icon: Icons.flip, label: 'Flip'),
                                     EffectItem(
-                                      icon: Icons.speed,
+                                      icon: YTIcons.flip_camera,
+                                      label: 'Flip',
+                                    ),
+                                    EffectItem(
+                                      icon: YTIcons.speed,
                                       label: 'Speed',
                                     ),
                                     EffectItem(
-                                      icon: Icons.timer,
+                                      icon: YTIcons.flash_off,
                                       label: 'Timer',
                                     ),
                                     EffectItem(
-                                      icon: Icons.star,
+                                      icon: YTIcons.sparkle,
                                       label: 'Effects',
                                     ),
                                     EffectItem(
-                                      icon: Icons.screen_search_desktop,
+                                      icon: YTIcons.green_screen,
                                       label: 'Green Screen',
                                     ),
                                     EffectItem(
-                                      icon: Icons.face_retouching_natural,
+                                      icon: YTIcons.retouch,
                                       label: 'Retouch',
                                     ),
                                     EffectItem(
-                                      icon: Icons.filter_vintage_outlined,
+                                      icon: YTIcons.filter_photo,
                                       label: 'Filter',
                                     ),
                                     EffectItem(
-                                      icon: Icons.light_mode_outlined,
+                                      icon: YTIcons.lighting,
                                       label: 'Lighting',
                                     ),
                                     EffectItem(
-                                      icon: Icons.flash_off,
+                                      icon: YTIcons.flash_off,
                                       label: 'Flash',
                                     ),
                                   ],
@@ -159,12 +161,14 @@ class CreateShortsScreen extends StatelessWidget {
                             const Icon(Icons.turn_right),
                             const SizedBox(width: 36),
                             Container(
+                              padding: const EdgeInsets.all(8),
                               decoration: const BoxDecoration(
+                                color: Colors.white,
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
-                                YTIcons.verified_filled,
-                                size: 48,
+                                YTIcons.check_outlined,
+                                color: Colors.black,
                               ),
                             ),
                           ],

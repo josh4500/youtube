@@ -77,7 +77,7 @@ class SearchResults extends StatelessWidget {
                             title: 'Save to Watch later',
                           ),
                           const DynamicSheetOptionItem(
-                            leading: Icon(YTIcons.save_outlined_1),
+                            leading: Icon(YTIcons.save_outlined),
                             title: 'Save to playlist',
                           ),
                           const DynamicSheetOptionItem(

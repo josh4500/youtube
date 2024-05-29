@@ -456,7 +456,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                         ),
                       ),
                       const DynamicSheetOptionItem(
-                        leading: Icon(YTIcons.save_outlined_1),
+                        leading: Icon(YTIcons.save_outlined),
                         title: 'Save to library',
                       ),
                       const DynamicSheetOptionItem(
@@ -538,7 +538,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                         ),
                       ),
                       const DynamicSheetOptionItem(
-                        leading: Icon(YTIcons.save_outlined_1),
+                        leading: Icon(YTIcons.save_outlined),
                         title: 'Save to library',
                       ),
                       const DynamicSheetOptionItem(

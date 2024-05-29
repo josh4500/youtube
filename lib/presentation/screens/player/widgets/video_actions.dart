@@ -145,7 +145,7 @@ class VideoActions extends StatelessWidget {
       ),
       items: [
         const DynamicSheetOptionItem(
-          leading: Icon(YTIcons.music_outlined),
+          leading: Icon(YTIcons.music),
           title: 'Sound',
           subtitle: 'Use the sound from this video',
         ),
@@ -155,12 +155,12 @@ class VideoActions extends StatelessWidget {
           subtitle: 'Create alongside this video',
         ),
         const DynamicSheetOptionItem(
-          leading: Icon(Icons.person_2_outlined),
+          leading: Icon(YTIcons.green_screen),
           title: 'Green Screen',
           subtitle: 'Use this video as a background',
         ),
         const DynamicSheetOptionItem(
-          leading: Icon(Icons.vertical_split_rounded),
+          leading: Icon(YTIcons.trim),
           title: 'Cut',
           subtitle: 'use a segment from this video',
         ),
