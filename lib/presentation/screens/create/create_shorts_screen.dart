@@ -28,6 +28,7 @@
 
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -195,21 +196,22 @@ class CreateShortsScreen extends StatelessWidget {
                                   ),
                                   child: Stack(
                                     children: [
-                                      Center(
-                                        child: Container(
-                                          height: 44,
-                                          width: 56,
-                                          margin: const EdgeInsets.all(2),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                      Positioned.fill(
+                                        child: Center(
+                                          child: Container(
+                                            width: 56,
+                                            margin: const EdgeInsets.all(2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
                                           ),
                                         ),
                                       ),
                                       const Padding(
                                         padding: EdgeInsets.symmetric(
-                                          vertical: 18.0,
+                                          vertical: 14.0,
                                           horizontal: 36,
                                         ),
                                         child: Row(
