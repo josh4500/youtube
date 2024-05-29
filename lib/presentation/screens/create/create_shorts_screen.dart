@@ -26,6 +26,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -54,45 +56,86 @@ class CreateShortsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Consumer(
         builder: (context, ref, child) {
           final permResult = ref.watch(_checkMicrophoneCameraPerm);
           return permResult.when(
             data: (bool granted) {
               if (granted) {
-                return Stack(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: Column(
-                        children: [
-                          CreateProgress(),
-                          SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CreateCloseButton(),
-                              CustomActionChip(
-                                icon: Icon(YTIcons.music),
-                                title: 'Add sound',
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 8,
-                                  horizontal: 12,
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: Material(
+                    child: Stack(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(12.0),
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                CreateProgress(),
+                                SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CreateCloseButton(),
+                                    CustomActionChip(
+                                      icon: Icon(YTIcons.music),
+                                      title: 'Add sound',
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 8,
+                                        horizontal: 12,
+                                      ),
+                                      textStyle: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      backgroundColor: Colors.black45,
+                                    ),
+                                    CreateShortsTimer(),
+                                  ],
                                 ),
-                                textStyle: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                backgroundColor: Colors.black45,
-                              ),
-                              CreateShortsTimer(),
-                            ],
+                              ],
+                            ),
                           ),
-                          Expanded(
+                        ),
+                        const Center(
+                          child: Text(
+                            '60 seconds',
+                            style: TextStyle(
+                              fontSize: 36,
+                              color: Colors.white12,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                SizedBox(),
-                                EffectOptions(
+                                SizedBox(
+                                  height:
+                                      MediaQuery.sizeOf(context).height * .45,
+                                  child: RotatedBox(
+                                    quarterTurns: 3,
+                                    child: SliderTheme(
+                                      data: const SliderThemeData(
+                                        trackHeight: 1,
+                                        thumbColor: Colors.white,
+                                        activeTrackColor: Colors.white,
+                                        inactiveTrackColor: Colors.white54,
+                                      ),
+                                      child: Slider(
+                                        value: .5,
+                                        onChanged: (v) {},
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const EffectOptions(
                                   items: [
                                     EffectItem(
                                       icon: YTIcons.flip_camera,
@@ -103,7 +146,7 @@ class CreateShortsScreen extends StatelessWidget {
                                       label: 'Speed',
                                     ),
                                     EffectItem(
-                                      icon: YTIcons.flash_off,
+                                      icon: Icons.timer_sharp,
                                       label: 'Timer',
                                     ),
                                     EffectItem(
@@ -135,72 +178,143 @@ class CreateShortsScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                          vertical: 32,
-                          horizontal: 12,
                         ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: Colors.white12,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 12,
                             ),
-                            const SizedBox(width: 36),
-                            const Icon(Icons.turn_left),
-                            const Spacer(),
-                            const Icon(Icons.turn_right),
-                            const SizedBox(width: 36),
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                YTIcons.check_outlined,
-                                color: Colors.black,
-                              ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black45,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      Center(
+                                        child: Container(
+                                          height: 44,
+                                          width: 56,
+                                          margin: const EdgeInsets.all(2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      ),
+                                      const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 18.0,
+                                          horizontal: 36,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              '1X',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            Text(
+                                              '2X',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            Text(
+                                              '3X',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            Text(
+                                              '4X',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            Text(
+                                              '5X',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 36),
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white12,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 36),
+                                    const Icon(Icons.turn_left),
+                                    const Spacer(),
+                                    const Icon(Icons.turn_right),
+                                    const SizedBox(width: 36),
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        YTIcons.check_outlined,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 48),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 42.5,
+                              horizontal: 12,
+                            ),
+                            child: CustomPaint(
+                              size: const Size(66, 66),
+                              foregroundPainter: CircledButton(),
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            width: 56,
+                            height: 56,
+                            margin: const EdgeInsets.all(48),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFFF0000),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                          vertical: 14,
-                          horizontal: 12,
-                        ),
-                        child: CustomPaint(
-                          size: const Size(80, 80),
-                          foregroundPainter: CircledButton(),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        width: 60,
-                        height: 60,
-                        margin: const EdgeInsets.all(24),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 );
               }
               return const CreateShortsPermissionRequest(

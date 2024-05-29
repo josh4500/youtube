@@ -3,6 +3,7 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'create_live_screen.dart';
+import 'create_post_screen.dart';
 import 'create_shorts_screen.dart';
 import 'create_video_screen.dart';
 
@@ -38,7 +39,7 @@ class _CreateScreenState extends State<CreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tabs = ['Video', 'Short', 'Live'];
+    final tabs = ['Video', 'Short', 'Live', 'Post'];
     return Theme(
       data: AppTheme.dark,
       child: Scaffold(
@@ -55,6 +56,7 @@ class _CreateScreenState extends State<CreateScreen> {
                         CreateVideoScreen(),
                         CreateShortsScreen(),
                         CreateLiveScreen(),
+                        CreatePostScreen(),
                       ],
                     );
                   },
@@ -63,7 +65,7 @@ class _CreateScreenState extends State<CreateScreen> {
               ColoredBox(
                 color: Colors.black,
                 child: SizedBox(
-                  height: 80,
+                  height: 88,
                   child: ShaderMask(
                     shaderCallback: _overflowShader.createShader,
                     child: Stack(
@@ -71,11 +73,11 @@ class _CreateScreenState extends State<CreateScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            vertical: 8,
+                            vertical: 10,
                             horizontal: 16,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white10,
+                            color: Colors.white24,
                             borderRadius: BorderRadius.circular(24),
                           ),
                           child: ListenableBuilder(
@@ -86,7 +88,7 @@ class _CreateScreenState extends State<CreateScreen> {
                                 child: Text(
                                   tabs[selectedNotifier.value],
                                   style: const TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -120,7 +122,7 @@ class _CreateScreenState extends State<CreateScreen> {
                                       return Text(
                                         tabs[index],
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 14,
                                           color: index == selectedNotifier.value
                                               ? Colors.white
                                               : Colors.grey,
