@@ -25,20 +25,24 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import 'dart:async';
 
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import 'widgets/capture/capture_button.dart';
+import 'widgets/capture/capture_drag_zoom_button.dart';
+import 'widgets/capture/capture_effects.dart';
+import 'widgets/capture/capture_progress_control.dart';
+import 'widgets/capture/capture_shorts_duration_timer.dart';
+import 'widgets/capture/capture_zoom_indicator.dart';
 import 'widgets/check_permission.dart';
 import 'widgets/create_close_button.dart';
 import 'widgets/create_progress.dart';
-import 'widgets/effect_options.dart';
+import 'widgets/range_selector.dart';
 
 final _checkMicrophoneCameraPerm = FutureProvider<bool>((ref) async {
   final result = await Future.wait([
@@ -66,10 +70,10 @@ class CreateShortsScreen extends StatelessWidget {
               if (granted) {
                 return ClipRRect(
                   borderRadius: BorderRadius.circular(24),
-                  child: Material(
+                  child: const Material(
                     child: Stack(
                       children: [
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.all(12.0),
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
@@ -94,225 +98,48 @@ class CreateShortsScreen extends StatelessWidget {
                                       ),
                                       backgroundColor: Colors.black45,
                                     ),
-                                    CreateShortsTimer(),
+                                    CaptureShortsDurationTimer(),
                                   ],
                                 ),
                               ],
                             ),
                           ),
                         ),
-                        const Center(
-                          child: Text(
-                            '60 seconds',
-                            style: TextStyle(
-                              fontSize: 36,
-                              color: Colors.white12,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
+                        Center(child: ControlEventText()),
                         Center(
                           child: Padding(
-                            padding: const EdgeInsets.all(12.0),
+                            padding: EdgeInsets.all(12.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                SizedBox(
-                                  height:
-                                      MediaQuery.sizeOf(context).height * .45,
-                                  child: RotatedBox(
-                                    quarterTurns: 3,
-                                    child: SliderTheme(
-                                      data: const SliderThemeData(
-                                        trackHeight: 1,
-                                        thumbColor: Colors.white,
-                                        activeTrackColor: Colors.white,
-                                        inactiveTrackColor: Colors.white54,
-                                      ),
-                                      child: Slider(
-                                        value: .5,
-                                        onChanged: (v) {},
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const EffectOptions(
-                                  items: [
-                                    EffectItem(
-                                      icon: YTIcons.flip_camera,
-                                      label: 'Flip',
-                                    ),
-                                    EffectItem(
-                                      icon: YTIcons.speed,
-                                      label: 'Speed',
-                                    ),
-                                    EffectItem(
-                                      icon: Icons.timer_sharp,
-                                      label: 'Timer',
-                                    ),
-                                    EffectItem(
-                                      icon: YTIcons.sparkle,
-                                      label: 'Effects',
-                                    ),
-                                    EffectItem(
-                                      icon: YTIcons.green_screen,
-                                      label: 'Green Screen',
-                                    ),
-                                    EffectItem(
-                                      icon: YTIcons.retouch,
-                                      label: 'Retouch',
-                                    ),
-                                    EffectItem(
-                                      icon: YTIcons.filter_photo,
-                                      label: 'Filter',
-                                    ),
-                                    EffectItem(
-                                      icon: YTIcons.lighting,
-                                      label: 'Lighting',
-                                    ),
-                                    EffectItem(
-                                      icon: YTIcons.flash_off,
-                                      label: 'Flash',
-                                    ),
-                                  ],
-                                ),
+                                CaptureZoomIndicator(),
+                                CaptureEffects(),
                               ],
                             ),
                           ),
                         ),
                         Align(
                           alignment: Alignment.bottomCenter,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                            ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black45,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Stack(
-                                    children: [
-                                      Positioned.fill(
-                                        child: Center(
-                                          child: Container(
-                                            width: 56,
-                                            margin: const EdgeInsets.all(2),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 14.0,
-                                          horizontal: 36,
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              '1X',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            Text(
-                                              '2X',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            Text(
-                                              '3X',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            Text(
-                                              '4X',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            Text(
-                                              '5X',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 36),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 48,
-                                      height: 48,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white12,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 36),
-                                    const Icon(Icons.turn_left),
-                                    const Spacer(),
-                                    const Icon(Icons.turn_right),
-                                    const SizedBox(width: 36),
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        YTIcons.check_outlined,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 48),
+                                RangeSelector(),
+                                SizedBox(height: 36),
+                                CaptureProgressControl(),
+                                SizedBox(height: 48),
                               ],
                             ),
                           ),
                         ),
                         Align(
                           alignment: Alignment.bottomCenter,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                              vertical: 42.5,
-                              horizontal: 12,
-                            ),
-                            child: CustomPaint(
-                              size: const Size(66, 66),
-                              foregroundPainter: CircledButton(),
-                            ),
-                          ),
+                          child: CaptureDragZoomButton(),
                         ),
                         Align(
                           alignment: Alignment.bottomCenter,
-                          child: Container(
-                            width: 56,
-                            height: 56,
-                            margin: const EdgeInsets.all(48),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFFF0000),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
+                          child: CaptureButton(),
                         ),
                       ],
                     ),
@@ -332,65 +159,17 @@ class CreateShortsScreen extends StatelessWidget {
   }
 }
 
-class CircledButton extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..strokeWidth = 2.5
-      ..style = PaintingStyle.stroke
-      ..color = Colors.white;
-    canvas.drawCircle(
-      Offset(size.halfWidth, size.halfHeight),
-      size.halfWidth,
-      paint,
-    );
-  }
+class ControlEventText extends StatelessWidget {
+  const ControlEventText({super.key});
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}
-
-class CreateShortsTimer extends StatefulWidget {
-  const CreateShortsTimer({
-    super.key,
-  });
-
-  @override
-  State<CreateShortsTimer> createState() => _CreateShortsTimerState();
-}
-
-class _CreateShortsTimerState extends State<CreateShortsTimer> {
-  int time = 15;
-  static const int minTime = 15;
-  static const int maxTime = 60;
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => setState(() {
-        time == minTime ? time = maxTime : time = minTime;
-      }),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              color: Colors.black45,
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              '${time}s',
-              style: const TextStyle(
-                fontSize: 13,
-              ),
-            ),
-          ),
-          CircularProgressIndicator(
-            color: Colors.white,
-            value: time / maxTime,
-            strokeWidth: 2,
-          ),
-        ],
+    return const Text(
+      '60 seconds',
+      style: TextStyle(
+        fontSize: 36,
+        color: Colors.white12,
+        fontWeight: FontWeight.w800,
       ),
     );
   }
@@ -429,22 +208,34 @@ class OldCreateShortsPermissionRequest extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 9,
-                    horizontal: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(32),
-                  ),
-                  child: const Text(
-                    'Allow access',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                Consumer(
+                  builder: (context, ref, child) {
+                    return GestureDetector(
+                      onTap: () async {
+                        await Permission.camera.request();
+                        await Permission.microphone.request();
+
+                        ref.refresh(_checkMicrophoneCameraPerm);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 9,
+                          horizontal: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        child: const Text(
+                          'Allow access',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
