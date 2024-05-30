@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class RangeSelector extends StatefulWidget {
@@ -83,7 +84,6 @@ class _RangeSelectorState extends State<RangeSelector>
               //   selected.value = selectedValue;
               // }
             },
-            onHorizontalDragEnd: (d) => print('hello'),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.black45,
@@ -105,7 +105,7 @@ class _RangeSelectorState extends State<RangeSelector>
                         margin: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(4),
                         ),
                       ),
                     ),

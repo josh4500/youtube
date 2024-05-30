@@ -378,7 +378,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
           ) {
             return Visibility(
               visible: showingSlideFrame == false,
-              child: ControlsVisibility(
+              child: AnimatedVisibility(
                 animation: _seekDurationIndicatorAnimation,
                 alignment: Alignment.lerp(
                   Alignment.center,
@@ -397,7 +397,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
             bool isForwardSeek,
             Widget? childWidget,
           ) {
-            return ControlsVisibility(
+            return AnimatedVisibility(
               animation: _showDoubleTapSeekAnimation,
               alignment: _isForwardSeek.value
                   ? Alignment.centerRight
@@ -458,7 +458,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                 color: Colors.transparent,
                 height: double.infinity,
                 width: double.infinity,
-                child: ControlsVisibility(
+                child: AnimatedVisibility(
                   animation: _controlsAnimation,
                   alignment: Alignment.center,
                   child: const ColoredBox(
@@ -468,22 +468,22 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                 ),
               ),
             ),
-            ControlsVisibility(
+            AnimatedVisibility(
               animation: _controlsAnimation,
               alignment: Alignment.topCenter,
               child: const _TopControl(),
             ),
-            ControlsVisibility(
+            AnimatedVisibility(
               animation: _controlsAnimation,
               alignment: Alignment.center,
               child: const _MiddleControl(),
             ),
-            ControlsVisibility(
+            AnimatedVisibility(
               animation: _controlsAnimation,
               alignment: Alignment.bottomCenter,
               child: const _BottomControl(),
             ),
-            ControlsVisibility(
+            AnimatedVisibility(
               animation: _showUnlockButtonAnimation,
               alignment: Alignment.lerp(
                 Alignment.center,
@@ -496,7 +496,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
             const Center(child: PlayerLoadingIndicator()),
           ],
         ),
-        ControlsVisibility(
+        AnimatedVisibility(
           alignment: Alignment.topCenter,
           animation: _seekIndicatorAnimation,
           child: SeekIndicator(valueListenable: _seekIndicatorNotifier),
@@ -1080,37 +1080,6 @@ class _BottomControl extends StatelessWidget {
           PlayerActionsControl(),
         ],
       ),
-    );
-  }
-}
-
-class ControlsVisibility extends StatelessWidget {
-  const ControlsVisibility({
-    super.key,
-    required this.animation,
-    required this.alignment,
-    required this.child,
-  });
-
-  final Animation<double> animation;
-  final Alignment alignment;
-  final Widget child;
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (BuildContext context, Widget? childWidget) {
-        return Visibility(
-          visible: animation.value != 0,
-          child: Align(
-            alignment: alignment,
-            child: Opacity(
-              opacity: animation.value,
-              child: child,
-            ),
-          ),
-        );
-      },
     );
   }
 }

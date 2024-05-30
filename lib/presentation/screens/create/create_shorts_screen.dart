@@ -42,7 +42,10 @@ import 'widgets/capture/capture_zoom_indicator.dart';
 import 'widgets/check_permission.dart';
 import 'widgets/create_close_button.dart';
 import 'widgets/create_progress.dart';
+import 'widgets/notifications/capture_notification.dart';
+import 'widgets/notifications/create_notification.dart';
 import 'widgets/range_selector.dart';
+import 'widgets/video_effect_options.dart';
 
 final _checkMicrophoneCameraPerm = FutureProvider<bool>((ref) async {
   final result = await Future.wait([
@@ -61,94 +64,14 @@ class CreateShortsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      resizeToAvoidBottomInset: false,
       body: Consumer(
         builder: (context, ref, child) {
           final permResult = ref.watch(_checkMicrophoneCameraPerm);
           return permResult.when(
             data: (bool granted) {
-              if (granted) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: const Material(
-                    child: Stack(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(12.0),
-                          child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                CreateProgress(),
-                                SizedBox(height: 12),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CreateCloseButton(),
-                                    CustomActionChip(
-                                      icon: Icon(YTIcons.music),
-                                      title: 'Add sound',
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 8,
-                                        horizontal: 12,
-                                      ),
-                                      textStyle: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      backgroundColor: Colors.black45,
-                                    ),
-                                    CaptureShortsDurationTimer(),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Center(child: ControlEventText()),
-                        Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(12.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                CaptureZoomIndicator(),
-                                CaptureEffects(),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                RangeSelector(),
-                                SizedBox(height: 36),
-                                CaptureProgressControl(),
-                                SizedBox(height: 48),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: CaptureDragZoomButton(),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: CaptureButton(),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-              return const CreateShortsPermissionRequest(
-                checking: false,
-              );
+              if (granted) return const CaptureShortsView();
+              return const CreateShortsPermissionRequest(checking: false);
             },
             error: (e, _) => const CreateShortsPermissionRequest(),
             loading: CreateShortsPermissionRequest.new,
@@ -159,16 +82,209 @@ class CreateShortsScreen extends StatelessWidget {
   }
 }
 
-class ControlEventText extends StatelessWidget {
-  const ControlEventText({super.key});
+class CaptureShortsView extends StatefulWidget {
+  const CaptureShortsView({
+    super.key,
+  });
+
+  @override
+  State<CaptureShortsView> createState() => _CaptureShortsViewState();
+}
+
+class _CaptureShortsViewState extends State<CaptureShortsView>
+    with TickerProviderStateMixin {
+  bool _controlHidden = false;
+  late final AnimationController hideController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  );
+
+  late final Animation<double> hideAnimation;
+
+  late final AnimationController hideZoomController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  );
+
+  late final AnimationController hideSpeedController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  );
+
+  final latestControlMessage = ValueNotifier<String>('');
+  Timer? controlMessageTimer;
+
+  final effectsController = VideoEffectOptionsController();
+
+  @override
+  void initState() {
+    super.initState();
+    hideAnimation = ReverseAnimation(
+      CurvedAnimation(
+        parent: hideController,
+        curve: Curves.easeInCubic,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    controlMessageTimer?.cancel();
+    latestControlMessage.dispose();
+    effectsController.dispose();
+
+    hideController.dispose();
+    super.dispose();
+  }
+
+  void handleOnTapCameraView() {
+    if (_controlHidden) {
+      effectsController.close();
+      return;
+    }
+  }
+
+  bool handleCaptureNotification(CaptureNotification notification) {
+    if (notification is HideCaptureControlsNotification) {
+      _controlHidden = true;
+      hideController.forward();
+      CreateNotification(hideNavigator: true).dispatch(context);
+    } else if (notification is ShowCaptureControlsNotification) {
+      _controlHidden = false;
+      hideController.reverse();
+      CreateNotification(hideNavigator: false).dispatch(context);
+    } else if (notification is ShowControlsMessageNotification) {
+      latestControlMessage.value = notification.message;
+      controlMessageTimer?.cancel();
+      controlMessageTimer = Timer(
+        const Duration(seconds: 2),
+        () => latestControlMessage.value = '',
+      );
+    }
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Text(
-      '60 seconds',
-      style: TextStyle(
+    final speedSelectorScaleAnimation = Tween<double>(
+      begin: .9,
+      end: 1,
+    ).animate(hideSpeedController);
+
+    return NotificationListener<CaptureNotification>(
+      onNotification: handleCaptureNotification,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Stack(
+          children: [
+            GestureDetector(
+              onTap: handleOnTapCameraView,
+              behavior: HitTestBehavior.opaque,
+              child: const SizedBox.expand(),
+            ),
+            AnimatedVisibility(
+              animation: hideAnimation,
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    CreateProgress(),
+                    SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CreateCloseButton(),
+                        CaptureMusicButton(),
+                        CaptureShortsDurationTimer(),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Center(
+              child: ListenableBuilder(
+                listenable: latestControlMessage,
+                builder: (BuildContext context, Widget? _) {
+                  return ControlMessageEvent(
+                    message: latestControlMessage.value,
+                  );
+                },
+              ),
+            ),
+            AnimatedVisibility(
+              animation: hideZoomController,
+              alignment: Alignment.centerLeft,
+              child: const CaptureZoomIndicator(),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: CaptureEffects(controller: effectsController),
+            ),
+            AnimatedVisibility(
+              animation: hideAnimation,
+              alignment: Alignment.bottomCenter,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  AnimatedVisibility(
+                    animation: hideSpeedController,
+                    child: ScaleTransition(
+                      scale: speedSelectorScaleAnimation,
+                      child: const RangeSelector(),
+                    ),
+                  ),
+                  const SizedBox(height: 36),
+                  const CaptureProgressControl(),
+                  const SizedBox(height: 48),
+                ],
+              ),
+            ),
+            AnimatedVisibility(
+              animation: hideAnimation,
+              alignment: Alignment.bottomCenter,
+              child: const CaptureDragZoomButton(),
+            ),
+            AnimatedVisibility(
+              animation: hideAnimation,
+              alignment: Alignment.bottomCenter,
+              child: const CaptureButton(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CaptureMusicButton extends StatelessWidget {
+  const CaptureMusicButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const CustomActionChip(
+      title: 'Add sound',
+      icon: Icon(YTIcons.music),
+      backgroundColor: Colors.black45,
+      textStyle: TextStyle(fontWeight: FontWeight.w500),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+    );
+  }
+}
+
+class ControlMessageEvent extends StatelessWidget {
+  const ControlMessageEvent({super.key, required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      message,
+      style: const TextStyle(
         fontSize: 36,
-        color: Colors.white12,
+        color: Colors.white24,
         fontWeight: FontWeight.w800,
       ),
     );

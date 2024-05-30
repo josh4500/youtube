@@ -18,11 +18,25 @@ class CaptureProgressControl extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
         ),
-        const SizedBox(width: 36),
-        const Icon(Icons.turn_left),
+        const SizedBox(width: 24),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.black26,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.turn_left),
+        ),
         const Spacer(),
-        const Icon(Icons.turn_right),
-        const SizedBox(width: 36),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.black26,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.turn_right),
+        ),
+        const SizedBox(width: 24),
         Container(
           padding: const EdgeInsets.all(8),
           decoration: const BoxDecoration(

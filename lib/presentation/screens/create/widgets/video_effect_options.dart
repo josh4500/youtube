@@ -1,21 +1,31 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-class EffectOptions extends StatefulWidget {
-  const EffectOptions({super.key, this.items = const <EffectItem>[]});
+class VideoEffectOptions extends StatefulWidget {
+  const VideoEffectOptions({
+    super.key,
+    this.controller,
+    this.items = const <EffectItem>[],
+    this.onExpand,
+  });
 
+  final VideoEffectOptionsController? controller;
   final List<EffectItem> items;
+  final ValueChanged<bool>? onExpand;
 
   @override
-  State<EffectOptions> createState() => _EffectOptionsState();
+  State<VideoEffectOptions> createState() => _VideoEffectOptionsState();
 }
 
-class _EffectOptionsState extends State<EffectOptions>
+class _VideoEffectOptionsState extends State<VideoEffectOptions>
     with SingleTickerProviderStateMixin {
   late final AnimationController controller;
   late final Animation<double> animation;
   final ValueNotifier<bool> _showLabelNotifier = ValueNotifier<bool>(true);
+  Timer? initialShowTimer;
 
   static const int maxInitialShown = 4;
 
@@ -30,13 +40,32 @@ class _EffectOptionsState extends State<EffectOptions>
     controller.addListener(() {
       _showLabelNotifier.value = controller.value == 1;
     });
+
+    widget.controller?.addListener(expandOrClose);
+
+    initialShowTimer = Timer(const Duration(seconds: 3), () {
+      _showLabelNotifier.value = false;
+    });
   }
 
   @override
   void dispose() {
+    initialShowTimer?.cancel();
     _showLabelNotifier.dispose();
     controller.dispose();
     super.dispose();
+  }
+
+  void expandOrClose() {
+    initialShowTimer?.cancel();
+    if (widget.items.length > maxInitialShown) {
+      widget.onExpand?.call(controller.isCompleted);
+      if (controller.isCompleted) {
+        controller.reverse();
+      } else {
+        controller.forward();
+      }
+    }
   }
 
   @override
@@ -73,11 +102,14 @@ class _EffectOptionsState extends State<EffectOptions>
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             for (int i = 0; i < maxInitialShown; i++)
-                              Container(
-                                margin: labelVerticalMargin,
-                                child: Text(
-                                  widget.items[i].label,
-                                  style: labelTextStyle,
+                              GestureDetector(
+                                onTap: widget.items[i].onTap,
+                                child: Container(
+                                  margin: labelVerticalMargin,
+                                  child: Text(
+                                    widget.items[i].label,
+                                    style: labelTextStyle,
+                                  ),
                                 ),
                               ),
                           ],
@@ -91,24 +123,30 @@ class _EffectOptionsState extends State<EffectOptions>
                                 for (int i = maxInitialShown;
                                     i < widget.items.length;
                                     i++)
-                                  Container(
-                                    margin: labelVerticalMargin,
-                                    child: Text(
-                                      widget.items[i].label,
-                                      style: labelTextStyle,
+                                  GestureDetector(
+                                    onTap: widget.items[i].onTap,
+                                    child: Container(
+                                      margin: labelVerticalMargin,
+                                      child: Text(
+                                        widget.items[i].label,
+                                        style: labelTextStyle,
+                                      ),
                                     ),
                                   ),
                               ],
                             ),
                           ),
-                          SizedBox(
-                            height: 40,
-                            child: Center(
-                              child: Text(
-                                visible && controller.value == 0
-                                    ? 'More'
-                                    : 'Close',
-                                style: labelTextStyle,
+                          GestureDetector(
+                            onTap: expandOrClose,
+                            child: SizedBox(
+                              height: 40,
+                              child: Center(
+                                child: Text(
+                                  visible && controller.value == 0
+                                      ? 'More'
+                                      : 'Close',
+                                  style: labelTextStyle,
+                                ),
                               ),
                             ),
                           ),
@@ -132,11 +170,9 @@ class _EffectOptionsState extends State<EffectOptions>
                   Column(
                     children: [
                       for (int i = 0; i < maxInitialShown; i++)
-                        CustomActionChip(
-                          padding: EdgeInsets.zero,
+                        EffectWidget(
                           margin: itemVerticalMargin,
-                          onTap: widget.items[i].onTap,
-                          icon: Icon(widget.items[i].icon, size: 18),
+                          item: widget.items[i],
                         ),
                     ],
                   ),
@@ -148,19 +184,15 @@ class _EffectOptionsState extends State<EffectOptions>
                           for (int i = maxInitialShown;
                               i < widget.items.length;
                               i++)
-                            CustomActionChip(
-                              padding: EdgeInsets.zero,
+                            EffectWidget(
                               margin: itemVerticalMargin,
-                              onTap: widget.items[i].onTap,
-                              icon: Icon(widget.items[i].icon, size: 18),
+                              item: widget.items[i],
                             ),
                         ],
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => controller.isCompleted
-                          ? controller.reverse()
-                          : controller.forward(),
+                      onTap: expandOrClose,
                       child: RotationTransition(
                         turns: Tween(begin: 0.0, end: -.5).animate(controller),
                         child: Container(
@@ -184,10 +216,61 @@ class _EffectOptionsState extends State<EffectOptions>
   }
 }
 
+class EffectWidget extends StatefulWidget {
+  const EffectWidget({
+    super.key,
+    required this.margin,
+    required this.item,
+  });
+
+  final EdgeInsets margin;
+  final EffectItem item;
+
+  @override
+  State<EffectWidget> createState() => _EffectWidgetState();
+}
+
+class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
+  bool active = false;
+  void handleTap() {
+    widget.item.onTap?.call();
+    if (widget.item.onTap != null) {
+      active = !active;
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomActionChip(
+      padding: EdgeInsets.zero,
+      margin: widget.margin,
+      onTap: handleTap,
+      icon: Icon(
+        active ? widget.item.activeIcon ?? widget.item.icon : widget.item.icon,
+        size: 18,
+      ),
+    );
+  }
+}
+
 class EffectItem {
-  const EffectItem({required this.icon, required this.label, this.onTap});
+  const EffectItem({
+    required this.icon,
+    this.activeIcon,
+    required this.label,
+    this.onTap,
+  });
 
   final IconData icon;
+  final IconData? activeIcon;
   final String label;
   final VoidCallback? onTap;
+}
+
+// TODO(josh4500): Refactor usage
+class VideoEffectOptionsController extends ChangeNotifier {
+  void close() {
+    notifyListeners();
+  }
 }

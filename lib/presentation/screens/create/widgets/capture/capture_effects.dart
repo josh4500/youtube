@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
-import '../effect_options.dart';
+import '../notifications/capture_notification.dart';
+import '../video_effect_options.dart';
 
 class CaptureEffects extends StatelessWidget {
-  const CaptureEffects({
-    super.key,
-  });
-
+  const CaptureEffects({super.key, this.controller});
+  final VideoEffectOptionsController? controller;
   @override
   Widget build(BuildContext context) {
-    return const EffectOptions(
-      items: [
+    return VideoEffectOptions(
+      controller: controller,
+      onExpand: (bool closed) {
+        closed
+            ? ShowCaptureControlsNotification().dispatch(context)
+            : HideCaptureControlsNotification().dispatch(context);
+      },
+      items: const <EffectItem>[
         EffectItem(
           icon: YTIcons.flip_camera,
           label: 'Flip',
