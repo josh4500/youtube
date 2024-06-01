@@ -14,7 +14,7 @@ class CreateCloseButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: const BoxDecoration(
-          color: Colors.black45,
+          color: Colors.black38,
           shape: BoxShape.circle,
         ),
         child: const Icon(

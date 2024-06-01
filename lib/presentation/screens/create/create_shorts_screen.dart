@@ -33,7 +33,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/camera/android_camera_view.dart';
 
 import '../../widgets/camera/camera_controller.dart';
 import '../../widgets/camera/camera_preview.dart';
@@ -159,6 +158,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   final effectsController = VideoEffectOptionsController();
 
+  final ValueNotifier<int?> hasInitCamera = ValueNotifier(null);
+
   double _minAvailableZoom = 1.0;
   double _maxAvailableZoom = 1.0;
   double _currentScale = 1.0;
@@ -189,6 +190,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     WidgetsBinding.instance.removeObserver(this);
 
     controller?.dispose();
+    hasInitCamera.dispose();
 
     controlMessageTimer?.cancel();
     latestControlMessage.dispose();
@@ -198,12 +200,10 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     super.dispose();
   }
 
-  bool hasSetInitialCamera = false;
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Timer.run(() {
+    Future.microtask(() {
       final CreateCameraState? cameraState =
           ref.read(_checkMicrophoneCameraPerm).value;
       if (cameraState != null && cameraState.cameras.isNotEmpty) {
@@ -306,10 +306,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       }
     }
 
-    if (mounted) {
-      // TODO(josh4500): Avoid this Rebuild UI
-      setState(() {});
-    }
+    hasInitCamera.value = controller?.cameraId;
   }
 
   void onViewFinderTap(TapDownDetails details, BoxConstraints constraints) {
@@ -421,23 +418,32 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (controller == null)
-            const SizedBox()
-          else
-            Listener(
-              child: LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-                  return CameraPreview(
-                    controller!,
-                    child: GestureDetector(
-                      onTap: handleOnTapCameraView,
-                      behavior: HitTestBehavior.opaque,
-                      child: const SizedBox.expand(),
-                    ),
-                  );
-                },
-              ),
-            ),
+          ValueListenableBuilder(
+            valueListenable: hasInitCamera,
+            builder: (BuildContext context, int? cameraId, Widget? _) {
+              if (controller == null) {
+                return const SizedBox();
+              } else {
+                return Listener(
+                  child: LayoutBuilder(
+                    builder: (
+                      BuildContext context,
+                      BoxConstraints constraints,
+                    ) {
+                      return CameraPreview(
+                        controller!,
+                        child: GestureDetector(
+                          onTap: handleOnTapCameraView,
+                          behavior: HitTestBehavior.opaque,
+                          child: const SizedBox.expand(),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }
+            },
+          ),
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: Stack(
@@ -532,9 +538,9 @@ class CaptureMusicButton extends StatelessWidget {
     return const CustomActionChip(
       title: 'Add sound',
       icon: Icon(YTIcons.music, size: 18),
-      backgroundColor: Colors.black45,
-      textStyle: TextStyle(fontWeight: FontWeight.w500),
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      backgroundColor: Colors.black38,
+      textStyle: TextStyle(fontSize: 13),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
     );
   }
 }

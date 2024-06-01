@@ -231,13 +231,19 @@ class EffectWidget extends StatefulWidget {
 }
 
 class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
-  bool active = false;
+  final ValueNotifier<bool> activeNotifier = ValueNotifier(false);
   void handleTap() {
-    widget.item.onTap?.call();
     if (widget.item.onTap != null) {
-      active = !active;
+      activeNotifier.value = !activeNotifier.value;
       setState(() {});
     }
+    widget.item.onTap?.call();
+  }
+
+  @override
+  void dispose() {
+    activeNotifier.dispose();
+    super.dispose();
   }
 
   @override
@@ -246,9 +252,16 @@ class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
       padding: EdgeInsets.zero,
       margin: widget.margin,
       onTap: handleTap,
-      icon: Icon(
-        active ? widget.item.activeIcon ?? widget.item.icon : widget.item.icon,
-        size: 20,
+      icon: ValueListenableBuilder<bool>(
+        valueListenable: activeNotifier,
+        builder: (BuildContext context, bool active, Widget? _) {
+          return Icon(
+            active
+                ? widget.item.activeIcon ?? widget.item.icon
+                : widget.item.icon,
+            size: 18,
+          );
+        },
       ),
     );
   }

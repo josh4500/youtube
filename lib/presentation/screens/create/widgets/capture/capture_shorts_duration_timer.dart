@@ -56,7 +56,7 @@ class _CaptureShortsDurationTimerState extends State<CaptureShortsDurationTimer>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: const BoxDecoration(
-              color: Colors.black45,
+              color: Colors.black38,
               shape: BoxShape.circle,
             ),
             child: Text(
