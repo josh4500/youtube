@@ -27,12 +27,16 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import 'dart:async';
 
+import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
+import 'package:youtube_clone/presentation/widgets/camera/android_camera_view.dart';
 
+import '../../widgets/camera/camera_controller.dart';
+import '../../widgets/camera/camera_preview.dart';
 import 'widgets/capture/capture_button.dart';
 import 'widgets/capture/capture_drag_zoom_button.dart';
 import 'widgets/capture/capture_effects.dart';
@@ -47,16 +51,51 @@ import 'widgets/notifications/create_notification.dart';
 import 'widgets/range_selector.dart';
 import 'widgets/video_effect_options.dart';
 
-final _checkMicrophoneCameraPerm = FutureProvider<bool>((ref) async {
-  final result = await Future.wait([
-    Permission.camera.isGranted,
-    Permission.microphone.isGranted,
-  ]);
-  return result.fold<bool>(
-    true,
-    (value, element) => value && element,
-  );
-});
+final _checkMicrophoneCameraPerm =
+    FutureProvider.autoDispose<CreateCameraState>(
+  (ref) async {
+    final result = await Future.wait([
+      Permission.camera.isGranted,
+      Permission.microphone.isGranted,
+    ]);
+
+    final hasPermission = result.fold<bool>(
+      true,
+      (value, element) => value && element,
+    );
+
+    CreateCameraState state = CreateCameraState(
+      hasPermissions: hasPermission,
+    );
+
+    if (hasPermission) {
+      final cameras = await availableCameras();
+      state = state.copyWith(cameras: cameras);
+    }
+
+    return state;
+  },
+);
+
+class CreateCameraState {
+  CreateCameraState({
+    required this.hasPermissions,
+    this.cameras = const <CameraDescription>[],
+  });
+
+  final bool hasPermissions;
+  final List<CameraDescription> cameras;
+
+  CreateCameraState copyWith({
+    bool? hasPermissions,
+    List<CameraDescription>? cameras,
+  }) {
+    return CreateCameraState(
+      hasPermissions: hasPermissions ?? this.hasPermissions,
+      cameras: cameras ?? this.cameras,
+    );
+  }
+}
 
 class CreateShortsScreen extends StatelessWidget {
   const CreateShortsScreen({super.key});
@@ -69,8 +108,10 @@ class CreateShortsScreen extends StatelessWidget {
         builder: (context, ref, child) {
           final permResult = ref.watch(_checkMicrophoneCameraPerm);
           return permResult.when(
-            data: (bool granted) {
-              if (granted) return const CaptureShortsView();
+            data: (CreateCameraState state) {
+              if (state.hasPermissions && state.cameras.isNotEmpty) {
+                return const CaptureShortsView();
+              }
               return const CreateShortsPermissionRequest(checking: false);
             },
             error: (e, _) => const CreateShortsPermissionRequest(),
@@ -82,17 +123,19 @@ class CreateShortsScreen extends StatelessWidget {
   }
 }
 
-class CaptureShortsView extends StatefulWidget {
+class CaptureShortsView extends ConsumerStatefulWidget {
   const CaptureShortsView({
     super.key,
   });
 
   @override
-  State<CaptureShortsView> createState() => _CaptureShortsViewState();
+  ConsumerState<CaptureShortsView> createState() => _CaptureShortsViewState();
 }
 
-class _CaptureShortsViewState extends State<CaptureShortsView>
-    with TickerProviderStateMixin {
+class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
+    with WidgetsBindingObserver, TickerProviderStateMixin {
+  CameraController? controller;
+
   bool _controlHidden = false;
   late final AnimationController hideController = AnimationController(
     vsync: this,
@@ -116,9 +159,23 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
 
   final effectsController = VideoEffectOptionsController();
 
+  double _minAvailableZoom = 1.0;
+  double _maxAvailableZoom = 1.0;
+  double _currentScale = 1.0;
+  double _baseScale = 1.0;
+
+  double _minAvailableExposureOffset = 0.0;
+  double _maxAvailableExposureOffset = 0.0;
+  double _currentExposureOffset = 0.0;
+
+  // Counting pointers (number of user fingers on screen)
+  int _pointers = 0;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
     hideAnimation = ReverseAnimation(
       CurvedAnimation(
         parent: hideController,
@@ -129,12 +186,200 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+
+    controller?.dispose();
+
     controlMessageTimer?.cancel();
     latestControlMessage.dispose();
     effectsController.dispose();
 
     hideController.dispose();
     super.dispose();
+  }
+
+  bool hasSetInitialCamera = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Timer.run(() {
+      final CreateCameraState? cameraState =
+          ref.read(_checkMicrophoneCameraPerm).value;
+      if (cameraState != null && cameraState.cameras.isNotEmpty) {
+        onNewCameraSelected(cameraState.cameras.first);
+      }
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final CameraController? cameraController = controller;
+
+    // App state changed before we got the chance to initialize.
+    if (cameraController == null || !cameraController.value.isInitialized) {
+      return;
+    }
+
+    if (state == AppLifecycleState.inactive) {
+      cameraController.dispose();
+    } else if (state == AppLifecycleState.resumed) {
+      onNewCameraSelected(cameraController.description);
+    }
+  }
+
+  Future<void> onNewCameraSelected(CameraDescription cameraDescription) async {
+    final CameraController? oldController = controller;
+    if (oldController != null) {
+      // `controller` needs to be set to null before getting disposed,
+      // to avoid a race condition when we use the controller that is being
+      // disposed. This happens when camera permission dialog shows up,
+      // which triggers `didChangeAppLifecycleState`, which disposes and
+      // re-creates the controller.
+      controller = null;
+      await oldController.dispose();
+    }
+
+    final CameraController cameraController = CameraController(
+      cameraDescription,
+      mediaSettings: const MediaSettings(
+        resolutionPreset: ResolutionPreset.veryHigh,
+        fps: 30,
+        videoBitrate: 200000,
+        audioBitrate: 32000,
+      ),
+      imageFormatGroup: ImageFormatGroup.jpeg,
+    );
+
+    controller = cameraController;
+
+    // If the controller is updated then update the UI.
+    cameraController.addListener(() {
+      if (mounted) {
+        // TODO(josh4500): Avoid this
+        setState(() {});
+      }
+      if (cameraController.value.hasError) {
+        // TODO(josh4500):  'Camera error ${cameraController.value.errorDescription}',
+      }
+    });
+
+    try {
+      await cameraController.initialize();
+      await Future.wait(
+        <Future<Object?>>[
+          cameraController.getMinExposureOffset().then(
+                (double value) => _minAvailableExposureOffset = value,
+              ),
+          cameraController.getMaxExposureOffset().then(
+                (double value) => _maxAvailableExposureOffset = value,
+              ),
+          cameraController
+              .getMaxZoomLevel()
+              .then((double value) => _maxAvailableZoom = value),
+          cameraController
+              .getMinZoomLevel()
+              .then((double value) => _minAvailableZoom = value),
+        ],
+      );
+    } on CameraException catch (e) {
+      switch (e.code) {
+        case 'CameraAccessDenied':
+        // TODO(josh4500): 'You have denied camera access.'
+        case 'CameraAccessDeniedWithoutPrompt':
+        // iOS only
+        // TODO(josh4500): 'Please go to Settings app to enable camera access.'
+        case 'CameraAccessRestricted':
+        // iOS only
+        // TODO(josh4500): 'Camera access is restricted.'
+        case 'AudioAccessDenied':
+        // TODO(josh4500): 'You have denied audio access.'
+        case 'AudioAccessDeniedWithoutPrompt':
+        // iOS only
+        // TODO(josh4500): 'Please go to Settings app to enable audio access.'
+        case 'AudioAccessRestricted':
+        // iOS only
+        // TODO(josh4500): 'Audio access is restricted.'
+        default:
+          // TODO(josh4500): Error
+          break;
+      }
+    }
+
+    if (mounted) {
+      // TODO(josh4500): Avoid this Rebuild UI
+      setState(() {});
+    }
+  }
+
+  void onViewFinderTap(TapDownDetails details, BoxConstraints constraints) {
+    if (controller == null) {
+      return;
+    }
+
+    final CameraController cameraController = controller!;
+
+    final Offset offset = Offset(
+      details.localPosition.dx / constraints.maxWidth,
+      details.localPosition.dy / constraints.maxHeight,
+    );
+    cameraController.setExposurePoint(offset);
+    cameraController.setFocusPoint(offset);
+  }
+
+  Future<void> setFlashMode(FlashMode mode) async {
+    if (controller == null) {
+      return;
+    }
+
+    try {
+      await controller!.setFlashMode(mode);
+    } on CameraException catch (e) {
+      // TODO(josh4500): Unable to set flash mode
+      rethrow;
+    }
+  }
+
+  Future<void> setExposureMode(ExposureMode mode) async {
+    if (controller == null) {
+      return;
+    }
+
+    try {
+      await controller!.setExposureMode(mode);
+    } on CameraException catch (e) {
+      // TODO(josh4500): Unable to set exposure mode
+      rethrow;
+    }
+  }
+
+  Future<void> setExposureOffset(double offset) async {
+    if (controller == null) {
+      return;
+    }
+
+    setState(() {
+      _currentExposureOffset = offset;
+    });
+    try {
+      offset = await controller!.setExposureOffset(offset);
+    } on CameraException catch (e) {
+      // TODO(josh4500): Unable to set exposure
+      rethrow;
+    }
+  }
+
+  Future<void> setFocusMode(FocusMode mode) async {
+    if (controller == null) {
+      return;
+    }
+
+    try {
+      await controller!.setFocusMode(mode);
+    } on CameraException catch (e) {
+      // TODO(josh4500): Unable to set focus mode
+      rethrow;
+    }
   }
 
   void handleOnTapCameraView() {
@@ -173,85 +418,105 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
 
     return NotificationListener<CaptureNotification>(
       onNotification: handleCaptureNotification,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Stack(
-          children: [
-            GestureDetector(
-              onTap: handleOnTapCameraView,
-              behavior: HitTestBehavior.opaque,
-              child: const SizedBox.expand(),
-            ),
-            AnimatedVisibility(
-              animation: hideAnimation,
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    CreateProgress(),
-                    SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CreateCloseButton(),
-                        CaptureMusicButton(),
-                        CaptureShortsDurationTimer(),
-                      ],
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (controller == null)
+            const SizedBox()
+          else
+            Listener(
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  return CameraPreview(
+                    controller!,
+                    child: GestureDetector(
+                      onTap: handleOnTapCameraView,
+                      behavior: HitTestBehavior.opaque,
+                      child: const SizedBox.expand(),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            Center(
-              child: ListenableBuilder(
-                listenable: latestControlMessage,
-                builder: (BuildContext context, Widget? _) {
-                  return ControlMessageEvent(
-                    message: latestControlMessage.value,
                   );
                 },
               ),
             ),
-            AnimatedVisibility(
-              animation: hideZoomController,
-              alignment: Alignment.centerLeft,
-              child: const CaptureZoomIndicator(),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: CaptureEffects(controller: effectsController),
-            ),
-            AnimatedVisibility(
-              animation: hideAnimation,
-              alignment: Alignment.bottomCenter,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  AnimatedVisibility(
-                    animation: hideSpeedController,
-                    child: ScaleTransition(
-                      scale: speedSelectorScaleAnimation,
-                      child: const RangeSelector(),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Stack(
+              children: [
+                AnimatedVisibility(
+                  animation: hideAnimation,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 6,
+                      horizontal: 4.0,
+                    ),
+                    child: Column(
+                      children: [
+                        CreateProgress(),
+                        SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CreateCloseButton(),
+                            CaptureMusicButton(),
+                            CaptureShortsDurationTimer(),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 36),
-                  const CaptureProgressControl(),
-                  const SizedBox(height: 48),
-                ],
-              ),
+                ),
+                Center(
+                  child: ListenableBuilder(
+                    listenable: latestControlMessage,
+                    builder: (BuildContext context, Widget? _) {
+                      return ControlMessageEvent(
+                        message: latestControlMessage.value,
+                      );
+                    },
+                  ),
+                ),
+                AnimatedVisibility(
+                  animation: hideZoomController,
+                  alignment: Alignment.centerLeft,
+                  child: const CaptureZoomIndicator(),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: CaptureEffects(controller: effectsController),
+                ),
+                AnimatedVisibility(
+                  animation: hideAnimation,
+                  alignment: Alignment.bottomCenter,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      AnimatedVisibility(
+                        animation: hideSpeedController,
+                        child: ScaleTransition(
+                          scale: speedSelectorScaleAnimation,
+                          child: const RangeSelector(),
+                        ),
+                      ),
+                      const SizedBox(height: 36),
+                      const CaptureProgressControl(),
+                      const SizedBox(height: 48),
+                    ],
+                  ),
+                ),
+                AnimatedVisibility(
+                  animation: hideAnimation,
+                  alignment: Alignment.bottomCenter,
+                  child: const CaptureDragZoomButton(),
+                ),
+                AnimatedVisibility(
+                  animation: hideAnimation,
+                  alignment: Alignment.bottomCenter,
+                  child: const CaptureButton(),
+                ),
+              ],
             ),
-            AnimatedVisibility(
-              animation: hideAnimation,
-              alignment: Alignment.bottomCenter,
-              child: const CaptureDragZoomButton(),
-            ),
-            AnimatedVisibility(
-              animation: hideAnimation,
-              alignment: Alignment.bottomCenter,
-              child: const CaptureButton(),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -266,7 +531,7 @@ class CaptureMusicButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return const CustomActionChip(
       title: 'Add sound',
-      icon: Icon(YTIcons.music),
+      icon: Icon(YTIcons.music, size: 18),
       backgroundColor: Colors.black45,
       textStyle: TextStyle(fontWeight: FontWeight.w500),
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),

@@ -248,7 +248,7 @@ class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
       onTap: handleTap,
       icon: Icon(
         active ? widget.item.activeIcon ?? widget.item.icon : widget.item.icon,
-        size: 18,
+        size: 20,
       ),
     );
   }
@@ -268,7 +268,7 @@ class EffectItem {
   final VoidCallback? onTap;
 }
 
-// TODO(josh4500): Refactor usage
+// TODO(josh4500): Refactor usage or Implement a mediator
 class VideoEffectOptionsController extends ChangeNotifier {
   void close() {
     notifyListeners();

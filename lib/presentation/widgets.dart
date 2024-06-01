@@ -32,8 +32,8 @@ export 'widgets/app_logo.dart';
 export 'widgets/appbar_action.dart';
 
 export 'widgets/builders/auth_state_builder.dart';
+export 'widgets/builders/scree_size_widget_builder.dart';
 export 'widgets/builders/network_builder.dart';
-export 'widgets/builders/network_listenable_builder.dart';
 export 'widgets/builders/orientation_builder.dart';
 
 export 'widgets/channel_subscription_tile.dart';

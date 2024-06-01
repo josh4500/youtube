@@ -122,7 +122,7 @@ class SettingsTile extends StatelessWidget {
                 vertical: 1,
               ),
               selectedColor: Colors.white,
-              selectedTileColor: Colors.grey,
+              selectedTileColor: Colors.white12,
               title: Text(title),
               subtitle: effectiveSummary != null
                   ? Text(

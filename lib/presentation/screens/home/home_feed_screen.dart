@@ -77,196 +77,237 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
     super.dispose();
   }
 
+  SliverGridDelegate _getGridDelegate(
+    bool isBigScreen,
+    bool isMediumScreen,
+  ) {
+    return SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: isMediumScreen
+          ? 2
+          : isBigScreen
+              ? 3
+              : 1,
+      mainAxisSpacing: isMediumScreen
+          ? 4
+          : isBigScreen
+              ? 12
+              : 0,
+      crossAxisSpacing: isMediumScreen
+          ? 4
+          : isBigScreen
+              ? 12
+              : 0,
+      childAspectRatio: isMediumScreen
+          ? 1.25
+          : isBigScreen
+              ? 1.3
+              : 1,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     const historyOff = 0 == 8;
     return AuthStateBuilder(
       builder: (BuildContext context, state) {
-        return Scaffold(
-          body: ScrollConfiguration(
-            behavior: const OverScrollGlowBehavior(enabled: false),
-            child: CustomScrollView(
-              controller: _scrollController,
-              slivers: <Widget>[
-                SliverAppBar(
-                  floating: true,
-                  automaticallyImplyLeading: false,
-                  leadingWidth: 120,
-                  leading: const AppLogo(),
-                  actions: <Widget>[
-                    AppbarAction(
-                      icon: YTIcons.cast_outlined,
-                      onTap: () {},
-                    ),
-                    AppbarAction(
-                      icon: YTIcons.notification_outlined,
-                      onTap: () => context.goto(AppRoutes.notifications),
-                    ),
-                    AppbarAction(
-                      icon: YTIcons.search_outlined,
-                      onTap: () => context.goto(AppRoutes.search),
-                    ),
-                  ],
-                  bottom: historyOff == false && state.isAuthenticated
-                      ? PreferredSize(
-                          preferredSize: const Size(double.infinity, 48),
-                          child: SizedBox(
-                            height: 48,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 4.0,
-                              ),
-                              child: DynamicTab(
-                                initialIndex: 0,
-                                leadingWidth: 7.5,
-                                useTappable: true,
-                                leading: Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Consumer(
-                                    builder: (context, ref, child) {
-                                      return CustomActionChip(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                        ),
-                                        borderRadius: BorderRadius.circular(4),
-                                        backgroundColor: Colors.white12,
-                                        icon: const Icon(
-                                          YTIcons.discover_outlined,
-                                        ),
-                                        onTap: () {
-                                          ref
-                                              .read(homeRepositoryProvider)
-                                              .openDrawer();
-                                        },
-                                      );
-                                    },
+        return ScreenSizeWidgetBuilder(
+          builder: (
+            BuildContext context,
+            bool isBigScreen,
+            bool isMediumScreen,
+            bool isSmallScreen,
+          ) {
+            return Scaffold(
+              body: ScrollConfiguration(
+                behavior: const OverScrollGlowBehavior(enabled: false),
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  slivers: <Widget>[
+                    SliverAppBar(
+                      floating: true,
+                      automaticallyImplyLeading: false,
+                      leadingWidth: 120,
+                      leading: const AppLogo(),
+                      actions: <Widget>[
+                        AppbarAction(
+                          icon: YTIcons.cast_outlined,
+                          onTap: () {},
+                        ),
+                        AppbarAction(
+                          icon: YTIcons.notification_outlined,
+                          onTap: () => context.goto(AppRoutes.notifications),
+                        ),
+                        AppbarAction(
+                          icon: YTIcons.search_outlined,
+                          onTap: () => context.goto(AppRoutes.search),
+                        ),
+                      ],
+                      bottom: historyOff == false && state.isAuthenticated
+                          ? PreferredSize(
+                              preferredSize: const Size(double.infinity, 48),
+                              child: SizedBox(
+                                height: 48,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 4.0,
                                   ),
-                                ),
-                                trailing: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: TappableArea(
-                                    onTap: () {},
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: const Text(
-                                      'Send feedback',
-                                      style: TextStyle(
-                                        color: Colors.blueAccent,
+                                  child: DynamicTab(
+                                    initialIndex: 0,
+                                    leadingWidth: 7.5,
+                                    useTappable: true,
+                                    leading: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Consumer(
+                                        builder: (context, ref, child) {
+                                          return CustomActionChip(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                            backgroundColor: Colors.white12,
+                                            icon: const Icon(
+                                              YTIcons.discover_outlined,
+                                            ),
+                                            onTap: () {
+                                              ref
+                                                  .read(homeRepositoryProvider)
+                                                  .openDrawer();
+                                            },
+                                          );
+                                        },
                                       ),
                                     ),
-                                  ),
-                                ),
-                                options: const <String>[
-                                  'All',
-                                  'Music',
-                                  'Debates',
-                                  'News',
-                                  'Computer programing',
-                                  'Apple',
-                                  'Mixes',
-                                  'Manga',
-                                  'Podcasts',
-                                  'Stewie Griffin',
-                                  'Gaming',
-                                  'Electrical Engineering',
-                                  'Physics',
-                                  'Live',
-                                  'Sketch comedy',
-                                  'Courts',
-                                  'AI',
-                                  'Machines',
-                                  'Recently uploaded',
-                                  'Posts',
-                                  'New to you',
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                      : null,
-                ),
-                if (historyOff || state.isInIncognito)
-                  const SliverToBoxAdapter(child: HomeFeedHistoryOff())
-                else if (state.isAuthenticated)
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return const HomeViewableVideoContent();
-                      },
-                      childCount: 10,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          floatingActionButton: Visibility(
-            visible: state.isAuthenticated,
-            child: Consumer(
-              builder: (
-                BuildContext context,
-                WidgetRef ref,
-                Widget? childWidget,
-              ) {
-                final bool isPlayerActive =
-                    ref.watch(playerOverlayStateProvider);
-
-                return Visibility(
-                  child: Transform.translate(
-                    offset: isPlayerActive
-                        ? const Offset(0, -kMiniPlayerHeight)
-                        : Offset.zero,
-                    child: RawMaterialButton(
-                      elevation: 0,
-                      fillColor: Colors.white,
-                      padding: const EdgeInsets.all(12.0),
-                      constraints: const BoxConstraints(
-                        minWidth: 44.0,
-                        minHeight: 36.0,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      onPressed: () {},
-                      child: AnimatedSize(
-                        duration: const Duration(milliseconds: 150),
-                        curve: Curves.easeInOutCubic,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            const Icon(YTIcons.play_arrow, color: Colors.black),
-                            ValueListenableBuilder<bool>(
-                              valueListenable: _playSNotifier,
-                              builder: (
-                                BuildContext context,
-                                bool show,
-                                Widget? _,
-                              ) {
-                                return Visibility(
-                                  visible: show,
-                                  child: const Row(
-                                    children: <Widget>[
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'Play something',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
+                                    trailing: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: TappableArea(
+                                        onTap: () {},
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: const Text(
+                                          'Send feedback',
+                                          style: TextStyle(
+                                            color: Colors.blueAccent,
+                                          ),
                                         ),
                                       ),
+                                    ),
+                                    options: const <String>[
+                                      'All',
+                                      'Music',
+                                      'Debates',
+                                      'News',
+                                      'Computer programing',
+                                      'Apple',
+                                      'Mixes',
+                                      'Manga',
+                                      'Podcasts',
+                                      'Stewie Griffin',
+                                      'Gaming',
+                                      'Electrical Engineering',
+                                      'Physics',
+                                      'Live',
+                                      'Sketch comedy',
+                                      'Courts',
+                                      'AI',
+                                      'Machines',
+                                      'Recently uploaded',
+                                      'Posts',
+                                      'New to you',
                                     ],
                                   ),
-                                );
-                              },
-                            ),
-                          ],
+                                ),
+                              ),
+                            )
+                          : null,
+                    ),
+                    if (historyOff || state.isInIncognito)
+                      const SliverToBoxAdapter(child: HomeFeedHistoryOff())
+                    else if (state.isAuthenticated)
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            return const HomeViewableVideoContent();
+                          },
+                          childCount: 10,
                         ),
                       ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+                  ],
+                ),
+              ),
+              floatingActionButton: Visibility(
+                visible: state.isAuthenticated,
+                child: Consumer(
+                  builder: (
+                    BuildContext context,
+                    WidgetRef ref,
+                    Widget? childWidget,
+                  ) {
+                    final bool isPlayerActive =
+                        ref.watch(playerOverlayStateProvider);
+
+                    return Visibility(
+                      child: Transform.translate(
+                        offset: isPlayerActive
+                            ? const Offset(0, -kMiniPlayerHeight)
+                            : Offset.zero,
+                        child: RawMaterialButton(
+                          elevation: 0,
+                          fillColor: Colors.white,
+                          padding: const EdgeInsets.all(12.0),
+                          constraints: const BoxConstraints(
+                            minWidth: 44.0,
+                            minHeight: 36.0,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          onPressed: () {},
+                          child: AnimatedSize(
+                            duration: const Duration(milliseconds: 150),
+                            curve: Curves.easeInOutCubic,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                const Icon(
+                                  YTIcons.play_arrow,
+                                  color: Colors.black,
+                                ),
+                                ValueListenableBuilder<bool>(
+                                  valueListenable: _playSNotifier,
+                                  builder: (
+                                    BuildContext context,
+                                    bool show,
+                                    Widget? _,
+                                  ) {
+                                    return Visibility(
+                                      visible: show,
+                                      child: const Row(
+                                        children: <Widget>[
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'Play something',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            );
+          },
         );
       },
     );

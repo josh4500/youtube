@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -71,7 +70,7 @@ class _CreateScreenState extends State<CreateScreen>
                   child: ListenableBuilder(
                     listenable: selectedNotifier,
                     builder: (BuildContext context, Widget? _) {
-                      return LazyIndexedStack(
+                      return IndexedStack(
                         index: selectedNotifier.value,
                         children: const <Widget>[
                           CreateVideoScreen(),

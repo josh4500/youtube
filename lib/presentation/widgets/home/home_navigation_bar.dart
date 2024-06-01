@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
 import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 import 'package:youtube_clone/presentation/router.dart';
-import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../account_avatar.dart';
@@ -104,57 +103,71 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
               axisAlignment: -1,
               sizeFactor: _navBarSizeAnimation,
               child: Material(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: widget.height),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      if (widget.selectedIndex != 1) const Divider(height: 0.5),
-                      AuthStateBuilder(
-                        builder: (BuildContext context, AuthState state) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              _NavButton(
-                                key: const ValueKey(1),
-                                title: 'Home',
-                                onPressed: () => widget.onChangeIndex(0),
-                                isSelected: widget.selectedIndex == 0,
-                                selectedIcon: YTIcons.home_filled,
-                                notSelectedIcon: YTIcons.home_outlined,
-                              ),
-                              _NavButton(
-                                key: const ValueKey(2),
-                                title: 'Shorts',
-                                onPressed: () => widget.onChangeIndex(1),
-                                isSelected: widget.selectedIndex == 1,
-                                selectedIcon: YTIcons.shorts_filled,
-                                notSelectedIcon: YTIcons.shorts_outlined,
-                              ),
-                              if (state.isAuthenticated)
-                                const _NavCreateButton(key: ValueKey(0)),
-                              _NavButton(
-                                key: const ValueKey(3),
-                                title: 'Subscriptions',
-                                onPressed: () => widget.onChangeIndex(2),
-                                isSelected: widget.selectedIndex == 2,
-                                selectedIcon: YTIcons.subscriptions_filled,
-                                notSelectedIcon: YTIcons.subscriptions_outlined,
-                              ),
-                              _NavLibraryButton(
-                                key: const ValueKey(4),
-                                widget: widget,
-                                isLibrary: false,
-                                isSelected: widget.selectedIndex == 3,
-                                onPressed: () => widget.onChangeIndex(3),
-                              ),
-                            ],
-                          );
-                        },
+                child: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    final bigScreen = constraints.maxWidth >= 600;
+                    return ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: widget.height),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          if (widget.selectedIndex != 1)
+                            const Divider(height: 0.5),
+                          AuthStateBuilder(
+                            builder: (BuildContext context, AuthState state) {
+                              return Row(
+                                mainAxisAlignment: constraints.maxWidth >= 600
+                                    ? MainAxisAlignment.center
+                                    : MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  _NavButton(
+                                    key: const ValueKey(1),
+                                    title: 'Home',
+                                    onPressed: () => widget.onChangeIndex(0),
+                                    isSelected: widget.selectedIndex == 0,
+                                    selectedIcon: YTIcons.home_filled,
+                                    notSelectedIcon: YTIcons.home_outlined,
+                                  ),
+                                  if (bigScreen) const SizedBox(width: 48),
+                                  _NavButton(
+                                    key: const ValueKey(2),
+                                    title: 'Shorts',
+                                    onPressed: () => widget.onChangeIndex(1),
+                                    isSelected: widget.selectedIndex == 1,
+                                    selectedIcon: YTIcons.shorts_filled,
+                                    notSelectedIcon: YTIcons.shorts_outlined,
+                                  ),
+                                  if (bigScreen) const SizedBox(width: 48),
+                                  if (state.isAuthenticated) ...[
+                                    const _NavCreateButton(key: ValueKey(0)),
+                                    if (bigScreen) const SizedBox(width: 48),
+                                  ],
+                                  _NavButton(
+                                    key: const ValueKey(3),
+                                    title: 'Subscriptions',
+                                    onPressed: () => widget.onChangeIndex(2),
+                                    isSelected: widget.selectedIndex == 2,
+                                    selectedIcon: YTIcons.subscriptions_filled,
+                                    notSelectedIcon:
+                                        YTIcons.subscriptions_outlined,
+                                  ),
+                                  if (bigScreen) const SizedBox(width: 48),
+                                  _NavLibraryButton(
+                                    key: const ValueKey(4),
+                                    widget: widget,
+                                    isLibrary: false,
+                                    isSelected: widget.selectedIndex == 3,
+                                    onPressed: () => widget.onChangeIndex(3),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ),
             ),

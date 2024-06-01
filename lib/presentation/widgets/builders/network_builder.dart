@@ -29,12 +29,39 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/infrastructure.dart';
 
+typedef NetworkWidgetBuilder = Widget Function(
+  BuildContext context,
+  ConnectivityState state,
+);
+
 class NetworkBuilder extends StatelessWidget {
   const NetworkBuilder({super.key, required this.builder});
-  final Widget Function(BuildContext context, ConnectivityState state) builder;
+  final NetworkWidgetBuilder builder;
 
   @override
   Widget build(BuildContext context) {
     return builder(context, InternetConnectivity.instance.state);
+  }
+}
+
+class NetworkListenableBuilder extends StatelessWidget {
+  const NetworkListenableBuilder({
+    super.key,
+    required this.builder,
+  });
+  final NetworkWidgetBuilder builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<ConnectivityState>(
+      initialData: InternetConnectivity.instance.state,
+      stream: InternetConnectivity.instance.onStateChange,
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<ConnectivityState> snapshot,
+      ) {
+        return builder(context, snapshot.data!);
+      },
+    );
   }
 }

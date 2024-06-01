@@ -27,8 +27,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/infrastructure/services/internet_connectivity/connectivity_state.dart';
-import 'package:youtube_clone/presentation/widgets/builders/network_listenable_builder.dart';
+import 'package:youtube_clone/infrastructure.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class AccountOptionTile extends StatelessWidget {
   const AccountOptionTile({
