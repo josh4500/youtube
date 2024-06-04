@@ -1,6 +1,4 @@
-import '../data_repository.dart';
-import '../data_resource.dart';
-import '../data_resource_use_case.dart';
+import '../injector.dart';
 
 class LocalDataRepository extends DataRepository {
   @override

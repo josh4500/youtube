@@ -1,3 +1,3 @@
-import '../data_resource_client.dart';
+import '../injector.dart';
 
 class GrpcResourceClient extends DataResourceClient {}
