@@ -185,9 +185,6 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
       }
     });
 
-    // TODO(josh4500): Investigate double rebuild
-    final screenSize = MediaQuery.sizeOf(context);
-
     return SafeArea(
       child: Stack(
         alignment: Alignment.bottomCenter,

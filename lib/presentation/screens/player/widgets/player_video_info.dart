@@ -38,7 +38,7 @@ class PlayerVideoInfo extends StatelessWidget {
                 Column(
                   children: <Widget>[
                     VideoDescriptionSection(),
-                    VideoContext(),
+                    // VideoContext(),
                     VideoChannelSection(),
                     VideoChannelContext(),
                     VideoActions(),

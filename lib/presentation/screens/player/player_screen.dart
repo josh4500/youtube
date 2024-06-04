@@ -74,8 +74,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   double _slideOffsetYValue = 0;
   late final AnimationController _viewController;
-  late final Animation<Offset> _slideAnimation;
-  late final Animation<double> _scaleAnimation;
+  late final Animation<Offset> _playerLandscapeSlideAnimation;
+  late final Animation<double> _playerLandscapeScaleAnimation;
 
   final ScrollController _infoScrollController = ScrollController();
   final CustomScrollableScrollPhysics _infoScrollPhysics =
@@ -323,12 +323,12 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       duration: const Duration(milliseconds: 100),
     );
 
-    _slideAnimation = Tween<Offset>(
+    _playerLandscapeSlideAnimation = Tween<Offset>(
       begin: Offset.zero,
       end: const Offset(0, .05),
     ).animate(_viewController);
 
-    _scaleAnimation = _viewController.drive(
+    _playerLandscapeScaleAnimation = _viewController.drive(
       Tween<double>(begin: 1, end: 0.95),
     );
 
@@ -978,9 +978,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   ///
   /// Use [force], to show controls regardless
   void _showControls([bool force = false]) {
-    if (_controlWasTempHidden || force) {
+    if ((_controlWasTempHidden || force) && !_preventGestures) {
       _controlWasTempHidden = false;
-      if (!_isMinimized && !_preventGestures) {
+      if (!_isMinimized) {
         ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
           PlayerSignal.showControls,
           if (context.orientation.isPortrait) PlayerSignal.showPlaybackProgress,
@@ -1015,32 +1015,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       return;
     }
 
-    // If the player is fully expanded, show controls
+    // If the player screen is full toggle controls
     if (_screenHeightNotifier.value == 1) {
       _toggleControls();
     }
 
     // Maximizes player
     if (_playerWidthNotifier.value != 1 && _screenHeightNotifier.value != 1) {
-      _isSeeking = false;
-      _preventPlayerDragDown = false;
-      _preventPlayerDragUp = false;
-
-      localMinimized = false;
-
-      // Set height and width to maximum
-      Future.wait([
-        _animateScreenHeight(1),
-        _animatePlayerWidth(1),
-        if (context.orientation.isLandscape) _animateScreenWidth(1),
-      ]).then((value) {
-        _showControls(ref.read(playerNotifierProvider).ended);
-
-        ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-          PlayerSignal.maximize,
-          PlayerSignal.showPlaybackProgress,
-        ]);
-      });
+      _exitMinimizedMode();
     }
 
     // Adjust additional height if within limits
@@ -1403,15 +1385,18 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     localExpanded = true;
     _hideControls();
 
-    ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-      PlayerSignal.enterExpanded,
-    ]);
     await _animateAdditionalHeight(maxAdditionalHeight);
 
     await SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.immersive,
       overlays: <SystemUiOverlay>[],
     );
+
+    if (_isExpanded == false) {
+      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+        PlayerSignal.enterExpanded,
+      ]);
+    }
 
     // NOTE: Second call here is to ensure it reaches [maxAdditionalHeight]
     // Screen takes time to show effects of [SystemUiMode.immersive]
@@ -1439,14 +1424,16 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           : _playerAddedHeightNotifier.value = minAdditionalHeight;
     }
 
-    ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-      PlayerSignal.exitExpanded,
-    ]);
-
     await SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
       overlays: SystemUiOverlay.values,
     );
+
+    if (_isExpanded) {
+      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+        PlayerSignal.exitExpanded,
+      ]);
+    }
 
     _hideGraphicsNotifier.value = false;
     _showControls();
@@ -1463,19 +1450,40 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _exitExpandedMode(false); // Avoids animation by passing false
     }
 
-    // Force hide after exiting expanded mode
-    _hideControls(true);
+    _hideControls();
+
+    ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+      PlayerSignal.minimize,
+      PlayerSignal.hidePlaybackProgress,
+    ]);
 
     Future.wait([
       _animateScreenHeight(minPlayerHeightRatio),
       _animatePlayerWidth(minVideoViewPortWidthRatio),
       if (context.orientation.isLandscape)
         _animateScreenWidth(minScreenWidthRatio),
+    ]);
+  }
+
+  void _exitMinimizedMode() {
+    _isSeeking = false;
+    _preventPlayerDragDown = false;
+    _preventPlayerDragUp = false;
+
+    localMinimized = false;
+
+    // Set height and width to maximum
+    Future.wait([
+      _animateScreenHeight(1),
+      _animatePlayerWidth(1),
+      if (context.orientation.isPortrait) _animateScreenWidth(1),
     ]).then((value) {
       ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-        PlayerSignal.minimize,
-        PlayerSignal.hidePlaybackProgress,
+        PlayerSignal.maximize,
+        PlayerSignal.showPlaybackProgress,
       ]);
+
+      _showControls(ref.read(playerNotifierProvider).ended);
     });
   }
 
@@ -1487,6 +1495,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _enterExpandedMode();
       } else {
         _exitExpandedMode();
+
         _infoScrollPhysics.canScroll(true);
       }
     }
@@ -1651,7 +1660,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (selection == 'Lock screen' && context.mounted) {
       _preventGestures = true;
       ref.read(playerRepositoryProvider).sendPlayerSignal(
-        [PlayerSignal.lockScreen],
+        [PlayerSignal.lockScreen, PlayerSignal.hidePlaybackProgress],
       );
       await Future.delayed(const Duration(milliseconds: 250));
       await _enterFullscreenMode();
@@ -1751,30 +1760,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           end: const Offset(0, 1),
         ),
       ),
-      child: ListenableBuilder(
-        listenable: Listenable.merge([
-          if (orientation.isLandscape)
-            _screenWidthNotifier
-          else
-            _playerWidthNotifier,
-        ]),
-        builder: (
-          BuildContext context,
-          Widget? _,
-        ) {
-          return Align(
-            alignment: Alignment.topRight,
-            child: Opacity(
-              opacity: miniPlayerOpacity,
-              child: MiniPlayer(
-                space: orientation.isLandscape
-                    ? screenWidth * minVideoViewPortWidthRatio
-                    : playerWidth,
-                height: playerMinHeight,
-              ),
-            ),
-          );
-        },
+      child: Align(
+        alignment: Alignment.topRight,
+        child: Opacity(
+          opacity: miniPlayerOpacity,
+          child: SizedBox(
+            height: playerMinHeight,
+            child: const MiniPlayer(),
+          ),
+        ),
       ),
     );
 
@@ -1800,9 +1794,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
               );
             },
             child: SlideTransition(
-              position: _slideAnimation,
+              position: _playerLandscapeSlideAnimation,
               child: ScaleTransition(
-                scale: _scaleAnimation,
+                scale: _playerLandscapeScaleAnimation,
                 child: interactivePlayerView,
               ),
             ),
@@ -1828,7 +1822,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                   minHeight: playerMinHeight,
                   maxHeight: playerMaxHeight,
                 ),
-                margin: EdgeInsets.only(
+                padding: EdgeInsets.only(
                   top: playerMargin,
                   left: playerMargin.clamp(0, 10),
                   right: playerMargin.clamp(0, 10),
@@ -1901,15 +1895,23 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                               onVerticalDragUpdate: _onDragPlayer,
                               onVerticalDragEnd: _onDragPlayerEnd,
                               behavior: HitTestBehavior.opaque,
-                              child: Stack(
-                                children: [
-                                  miniPlayer,
-                                  mainPlayer,
-                                  Positioned(
-                                    bottom: 0,
-                                    child: miniPlayerProgress,
-                                  ),
-                                ],
+                              child: Material(
+                                child: Stack(
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        mainPlayer,
+                                        Expanded(child: miniPlayer),
+                                      ],
+                                    ),
+                                    Positioned(
+                                      bottom: 0,
+                                      child: miniPlayerProgress,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),

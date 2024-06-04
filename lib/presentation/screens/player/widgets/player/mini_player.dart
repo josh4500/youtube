@@ -28,80 +28,59 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/constants.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
-import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
 
 class MiniPlayer extends StatelessWidget {
-  const MiniPlayer({
-    super.key,
-    required this.space,
-    required this.height,
-  });
-  final double space;
-  final double height;
+  const MiniPlayer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final double minPlayerHeightRatio = context.orientation.isPortrait
-        ? kMinPlayerHeightPortrait
-        : kMinPlayerHeightLandscape;
-
-    return Material(
-      child: SizedBox(
-        height: height,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: space,
-              height: MediaQuery.sizeOf(context).height * minPlayerHeightRatio,
-            ),
-            const SizedBox(width: 8),
-            const Expanded(
-              flex: 2,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Google Chromecast: Official Video',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      color: Color(0xFFF1F1F1),
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Harris Craycraft',
-                    maxLines: 1,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      color: Color(0xFFAAAAAA),
-                    ),
-                  ),
-                ],
+    return Row(
+      children: [
+        const SizedBox(width: 8),
+        const Expanded(
+          flex: 3,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Google Chromecast: Official Video',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: Color(0xFFF1F1F1),
+                ),
               ),
-            ),
-            Expanded(
-              child: ListView(
-                reverse: true,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                scrollDirection: Axis.horizontal,
-                children: const <Widget>[
-                  _MiniPlayerCloseButton(),
-                  _MiniPlayerPausePlayButton(),
-                ],
+              SizedBox(height: 4),
+              Text(
+                'Harris Craycraft',
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: Color(0xFFAAAAAA),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+        Expanded(
+          flex: 2,
+          child: ListView(
+            reverse: true,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            children: const <Widget>[
+              _MiniPlayerCloseButton(),
+              _MiniPlayerPausePlayButton(),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -127,13 +106,13 @@ class _MiniPlayerPausePlayButton extends ConsumerWidget {
           ref.read(playerRepositoryProvider).restartVideo();
         }
       },
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14),
       child: Icon(
         isRestart
             ? Icons.restart_alt
             : isPlaying
-                ? YTIcons.pause
-                : YTIcons.play_arrow,
+                ? Icons.pause
+                : Icons.play_arrow,
       ),
     );
   }
