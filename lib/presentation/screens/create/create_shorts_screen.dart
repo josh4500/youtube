@@ -167,7 +167,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   double _minAvailableExposureOffset = 0.0;
   double _maxAvailableExposureOffset = 0.0;
-  double _currentExposureOffset = 0.0;
 
   // Counting pointers (number of user fingers on screen)
   int _pointers = 0;
@@ -257,7 +256,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     cameraController.addListener(() {
       if (mounted) {
         // TODO(josh4500): Avoid this
-        setState(() {});
+        // setState(() {}); 'Might always need to rebuild Preview Widget'
+        hasInitCamera.value = controller?.cameraId;
       }
       if (cameraController.value.hasError) {
         // TODO(josh4500):  'Camera error ${cameraController.value.errorDescription}',
@@ -355,9 +355,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       return;
     }
 
-    setState(() {
-      _currentExposureOffset = offset;
-    });
     try {
       offset = await controller!.setExposureOffset(offset);
     } on CameraException catch (e) {

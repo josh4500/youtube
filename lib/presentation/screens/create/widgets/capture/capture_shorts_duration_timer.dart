@@ -59,12 +59,7 @@ class _CaptureShortsDurationTimerState extends State<CaptureShortsDurationTimer>
               color: Colors.black38,
               shape: BoxShape.circle,
             ),
-            child: Text(
-              '${time}s',
-              style: const TextStyle(
-                fontSize: 13,
-              ),
-            ),
+            child: Text('${time}s', style: const TextStyle(fontSize: 14)),
           ),
           AnimatedBuilder(
             animation: animation,

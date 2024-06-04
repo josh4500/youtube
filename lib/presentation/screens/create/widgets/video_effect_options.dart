@@ -71,7 +71,7 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
   @override
   Widget build(BuildContext context) {
     const EdgeInsets itemVerticalMargin = EdgeInsets.symmetric(vertical: 10);
-    const EdgeInsets labelVerticalMargin = EdgeInsets.symmetric(vertical: 10);
+    const EdgeInsets labelVerticalMargin = EdgeInsets.symmetric(vertical: 13);
     const TextStyle labelTextStyle = TextStyle(
       fontSize: 15,
       shadows: [Shadow(offset: Offset(1, 1), color: Colors.black54)],
@@ -92,7 +92,6 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
                 return Visibility(
                   visible: visible,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
                     margin: const EdgeInsets.symmetric(horizontal: 8),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -159,7 +158,7 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
             ),
           if (widget.items.isNotEmpty)
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
                 color: Colors.black45,
                 borderRadius: BorderRadius.circular(24),
@@ -202,7 +201,7 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
                             color: Colors.white30,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(YTIcons.chevron_down, size: 16),
+                          child: const Icon(YTIcons.chevron_down, size: 22),
                         ),
                       ),
                     ),
@@ -259,7 +258,7 @@ class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
             active
                 ? widget.item.activeIcon ?? widget.item.icon
                 : widget.item.icon,
-            size: 18,
+            size: 24,
           );
         },
       ),

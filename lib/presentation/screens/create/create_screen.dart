@@ -143,15 +143,17 @@ class _CreateScreenState extends State<CreateScreen>
                                         BuildContext context,
                                         Widget? _,
                                       ) {
-                                        return Text(
-                                          tabs[index],
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color:
-                                                index == selectedNotifier.value
-                                                    ? Colors.white
-                                                    : Colors.grey,
-                                            fontWeight: FontWeight.w500,
+                                        return FittedBox(
+                                          child: Text(
+                                            tabs[index],
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: index ==
+                                                      selectedNotifier.value
+                                                  ? Colors.white
+                                                  : Colors.grey,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
                                         );
                                       },
