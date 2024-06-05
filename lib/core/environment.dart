@@ -49,7 +49,8 @@ enum Environment {
       return Environment.values.byName(_envMode);
     } on ArgumentError {
       throw Exception(
-          "Invalid runtime environment: '$_envMode'. Available environments: ${values.join(', ')}");
+        "Invalid runtime environment: '$_envMode'. Available environments: ${values.join(', ')}",
+      );
     }
   }
 }

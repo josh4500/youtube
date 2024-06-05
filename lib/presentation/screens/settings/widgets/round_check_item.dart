@@ -52,7 +52,7 @@ class RoundCheckItem<T> extends StatelessWidget {
         enableFeedback: true,
         subtitle: subtitle,
         splashRadius: 0,
-        overlayColor: MaterialStateProperty.resolveWith(
+        overlayColor: WidgetStateProperty.resolveWith(
           (states) => Colors.transparent,
         ),
         value: value,

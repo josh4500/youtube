@@ -87,7 +87,7 @@ class AccountIncognitoScreen extends ConsumerWidget {
         const Expanded(
           child: Column(
             children: <Widget>[
-              if (false) Center(child: CircularProgressIndicator()),
+              Center(child: CircularProgressIndicator()),
             ],
           ),
         ),

@@ -33,6 +33,7 @@ import 'package:flutter/services.dart';
 import 'package:youtube_clone/presentation/theme/app_sizing.dart';
 import 'package:youtube_clone/presentation/theme/relative_size.dart';
 
+import '../utils/sizer_utils.dart';
 import 'enum.dart';
 
 typedef LandscapeBuilder = Widget Function(BuildContext context, Widget? child);
@@ -264,6 +265,7 @@ class _DeviceThemeFromViewState extends State<_DeviceThemeFromView>
   @override
   Widget build(BuildContext context) {
     final DeviceThemeData effectiveData = _data!;
+    SizerUtils.dpr = widget.view.devicePixelRatio;
 
     return DeviceTheme(
       data: effectiveData,

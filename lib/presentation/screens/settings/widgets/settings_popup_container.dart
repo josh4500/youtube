@@ -178,7 +178,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
                             TextButton(
                               onPressed: () {
                                 if (onAffirm != null) {
-                                  onAffirm!(effectiveController.value);
+                                  onAffirm?.call(effectiveController.value);
                                 }
                                 context.pop(effectiveController.value);
                               },

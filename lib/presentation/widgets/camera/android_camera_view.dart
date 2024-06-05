@@ -659,7 +659,7 @@ class _AndroidCameraViewState extends State<AndroidCameraView>
           // TODO(josh4500):  'Capture orientation locked to ${cameraController.value.lockedCaptureOrientation.toString().split('.').last}',
         }
       }
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Error
     }
   }
@@ -763,7 +763,7 @@ class _AndroidCameraViewState extends State<AndroidCameraView>
 
     try {
       await cameraController.startVideoRecording();
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to start VideoRecording
       return;
     }
@@ -778,7 +778,7 @@ class _AndroidCameraViewState extends State<AndroidCameraView>
 
     try {
       return cameraController.stopVideoRecording();
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to stop video recording
       return null;
     }
@@ -793,7 +793,7 @@ class _AndroidCameraViewState extends State<AndroidCameraView>
 
     try {
       await cameraController.pauseVideoRecording();
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to pauseVideoRecording
       rethrow;
     }
@@ -808,7 +808,7 @@ class _AndroidCameraViewState extends State<AndroidCameraView>
 
     try {
       await cameraController.resumeVideoRecording();
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to resume recording
       rethrow;
     }
@@ -821,7 +821,7 @@ class _AndroidCameraViewState extends State<AndroidCameraView>
 
     try {
       await controller!.setFlashMode(mode);
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to set flash mode
       rethrow;
     }
@@ -834,7 +834,7 @@ class _AndroidCameraViewState extends State<AndroidCameraView>
 
     try {
       await controller!.setExposureMode(mode);
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to set exposure mode
       rethrow;
     }
@@ -850,7 +850,7 @@ class _AndroidCameraViewState extends State<AndroidCameraView>
     });
     try {
       offset = await controller!.setExposureOffset(offset);
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to set exposure
       rethrow;
     }
@@ -863,7 +863,7 @@ class _AndroidCameraViewState extends State<AndroidCameraView>
 
     try {
       await controller!.setFocusMode(mode);
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to set focus mode
       rethrow;
     }
@@ -884,7 +884,7 @@ class _AndroidCameraViewState extends State<AndroidCameraView>
     try {
       final XFile file = await cameraController.takePicture();
       return file;
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to save file
       return null;
     }

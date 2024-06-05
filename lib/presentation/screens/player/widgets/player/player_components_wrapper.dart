@@ -33,7 +33,6 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../controls/player_notifications.dart';
 import '../controls/player_overlay_controls.dart';
-import '../infographics/video_channel_watermark.dart';
 
 class PlayerComponentsWrapper extends StatelessWidget {
   const PlayerComponentsWrapper({

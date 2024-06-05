@@ -58,8 +58,8 @@ abstract final class AppStyle {
       BrightnessPair<ButtonStyle>(
     light: ButtonStyle(
       enableFeedback: true,
-      overlayColor: MaterialStateProperty.all(const Color(0xFF505065)),
-      textStyle: MaterialStateProperty.all(
+      overlayColor: WidgetStateProperty.all(const Color(0xFF505065)),
+      textStyle: WidgetStateProperty.all(
         const TextStyle(
           color: Color(0xFF065FD4),
           fontWeight: FontWeight.w500,
@@ -68,8 +68,8 @@ abstract final class AppStyle {
     ),
     dark: ButtonStyle(
       enableFeedback: true,
-      overlayColor: MaterialStateProperty.all(const Color(0xFF505065)),
-      textStyle: MaterialStateProperty.all(
+      overlayColor: WidgetStateProperty.all(const Color(0xFF505065)),
+      textStyle: WidgetStateProperty.all(
         const TextStyle(
           color: Color(0xFFFFFFFF),
           fontWeight: FontWeight.w500,

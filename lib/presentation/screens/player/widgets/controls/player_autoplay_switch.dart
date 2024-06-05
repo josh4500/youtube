@@ -54,9 +54,9 @@ class PlayerAutoplaySwitch extends ConsumerWidget {
         activeTrackColor: Colors.white30,
         inactiveTrackColor: Colors.white30,
         inactiveThumbColor: const Color(0xFF606060),
-        thumbIcon: MaterialStateProperty.resolveWith(
+        thumbIcon: WidgetStateProperty.resolveWith(
           (states) {
-            if (states.contains(MaterialState.selected)) {
+            if (states.contains(WidgetState.selected)) {
               return const Icon(
                 YTIcons.play_arrow,
                 color: Colors.black,

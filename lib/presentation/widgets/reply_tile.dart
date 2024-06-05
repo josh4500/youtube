@@ -31,7 +31,6 @@ import 'package:youtube_clone/presentation/themes.dart';
 
 import 'account_avatar.dart';
 import 'custom_ink_well.dart';
-import 'tappable_area.dart';
 
 class ReplyTile extends StatelessWidget {
   const ReplyTile({super.key, this.creatorLikes = false});

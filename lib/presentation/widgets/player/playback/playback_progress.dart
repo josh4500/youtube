@@ -313,6 +313,8 @@ class _PlaybackProgressState extends State<PlaybackProgress>
               _onHorizontalDragUpdate(details, constraint.maxWidth),
           onHorizontalDragEnd: (DragEndDetails details) =>
               _onHorizontalDragEnd(details, constraint.maxWidth),
+          onVerticalDragStart: _onVerticalDragStart,
+          onVerticalDragUpdate: _onVerticalDragUpdate,
           child: Container(
             color: Colors.transparent,
             height: widget.tapSize,
@@ -426,6 +428,14 @@ class _PlaybackProgressState extends State<PlaybackProgress>
     // Call the passed `onDragEnd` callback if available.
     widget.onDragEnd?.call();
     _scaleOut();
+  }
+
+  void _onVerticalDragStart(DragStartDetails details) {
+    _longPressYStartPosition = details.globalPosition.dy;
+  }
+
+  void _onVerticalDragUpdate(DragUpdateDetails details) {
+    if (_longPressYStartPosition - details.delta.dy >= 30) {}
   }
 
   /// Calculates the position in milliseconds relative to the widget width.

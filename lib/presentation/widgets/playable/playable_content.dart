@@ -31,7 +31,6 @@ import 'package:youtube_clone/presentation/themes.dart';
 
 import '../custom_ink_well.dart';
 import '../network_image/custom_network_image.dart';
-import '../tappable_area.dart';
 
 class PlayableContent extends StatelessWidget {
   const PlayableContent({

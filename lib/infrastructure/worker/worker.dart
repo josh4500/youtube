@@ -5,6 +5,9 @@ import 'dart:isolate';
 import 'package:flutter/foundation.dart';
 
 class Worker {
+  Worker._(this._commands, this._responses) {
+    _responses.listen(_handleResponsesFromIsolate);
+  }
   final SendPort _commands;
   final ReceivePort _responses;
   final Map<int, Completer<Object?>> _activeRequests = {};
@@ -17,7 +20,7 @@ class Worker {
     final id = _idCounter++;
     _activeRequests[id] = completer;
     _commands.send((id, message));
-    return await completer.future;
+    return completer.future;
   }
 
   static Future<Worker> spawn() async {
@@ -27,15 +30,17 @@ class Worker {
 
     initPort.handler = (initialMessage) {
       final commandPort = initialMessage as SendPort;
-      connection.complete((
-        ReceivePort.fromRawReceivePort(initPort),
-        commandPort,
-      ));
+      connection.complete(
+        (
+          ReceivePort.fromRawReceivePort(initPort),
+          commandPort,
+        ),
+      );
     };
 
     // Spawn the isolate.
     try {
-      await Isolate.spawn(_startRemoteIsolate, (initPort.sendPort));
+      await Isolate.spawn(_startRemoteIsolate, initPort.sendPort);
     } on Object {
       initPort.close();
       rethrow;
@@ -56,10 +61,6 @@ class Worker {
     } else {
       completer.complete(response); // Updated
     }
-  }
-
-  Worker._(this._commands, this._responses) {
-    _responses.listen(_handleResponsesFromIsolate);
   }
 
   static void _startRemoteIsolate(SendPort sendPort) {

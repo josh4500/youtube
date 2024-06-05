@@ -115,14 +115,14 @@ class _LinkTvScreenState extends State<LinkTvScreen> {
               TextButton(
                 onPressed: () {},
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.grey),
-                  padding: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(Colors.grey),
+                  padding: WidgetStateProperty.all(
                     const EdgeInsetsDirectional.symmetric(
                       vertical: 8,
                       horizontal: 24,
                     ),
                   ),
-                  shape: MaterialStateProperty.all(
+                  shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(32),
                     ),

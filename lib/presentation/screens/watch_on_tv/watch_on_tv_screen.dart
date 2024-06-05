@@ -78,7 +78,7 @@ class WatchOnTvScreen extends StatelessWidget {
                   TextButton(
                     onPressed: () {},
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all(
+                      padding: WidgetStateProperty.all(
                         EdgeInsetsDirectional.zero,
                       ),
                     ),

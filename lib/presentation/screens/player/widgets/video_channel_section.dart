@@ -77,7 +77,7 @@ class VideoChannelActionButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        if (false) VideoChannelMembershipButton(),
+        VideoChannelMembershipButton(),
         SizedBox(width: 12),
         VideoChannelSubscriptionButton(),
       ],

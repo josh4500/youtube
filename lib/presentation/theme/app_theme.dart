@@ -95,7 +95,7 @@ abstract final class AppTheme {
     primaryColor: Colors.black,
     canvasColor: const Color(0xFF0F0F0F),
     colorScheme: const ColorScheme.dark(
-      background: Colors.black,
+      surface: Colors.black,
       secondary: Color(0xFF3DA3FA),
     ),
     scrollbarTheme: const ScrollbarThemeData(

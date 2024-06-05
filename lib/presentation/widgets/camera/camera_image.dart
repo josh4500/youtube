@@ -118,8 +118,11 @@ class CameraImage {
       : format = ImageFormat._fromPlatformInterface(data.format),
         height = data.height,
         width = data.width,
-        planes = List<Plane>.unmodifiable(data.planes.map<Plane>(
-            (CameraImagePlane plane) => Plane._fromPlatformInterface(plane))),
+        planes = List<Plane>.unmodifiable(
+          data.planes.map<Plane>(
+            (CameraImagePlane plane) => Plane._fromPlatformInterface(plane),
+          ),
+        ),
         lensAperture = data.lensAperture,
         sensorExposureTime = data.sensorExposureTime,
         sensorSensitivity = data.sensorSensitivity;
@@ -133,9 +136,12 @@ class CameraImage {
         lensAperture = data['lensAperture'] as double?,
         sensorExposureTime = data['sensorExposureTime'] as int?,
         sensorSensitivity = data['sensorSensitivity'] as double?,
-        planes = List<Plane>.unmodifiable((data['planes'] as List<dynamic>)
-            .map<Plane>((dynamic planeData) =>
-                Plane._fromPlatformData(planeData as Map<dynamic, dynamic>)));
+        planes = List<Plane>.unmodifiable(
+          (data['planes'] as List<dynamic>).map<Plane>(
+            (dynamic planeData) =>
+                Plane._fromPlatformData(planeData as Map<dynamic, dynamic>),
+          ),
+        );
 
   /// Format of the image provided.
   ///

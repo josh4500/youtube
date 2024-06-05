@@ -42,22 +42,16 @@ enum ConnectivityType {
 
 /// Represents the state of internet connectivity.
 class ConnectivityState {
-  final bool isConnected;
-  final bool initializing;
-  final ConnectivityType type;
-
-  bool get isNotConnected => !isConnected;
+  /// Factory method to create a connected state.
+  factory ConnectivityState.connected() {
+    return const ConnectivityState(isConnected: true);
+  }
 
   const ConnectivityState({
     required this.isConnected,
     this.initializing = false,
     this.type = ConnectivityType.none,
   });
-
-  /// Factory method to create a connected state.
-  factory ConnectivityState.connected() {
-    return const ConnectivityState(isConnected: true);
-  }
 
   /// Factory method to create a disconnected state.
   factory ConnectivityState.disconnected() {
@@ -67,6 +61,11 @@ class ConnectivityState {
   factory ConnectivityState.initializing() {
     return const ConnectivityState(isConnected: false, initializing: true);
   }
+  final bool isConnected;
+  final bool initializing;
+  final ConnectivityType type;
+
+  bool get isNotConnected => !isConnected;
 
   @override
   String toString() {

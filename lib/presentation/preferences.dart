@@ -683,7 +683,8 @@ class AccessibilityPreferences {
 
   String toJson() {
     return jsonEncode(
-        <String, Object>{'enabled': enabled, 'hideDuration': hideDuration});
+      <String, Object>{'enabled': enabled, 'hideDuration': hideDuration},
+    );
   }
 }
 

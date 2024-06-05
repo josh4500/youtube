@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
 

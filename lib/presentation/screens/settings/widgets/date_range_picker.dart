@@ -30,7 +30,6 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/screens/settings/widgets/settings_popup_container.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/roulette_scroll.dart';
 
 class DateRangePicker extends StatefulWidget {
   const DateRangePicker({

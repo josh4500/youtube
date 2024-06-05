@@ -228,7 +228,6 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
   bool hiddenPermanently = false;
   bool hiddenTemporary = false;
   Timer? permanentTimer;
-  Timer? temporaryTimer;
 
   @override
   void initState() {
@@ -288,8 +287,6 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
         (event) {
           final showing = showNotifier.value;
           if (event.inSeconds == widget.showAt?.inSeconds) {
-            // In case when duration was changed and timer is still active
-            temporaryTimer?.cancel();
             hiddenTemporary = false;
 
             final isMinimized = ref.read(playerViewStateProvider).isMinimized;
@@ -298,7 +295,14 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
 
             showNotifier.value = true;
             visibilityController.forward();
-            temporaryTimer = Timer(widget.hideDuration, temporaryHide);
+          } else if (showing &&
+              event.inSeconds ==
+                  (widget.showAt?.inSeconds ?? 0) +
+                      widget.hideDuration.inSeconds) {
+            temporaryHide();
+          } else if (event.inSeconds < (widget.showAt?.inSeconds ?? 0)) {
+            hiddenTemporary = false;
+            showNotifier.value = false;
           }
         },
       );
@@ -318,8 +322,6 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
   @override
   void dispose() {
     permanentTimer?.cancel();
-    temporaryTimer?.cancel();
-
     showNotifier.dispose();
     alignmentController.dispose();
     visibilityController.dispose();

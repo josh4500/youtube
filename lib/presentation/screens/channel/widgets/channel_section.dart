@@ -76,10 +76,7 @@ class ChannelSection extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(
-                            YTIcons.verified_filled,
-                            size: 16,
-                          )
+                          Icon(YTIcons.verified_filled, size: 16),
                         ],
                       ),
                       const SizedBox(height: 4),
