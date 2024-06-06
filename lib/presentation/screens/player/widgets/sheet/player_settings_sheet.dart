@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants/values.dart';
+import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/dynamic_sheet.dart';
 
@@ -231,10 +233,24 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
           title: 'Loop video',
           trailing: PlayerSettingsSwitch(selected: false),
         ),
-        const DynamicSheetOptionItem(
-          leading: Icon(YTIcons.ambient_mode_outlined),
+        DynamicSheetOptionItem(
+          leading: const Icon(YTIcons.ambient_mode_outlined),
           title: 'Ambient mode',
-          trailing: PlayerSettingsSwitch(selected: false),
+          action: () {},
+          trailing: Consumer(
+            builder: (
+              BuildContext context,
+              WidgetRef ref,
+              Widget? childWidget,
+            ) {
+              final ambientModeEnabled = ref.watch(
+                preferencesProvider.select(
+                  (preferences) => preferences.ambientMode,
+                ),
+              );
+              return PlayerSettingsSwitch(selected: ambientModeEnabled);
+            },
+          ),
         ),
         const DynamicSheetOptionItem(
           leading: Icon(Icons.video_stable),

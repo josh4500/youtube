@@ -30,10 +30,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:riverpod/src/notifier.dart';
-import 'package:youtube_clone/core/enums/settings_enums.dart';
-import 'package:youtube_clone/infrastructure/services/cache/hive_cache_provider.dart';
-
-import '../infrastructure/services/cache/read_write_value.dart';
+import 'package:youtube_clone/core.dart';
+import 'package:youtube_clone/infrastructure.dart';
 
 class Preferences extends Notifier<PreferenceState> {
   /// Dynamic Preference [HiveCacheProvider]
