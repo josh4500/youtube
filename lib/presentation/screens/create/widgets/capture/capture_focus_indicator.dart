@@ -67,7 +67,7 @@ class _FocusPainter extends CustomPainter {
 
     final Paint paint2 = Paint()
       ..strokeWidth = 1
-      ..color = Colors.white30.withAlpha((77.0 * opacity).round())
+      ..color = Colors.white.withAlpha((77.0 * opacity).round())
       ..style = PaintingStyle.fill;
     canvas.drawCircle(
       Offset(size.width, size.width),

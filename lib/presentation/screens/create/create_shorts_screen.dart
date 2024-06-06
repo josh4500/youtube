@@ -204,6 +204,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     latestControlMessage.dispose();
     effectsController.dispose();
 
+    focusController.dispose();
+
     hideController.dispose();
     super.dispose();
   }
