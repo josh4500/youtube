@@ -39,6 +39,7 @@ import '../../widgets/camera/camera_preview.dart';
 import 'widgets/capture/capture_button.dart';
 import 'widgets/capture/capture_drag_zoom_button.dart';
 import 'widgets/capture/capture_effects.dart';
+import 'widgets/capture/capture_focus_indicator.dart';
 import 'widgets/capture/capture_progress_control.dart';
 import 'widgets/capture/capture_shorts_duration_timer.dart';
 import 'widgets/capture/capture_zoom_indicator.dart';
@@ -153,12 +154,20 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     duration: const Duration(milliseconds: 300),
   );
 
-  final latestControlMessage = ValueNotifier<String>('');
+  final ValueNotifier<String> latestControlMessage = ValueNotifier<String>('');
   Timer? controlMessageTimer;
 
   final effectsController = VideoEffectOptionsController();
 
   final ValueNotifier<int?> hasInitCamera = ValueNotifier(null);
+
+  final ValueNotifier<Offset> focusPosition = ValueNotifier(Offset.zero);
+
+  late final AnimationController focusController = AnimationController(
+    vsync: this,
+    value: 1,
+    duration: const Duration(milliseconds: 1000),
+  );
 
   double _minAvailableZoom = 1.0;
   double _maxAvailableZoom = 1.0;
@@ -268,12 +277,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       await cameraController.initialize();
       await Future.wait(
         <Future<Object?>>[
-          cameraController.getMinExposureOffset().then(
-                (double value) => _minAvailableExposureOffset = value,
-              ),
-          cameraController.getMaxExposureOffset().then(
-                (double value) => _maxAvailableExposureOffset = value,
-              ),
+          cameraController
+              .getMinExposureOffset()
+              .then((double value) => _minAvailableExposureOffset = value),
+          cameraController
+              .getMaxExposureOffset()
+              .then((double value) => _maxAvailableExposureOffset = value),
           cameraController
               .getMaxZoomLevel()
               .then((double value) => _maxAvailableZoom = value),
@@ -309,7 +318,15 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     hasInitCamera.value = controller?.cameraId;
   }
 
-  void onViewFinderTap(TapDownDetails details, BoxConstraints constraints) {
+  void handleOnTapCameraView(
+    TapDownDetails details,
+    BoxConstraints constraints,
+  ) {
+    if (_controlHidden) {
+      effectsController.close();
+      return;
+    }
+
     if (controller == null) {
       return;
     }
@@ -322,6 +339,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     );
     cameraController.setExposurePoint(offset);
     cameraController.setFocusPoint(offset);
+    focusPosition.value = Offset(
+      details.localPosition.dx - kFocusSize,
+      details.localPosition.dy - kFocusSize,
+    );
+    focusController.reset();
+    focusController.forward();
   }
 
   Future<void> setFlashMode(FlashMode mode) async {
@@ -376,13 +399,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     }
   }
 
-  void handleOnTapCameraView() {
-    if (_controlHidden) {
-      effectsController.close();
-      return;
-    }
-  }
-
   bool handleCaptureNotification(CaptureNotification notification) {
     if (notification is HideCaptureControlsNotification) {
       _controlHidden = true;
@@ -430,7 +446,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                       return CameraPreview(
                         controller!,
                         child: GestureDetector(
-                          onTap: handleOnTapCameraView,
+                          onTapDown: (TapDownDetails details) {
+                            handleOnTapCameraView(details, constraints);
+                          },
                           behavior: HitTestBehavior.opaque,
                           child: const SizedBox.expand(),
                         ),
@@ -440,6 +458,21 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                 );
               }
             },
+          ),
+          ValueListenableBuilder(
+            valueListenable: focusPosition,
+            builder: (
+              BuildContext context,
+              Offset position,
+              Widget? childWidget,
+            ) {
+              return Positioned(
+                top: position.dy,
+                left: position.dx,
+                child: childWidget!,
+              );
+            },
+            child: CaptureFocusIndicator(animation: focusController),
           ),
           Padding(
             padding: const EdgeInsets.all(12.0),

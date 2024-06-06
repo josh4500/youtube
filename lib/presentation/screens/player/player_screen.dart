@@ -436,7 +436,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     _playerMarginNotifier = ValueNotifier<double>(0);
 
-    // TODO(josh4500): Using portrait first may be an issue
     _playerWidthNotifier = ValueNotifier<double>(
       kMinVideoViewPortWidthPortrait,
     );
@@ -533,10 +532,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       // Initial changes
       _showHideNavigationBar(_screenHeightNotifier.value);
 
-      final PlayerRepository playerRepo = ref.read(playerRepositoryProvider);
-
+      // Opens and play video
       // TODO(josh4500): Reconsider to always call this method mount widget
-      playerRepo.openVideo(); // Opens and play video
+      ref.read(playerRepositoryProvider).openVideo();
     });
 
     // NOTE: Do not remove
