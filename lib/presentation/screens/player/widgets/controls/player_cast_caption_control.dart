@@ -14,7 +14,10 @@ class PlayerCastCaptionControl extends ConsumerWidget {
     return const Row(
       children: [
         AppbarAction(icon: YTIcons.cast_outlined),
-        AppbarAction(icon: Icons.closed_caption_off),
+        AppbarAction(
+          enabled: false,
+          icon: Icons.closed_caption_off,
+        ),
       ],
     );
   }

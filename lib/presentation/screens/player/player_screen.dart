@@ -34,9 +34,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'widgets/controls/player_notifications.dart';
@@ -988,7 +988,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       }
     } else if (!_isMinimized && context.orientation.isPortrait) {
       ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-        PlayerSignal.showPlaybackProgress,
+        if (!localExpanded) PlayerSignal.showPlaybackProgress,
       ]);
     }
   }
@@ -1348,39 +1348,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _showControls();
   }
 
-  void _onDragInfo(PointerMoveEvent event) {
-    if (_preventGestures) return;
-
-    if (_infoScrollController.offset == 0 ||
-        (_isResizableExpandingMode && event.delta.dy < 0)) {
-      if (_allowInfoDrag) {
-        _infoScrollPhysics.canScroll(false);
-        _playerAddedHeightNotifier.value = ui.clampDouble(
-          _playerAddedHeightNotifier.value + event.delta.dy,
-          minAdditionalHeight,
-          maxAdditionalHeight,
-        );
-        if (additionalHeight > 0) {
-          // Hides the playback progress while animating "to" expanded view
-          ref.read(playerRepositoryProvider).sendPlayerSignal(
-            <PlayerSignal>[PlayerSignal.hidePlaybackProgress],
-          );
-
-          _hideControls();
-          _hideGraphicsNotifier.value = true;
-        }
-      }
-    }
-
-    if (event.delta.dy < 0 && _infoScrollController.offset > 0) {
-      _allowInfoDrag = false;
-    }
-
-    if (_playerAddedHeightNotifier.value == 0) {
-      _infoScrollPhysics.canScroll(true);
-    }
-  }
-
   Future<void> _enterExpandedMode() async {
     localExpanded = true;
     _hideControls();
@@ -1450,7 +1417,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _exitExpandedMode(false); // Avoids animation by passing false
     }
 
-    _hideControls();
+    _hideControls(true);
 
     ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
       PlayerSignal.minimize,
@@ -1485,24 +1452,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
       _showControls(ref.read(playerNotifierProvider).ended);
     });
-  }
-
-  Future<void> _onDragInfoUp(PointerUpEvent event) async {
-    if (_preventGestures) return;
-
-    if (_allowInfoDrag) {
-      if (additionalHeight > maxAdditionalHeight / 2) {
-        _enterExpandedMode();
-      } else {
-        _exitExpandedMode();
-
-        _infoScrollPhysics.canScroll(true);
-      }
-    }
-
-    if (_infoScrollController.offset == 0) {
-      _allowInfoDrag = true;
-    }
   }
 
   /// Callback to open Comments draggable sheets
@@ -1612,6 +1561,75 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   // TODO(Josh): Will add Membership sheet too
 
+  Future<void> _openSettings() async {
+    // TODO(josh4500): Create Model for settings final option
+    final selection = await openSettingsSheet(context);
+    if (selection == 'Lock screen' && context.mounted) {
+      _preventGestures = true;
+      ref.read(playerRepositoryProvider).sendPlayerSignal(
+        [PlayerSignal.lockScreen, PlayerSignal.hidePlaybackProgress],
+      );
+      await Future.delayed(const Duration(milliseconds: 250));
+      await _enterFullscreenMode();
+    } else if (selection == 'Ambient mode') {
+      ref.read(playerRepositoryProvider).toggleAmbientMode();
+    } else if (selection is PlayerSpeed) {
+      ref.read(playerRepositoryProvider).setSpeed(selection);
+    }
+  }
+
+  void _onPointerMove(PointerMoveEvent event) {
+    if (_preventGestures) return;
+
+    if (_infoScrollController.offset == 0 ||
+        (_isResizableExpandingMode && event.delta.dy < 0)) {
+      if (_allowInfoDrag) {
+        _infoScrollPhysics.canScroll(false);
+        _playerAddedHeightNotifier.value = ui.clampDouble(
+          _playerAddedHeightNotifier.value + event.delta.dy,
+          minAdditionalHeight,
+          maxAdditionalHeight,
+        );
+
+        if (additionalHeight > 0) {
+          // Hides the playback progress while animating "to" expanded view
+          ref.read(playerRepositoryProvider).sendPlayerSignal(
+            <PlayerSignal>[PlayerSignal.hidePlaybackProgress],
+          );
+
+          _hideControls();
+          _hideGraphicsNotifier.value = true;
+        }
+      }
+    }
+
+    if (event.delta.dy < 0 && _infoScrollController.offset > 0) {
+      _allowInfoDrag = false;
+    }
+
+    if (_playerAddedHeightNotifier.value == 0) {
+      _infoScrollPhysics.canScroll(true);
+    }
+  }
+
+  Future<void> _onPointerUp(PointerUpEvent event) async {
+    if (_preventGestures) return;
+
+    if (_allowInfoDrag) {
+      if (additionalHeight > maxAdditionalHeight / 2) {
+        _enterExpandedMode();
+      } else {
+        _exitExpandedMode();
+
+        _infoScrollPhysics.canScroll(true);
+      }
+    }
+
+    if (_infoScrollController.offset == 0) {
+      _allowInfoDrag = true;
+    }
+  }
+
   /// Callback for when scroll notifications are received in info section
   bool _onScrollInfoScrollNotification(ScrollNotification notification) {
     // Prevents info to be dragged down while scrolling in DynamicTab
@@ -1630,7 +1648,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     return true;
   }
 
-  void handlePlayerControlNotification(PlayerNotification notification) {
+  void _handlePlayerControlNotification(PlayerNotification notification) {
     if (notification is MinimizePlayerNotification) {
       _enterMinimizedMode();
     } else if (notification is ExpandPlayerNotification) {
@@ -1651,19 +1669,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _isSeeking = false;
       _preventPlayerDragUp = false;
       _preventPlayerDragDown = false;
-    }
-  }
-
-  Future<void> _openSettings() async {
-    // TODO(josh4500): Create Model for settings final option
-    final selection = await openSettingsSheet(context);
-    if (selection == 'Lock screen' && context.mounted) {
-      _preventGestures = true;
-      ref.read(playerRepositoryProvider).sendPlayerSignal(
-        [PlayerSignal.lockScreen, PlayerSignal.hidePlaybackProgress],
-      );
-      await Future.delayed(const Duration(milliseconds: 250));
-      await _enterFullscreenMode();
     }
   }
 
@@ -1693,7 +1698,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     final interactivePlayerView = PlayerComponentsWrapper(
       key: _interactivePlayerKey,
-      handleNotification: handlePlayerControlNotification,
+      handleNotification: _handlePlayerControlNotification,
       child: ListenableBuilder(
         listenable: _transformationController,
         builder: (BuildContext context, Widget? childWidget) {
@@ -1921,8 +1926,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                         Flexible(
                           child: Material(
                             child: Listener(
-                              onPointerMove: _onDragInfo,
-                              onPointerUp: _onDragInfoUp,
+                              onPointerMove: _onPointerMove,
+                              onPointerUp: _onPointerUp,
                               child: AnimatedBuilder(
                                 animation: _infoOpacityAnimation,
                                 builder: (

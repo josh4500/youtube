@@ -37,6 +37,7 @@ import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/view_models/progress.dart';
+import 'package:youtube_clone/presentation/view_models/state/player_settings_view_model.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'player_actions_control.dart';
@@ -612,7 +613,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   void _hide2xSpeed() {
     _seekIndicatorController.reverse();
     // Reset player speed to normal (1x)
-    ref.read(playerRepositoryProvider).setSpeed(1.0);
+    ref.read(playerRepositoryProvider).setSpeed(PlayerSpeed.normal);
   }
 
   /// Shows  sliding seek indicator and initiate necessary actions

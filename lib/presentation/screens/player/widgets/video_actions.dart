@@ -101,6 +101,10 @@ class VideoActions extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             margin: const EdgeInsets.symmetric(horizontal: 4),
             icon: const Icon(YTIcons.download_outlined, size: 18),
+            textStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
             onTap: () => onDownloadClicked(context),
           ),
           const CustomActionChip(

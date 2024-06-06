@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/constants/values.dart';
+import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/dynamic_sheet.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../controls/player_settings.dart';
 
 Future<dynamic> openSettingsSheet(BuildContext context) async {
-  final selection = await showDynamicSheet(
+  dynamic selection = await showDynamicSheet(
     context,
     items: [
       const DynamicSheetOptionItem(
@@ -29,17 +31,26 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
           ],
         ),
       ),
-      const DynamicSheetOptionItem(
-        leading: Icon(YTIcons.playback_speed_outlined),
+      DynamicSheetOptionItem(
+        leading: const Icon(YTIcons.playback_speed_outlined),
         title: 'Playback speed',
         value: 'Playback speed',
         trailing: Row(
           children: [
-            Text(
-              'Normal',
-              style: TextStyle(color: Color(0xFFAAAAAA)),
+            Consumer(
+              builder: (
+                BuildContext context,
+                WidgetRef ref,
+                Widget? _,
+              ) {
+                final currentSpeed = ref.read(playerRepositoryProvider).speed;
+                return Text(
+                  currentSpeed.sRate,
+                  style: const TextStyle(color: Color(0xFFAAAAAA)),
+                );
+              },
             ),
-            Icon(
+            const Icon(
               YTIcons.chevron_right,
               size: 16,
               color: Color(0xFFAAAAAA),
@@ -51,6 +62,7 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
         leading: Icon(Icons.closed_caption_off),
         title: 'Captions',
         value: 'Captions',
+        enabled: false,
       ),
       const DynamicSheetOptionItem(
         leading: Icon(YTIcons.private_circle_outlined),
@@ -138,22 +150,23 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
       ],
     );
   } else if (selection == 'Playback speed' && context.mounted) {
-    await showDynamicSheet(
+    selection = await showDynamicSheet(
       context,
       items: [
-        for (final speed in [
-          '0.25x',
-          '0.5x',
-          '0.75x',
-          'Normal',
-          '1.25x',
-          '1.5x',
-          '1.75x',
-          '2x',
-        ])
+        for (final speed in PlayerSpeed.values)
           DynamicSheetOptionItem(
-            leading: DynamicSheetItemCheck(selected: speed == 'Normal'),
-            title: speed,
+            leading: Consumer(
+              builder: (
+                BuildContext context,
+                WidgetRef ref,
+                Widget? _,
+              ) {
+                final currentSpeed = ref.read(playerRepositoryProvider).speed;
+                return DynamicSheetItemCheck(selected: speed == currentSpeed);
+              },
+            ),
+            title: speed.sRate,
+            value: speed,
           ),
       ],
     );
@@ -205,7 +218,7 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
       ],
     );
   } else if (selection == 'Additional settings' && context.mounted) {
-    await showDynamicSheet(
+    selection = await showDynamicSheet(
       context,
       trailing: const Padding(
         padding: EdgeInsets.symmetric(
@@ -236,7 +249,7 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
         DynamicSheetOptionItem(
           leading: const Icon(YTIcons.ambient_mode_outlined),
           title: 'Ambient mode',
-          action: () {},
+          value: 'Ambient mode',
           trailing: Consumer(
             builder: (
               BuildContext context,

@@ -34,7 +34,8 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:youtube_clone/core/utils/progress.dart';
 import 'package:youtube_clone/infrastructure.dart';
-import 'package:youtube_clone/presentation/view_models/progress.dart';
+import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/preferences.dart';
 
 import '../state/player_state_provider.dart';
 import '../state/player_view_state_provider.dart';
@@ -147,6 +148,13 @@ class PlayerRepository {
   // TODO(Josh): May use a Riverpod provider
   final Set<PlayerLockReason> _lock = <PlayerLockReason>{};
 
+  // TODO(Josh): May use a Riverpod provider
+  PlayerSettingsViewModel settings = PlayerSettingsViewModel(
+    speed: PlayerSpeed.normal,
+  );
+
+  PlayerSpeed get speed => settings.speed;
+
   // TODO(Josh): Should be able open video
   Future<void> openPlayerScreen() async {
     _ref.read(_playerOverlayStateProvider.notifier).state = true;
@@ -203,8 +211,11 @@ class PlayerRepository {
     }
   }
 
-  Future<void> setSpeed([double rate = 2]) async {
-    await _videoPlayer.setRate(rate);
+  Future<void> setSpeed([
+    PlayerSpeed speed = PlayerSpeed.byTwo,
+  ]) async {
+    settings = settings.copyWith(speed: speed);
+    await _videoPlayer.setRate(speed.dRate);
   }
 
   Future<void> setPitch(double pitch) async {
@@ -298,5 +309,10 @@ class PlayerRepository {
       }
       _playerSignalController.sink.add(signal);
     }
+  }
+
+  void toggleAmbientMode() {
+    final prevV = _ref.read(preferencesProvider).ambientMode;
+    _ref.read(preferencesProvider.notifier).ambientMode = !prevV;
   }
 }
