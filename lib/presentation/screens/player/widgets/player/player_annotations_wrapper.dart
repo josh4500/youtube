@@ -36,13 +36,14 @@ import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../infographics/infographics_notification.dart';
-import '../infographics/video_card_teaser.dart';
-import '../infographics/video_channel_watermark.dart';
-import '../infographics/video_product.dart';
+import '../annotations/annotations_notification.dart';
+import '../annotations/video_card_teaser.dart';
+import '../annotations/video_channel_watermark.dart';
+import '../annotations/video_product.dart';
+import '../annotations/video_suggestion.dart';
 
-class PlayerInfographicsWrapper extends StatefulWidget {
-  const PlayerInfographicsWrapper({
+class PlayerAnnotationsWrapper extends StatefulWidget {
+  const PlayerAnnotationsWrapper({
     super.key,
     this.hideGraphicsNotifier,
     required this.child,
@@ -51,12 +52,12 @@ class PlayerInfographicsWrapper extends StatefulWidget {
   final ValueNotifier<bool>? hideGraphicsNotifier;
 
   @override
-  State<PlayerInfographicsWrapper> createState() =>
-      _PlayerInfographicsWrapperState();
+  State<PlayerAnnotationsWrapper> createState() =>
+      _PlayerAnnotationsWrapperState();
 }
 
-class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
-  final InfographicsListenable listenable = InfographicsListenable();
+class _PlayerAnnotationsWrapperState extends State<PlayerAnnotationsWrapper> {
+  final AnnotationsNotifier listenable = AnnotationsNotifier();
 
   @override
   void initState() {
@@ -93,14 +94,14 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
           children: [
             childWidget!,
             if (listenable.includesPromotions)
-              InfographicVisibility(
+              AnnotationVisibility(
                 visible: listenable.showVisuals,
                 alwaysShow: true,
                 hideDuration: const Duration(seconds: 10),
                 alignment: Alignment.topLeft,
                 child: const IncludePromotionButton(margin: EdgeInsets.all(8)),
               ),
-            InfographicVisibility(
+            AnnotationVisibility(
               visible: listenable.showVisuals,
               alignment: Alignment.topRight,
               showAt: const Duration(seconds: 6),
@@ -110,7 +111,7 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
               child: Consumer(
                 builder: (context, ref, child) {
                   final playerViewState = ref.watch(playerViewStateProvider);
-                  return InfographicVisibility(
+                  return AnnotationVisibility(
                     visible: listenable.showVisuals,
                     alignment: Alignment.bottomLeft,
                     visibleControlAlignment: Alignment.lerp(
@@ -128,12 +129,19 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
               ),
             ),
             Positioned.fill(
-              child: InfographicVisibility(
+              child: AnnotationVisibility(
                 visible: listenable.showVisuals,
                 alignment: Alignment.bottomRight,
                 child: const VideoChannelWatermark(),
               ),
             ),
+            // Positioned.fill(
+            //   child: AnnotationVisibility(
+            //     visible: listenable.showVisuals,
+            //     alwaysShow: true,
+            //     child: const VideoSuggestion(),
+            //   ),
+            // ),
           ],
         );
       },
@@ -142,7 +150,7 @@ class _PlayerInfographicsWrapperState extends State<PlayerInfographicsWrapper> {
   }
 }
 
-class InfographicsListenable extends ChangeNotifier {
+class AnnotationsNotifier extends ChangeNotifier {
   bool get includesPromotions => true;
   bool _paused = false;
   bool get paused => _paused;
@@ -161,8 +169,8 @@ class InfographicsListenable extends ChangeNotifier {
   }
 }
 
-class InfographicVisibility extends ConsumerStatefulWidget {
-  const InfographicVisibility({
+class AnnotationVisibility extends ConsumerStatefulWidget {
+  const AnnotationVisibility({
     super.key,
     this.showAt,
     this.alwaysShow = false,
@@ -196,11 +204,11 @@ class InfographicVisibility extends ConsumerStatefulWidget {
   final Widget child;
 
   @override
-  ConsumerState<InfographicVisibility> createState() =>
-      _InfographicVisibilityState();
+  ConsumerState<AnnotationVisibility> createState() =>
+      _AnnotationVisibilityState();
 }
 
-class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
+class _AnnotationVisibilityState extends ConsumerState<AnnotationVisibility>
     with TickerProviderStateMixin {
   /// Controller to animate opacity to visibility
   late final AnimationController visibilityController;
@@ -310,7 +318,7 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
   }
 
   @override
-  void didUpdateWidget(covariant InfographicVisibility oldWidget) {
+  void didUpdateWidget(covariant AnnotationVisibility oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.visible != widget.visible) {
@@ -368,9 +376,9 @@ class _InfographicVisibilityState extends ConsumerState<InfographicVisibility>
               ),
             );
           },
-          child: NotificationListener<InfographicsNotification>(
-            onNotification: (InfographicsNotification notification) {
-              if (notification is CloseInfographicsNotification) {
+          child: NotificationListener<AnnotationsNotification>(
+            onNotification: (AnnotationsNotification notification) {
+              if (notification is CloseAnnotationsNotification) {
                 (widget.showAt != null) ? temporaryHide() : permanentHide();
               }
               return true;

@@ -30,7 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import 'infographics_notification.dart';
+import 'annotations_notification.dart';
 
 class VideoProduct extends StatefulWidget {
   const VideoProduct({super.key});
@@ -117,7 +117,7 @@ class _VideoProductState extends State<VideoProduct>
                     padding: const EdgeInsets.all(4),
                     borderRadius: BorderRadius.circular(24),
                     onTap: () {
-                      CloseInfographicsNotification().dispatch(context);
+                      CloseAnnotationsNotification().dispatch(context);
                     },
                     child: const Icon(
                       YTIcons.close_circle_outlined,

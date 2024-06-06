@@ -41,8 +41,8 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'widgets/controls/player_notifications.dart';
 import 'widgets/player/mini_player.dart';
+import 'widgets/player/player_annotations_wrapper.dart';
 import 'widgets/player/player_components_wrapper.dart';
-import 'widgets/player/player_infographics_wrapper.dart';
 import 'widgets/player/player_view.dart';
 import 'widgets/player_video_info.dart';
 import 'widgets/sheet/player_draggable_sheet.dart';
@@ -1887,7 +1887,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                             : FlexFit.loose,
                         child: FadeTransition(
                           opacity: _playerOpacityAnimation,
-                          child: PlayerInfographicsWrapper(
+                          child: PlayerAnnotationsWrapper(
                             hideGraphicsNotifier: _hideGraphicsNotifier,
                             child: GestureDetector(
                               onTap: _onTapPlayer,
