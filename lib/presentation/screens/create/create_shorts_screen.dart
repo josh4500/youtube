@@ -37,7 +37,7 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../widgets/camera/camera_controller.dart';
 import '../../widgets/camera/camera_preview.dart';
-import 'widgets/capture/capture_drag_zoom_button.dart';
+import 'widgets/capture/capture_button.dart';
 import 'widgets/capture/capture_effects.dart';
 import 'widgets/capture/capture_focus_indicator.dart';
 import 'widgets/capture/capture_progress_control.dart';
@@ -169,13 +169,13 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     duration: const Duration(milliseconds: 1000),
   );
   bool disableDragMode = false;
-  final ValueNotifier<bool> recordingNotifier = ValueNotifier(false);
-  final ValueNotifier<bool> dragRecordNotifier = ValueNotifier(false);
-  final ValueNotifier<double> dragZoomLevelNotifier = ValueNotifier(0);
-  final ValueNotifier<Offset?> recordZoomButtonPosition = ValueNotifier(null);
-  final ValueNotifier<Offset?> recordControlButtonPosition =
-      ValueNotifier(null);
-  late final recordZoomButtonController = AnimationController(
+  bool droppedButton = false;
+  final recordingNotifier = ValueNotifier<bool>(false);
+  final dragRecordNotifier = ValueNotifier<bool>(false);
+  final dragZoomLevelNotifier = ValueNotifier<double>(0);
+  final recordOuterButtonPosition = ValueNotifier<Offset?>(null);
+  final recordInnerButtonPosition = ValueNotifier<Offset?>(null);
+  late final recordOuterButtonController = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 900),
   );
@@ -220,12 +220,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     focusPosition.dispose();
     focusController.dispose();
 
-    recordZoomButtonController.dispose();
+    recordOuterButtonController.dispose();
     recordingNotifier.dispose();
     dragRecordNotifier.dispose();
     dragZoomLevelNotifier.dispose();
-    recordZoomButtonPosition.dispose();
-    recordControlButtonPosition.dispose();
+    recordOuterButtonPosition.dispose();
+    recordInnerButtonPosition.dispose();
 
     hideController.dispose();
     super.dispose();
@@ -233,34 +233,33 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   Offset getDragCircleInitPosition(BoxConstraints constraints) {
     return Offset(
-      (constraints.maxWidth / 2) - (kRecordCircleSize / 2),
-      (constraints.maxHeight) - kRecordCircleSize - bottomPaddingHeight,
+      (constraints.maxWidth / 2) - (kRecordOuterButtonSize / 2),
+      (constraints.maxHeight) - kRecordOuterButtonSize - bottomPaddingHeight,
     );
   }
 
   static const double offsetYFromCircle =
-      (kRecordCircleSize - kRecordButtonSize) / 2;
+      (kRecordOuterButtonSize - kRecordInnerButtonSize) / 2;
+  static const bottomOffset = offsetYFromCircle - bottomPaddingHeight;
 
   Offset getCenterButtonPosition(BoxConstraints constraints) {
     return Offset(
-      (constraints.maxWidth / 2) - (kRecordButtonSize / 2) + 0.625,
-      (constraints.maxHeight) -
-          kRecordCircleSize -
-          bottomPaddingHeight +
-          offsetYFromCircle,
+      (constraints.maxWidth / 2) - (kRecordInnerButtonSize / 2) + 0.625,
+      (constraints.maxHeight) - kRecordOuterButtonSize + bottomOffset,
     );
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Future.microtask(() {
-      final CreateCameraState? cameraState =
-          ref.read(_checkMicrophoneCameraPerm).value;
-      if (cameraState != null && cameraState.cameras.isNotEmpty) {
-        onNewCameraSelected(cameraState.cameras.first);
-      }
-    });
+    if (hasInitCameraNotifier.value == null) {
+      Future.microtask(() {
+        final cameraState = ref.read(_checkMicrophoneCameraPerm).value;
+        if (cameraState != null && cameraState.cameras.isNotEmpty) {
+          onNewCameraSelected(cameraState.cameras.first);
+        }
+      });
+    }
   }
 
   @override
@@ -393,6 +392,11 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     TapDownDetails details,
     BoxConstraints constraints,
   ) {
+    if (_controlHidden) {
+      effectsController.close();
+      return;
+    }
+
     final List<CameraDescription>? cameras =
         ref.read(_checkMicrophoneCameraPerm).value?.cameras;
 
@@ -413,8 +417,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     disableDragMode = recording;
     recordingNotifier.value = recording;
     recording
-        ? recordZoomButtonController.forward(from: .8)
-        : recordZoomButtonController.reverse(from: .2);
+        ? recordOuterButtonController.forward(from: .8)
+        : recordOuterButtonController.reverse(from: .6);
 
     CreateNotification(hideNavigator: recording).dispatch(context);
   }
@@ -426,7 +430,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     recordingNotifier.value = true;
     hideZoomController.forward();
     CreateNotification(hideNavigator: true).dispatch(context);
-    recordZoomButtonController.repeat(min: .7, max: 1, reverse: true);
+    recordOuterButtonController.repeat(min: .7, max: 1, reverse: true);
   }
 
   void handleLongPressEndRecordButton(
@@ -442,25 +446,11 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     hideZoomController.reverse();
 
     // Reset positions
-    recordZoomButtonPosition.value = getDragCircleInitPosition(constraints);
-    recordControlButtonPosition.value = getCenterButtonPosition(constraints);
+    recordOuterButtonPosition.value = getDragCircleInitPosition(constraints);
+    recordInnerButtonPosition.value = getCenterButtonPosition(constraints);
 
-    // final Animation<Offset> tween = Tween<Offset>(
-    //   begin: Offset.zero,
-    //   end: recordZoomButtonPosition.value,
-    // ).animate(
-    //   CurvedAnimation(
-    //     parent: recordZoomButtonController,
-    //     curve: Curves.easeInCubic,
-    //   ),
-    // );
-    // tween.addListener(() => recordZoomButtonPosition.value = tween.value);
-    await recordZoomButtonController.reverse();
-
-    // tween.removeListener(() => recordZoomButtonPosition.value = tween.value);
+    recordOuterButtonController.reverse();
   }
-
-  bool droppedButton = false;
 
   void handleLongPressUpdateRecordButton(
     LongPressMoveUpdateDetails details,
@@ -471,31 +461,30 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     final position = details.globalPosition;
     final maxHeight = constraints.maxHeight;
 
-    recordZoomButtonPosition.value = Offset(
-      position.dx - kRecordCircleSize / 2,
-      position.dy - kRecordCircleSize,
+    recordOuterButtonPosition.value = Offset(
+      position.dx - kRecordOuterButtonSize / 2,
+      position.dy - kRecordOuterButtonSize,
     );
 
     if (droppedButton == false) {
-      recordControlButtonPosition.value = Offset(
-        position.dx - kRecordButtonSize / 2,
-        position.dy - kRecordButtonSize - offsetYFromCircle,
+      recordInnerButtonPosition.value = Offset(
+        position.dx - kRecordInnerButtonSize / 2,
+        position.dy - kRecordInnerButtonSize - offsetYFromCircle,
       );
     }
+
+    // Update zoom level
+    setZoomLevel((1 - (position.dy / maxHeight)).clamp(0, 1));
 
     if (position.dy <= maxHeight * .8) {
       droppedButton = true;
       // TODO(josh4500): Animate
-      recordControlButtonPosition.value = getCenterButtonPosition(constraints);
+      recordInnerButtonPosition.value = getCenterButtonPosition(constraints);
     } else if (droppedButton &&
         position.dy >=
-            maxHeight - (kRecordCircleSize / 2) - bottomPaddingHeight) {
+            maxHeight - (kRecordOuterButtonSize / 2) - bottomPaddingHeight) {
       droppedButton = false;
     }
-
-    setZoomLevel(
-      1 - ((position.dy - kRecordCircleSize) / (maxHeight - kRecordCircleSize)),
-    );
   }
 
   Future<void> setZoomLevel(double level) async {
@@ -507,6 +496,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       await controller!.setZoomLevel(
         level.normalizeRange(_minAvailableZoom, _maxAvailableZoom),
       );
+      print(level);
       dragZoomLevelNotifier.value = level;
     } on CameraException catch (e) {
       // TODO(josh4500): Unable to set zoom level
@@ -647,7 +637,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                     child: CaptureFocusIndicator(animation: focusController),
                   ),
                   ValueListenableBuilder(
-                    valueListenable: recordZoomButtonPosition,
+                    valueListenable: recordOuterButtonPosition,
                     builder: (
                       BuildContext context,
                       Offset? position,
@@ -668,7 +658,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                         listenable: recordingNotifier,
                         builder: (BuildContext context, Widget? _) {
                           return CaptureDragZoomButton(
-                            animation: recordZoomButtonController,
+                            animation: recordOuterButtonController,
                             isRecording: recordingNotifier.value,
                           );
                         },
@@ -676,7 +666,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                     ),
                   ),
                   ValueListenableBuilder(
-                    valueListenable: recordControlButtonPosition,
+                    valueListenable: recordInnerButtonPosition,
                     builder: (
                       BuildContext context,
                       Offset? position,

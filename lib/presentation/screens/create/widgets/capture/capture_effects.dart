@@ -11,46 +11,47 @@ class CaptureEffects extends StatelessWidget {
   Widget build(BuildContext context) {
     return VideoEffectOptions(
       controller: controller,
-      onExpand: (bool closed) {
-        closed
-            ? ShowCaptureControlsNotification().dispatch(context)
-            : HideCaptureControlsNotification().dispatch(context);
+      onExpand: (bool isOpened) {
+        isOpened
+            ? HideCaptureControlsNotification().dispatch(context)
+            : ShowCaptureControlsNotification().dispatch(context);
       },
-      items: const <EffectItem>[
-        EffectItem(
+      items: const <EffectOption>[
+        EffectOption(
           icon: YTIcons.flip_camera,
           label: 'Flip',
         ),
-        EffectItem(
+        EffectOption(
           icon: YTIcons.speed,
           label: 'Speed',
         ),
-        EffectItem(
+        EffectOption(
           icon: Icons.timer_sharp,
           label: 'Timer',
         ),
-        EffectItem(
+        EffectOption(
           icon: YTIcons.sparkle,
           label: 'Effects',
         ),
-        EffectItem(
+        EffectOption(
           icon: YTIcons.green_screen,
           label: 'Green Screen',
         ),
-        EffectItem(
+        EffectOption(
           icon: YTIcons.retouch,
           label: 'Retouch',
         ),
-        EffectItem(
+        EffectOption(
           icon: YTIcons.filter_photo,
           label: 'Filter',
         ),
-        EffectItem(
+        EffectOption(
           icon: YTIcons.lighting,
           label: 'Lighting',
         ),
-        EffectItem(
+        EffectOption(
           icon: YTIcons.flash_off,
+          activeIcon: Icons.flash_on,
           label: 'Flash',
         ),
       ],

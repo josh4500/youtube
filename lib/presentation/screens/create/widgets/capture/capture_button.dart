@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-const double kRecordCircleWidth = 3.5;
-const double kRecordCircleSize = 66.0;
-const double kRecordButtonSize = 56.0;
+const double kRecordButtonStrokeWidth = 3.5;
+const double kRecordOuterButtonSize = 66.0;
+const double kRecordInnerButtonSize = 56.0;
 
 class CaptureDragZoomButton extends StatelessWidget {
   const CaptureDragZoomButton({
@@ -23,7 +23,7 @@ class CaptureDragZoomButton extends StatelessWidget {
       animation: sizeAnimation,
       builder: (BuildContext context, Widget? _) {
         return CustomPaint(
-          size: const Size.square(kRecordCircleSize),
+          size: const Size.square(kRecordOuterButtonSize),
           foregroundPainter: CircledButton(
             sizeFactor: sizeAnimation.value,
             color: isRecording ? const Color(0xFFFF0000) : Colors.white,
@@ -56,7 +56,7 @@ class CircledButton extends CustomPainter {
     );
 
     final paint2 = Paint()
-      ..strokeWidth = kRecordCircleWidth
+      ..strokeWidth = kRecordButtonStrokeWidth
       ..style = PaintingStyle.stroke
       ..color = color;
     canvas.drawCircle(
@@ -82,12 +82,13 @@ class CaptureButton extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 100),
       margin: EdgeInsets.all(isRecording ? 12 : 0),
-      width: isRecording ? kRecordButtonSize - 24 : kRecordButtonSize,
-      height: isRecording ? kRecordButtonSize - 24 : kRecordButtonSize,
+      width: isRecording ? kRecordInnerButtonSize - 24 : kRecordInnerButtonSize,
+      height:
+          isRecording ? kRecordInnerButtonSize - 24 : kRecordInnerButtonSize,
       decoration: BoxDecoration(
         color: const Color(0xFFFF0000),
         borderRadius: BorderRadius.circular(
-          isRecording ? 4 : kRecordButtonSize,
+          isRecording ? 4 : kRecordInnerButtonSize,
         ),
       ),
     );
