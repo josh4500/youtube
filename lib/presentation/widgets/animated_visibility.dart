@@ -5,12 +5,12 @@ class AnimatedVisibility extends StatelessWidget {
     super.key,
     required this.animation,
     this.alignment = Alignment.topLeft,
-    required this.child,
+    this.child,
   });
 
   final Animation<double> animation;
   final Alignment alignment;
-  final Widget child;
+  final Widget? child;
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -18,15 +18,17 @@ class AnimatedVisibility extends StatelessWidget {
       builder: (BuildContext context, Widget? childWidget) {
         return Visibility(
           visible: animation.value != 0,
+          maintainState: true,
           child: Align(
             alignment: alignment,
             child: Opacity(
               opacity: animation.value,
-              child: child,
+              child: childWidget,
             ),
           ),
         );
       },
+      child: child,
     );
   }
 }

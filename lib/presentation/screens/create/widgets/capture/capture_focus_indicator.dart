@@ -61,7 +61,7 @@ class _FocusPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
     canvas.drawCircle(
       Offset(size.width, size.width),
-      (size.width / 2) + (10 * (1 - sizeFactor)),
+      (size.width / 2) + (12 * (1 - sizeFactor)),
       paint,
     );
 

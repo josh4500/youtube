@@ -67,7 +67,7 @@ class _CaptureShortsDurationTimerState extends State<CaptureShortsDurationTimer>
               return CircularProgressIndicator(
                 color: Colors.white,
                 value: animation.value,
-                strokeWidth: 2,
+                strokeWidth: 1.8,
               );
             },
           ),

@@ -31,12 +31,12 @@ import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../widgets/camera/camera_controller.dart';
 import '../../widgets/camera/camera_preview.dart';
-import 'widgets/capture/capture_button.dart';
 import 'widgets/capture/capture_drag_zoom_button.dart';
 import 'widgets/capture/capture_effects.dart';
 import 'widgets/capture/capture_focus_indicator.dart';
@@ -159,7 +159,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   final effectsController = VideoEffectOptionsController();
 
-  final ValueNotifier<int?> hasInitCamera = ValueNotifier(null);
+  final hasInitCameraNotifier = ValueNotifier<CameraDescription?>(null);
 
   final ValueNotifier<Offset> focusPosition = ValueNotifier(Offset.zero);
 
@@ -167,6 +167,17 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     vsync: this,
     value: 1,
     duration: const Duration(milliseconds: 1000),
+  );
+  bool disableDragMode = false;
+  final ValueNotifier<bool> recordingNotifier = ValueNotifier(false);
+  final ValueNotifier<bool> dragRecordNotifier = ValueNotifier(false);
+  final ValueNotifier<double> dragZoomLevelNotifier = ValueNotifier(0);
+  final ValueNotifier<Offset?> recordZoomButtonPosition = ValueNotifier(null);
+  final ValueNotifier<Offset?> recordControlButtonPosition =
+      ValueNotifier(null);
+  late final recordZoomButtonController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
   );
 
   double _minAvailableZoom = 1.0;
@@ -179,6 +190,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   // Counting pointers (number of user fingers on screen)
   int _pointers = 0;
+
+  static const double bottomPaddingHeight = 48;
 
   @override
   void initState() {
@@ -198,16 +211,44 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     WidgetsBinding.instance.removeObserver(this);
 
     controller?.dispose();
-    hasInitCamera.dispose();
+    hasInitCameraNotifier.dispose();
 
     controlMessageTimer?.cancel();
     latestControlMessage.dispose();
     effectsController.dispose();
 
+    focusPosition.dispose();
     focusController.dispose();
+
+    recordZoomButtonController.dispose();
+    recordingNotifier.dispose();
+    dragRecordNotifier.dispose();
+    dragZoomLevelNotifier.dispose();
+    recordZoomButtonPosition.dispose();
+    recordControlButtonPosition.dispose();
 
     hideController.dispose();
     super.dispose();
+  }
+
+  Offset getDragCircleInitPosition(BoxConstraints constraints) {
+    return Offset(
+      (constraints.maxWidth / 2) - (kRecordCircleSize / 2),
+      (constraints.maxHeight) - kRecordCircleSize - bottomPaddingHeight,
+    );
+  }
+
+  static const double offsetYFromCircle =
+      (kRecordCircleSize - kRecordButtonSize) / 2;
+
+  Offset getCenterButtonPosition(BoxConstraints constraints) {
+    return Offset(
+      (constraints.maxWidth / 2) - (kRecordButtonSize / 2) + 0.625,
+      (constraints.maxHeight) -
+          kRecordCircleSize -
+          bottomPaddingHeight +
+          offsetYFromCircle,
+    );
   }
 
   @override
@@ -265,11 +306,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     // If the controller is updated then update the UI.
     cameraController.addListener(() {
-      if (mounted) {
-        // TODO(josh4500): Avoid this
-        // setState(() {}); 'Might always need to rebuild Preview Widget'
-        hasInitCamera.value = controller?.cameraId;
-      }
       if (cameraController.value.hasError) {
         // TODO(josh4500):  'Camera error ${cameraController.value.errorDescription}',
       }
@@ -317,7 +353,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       }
     }
 
-    hasInitCamera.value = controller?.cameraId;
+    hasInitCameraNotifier.value = cameraDescription;
   }
 
   void handleOnTapCameraView(
@@ -341,12 +377,141 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     );
     cameraController.setExposurePoint(offset);
     cameraController.setFocusPoint(offset);
+
+    // Set focus position tapped by user
     focusPosition.value = Offset(
       details.localPosition.dx - kFocusSize,
       details.localPosition.dy - kFocusSize,
     );
+
+    // Show focus points
     focusController.reset();
     focusController.forward();
+  }
+
+  void handleOnDoubleTapCameraView(
+    TapDownDetails details,
+    BoxConstraints constraints,
+  ) {
+    final List<CameraDescription>? cameras =
+        ref.read(_checkMicrophoneCameraPerm).value?.cameras;
+
+    if (cameras.isNotNull && cameras!.length > 1) {
+      onNewCameraSelected(
+        cameras.firstWhere(
+          (camera) => camera != hasInitCameraNotifier.value,
+          orElse: () => cameras.first,
+        ),
+      );
+    }
+  }
+
+  void handleOnTapRecordButton() {
+    dragRecordNotifier.value = false; // Not dragging
+
+    final recording = !recordingNotifier.value;
+    disableDragMode = recording;
+    recordingNotifier.value = recording;
+    recording
+        ? recordZoomButtonController.forward(from: .8)
+        : recordZoomButtonController.reverse(from: .2);
+
+    CreateNotification(hideNavigator: recording).dispatch(context);
+  }
+
+  void handleLongPressStartRecordButton(LongPressStartDetails details) {
+    if (disableDragMode) return;
+
+    dragRecordNotifier.value = true;
+    recordingNotifier.value = true;
+    hideZoomController.forward();
+    CreateNotification(hideNavigator: true).dispatch(context);
+    recordZoomButtonController.repeat(min: .7, max: 1, reverse: true);
+  }
+
+  void handleLongPressEndRecordButton(
+    LongPressEndDetails details,
+    BoxConstraints constraints,
+  ) async {
+    if (disableDragMode) return;
+
+    droppedButton = false;
+
+    dragRecordNotifier.value = false;
+    recordingNotifier.value = false;
+    hideZoomController.reverse();
+
+    // Reset positions
+    recordZoomButtonPosition.value = getDragCircleInitPosition(constraints);
+    recordControlButtonPosition.value = getCenterButtonPosition(constraints);
+
+    // final Animation<Offset> tween = Tween<Offset>(
+    //   begin: Offset.zero,
+    //   end: recordZoomButtonPosition.value,
+    // ).animate(
+    //   CurvedAnimation(
+    //     parent: recordZoomButtonController,
+    //     curve: Curves.easeInCubic,
+    //   ),
+    // );
+    // tween.addListener(() => recordZoomButtonPosition.value = tween.value);
+    await recordZoomButtonController.reverse();
+
+    // tween.removeListener(() => recordZoomButtonPosition.value = tween.value);
+  }
+
+  bool droppedButton = false;
+
+  void handleLongPressUpdateRecordButton(
+    LongPressMoveUpdateDetails details,
+    BoxConstraints constraints,
+  ) {
+    if (disableDragMode) return;
+
+    final position = details.globalPosition;
+    final maxHeight = constraints.maxHeight;
+
+    recordZoomButtonPosition.value = Offset(
+      position.dx - kRecordCircleSize / 2,
+      position.dy - kRecordCircleSize,
+    );
+
+    if (droppedButton == false) {
+      recordControlButtonPosition.value = Offset(
+        position.dx - kRecordButtonSize / 2,
+        position.dy - kRecordButtonSize - offsetYFromCircle,
+      );
+    }
+
+    if (position.dy <= maxHeight * .8) {
+      droppedButton = true;
+      // TODO(josh4500): Animate
+      recordControlButtonPosition.value = getCenterButtonPosition(constraints);
+    } else if (droppedButton &&
+        position.dy >=
+            maxHeight - (kRecordCircleSize / 2) - bottomPaddingHeight) {
+      droppedButton = false;
+    }
+
+    setZoomLevel(
+      1 - ((position.dy - kRecordCircleSize) / (maxHeight - kRecordCircleSize)),
+    );
+  }
+
+  Future<void> setZoomLevel(double level) async {
+    if (controller == null) {
+      return;
+    }
+
+    try {
+      await controller!.setZoomLevel(
+        level.normalizeRange(_minAvailableZoom, _maxAvailableZoom),
+      );
+      dragZoomLevelNotifier.value = level;
+    } on CameraException catch (e) {
+      // TODO(josh4500): Unable to set zoom level
+      rethrow;
+    }
   }
 
   Future<void> setFlashMode(FlashMode mode) async {
@@ -433,48 +598,135 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       child: Stack(
         fit: StackFit.expand,
         children: [
-          ValueListenableBuilder(
-            valueListenable: hasInitCamera,
-            builder: (BuildContext context, int? cameraId, Widget? _) {
-              if (controller == null) {
-                return const SizedBox();
-              } else {
-                return Listener(
-                  child: LayoutBuilder(
-                    builder: (
-                      BuildContext context,
-                      BoxConstraints constraints,
-                    ) {
-                      return CameraPreview(
-                        controller!,
-                        child: GestureDetector(
-                          onTapDown: (TapDownDetails details) {
-                            handleOnTapCameraView(details, constraints);
-                          },
-                          behavior: HitTestBehavior.opaque,
-                          child: const SizedBox.expand(),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              }
-            },
-          ),
-          ValueListenableBuilder(
-            valueListenable: focusPosition,
+          LayoutBuilder(
             builder: (
               BuildContext context,
-              Offset position,
-              Widget? childWidget,
+              BoxConstraints constraints,
             ) {
-              return Positioned(
-                top: position.dy,
-                left: position.dx,
-                child: childWidget!,
+              return Stack(
+                children: [
+                  ValueListenableBuilder(
+                    valueListenable: hasInitCameraNotifier,
+                    builder: (
+                      BuildContext context,
+                      CameraDescription? cameraDesc,
+                      Widget? _,
+                    ) {
+                      if (controller == null) {
+                        return const SizedBox();
+                      } else {
+                        return CameraPreview(
+                          controller!,
+                          child: GestureDetector(
+                            onTapDown: (TapDownDetails details) {
+                              handleOnTapCameraView(details, constraints);
+                            },
+                            onDoubleTapDown: (TapDownDetails details) {
+                              handleOnDoubleTapCameraView(details, constraints);
+                            },
+                            behavior: HitTestBehavior.opaque,
+                            child: const SizedBox.expand(),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  ValueListenableBuilder(
+                    valueListenable: focusPosition,
+                    builder: (
+                      BuildContext context,
+                      Offset position,
+                      Widget? childWidget,
+                    ) {
+                      return Positioned(
+                        top: position.dy,
+                        left: position.dx,
+                        child: childWidget!,
+                      );
+                    },
+                    child: CaptureFocusIndicator(animation: focusController),
+                  ),
+                  ValueListenableBuilder(
+                    valueListenable: recordZoomButtonPosition,
+                    builder: (
+                      BuildContext context,
+                      Offset? position,
+                      Widget? childWidget,
+                    ) {
+                      position ??= getDragCircleInitPosition(constraints);
+
+                      return Positioned(
+                        top: position.dy,
+                        left: position.dx,
+                        child: childWidget!,
+                      );
+                    },
+                    child: AnimatedVisibility(
+                      animation: hideAnimation,
+                      alignment: Alignment.bottomCenter,
+                      child: ListenableBuilder(
+                        listenable: recordingNotifier,
+                        builder: (BuildContext context, Widget? _) {
+                          return CaptureDragZoomButton(
+                            animation: recordZoomButtonController,
+                            isRecording: recordingNotifier.value,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  ValueListenableBuilder(
+                    valueListenable: recordControlButtonPosition,
+                    builder: (
+                      BuildContext context,
+                      Offset? position,
+                      Widget? childWidget,
+                    ) {
+                      position ??= getCenterButtonPosition(constraints);
+
+                      return Positioned(
+                        top: position.dy,
+                        left: position.dx,
+                        child: childWidget!,
+                      );
+                    },
+                    child: AnimatedVisibility(
+                      animation: hideAnimation,
+                      alignment: Alignment.bottomCenter,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: handleOnTapRecordButton,
+                        onLongPressStart: handleLongPressStartRecordButton,
+                        onLongPressEnd: (LongPressEndDetails details) {
+                          handleLongPressEndRecordButton(details, constraints);
+                        },
+                        onLongPressMoveUpdate:
+                            (LongPressMoveUpdateDetails details) {
+                          handleLongPressUpdateRecordButton(
+                            details,
+                            constraints,
+                          );
+                        },
+                        child: ListenableBuilder(
+                          listenable: Listenable.merge(
+                            [
+                              recordingNotifier,
+                              dragRecordNotifier,
+                            ],
+                          ),
+                          builder: (BuildContext context, Widget? _) {
+                            return CaptureButton(
+                              isRecording: recordingNotifier.value &&
+                                  !dragRecordNotifier.value,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               );
             },
-            child: CaptureFocusIndicator(animation: focusController),
           ),
           Padding(
             padding: const EdgeInsets.all(12.0),
@@ -482,22 +734,25 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
               children: [
                 AnimatedVisibility(
                   animation: hideAnimation,
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
                       vertical: 6,
                       horizontal: 4.0,
                     ),
                     child: Column(
                       children: [
-                        CreateProgress(),
-                        SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            CreateCloseButton(),
-                            CaptureMusicButton(),
-                            CaptureShortsDurationTimer(),
-                          ],
+                        const CreateProgress(),
+                        const SizedBox(height: 12),
+                        HideOnRecording(
+                          notifier: recordingNotifier,
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CreateCloseButton(),
+                              CaptureMusicButton(),
+                              CaptureShortsDurationTimer(),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -516,40 +771,38 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                 AnimatedVisibility(
                   animation: hideZoomController,
                   alignment: Alignment.centerLeft,
-                  child: const CaptureZoomIndicator(),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: CaptureEffects(controller: effectsController),
-                ),
-                AnimatedVisibility(
-                  animation: hideAnimation,
-                  alignment: Alignment.bottomCenter,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      AnimatedVisibility(
-                        animation: hideSpeedController,
-                        child: ScaleTransition(
-                          scale: speedSelectorScaleAnimation,
-                          child: const RangeSelector(),
-                        ),
-                      ),
-                      const SizedBox(height: 36),
-                      const CaptureProgressControl(),
-                      const SizedBox(height: 48),
-                    ],
+                  child: CaptureZoomIndicator(
+                    controller: dragZoomLevelNotifier,
                   ),
                 ),
-                AnimatedVisibility(
-                  animation: hideAnimation,
-                  alignment: Alignment.bottomCenter,
-                  child: const CaptureDragZoomButton(),
+                HideOnRecording(
+                  notifier: recordingNotifier,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: CaptureEffects(controller: effectsController),
+                  ),
                 ),
-                AnimatedVisibility(
-                  animation: hideAnimation,
-                  alignment: Alignment.bottomCenter,
-                  child: const CaptureButton(),
+                HideOnRecording(
+                  notifier: recordingNotifier,
+                  child: AnimatedVisibility(
+                    animation: hideAnimation,
+                    alignment: Alignment.bottomCenter,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        AnimatedVisibility(
+                          animation: hideSpeedController,
+                          child: ScaleTransition(
+                            scale: speedSelectorScaleAnimation,
+                            child: const RangeSelector(),
+                          ),
+                        ),
+                        const SizedBox(height: 36),
+                        const CaptureProgressControl(),
+                        const SizedBox(height: bottomPaddingHeight),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -587,7 +840,7 @@ class ControlMessageEvent extends StatelessWidget {
       message,
       style: const TextStyle(
         fontSize: 36,
-        color: Colors.white24,
+        color: Colors.white38,
         fontWeight: FontWeight.w800,
       ),
     );
@@ -824,4 +1077,31 @@ class CreateListReason extends StatelessWidget {
       ),
     );
   }
+}
+
+class HideOnRecording extends StatelessWidget {
+  const HideOnRecording({
+    super.key,
+    required this.notifier,
+    required this.child,
+  });
+  final ValueNotifier<bool> notifier;
+  final Widget child;
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: notifier,
+      builder: (BuildContext context, bool recording, Widget? _) {
+        return Offstage(
+          offstage: recording,
+          child: child,
+        );
+      },
+    );
+  }
+}
+
+extension IfNullExtension<T> on T? {
+  bool get isNull => this == null;
+  bool get isNotNull => this != null;
 }

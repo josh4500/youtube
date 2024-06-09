@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import '../notifications/create_notification.dart';
+
 class CaptureProgressControl extends StatelessWidget {
   const CaptureProgressControl({
     super.key,
@@ -19,13 +21,19 @@ class CaptureProgressControl extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 24),
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: const BoxDecoration(
-            color: Colors.black26,
-            shape: BoxShape.circle,
+        GestureDetector(
+          onTap: () {
+            // TODO(josh4500): Check if recorded timeline is empty
+            CreateNotification(hideNavigator: false).dispatch(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(
+              color: Colors.black26,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.turn_left),
           ),
-          child: const Icon(Icons.turn_left),
         ),
         const Spacer(),
         Container(
