@@ -52,7 +52,7 @@ class _RangeSelectorState extends State<RangeSelector>
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           return GestureDetector(
@@ -100,7 +100,7 @@ class _RangeSelectorState extends State<RangeSelector>
                         );
                       },
                       child: Container(
-                        width: constraints.maxWidth / 5,
+                        width: constraints.maxWidth / 6,
                         margin: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -109,22 +109,22 @@ class _RangeSelectorState extends State<RangeSelector>
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14.0,
-                      horizontal: 30,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(5, (index) {
-                        return ValueListenableBuilder<int>(
-                          valueListenable: selected,
-                          builder: (
-                            BuildContext context,
-                            int selectedIndex,
-                            Widget? _,
-                          ) {
-                            return Text(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(5, (index) {
+                      return ValueListenableBuilder<int>(
+                        valueListenable: selected,
+                        builder: (
+                          BuildContext context,
+                          int selectedIndex,
+                          Widget? _,
+                        ) {
+                          return Container(
+                            width: constraints.maxWidth / 6,
+                            height: 36,
+                            margin: const EdgeInsets.all(2),
+                            alignment: Alignment.center,
+                            child: Text(
                               '${index + 1}X',
                               style: TextStyle(
                                 color: index == selectedIndex
@@ -133,11 +133,11 @@ class _RangeSelectorState extends State<RangeSelector>
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
                               ),
-                            );
-                          },
-                        );
-                      }),
-                    ),
+                            ),
+                          );
+                        },
+                      );
+                    }),
                   ),
                 ],
               ),
