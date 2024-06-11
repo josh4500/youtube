@@ -347,16 +347,35 @@ class EffectOption {
   int get hashCode => icon.hashCode ^ activeIcon.hashCode ^ label.hashCode;
 }
 
-// TODO(josh4500): Might be setting off unnecessary listeners
+enum EffectAction { add, remove }
+
+typedef EffectStatusListener = void Function(
+  EffectAction action,
+  EffectOption effect,
+);
+
 class VideoEffectOptionsController extends ChangeNotifier {
   final ValueNotifier<Set<EffectOption>> _selectedItems = ValueNotifier({});
+  final List<EffectStatusListener> _statusListener = [];
+
+  void addStatusListener(EffectStatusListener listener) =>
+      _statusListener.add(listener);
+  void removeStatusListener(EffectStatusListener listener) =>
+      _statusListener.remove(listener);
 
   void toggle(EffectOption item) {
+    final EffectAction action;
     if (_selectedItems.value.contains(item)) {
       _selectedItems.value.remove(item);
       _selectedItems.value = {..._selectedItems.value};
+      action = EffectAction.remove;
     } else {
       _selectedItems.value = {..._selectedItems.value, item};
+      action = EffectAction.add;
+    }
+
+    for (final listener in _statusListener) {
+      listener(action, item);
     }
   }
 

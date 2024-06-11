@@ -66,7 +66,7 @@ class PlayerScreen extends ConsumerStatefulWidget {
 }
 
 class _PlayerScreenState extends ConsumerState<PlayerScreen>
-    with TickerProviderStateMixin, WidgetsBindingObserver {
+    with TickerProviderStateMixin, WidgetsBindingObserver, RouteAware {
   final GlobalKey _interactivePlayerKey = GlobalKey();
   final GlobalKey _commentSheetKey = GlobalKey();
   final GlobalKey _descSheetKey = GlobalKey();
@@ -548,7 +548,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   @override
   void didChangeDependencies() {
-    _view = View.of(context);
+    _view = View.maybeOf(context);
 
     _animatePlayerWidth(1);
     _animateScreenHeight(1);

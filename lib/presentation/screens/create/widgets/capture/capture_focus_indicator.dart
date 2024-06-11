@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const double kFocusSize = 60;
+const double kFocusSize = 56;
 
 class CaptureFocusIndicator extends StatefulWidget {
   const CaptureFocusIndicator({super.key, required this.animation});

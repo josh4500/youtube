@@ -47,6 +47,7 @@ class CaptureEffects extends StatelessWidget {
         ),
         EffectOption(
           icon: YTIcons.lighting,
+          activeIcon: Icons.light_mode,
           label: 'Lighting',
         ),
         EffectOption(

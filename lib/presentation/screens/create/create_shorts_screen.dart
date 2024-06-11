@@ -40,7 +40,7 @@ import '../../widgets/camera/camera_preview.dart';
 import 'widgets/capture/capture_button.dart';
 import 'widgets/capture/capture_effects.dart';
 import 'widgets/capture/capture_focus_indicator.dart';
-import 'widgets/capture/capture_progress_control.dart';
+import 'widgets/capture/capture_timeline_control.dart';
 import 'widgets/capture/capture_shorts_duration_timer.dart';
 import 'widgets/capture/capture_zoom_indicator.dart';
 import 'widgets/check_permission.dart';
@@ -151,7 +151,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   late final AnimationController hideSpeedController = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 300),
+    duration: const Duration(milliseconds: 150),
   );
 
   final ValueNotifier<String> latestControlMessage = ValueNotifier<String>('');
@@ -182,14 +182,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   double _minAvailableZoom = 1.0;
   double _maxAvailableZoom = 1.0;
-  double _currentScale = 1.0;
-  double _baseScale = 1.0;
 
   double _minAvailableExposureOffset = 0.0;
   double _maxAvailableExposureOffset = 0.0;
-
-  // Counting pointers (number of user fingers on screen)
-  int _pointers = 0;
 
   static const double bottomPaddingHeight = 48;
 
@@ -204,11 +199,15 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
         curve: Curves.easeInCubic,
       ),
     );
+
+    effectsController.addStatusListener(effectStatusListener);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+
+    effectsController.removeStatusListener(effectStatusListener);
 
     controller?.dispose();
     hasInitCameraNotifier.dispose();
@@ -273,8 +272,38 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     if (state == AppLifecycleState.inactive) {
       cameraController.dispose();
+      hasInitCameraNotifier.value = null;
     } else if (state == AppLifecycleState.resumed) {
       onNewCameraSelected(cameraController.description);
+    }
+  }
+
+  void effectStatusListener(EffectAction action, EffectOption option) {
+    if (option.label == 'Flip') {
+      _flipCamera();
+    } else if (option.label == 'Speed') {
+      if (action == EffectAction.add) {
+        hideSpeedController.forward();
+      } else {
+        hideSpeedController.reverse();
+      }
+    } else if (option.label == 'Lighting') {
+      if (action == EffectAction.add) {
+        setExposureOffset(
+          .75.normalizeRange(
+            _minAvailableExposureOffset,
+            _maxAvailableExposureOffset,
+          ),
+        );
+      } else {
+        setExposureOffset(_minAvailableExposureOffset);
+      }
+    } else if (option.label == 'Flash') {
+      if (action == EffectAction.add) {
+        setFlashMode(FlashMode.torch);
+      } else {
+        setFlashMode(FlashMode.off);
+      }
     }
   }
 
@@ -302,13 +331,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     );
 
     controller = cameraController;
-
-    // If the controller is updated then update the UI.
-    cameraController.addListener(() {
-      if (cameraController.value.hasError) {
-        // TODO(josh4500):  'Camera error ${cameraController.value.errorDescription}',
-      }
-    });
 
     try {
       await cameraController.initialize();
@@ -397,6 +419,10 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       return;
     }
 
+    _flipCamera();
+  }
+
+  void _flipCamera() {
     final List<CameraDescription>? cameras =
         ref.read(_checkMicrophoneCameraPerm).value?.cameras;
 
@@ -474,7 +500,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     }
 
     // Update zoom level
-    setZoomLevel((1 - (position.dy / maxHeight)).clamp(0, 1));
+    setZoomLevel(
+      (1 -
+              (position.dy /
+                  (maxHeight - kRecordOuterButtonSize - bottomPaddingHeight)))
+          .clamp(0, 1),
+    );
 
     if (position.dy <= maxHeight * .8) {
       droppedButton = true;
@@ -496,7 +527,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       await controller!.setZoomLevel(
         level.normalizeRange(_minAvailableZoom, _maxAvailableZoom),
       );
-      print(level);
       dragZoomLevelNotifier.value = level;
     } on CameraException catch (e) {
       // TODO(josh4500): Unable to set zoom level
@@ -594,6 +624,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
               BoxConstraints constraints,
             ) {
               return Stack(
+                fit: StackFit.expand,
                 children: [
                   ValueListenableBuilder(
                     valueListenable: hasInitCameraNotifier,
@@ -602,7 +633,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                       CameraDescription? cameraDesc,
                       Widget? _,
                     ) {
-                      if (controller == null) {
+                      if (cameraDesc == null) {
                         return const SizedBox();
                       } else {
                         return CameraPreview(
@@ -788,7 +819,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                           ),
                         ),
                         const SizedBox(height: 36),
-                        const CaptureProgressControl(),
+                        const CaptureTimelineControl(),
                         const SizedBox(height: bottomPaddingHeight),
                       ],
                     ),

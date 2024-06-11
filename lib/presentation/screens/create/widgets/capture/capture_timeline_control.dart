@@ -3,8 +3,8 @@ import 'package:youtube_clone/presentation/themes.dart';
 
 import '../notifications/create_notification.dart';
 
-class CaptureProgressControl extends StatelessWidget {
-  const CaptureProgressControl({
+class CaptureTimelineControl extends StatelessWidget {
+  const CaptureTimelineControl({
     super.key,
   });
 
@@ -18,6 +18,7 @@ class CaptureProgressControl extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white12,
             borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.white, width: 2),
           ),
         ),
         const SizedBox(width: 24),
