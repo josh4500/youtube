@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -271,7 +272,7 @@ class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
   @override
   void initState() {
     super.initState();
-    widget.controller?.listenForSelected(changeStateCallback);
+    widget.controller?.addStatusListener(changeStateCallback);
   }
 
   void handleTap() {
@@ -280,16 +281,17 @@ class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
     widget.controller?.close();
   }
 
-  void changeStateCallback() {
-    final selected = widget.controller?.getItemSelectionState(widget.item);
-    activeNotifier.value = selected ?? false;
+  void changeStateCallback(EffectAction action, EffectOption effect) {
+    if (effect == widget.item) {
+      activeNotifier.value = action == EffectAction.add;
+    }
   }
 
   @override
   void didUpdateWidget(covariant EffectWidget oldWidget) {
     if (oldWidget.controller != widget.controller) {
-      oldWidget.controller?.removeListenForSelected(changeStateCallback);
-      widget.controller?.listenForSelected(changeStateCallback);
+      oldWidget.controller?.removeStatusListener(changeStateCallback);
+      widget.controller?.addStatusListener(changeStateCallback);
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -297,6 +299,7 @@ class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
   @override
   void dispose() {
     activeNotifier.dispose();
+    widget.controller?.removeStatusListener(changeStateCallback);
     super.dispose();
   }
 
@@ -355,7 +358,7 @@ typedef EffectStatusListener = void Function(
 );
 
 class VideoEffectOptionsController extends ChangeNotifier {
-  final ValueNotifier<Set<EffectOption>> _selectedItems = ValueNotifier({});
+  final Set<EffectOption> _selectedItems = {};
   final List<EffectStatusListener> _statusListener = [];
 
   void addStatusListener(EffectStatusListener listener) =>
@@ -365,12 +368,11 @@ class VideoEffectOptionsController extends ChangeNotifier {
 
   void toggle(EffectOption item) {
     final EffectAction action;
-    if (_selectedItems.value.contains(item)) {
-      _selectedItems.value.remove(item);
-      _selectedItems.value = {..._selectedItems.value};
+    if (_selectedItems.contains(item)) {
+      _selectedItems.remove(item);
       action = EffectAction.remove;
     } else {
-      _selectedItems.value = {..._selectedItems.value, item};
+      _selectedItems.add(item);
       action = EffectAction.add;
     }
 
@@ -392,16 +394,5 @@ class VideoEffectOptionsController extends ChangeNotifier {
     final oldValue = _isOpened;
     _isOpened = false;
     if (oldValue != _isOpened) notifyListeners();
-  }
-
-  bool getItemSelectionState(EffectOption item) =>
-      _selectedItems.value.contains(item);
-
-  void listenForSelected(void Function() changeStateCallback) {
-    _selectedItems.addListener(changeStateCallback);
-  }
-
-  void removeListenForSelected(void Function() changeStateCallback) {
-    _selectedItems.removeListener(changeStateCallback);
   }
 }
