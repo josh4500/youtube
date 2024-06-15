@@ -46,6 +46,10 @@ class CaptureEffects extends StatelessWidget {
           label: 'Filter',
         ),
         EffectOption(
+          icon: YTIcons.align,
+          label: 'Align',
+        ),
+        EffectOption(
           icon: YTIcons.lighting,
           activeIcon: Icons.light_mode,
           label: 'Lighting',
@@ -53,6 +57,10 @@ class CaptureEffects extends StatelessWidget {
         EffectOption(
           icon: YTIcons.flash_off,
           activeIcon: Icons.flash_on,
+          label: 'Flash',
+        ),
+        EffectOption(
+          icon: YTIcons.trim,
           label: 'Flash',
         ),
       ],

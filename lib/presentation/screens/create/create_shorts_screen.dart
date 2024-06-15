@@ -32,6 +32,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
+import 'package:youtube_clone/presentation/theme/icon/y_t_icons_icons.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -443,8 +444,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     disableDragMode = recording;
     recordingNotifier.value = recording;
     recording
-        ? recordOuterButtonController.forward(from: .8)
-        : recordOuterButtonController.reverse(from: .6);
+        ? recordOuterButtonController.forward(from: .7)
+        : recordOuterButtonController.reverse(from: .7);
 
     CreateNotification(hideNavigator: recording).dispatch(context);
   }
@@ -456,7 +457,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     recordingNotifier.value = true;
     hideZoomController.forward();
     CreateNotification(hideNavigator: true).dispatch(context);
-    recordOuterButtonController.repeat(min: .7, max: 1, reverse: true);
+    recordOuterButtonController.repeat(min: .8, max: 1, reverse: true);
   }
 
   void handleLongPressEndRecordButton(
@@ -690,6 +691,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                         builder: (BuildContext context, Widget? _) {
                           return CaptureDragZoomButton(
                             animation: recordOuterButtonController,
+                            isDragging: dragRecordNotifier.value,
                             isRecording: recordingNotifier.value,
                           );
                         },
@@ -974,10 +976,12 @@ class CreateShortsPermissionRequest extends StatelessWidget {
                       children: [
                         const Spacer(),
                         const Padding(
-                          padding: EdgeInsets.all(48.0),
+                          padding: EdgeInsets.all(24.0),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              Icon(YTIcons.shorts_outline_outlined, size: 48),
+                              SizedBox(height: 48),
                               Text(
                                 'To record, let YouTube access your camera and microphone',
                                 textAlign: TextAlign.center,
@@ -1003,7 +1007,7 @@ class CreateShortsPermissionRequest extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 12),
                         Consumer(
                           builder: (context, ref, child) {
                             return GestureDetector(
@@ -1016,7 +1020,7 @@ class CreateShortsPermissionRequest extends StatelessWidget {
                               child: Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
+                                  vertical: 16,
                                   horizontal: 12,
                                 ),
                                 decoration: BoxDecoration(
@@ -1067,11 +1071,7 @@ class CreateListReason extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: Colors.white70,
-          ),
+          Icon(icon, size: 16),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -1079,17 +1079,12 @@ class CreateListReason extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    fontSize: 11.5,
-                    color: Colors.white70,
-                  ),
+                  style: const TextStyle(fontSize: 11.5),
                 ),
               ],
             ),
