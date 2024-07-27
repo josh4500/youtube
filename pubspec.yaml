@@ -60,6 +60,90 @@ flutter:
     - family: YTIcons
       fonts:
         - asset:  assets/fonts/YTIcons.ttf
+    - family: Roboto
+      fonts:
+        - asset:  assets/fonts/roboto/Roboto-Regular.ttf
+          weight: 400
+          style: normal
+        - asset: assets/fonts/roboto/Roboto-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/roboto/Roboto-Medium.ttf
+          weight: 500
+          style: normal
+        - asset: assets/fonts/roboto/Roboto-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/roboto/Roboto-Light.ttf
+          weight: 300
+          style: normal
+        - asset: assets/fonts/roboto/Roboto-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/roboto/Roboto-Thin.ttf
+          weight: 200
+          style: normal
+        - asset: assets/fonts/roboto/Roboto-ThinItalic.ttf
+          weight: 200
+          style: italic
+        - asset: assets/fonts/roboto/Roboto-Black.ttf
+          weight: 900
+          style: normal
+        - asset: assets/fonts/roboto/Roboto-BlackItalic.ttf
+          weight: 900
+          style: italic
+        - asset: assets/fonts/roboto/Roboto-Bold.ttf
+          weight: 700
+          style: normal
+        - asset: assets/fonts/roboto/Roboto-BoldItalic.ttf
+          weight: 700
+          style: italic
+    - family: YouTubeSans
+      fonts:
+        - asset: assets/fonts/YouTubeSansRegular.otf
+          weight: 400
+          style: normal
+        - asset: assets/fonts/YouTubeSansMedium.otf
+          weight: 500
+          style: normal
+        - asset: assets/fonts/YouTubeSansLight.otf
+          weight: 300
+          style: normal
+        - asset: assets/fonts/YouTubeSansBlack.otf
+          weight: 900
+          style: normal
+        - asset: assets/fonts/YouTubeSansBold.otf
+          weight: 700
+          style: normal
+        - asset: assets/fonts/YouTubeSansDarkBlack.otf
+          weight: 900
+          style: normal
+        - asset: assets/fonts/YouTubeSansDarkBold.otf
+          weight: 700
+          style: normal
+        - asset: assets/fonts/YouTubeSansDarkExtraBold.otf
+          weight: 800
+          style: normal
+        - asset: assets/fonts/YouTubeSansDarkLight.otf
+          weight: 300
+          style: normal
+        - asset: assets/fonts/YouTubeSansDarkMedium.otf
+          weight: 500
+          style: normal
+        - asset: assets/fonts/YouTubeSansDarkRegular.otf
+          weight: 400
+          style: normal
+        - asset: assets/fonts/YouTubeSansDarkSemibold.otf
+          weight: 600
+          style: normal
+        - asset: assets/fonts/YouTubeSansExtraBold.otf
+          weight: 800
+          style: normal
+        - asset: assets/fonts/YouTubeSansSemibold.otf
+          weight: 600
+          style: normal
+
+
 
 flutter_intl:
   enabled: true
