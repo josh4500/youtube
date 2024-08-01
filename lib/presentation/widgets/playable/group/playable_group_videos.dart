@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../tappable_area.dart';
+import '../../gestures/tappable_area.dart';
 import '../playable_video_content.dart';
 
 class PlayableGroupVideos extends StatelessWidget {

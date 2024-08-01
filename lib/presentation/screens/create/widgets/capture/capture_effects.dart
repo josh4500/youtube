@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
@@ -7,12 +6,12 @@ import '../video_effect_options.dart';
 
 class CaptureEffects extends StatelessWidget {
   const CaptureEffects({super.key, this.controller});
-  final VideoEffectOptionsController? controller;
+  final EffectController? controller;
   @override
   Widget build(BuildContext context) {
     return VideoEffectOptions(
       controller: controller,
-      onExpand: (bool isOpened) {
+      onOpenChanged: (bool isOpened) {
         isOpened
             ? HideCaptureControlsNotification().dispatch(context)
             : ShowCaptureControlsNotification().dispatch(context);
@@ -62,7 +61,7 @@ class CaptureEffects extends StatelessWidget {
         ),
         EffectOption(
           icon: YTIcons.trim,
-          label: 'Flash',
+          label: 'Trim',
         ),
       ],
     );

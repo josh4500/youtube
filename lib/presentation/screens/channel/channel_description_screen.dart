@@ -27,14 +27,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/appbar_action.dart';
-import 'package:youtube_clone/presentation/widgets/over_scroll_glow_behavior.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../providers.dart';
 import 'widgets/channel_desc_link.dart';
 
 class ChannelDescriptionScreen extends StatelessWidget {

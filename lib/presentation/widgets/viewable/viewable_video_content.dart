@@ -31,11 +31,11 @@ import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../account_avatar.dart';
-import '../custom_ink_well.dart';
+import '../gestures/custom_ink_well.dart';
+import '../gestures/tappable_area.dart';
 import '../network_image/custom_network_image.dart';
 import '../player/playback/playback_view.dart';
 import '../shimmer.dart';
-import '../tappable_area.dart';
 
 class ViewableVideoContent extends StatelessWidget {
   const ViewableVideoContent({super.key, this.onTap, this.onMore});
@@ -51,9 +51,8 @@ class ViewableVideoContent extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 12),
           child: Column(
             children: <Widget>[
-              SizedBox(
-                height: 227,
-                width: double.infinity,
+              ConstrainedBox(
+                constraints: const BoxConstraints.expand(height: 200),
                 child: PlaybackView(
                   placeholder: Container(
                     decoration: const BoxDecoration(
@@ -144,7 +143,7 @@ class ViewableVideoContent extends StatelessWidget {
         ),
         const Positioned(
           left: 8,
-          top: 227,
+          top: 200,
           child: Padding(
             padding: EdgeInsets.symmetric(
               vertical: 12.0,
@@ -158,7 +157,7 @@ class ViewableVideoContent extends StatelessWidget {
         ),
         Positioned(
           right: 8,
-          top: 231,
+          top: 204,
           child: CustomInkWell(
             onTap: onMore,
             padding: const EdgeInsets.all(8.0),
@@ -177,7 +176,7 @@ class ViewableVideoContent extends StatelessWidget {
     return Column(
       children: <Widget>[
         const Shimmer(
-          height: 227,
+          height: 200,
           width: double.infinity,
         ),
         Padding(

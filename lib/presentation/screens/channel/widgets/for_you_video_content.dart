@@ -29,7 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets/player/playback/playback_duration.dart';
 import 'package:youtube_clone/presentation/widgets/player/playback/playback_progress.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
+import 'package:youtube_clone/presentation/widgets/gestures/tappable_area.dart';
 
 class ForYouVideoContent extends StatelessWidget {
   const ForYouVideoContent({super.key});

@@ -32,7 +32,7 @@ import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/account_avatar.dart';
 import 'package:youtube_clone/presentation/widgets/custom_action_chip.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
+import 'package:youtube_clone/presentation/widgets/gestures/tappable_area.dart';
 
 import '../../../widgets/notification_option.dart';
 

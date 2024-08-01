@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import '../notifications/capture_notification.dart';
 
 class CaptureShortsDurationTimer extends StatefulWidget {
-  const CaptureShortsDurationTimer({
-    super.key,
-  });
+  const CaptureShortsDurationTimer({super.key});
 
   @override
   State<CaptureShortsDurationTimer> createState() =>
@@ -22,6 +20,11 @@ class _CaptureShortsDurationTimerState extends State<CaptureShortsDurationTimer>
     duration: const Duration(milliseconds: 150),
   );
 
+  late final animation = Tween<double>(
+    begin: minTime / maxTime,
+    end: 1,
+  ).animate(controller);
+
   @override
   void dispose() {
     controller.dispose();
@@ -30,10 +33,6 @@ class _CaptureShortsDurationTimerState extends State<CaptureShortsDurationTimer>
 
   @override
   Widget build(BuildContext context) {
-    final animation = Tween<double>(
-      begin: minTime / maxTime,
-      end: 1,
-    ).animate(controller);
     return GestureDetector(
       onTap: () {
         if (time == minTime) {
@@ -52,7 +51,7 @@ class _CaptureShortsDurationTimerState extends State<CaptureShortsDurationTimer>
       },
       child: Stack(
         alignment: Alignment.center,
-        children: [
+        children: <Widget>[
           Container(
             padding: const EdgeInsets.all(12),
             decoration: const BoxDecoration(

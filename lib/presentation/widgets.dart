@@ -32,9 +32,9 @@ export 'widgets/app_logo.dart';
 export 'widgets/appbar_action.dart';
 
 export 'widgets/builders/auth_state_builder.dart';
-export 'widgets/builders/scree_size_widget_builder.dart';
 export 'widgets/builders/network_builder.dart';
 export 'widgets/builders/orientation_builder.dart';
+export 'widgets/builders/scree_size_widget_builder.dart';
 
 export 'widgets/channel_subscription_tile.dart';
 export 'widgets/clip_thumb_clipper.dart';
@@ -45,12 +45,16 @@ export 'widgets/custom_action_button.dart';
 export 'widgets/custom_action_chip.dart';
 export 'widgets/custom_backbutton.dart';
 export 'widgets/custom_checkbox.dart';
-export 'widgets/custom_ink_well.dart';
 export 'widgets/custom_scroll_physics.dart';
+export 'widgets/date_grouping.dart';
 export 'widgets/download_storage_usage.dart';
 export 'widgets/dynamic_sheet.dart';
 export 'widgets/dynamic_tab.dart';
 export 'widgets/error_overlay.dart';
+
+export 'widgets/gestures/custom_ink_well.dart';
+export 'widgets/gestures/tappable_area.dart';
+
 export 'widgets/grouped_view_builder.dart';
 export 'widgets/info_buttons.dart';
 export 'widgets/lazy_indexed_stack.dart';
@@ -81,7 +85,6 @@ export 'widgets/reply_tile.dart';
 export 'widgets/roulette_scroll.dart';
 export 'widgets/slidable.dart';
 export 'widgets/slides_indicator.dart';
-export 'widgets/tappable_area.dart';
 
 export 'widgets/text_widgets/custom_text.dart';
 export 'widgets/text_widgets/icon_span.dart';

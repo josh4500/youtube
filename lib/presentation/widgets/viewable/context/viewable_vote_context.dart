@@ -30,8 +30,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../gestures/tappable_area.dart';
 import '../../network_image/custom_network_image.dart';
-import '../../tappable_area.dart';
 
 class ViewableVoteContext extends StatelessWidget {
   const ViewableVoteContext({super.key});

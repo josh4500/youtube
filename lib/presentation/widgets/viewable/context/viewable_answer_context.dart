@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../../theme/icon/y_t_icons_icons.dart';
-import '../../tappable_area.dart';
+import '../../gestures/tappable_area.dart';
 
 class ViewableAnswerContext extends StatelessWidget {
   const ViewableAnswerContext({super.key});

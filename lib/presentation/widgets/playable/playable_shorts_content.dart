@@ -29,7 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
-import '../custom_ink_well.dart';
+import '../gestures/custom_ink_well.dart';
 import '../network_image/custom_network_image.dart';
 
 class PlayableShortsContent extends StatelessWidget {

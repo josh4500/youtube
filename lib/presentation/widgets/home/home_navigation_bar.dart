@@ -4,7 +4,6 @@ import 'package:youtube_clone/core/enums/auth_state.dart';
 import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../account_avatar.dart';
 import '../builders/auth_state_builder.dart';
@@ -114,7 +113,7 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
                           if (widget.selectedIndex != 1)
-                            const Divider(height: 0.5),
+                            const Divider(height: 1),
                           AuthStateBuilder(
                             builder: (BuildContext context, AuthState state) {
                               return Padding(
@@ -262,13 +261,13 @@ class _NavLibraryButton extends StatelessWidget {
                         ),
                       )
                     : AccountAvatar(
-                        size: 24,
+                        size: 22,
                         name: 'John Jackson',
                         border: isSelected
                             ? Border.all(color: Colors.white, width: 1.5)
                             : null,
                       ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 isLibrary ? 'Library' : 'You',
                 style: const TextStyle(fontSize: 10),

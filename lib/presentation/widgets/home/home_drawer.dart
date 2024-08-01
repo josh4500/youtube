@@ -7,7 +7,7 @@ import 'package:youtube_clone/presentation/themes.dart';
 import '../../constants.dart';
 import '../app_logo.dart';
 import '../over_scroll_glow_behavior.dart';
-import '../tappable_area.dart';
+import '../gestures/tappable_area.dart';
 
 class HomeDrawer extends StatelessWidget {
   const HomeDrawer({

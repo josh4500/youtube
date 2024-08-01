@@ -32,9 +32,9 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../account_avatar.dart';
-import '../custom_ink_well.dart';
 import '../dynamic_sheet.dart';
-import '../tappable_area.dart';
+import '../gestures/custom_ink_well.dart';
+import '../gestures/tappable_area.dart';
 import 'context/viewable_answer_context.dart';
 import 'context/viewable_image_context.dart';
 import 'context/viewable_slides_context.dart';

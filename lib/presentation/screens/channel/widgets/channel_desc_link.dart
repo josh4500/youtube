@@ -27,7 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
+import 'package:youtube_clone/presentation/widgets/gestures/tappable_area.dart';
 
 class ChannelDescLink extends StatelessWidget {
   const ChannelDescLink({super.key});

@@ -33,8 +33,8 @@ import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import 'account_avatar.dart';
-import 'custom_ink_well.dart';
-import 'tappable_area.dart';
+import 'gestures/custom_ink_well.dart';
+import 'gestures/tappable_area.dart';
 
 class CommentTile extends StatelessWidget {
   const CommentTile({

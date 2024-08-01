@@ -28,7 +28,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'tappable_area.dart';
+import 'gestures/tappable_area.dart';
 
 class CustomActionButton extends StatelessWidget {
   const CustomActionButton({

@@ -91,6 +91,7 @@ abstract final class AppTheme {
 
   static final ThemeData dark = ThemeData(
     useMaterial3: false,
+    fontFamily: 'Roboto',
     scaffoldBackgroundColor: const Color(0xFF0F0F0F),
     primaryColor: Colors.black,
     canvasColor: const Color(0xFF0F0F0F),

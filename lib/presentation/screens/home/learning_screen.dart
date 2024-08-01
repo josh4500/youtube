@@ -26,15 +26,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/playable/group/playable_group_contents.dart';
 import 'package:youtube_clone/presentation/widgets/playable/group/playable_group_videos.dart';
-
-import '../../providers.dart';
 
 class LearningScreen extends StatefulWidget {
   const LearningScreen({super.key});

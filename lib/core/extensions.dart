@@ -26,6 +26,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:intl/intl.dart';
+
+import 'enums/date_group_head.dart';
+
 extension FirstWhereOrNullExtension<T> on Iterable<T> {
   /// The first element that satisfies the given predicate [test].
   ///
@@ -52,5 +56,112 @@ extension FirstWhereOrNullExtension<T> on Iterable<T> {
 extension RemoveFirstExtension<T> on List<T> {
   T removeFirst() {
     return removeAt(0);
+  }
+}
+
+class Grouper<T> {
+  Grouper();
+
+  Type get type => T;
+  bool callback(dynamic item) => item.runtimeType == T;
+}
+
+class GroupedItems<T> {
+  GroupedItems(this.type, {this.items = const []});
+
+  final Type type;
+  final List<T> items;
+
+  @override
+  String toString() => type.toString();
+}
+
+extension GrouperExtension<T> on List<T> {
+  List<GroupedItems<T>> group(List<Grouper<T>> groupers) {
+    final List<GroupedItems<T>> groups = [];
+    GroupedItems<T> currentGroup = GroupedItems<T>(Type);
+
+    for (final item in this) {
+      for (final grouper in groupers) {
+        if (grouper.callback(item) && grouper.type != currentGroup.type) {
+          currentGroup = GroupedItems<T>(item.runtimeType, items: []);
+          break;
+        }
+      }
+
+      currentGroup.items.add(item);
+      // Adds new group created
+      if (currentGroup.items.length == 1) groups.add(currentGroup);
+    }
+
+    return groups;
+  }
+}
+
+extension DateGroupingExtension on DateTime {
+  bool compareYMD(DateTime time) {
+    return day == time.day && year == time.year && month == time.month;
+  }
+
+  bool get isToday => compareYMD(DateTime.now());
+  bool get isYesterday {
+    final yesterday = DateTime.now().subtract(const Duration(days: 1));
+    return compareYMD(yesterday);
+  }
+
+  bool get isSameWeek => weekNum(DateTime.now()) == weekNum(this);
+  bool get isSameYear => DateTime.now().year == year;
+  bool get isSameMonth {
+    final now = DateTime.now();
+    return year == now.year && month == now.month;
+  }
+
+  int weekNum(DateTime date) {
+    final fDY = DateTime(date.year);
+
+    return ((((date.millisecondsSinceEpoch - fDY.millisecondsSinceEpoch) /
+                    86400000) +
+                fDY.day +
+                1) /
+            7)
+        .ceil();
+  }
+
+  String get header {
+    String dateGroup;
+    if (isToday) {
+      dateGroup = 'Today';
+    } else if (isYesterday) {
+      dateGroup = 'Yesterday';
+    } else if (isSameWeek) {
+      dateGroup = 'This week';
+    } else if (isSameMonth) {
+      dateGroup = 'This month';
+    } else if (isSameYear) {
+      dateGroup = DateFormat('MMM, dd').format(this);
+    } else {
+      dateGroup = DateFormat('MMM, dd yyyy').format(this);
+    }
+
+    return dateGroup;
+  }
+
+  DateHead get asHeader {
+    DateHead dateGroup;
+    if (isToday) {
+      dateGroup = DateHead.today;
+    } else if (isYesterday) {
+      dateGroup = DateHead.yesterday;
+    } else if (isSameWeek) {
+      dateGroup = DateHead.week;
+    } else if (isSameMonth) {
+      dateGroup = DateHead.month;
+    } else if (isSameYear) {
+      dateGroup = DateHead.year;
+    } else {
+      dateGroup = DateHead.other;
+    }
+
+    return dateGroup;
   }
 }

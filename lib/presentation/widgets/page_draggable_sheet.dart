@@ -4,9 +4,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
-import 'custom_ink_well.dart';
 import 'custom_scroll_physics.dart';
 import 'dynamic_tab.dart';
+import 'gestures/custom_ink_well.dart';
 import 'over_scroll_glow_behavior.dart';
 import 'persistent_header_delegate.dart';
 import 'sheet_drag_indicator.dart';

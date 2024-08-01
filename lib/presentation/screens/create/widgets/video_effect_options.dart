@@ -1,21 +1,93 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
+
+class EffectOption {
+  const EffectOption({
+    required this.icon,
+    this.activeIcon,
+    required this.label,
+    this.onTap,
+  });
+
+  final IconData icon;
+  final IconData? activeIcon;
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is EffectOption &&
+          runtimeType == other.runtimeType &&
+          icon == other.icon &&
+          activeIcon == other.activeIcon &&
+          label == other.label;
+
+  @override
+  int get hashCode => icon.hashCode ^ activeIcon.hashCode ^ label.hashCode;
+}
+
+enum EffectAction { add, remove }
+
+typedef EffectStatusListener = void Function(
+  EffectAction action,
+  EffectOption effect,
+);
+
+class EffectController extends ChangeNotifier {
+  final Set<EffectOption> _selectedItems = {};
+  final List<EffectStatusListener> _statusListener = [];
+
+  void addStatusListener(EffectStatusListener listener) =>
+      _statusListener.add(listener);
+  void removeStatusListener(EffectStatusListener listener) =>
+      _statusListener.remove(listener);
+
+  void toggle(EffectOption item) {
+    final EffectAction action;
+    if (_selectedItems.contains(item)) {
+      _selectedItems.remove(item);
+      action = EffectAction.remove;
+    } else {
+      _selectedItems.add(item);
+      action = EffectAction.add;
+    }
+
+    for (final listener in _statusListener) {
+      listener(action, item);
+    }
+  }
+
+  bool _isOpened = false;
+  bool get isOpened => _isOpened;
+
+  void open() {
+    final oldValue = _isOpened;
+    _isOpened = true;
+    if (oldValue != _isOpened) notifyListeners();
+  }
+
+  void close() {
+    final oldValue = _isOpened;
+    _isOpened = false;
+    if (oldValue != _isOpened) notifyListeners();
+  }
+}
 
 class VideoEffectOptions extends StatefulWidget {
   const VideoEffectOptions({
     super.key,
     this.controller,
     this.items = const <EffectOption>[],
-    this.onExpand,
+    this.onOpenChanged,
   });
 
-  final VideoEffectOptionsController? controller;
+  final EffectController? controller;
   final List<EffectOption> items;
-  final ValueChanged<bool>? onExpand;
+  final ValueChanged<bool>? onOpenChanged;
 
   @override
   State<VideoEffectOptions> createState() => _VideoEffectOptionsState();
@@ -71,7 +143,7 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
       final isExpanded = widget.controller!.isOpened;
       _showLabelNotifier.value = isExpanded;
 
-      widget.onExpand?.call(isExpanded);
+      widget.onOpenChanged?.call(isExpanded);
       if (isExpanded) {
         animationController.forward();
       } else {
@@ -260,7 +332,7 @@ class EffectWidget extends StatefulWidget {
 
   final EdgeInsets margin;
   final EffectOption item;
-  final VideoEffectOptionsController? controller;
+  final EffectController? controller;
 
   @override
   State<EffectWidget> createState() => _EffectWidgetState();
@@ -321,78 +393,5 @@ class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
         },
       ),
     );
-  }
-}
-
-class EffectOption {
-  const EffectOption({
-    required this.icon,
-    this.activeIcon,
-    required this.label,
-    this.onTap,
-  });
-
-  final IconData icon;
-  final IconData? activeIcon;
-  final String label;
-  final VoidCallback? onTap;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is EffectOption &&
-          runtimeType == other.runtimeType &&
-          icon == other.icon &&
-          activeIcon == other.activeIcon &&
-          label == other.label;
-
-  @override
-  int get hashCode => icon.hashCode ^ activeIcon.hashCode ^ label.hashCode;
-}
-
-enum EffectAction { add, remove }
-
-typedef EffectStatusListener = void Function(
-  EffectAction action,
-  EffectOption effect,
-);
-
-class VideoEffectOptionsController extends ChangeNotifier {
-  final Set<EffectOption> _selectedItems = {};
-  final List<EffectStatusListener> _statusListener = [];
-
-  void addStatusListener(EffectStatusListener listener) =>
-      _statusListener.add(listener);
-  void removeStatusListener(EffectStatusListener listener) =>
-      _statusListener.remove(listener);
-
-  void toggle(EffectOption item) {
-    final EffectAction action;
-    if (_selectedItems.contains(item)) {
-      _selectedItems.remove(item);
-      action = EffectAction.remove;
-    } else {
-      _selectedItems.add(item);
-      action = EffectAction.add;
-    }
-
-    for (final listener in _statusListener) {
-      listener(action, item);
-    }
-  }
-
-  bool _isOpened = false;
-  bool get isOpened => _isOpened;
-
-  void open() {
-    final oldValue = _isOpened;
-    _isOpened = true;
-    if (oldValue != _isOpened) notifyListeners();
-  }
-
-  void close() {
-    final oldValue = _isOpened;
-    _isOpened = false;
-    if (oldValue != _isOpened) notifyListeners();
   }
 }

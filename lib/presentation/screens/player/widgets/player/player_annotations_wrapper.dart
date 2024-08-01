@@ -40,7 +40,6 @@ import '../annotations/annotations_notification.dart';
 import '../annotations/video_card_teaser.dart';
 import '../annotations/video_channel_watermark.dart';
 import '../annotations/video_product.dart';
-import '../annotations/video_suggestion.dart';
 
 class PlayerAnnotationsWrapper extends StatefulWidget {
   const PlayerAnnotationsWrapper({

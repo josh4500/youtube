@@ -30,7 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import 'dynamic_sheet.dart';
-import 'tappable_area.dart';
+import 'gestures/tappable_area.dart';
 
 class SubscribedChannelButton extends StatelessWidget {
   const SubscribedChannelButton({

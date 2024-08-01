@@ -30,7 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets/tappable_area.dart';
+import 'package:youtube_clone/presentation/widgets/gestures/tappable_area.dart';
 
 class MiniPlayer extends StatelessWidget {
   const MiniPlayer({super.key});

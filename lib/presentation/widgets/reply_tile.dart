@@ -30,7 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import 'account_avatar.dart';
-import 'custom_ink_well.dart';
+import 'gestures/custom_ink_well.dart';
 
 class ReplyTile extends StatelessWidget {
   const ReplyTile({super.key, this.creatorLikes = false});

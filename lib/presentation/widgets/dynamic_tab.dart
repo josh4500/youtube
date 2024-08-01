@@ -28,9 +28,9 @@
 
 import 'package:flutter/material.dart';
 
+import 'gestures/tappable_area.dart';
 import 'over_scroll_glow_behavior.dart';
 import 'shimmer.dart';
-import 'tappable_area.dart';
 
 class DynamicTab extends StatefulWidget {
   const DynamicTab({

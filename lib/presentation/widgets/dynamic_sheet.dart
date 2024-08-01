@@ -4,10 +4,11 @@ import 'package:youtube_clone/presentation/theme/device_theme.dart';
 
 import '../../infrastructure.dart';
 import '../theme/icon/y_t_icons_icons.dart';
-import 'custom_ink_well.dart';
+import 'custom_scroll_physics.dart';
+import 'gestures/custom_ink_well.dart';
+import 'gestures/tappable_area.dart';
 import 'over_scroll_glow_behavior.dart';
 import 'sheet_drag_indicator.dart';
-import 'tappable_area.dart';
 
 class DynamicSheet extends StatefulWidget {
   const DynamicSheet({
@@ -27,6 +28,9 @@ class DynamicSheet extends StatefulWidget {
 
 class _DynamicSheetState extends State<DynamicSheet>
     with SingleTickerProviderStateMixin {
+  final customScrollPhysics = const CustomScrollableScrollPhysics(
+    tag: 'dynamic-sheet',
+  );
   final ScrollController scrollController = ScrollController();
   final ValueNotifier<double> heightNotifier = ValueNotifier<double>(0);
 
@@ -47,11 +51,6 @@ class _DynamicSheetState extends State<DynamicSheet>
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
@@ -59,41 +58,50 @@ class _DynamicSheetState extends State<DynamicSheet>
         borderRadius: BorderRadius.circular(12),
         child: Material(
           color: const Color(0xFF212121),
-          child: ListenableBuilder(
-            listenable: heightNotifier,
-            builder: (BuildContext context, Widget? childWidget) {
-              return ConstrainedBox(
-                constraints: const BoxConstraints(
-                    // minHeight: minSheetHeight,
-                    // maxHeight: heightNotifier.value,
-                    ),
-                child: childWidget,
+          child: Listener(
+            onPointerMove: (event) {
+              final deltaY = event.delta.dy;
+              final newHeight = heightNotifier.value + (deltaY * -1);
+
+              heightNotifier.value = newHeight.clamp(
+                minSheetHeight,
+                maxSheetHeight,
+              );
+
+              customScrollPhysics.canScroll(
+                !(heightNotifier.value <= minSheetHeight && deltaY >= 0),
               );
             },
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                const SheetDragIndicator(),
-                ScrollConfiguration(
-                  behavior: const OverScrollGlowBehavior(
-                    enabled: false,
-                  ),
-                  child: Scrollbar(
+            child: ListenableBuilder(
+              listenable: heightNotifier,
+              builder: (BuildContext context, Widget? childWidget) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: heightNotifier.value),
+                  child: childWidget,
+                );
+              },
+              child: ScrollConfiguration(
+                behavior: const OverScrollGlowBehavior(enabled: false),
+                child: Scrollbar(
+                  controller: scrollController,
+                  child: ListView(
+                    physics: customScrollPhysics,
+                    shrinkWrap: true,
                     controller: scrollController,
-                    child: ListView(
-                      shrinkWrap: true,
-                      controller: scrollController,
-                      children: [
-                        if (widget.title != null) widget.title!,
-                        ...widget.children,
-                      ],
-                    ),
+                    children: [
+                      const Column(
+                        children: <Widget>[
+                          SizedBox(height: 8),
+                          SheetDragIndicator(),
+                        ],
+                      ),
+                      if (widget.title != null) widget.title!,
+                      ...widget.children,
+                      if (widget.trailing != null) widget.trailing!,
+                    ],
                   ),
                 ),
-                if (widget.trailing != null) widget.trailing!,
-              ],
+              ),
             ),
           ),
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 typedef Dependency = Type;
 
@@ -116,6 +117,7 @@ abstract class DataRepository {
 class UnregisteredResource<T> implements Exception {
   @override
   String toString() {
+    GlobalKey();
     return 'Resource ${T.runtimeType} was not registered in this repository';
   }
 }

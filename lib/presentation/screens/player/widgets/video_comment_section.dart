@@ -67,7 +67,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
     );
     // TODO(Josh): Check for isLiveVideo
     final random = Random();
-    final isDisabled = random.nextBool();
+    random.nextBool();
     final isLiveVideo = random.nextBool();
     final showHighlighted = random.nextBool();
 

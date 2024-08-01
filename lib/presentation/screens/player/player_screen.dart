@@ -1682,6 +1682,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _enterMinimizedMode();
     }
 
+    print('Is Minimise: $_isMinimized');
+
     if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
       // Closes screen when Player is minimized
       if (_isMinimized) ref.read(playerRepositoryProvider).closePlayerScreen();

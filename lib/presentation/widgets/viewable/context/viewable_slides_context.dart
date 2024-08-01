@@ -43,8 +43,8 @@ class _ViewableSlidesContextState extends State<ViewableSlidesContext> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 320,
+    return ConstrainedBox(
+      constraints: const BoxConstraints.expand(height: 320),
       child: PageView.builder(
         itemCount: slideCount,
         controller: pageController,

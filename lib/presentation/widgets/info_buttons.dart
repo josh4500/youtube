@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
-import 'custom_ink_well.dart';
+import 'gestures/custom_ink_well.dart';
 
 class IncludePromotionButton extends StatelessWidget {
   const IncludePromotionButton({super.key, this.margin});
