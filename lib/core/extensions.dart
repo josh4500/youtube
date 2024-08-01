@@ -79,12 +79,12 @@ class GroupedItems<T> {
 extension GrouperExtension<T> on List<T> {
   List<GroupedItems<T>> group(List<Grouper<T>> groupers) {
     final List<GroupedItems<T>> groups = [];
-    GroupedItems<T> currentGroup = GroupedItems<T>(Type);
+    GroupedItems<T> currentGroup = GroupedItems<T>(T);
 
     for (final item in this) {
       for (final grouper in groupers) {
         if (grouper.callback(item) && grouper.type != currentGroup.type) {
-          currentGroup = GroupedItems<T>(item.runtimeType, items: []);
+          currentGroup = GroupedItems<T>(item.runtimeType, items: <T>[]);
           break;
         }
       }
@@ -163,5 +163,11 @@ extension DateGroupingExtension on DateTime {
     }
 
     return dateGroup;
+  }
+}
+
+extension AgoExtension on DateTime {
+  String get ago {
+    return 'ago';
   }
 }
