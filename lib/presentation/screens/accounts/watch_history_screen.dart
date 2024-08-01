@@ -28,6 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -128,29 +129,23 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
 
   @override
   Widget build(BuildContext context) {
+    final historyItems = groupedTimes.group([Grouper<A>(), Grouper<B>()]);
+
     return Scaffold(
       appBar: AppBar(
         title: AnimatedBuilder(
           animation: animation,
           builder: (BuildContext context, Widget? child) {
-            return Opacity(
-              opacity: animation.value,
-              child: child,
-            );
+            return Opacity(opacity: animation.value, child: child);
           },
           child: const Text(
             'History',
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-            ),
+            style: TextStyle(fontWeight: FontWeight.w500),
           ),
         ),
         leading: CustomBackButton(onPressed: context.pop),
         actions: <Widget>[
-          AppbarAction(
-            icon: YTIcons.cast_outlined,
-            onTap: () {},
-          ),
+          AppbarAction(icon: YTIcons.cast_outlined, onTap: () {}),
           AppbarAction(
             icon: YTIcons.search_outlined,
             onTap: () => context.goto(AppRoutes.search),
@@ -167,112 +162,152 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
           ),
         ],
       ),
-      body: GestureDetector(
-        onTap: focusNode.unfocus,
-        child: ScrollConfiguration(
-          behavior: const OverScrollGlowBehavior(enabled: false),
-          child: CustomScrollView(
-            controller: controller,
-            slivers: <Widget>[
-              SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: Text(
-                        'History',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w600,
+      body: DefaultGroupValue(
+        buildAsFirst: (currentDateBuild) {
+          final firstGroup = historyItems.first.items;
+          return currentDateBuild == firstGroup.first.time;
+        },
+        child: GestureDetector(
+          onTap: focusNode.unfocus,
+          child: ScrollConfiguration(
+            behavior: const OverScrollGlowBehavior(enabled: false),
+            child: CustomScrollView(
+              controller: controller,
+              slivers: <Widget>[
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const Padding(
+                        padding: EdgeInsets.all(12.0),
+                        child: Text(
+                          'History',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
+                      HistorySearchTextField(
+                        focusNode: focusNode,
+                        controller: textEditingController,
+                      ),
+                    ],
+                  ),
+                ),
+                for (final historyItem in historyItems)
+                  if (historyItem.type == A)
+                    SliverSingleDateGroup(
+                      date: historyItem.items.first.time,
+                      separatorBuilder: (date) => SeparatorWidget(date: date),
+                      child: const ShortsHistory(),
+                    )
+                  else
+                    SliverDateGroupList(
+                      comparator: (a, b) => !a.compareYMD(b),
+                      itemBuilder: (BuildContext context, int index) {
+                        return HistoryVideo(
+                          index: index,
+                          sharedSlidableState: sharedSlidableState,
+                          onMore: onMorePlayableVideo,
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return SeparatorWidget(
+                          date: historyItem.items[index].time,
+                        );
+                      },
+                      indexedDateItem: (int index) =>
+                          historyItem.items[index].time,
+                      childCount: historyItem.items.length,
                     ),
-                    HistorySearchTextField(
-                      focusNode: focusNode,
-                      controller: textEditingController,
-                    ),
-                  ],
-                ),
-              ),
-              const SliverToBoxAdapter(
-                child: ShortsHistory(),
-              ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return Slidable(
-                      maxOffset: 0.3,
-                      key: ValueKey(-index),
-                      sharedSlidableState: sharedSlidableState,
-                      items: const <SlidableItem>[
-                        SlidableItem(
-                          icon: Icon(
-                            Icons.delete,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                      child: Material(
-                        child: CustomInkWell(
-                          onTap: () {},
-                          child: PlayableVideoContent(
-                            width: 145,
-                            height: 88,
-                            margin: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 16.0,
-                            ),
-                            onMore: onMorePlayableVideo,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  childCount: 1,
-                ),
-              ),
-              const SliverToBoxAdapter(
-                child: ShortsHistory(),
-              ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return Slidable(
-                      key: ValueKey(index),
-                      maxOffset: 0.3,
-                      sharedSlidableState: sharedSlidableState,
-                      items: const <SlidableItem>[
-                        SlidableItem(
-                          icon: Icon(
-                            Icons.delete,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                      child: Material(
-                        child: CustomInkWell(
-                          onTap: () {},
-                          child: PlayableVideoContent(
-                            width: 145,
-                            height: 88,
-                            margin: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 16.0,
-                            ),
-                            onMore: onMorePlayableVideo,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  childCount: 10,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
+
+class HistoryVideo extends StatelessWidget {
+  const HistoryVideo({
+    super.key,
+    required this.index,
+    this.sharedSlidableState,
+    required this.onMore,
+  });
+  final int index;
+  final SharedSlidableState<dynamic>? sharedSlidableState;
+  final VoidCallback onMore;
+  @override
+  Widget build(BuildContext context) {
+    return Slidable(
+      key: ValueKey(index),
+      maxOffset: 0.3,
+      sharedSlidableState: sharedSlidableState,
+      items: const <SlidableItem>[
+        SlidableItem(
+          icon: Icon(
+            Icons.delete,
+            color: Colors.black,
+          ),
+        ),
+      ],
+      child: Material(
+        child: CustomInkWell(
+          onTap: () {},
+          child: PlayableVideoContent(
+            width: 145,
+            height: 88,
+            margin: const EdgeInsets.symmetric(
+              vertical: 12,
+              horizontal: 16.0,
+            ),
+            onMore: onMore,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+abstract class HistoryItem {
+  HistoryItem(this.time);
+
+  final DateTime time;
+}
+
+class A extends HistoryItem {
+  A(super.time);
+}
+
+class B extends HistoryItem {
+  B(super.time);
+}
+
+final groupedTimes = <HistoryItem>[
+  A(DateTime.now()),
+  A(DateTime.now()),
+  B(DateTime.now().subtract(const Duration(days: 1))),
+  B(DateTime.now().subtract(const Duration(days: 1))),
+  B(DateTime.now().subtract(const Duration(days: 1))),
+  B(DateTime.now().subtract(const Duration(days: 2))),
+  B(DateTime.now().subtract(const Duration(days: 2))),
+  B(DateTime.now().subtract(const Duration(days: 2))),
+  A(DateTime.now().subtract(const Duration(days: 2))),
+  A(DateTime.now().subtract(const Duration(days: 2))),
+  B(DateTime.now().subtract(const Duration(days: 3))),
+  B(DateTime.now().subtract(const Duration(days: 3))),
+  B(DateTime.now().subtract(const Duration(days: 3))),
+  B(DateTime.now().subtract(const Duration(days: 3))),
+  B(DateTime.now().subtract(const Duration(days: 15))),
+  B(DateTime.now().subtract(const Duration(days: 15))),
+  B(DateTime.now().subtract(const Duration(days: 15))),
+  B(DateTime.now().subtract(const Duration(days: 30))),
+  B(DateTime.now().subtract(const Duration(days: 30))),
+  B(DateTime.now().subtract(const Duration(days: 30))),
+  B(DateTime.now().subtract(const Duration(days: 33))),
+  B(DateTime.now().subtract(const Duration(days: 33))),
+  B(DateTime.now().subtract(const Duration(days: 300))),
+];
