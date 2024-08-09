@@ -36,4 +36,8 @@ class PlayerViewState extends _$PlayerViewState {
     oldState.remove(viewState);
     state = <ViewState>{...oldState};
   }
+
+  void clearState() {
+    state = <ViewState>{};
+  }
 }

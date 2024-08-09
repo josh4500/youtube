@@ -255,65 +255,71 @@ class _AnnotationVisibilityState extends ConsumerState<AnnotationVisibility>
       vsync: this,
       duration: const Duration(milliseconds: 250),
     );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (ref.read(playerViewStateProvider).showControls) {
-      controlVisibilityNotifier.value = false;
-      if (widget.visibleControlAlignment != null) alignmentController.forward();
-    } else {
-      controlVisibilityNotifier.value = !hiddenPermanently && !hiddenTemporary;
-      if (widget.visibleControlAlignment != null) alignmentController.reverse();
-    }
-
-    final playerRepo = ref.read(playerRepositoryProvider);
-    _playerSignalSubscription ??= playerRepo.playerSignalStream.listen(
-      (event) {
-        if (event == PlayerSignal.showControls) {
-          controlVisibilityNotifier.value = false;
-          if (widget.visibleControlAlignment != null) {
-            alignmentController.forward();
-          }
-        } else if (event == PlayerSignal.hideControls) {
-          controlVisibilityNotifier.value =
-              !hiddenPermanently && !hiddenTemporary;
-
-          if (widget.visibleControlAlignment != null) {
-            alignmentController.reverse();
-          }
+    Future(() {
+      if (ref.read(playerViewStateProvider).showControls) {
+        controlVisibilityNotifier.value = false;
+        if (widget.visibleControlAlignment != null) {
+          alignmentController.forward();
         }
-      },
-    );
+      } else {
+        controlVisibilityNotifier.value =
+            !hiddenPermanently && !hiddenTemporary;
+        if (widget.visibleControlAlignment != null) {
+          alignmentController.reverse();
+        }
+      }
 
-    if (widget.alwaysShow && widget.showAt == null && !hiddenPermanently) {
-      permanentTimer ??= Timer(widget.hideDuration, permanentHide);
-    } else if (widget.showAt != null) {
-      _videoDurationSubscription ??= playerRepo.positionStream.listen(
+      final playerRepo = ref.read(playerRepositoryProvider);
+      _playerSignalSubscription ??= playerRepo.playerSignalStream.listen(
         (event) {
-          final showing = showNotifier.value;
-          if (event.inSeconds == widget.showAt?.inSeconds) {
-            hiddenTemporary = false;
+          if (context.mounted == false) return;
 
-            final isMinimized = ref.read(playerViewStateProvider).isMinimized;
-            // Avoid showing when minimized
-            controlVisibilityNotifier.value = !isMinimized;
+          if (event == PlayerSignal.showControls) {
+            controlVisibilityNotifier.value = false;
+            if (widget.visibleControlAlignment != null) {
+              alignmentController.forward();
+            }
+          } else if (event == PlayerSignal.hideControls) {
+            controlVisibilityNotifier.value =
+                !hiddenPermanently && !hiddenTemporary;
 
-            showNotifier.value = true;
-            visibilityController.forward();
-          } else if (showing &&
-              event.inSeconds ==
-                  (widget.showAt?.inSeconds ?? 0) +
-                      widget.hideDuration.inSeconds) {
-            temporaryHide();
-          } else if (event.inSeconds < (widget.showAt?.inSeconds ?? 0)) {
-            hiddenTemporary = false;
-            showNotifier.value = false;
+            if (widget.visibleControlAlignment != null) {
+              alignmentController.reverse();
+            }
           }
         },
       );
-    }
+
+      if (widget.alwaysShow && widget.showAt == null && !hiddenPermanently) {
+        permanentTimer ??= Timer(widget.hideDuration, permanentHide);
+      } else if (widget.showAt != null) {
+        _videoDurationSubscription ??= playerRepo.positionStream.listen(
+          (event) {
+            if (context.mounted == false) return;
+
+            final showing = showNotifier.value;
+            if (event.inSeconds == widget.showAt?.inSeconds) {
+              hiddenTemporary = false;
+
+              final isMinimized = ref.read(playerViewStateProvider).isMinimized;
+              // Avoid showing when minimized
+              controlVisibilityNotifier.value = !isMinimized;
+
+              showNotifier.value = true;
+              visibilityController.forward();
+            } else if (showing &&
+                event.inSeconds ==
+                    (widget.showAt?.inSeconds ?? 0) +
+                        widget.hideDuration.inSeconds) {
+              temporaryHide();
+            } else if (event.inSeconds < (widget.showAt?.inSeconds ?? 0)) {
+              hiddenTemporary = false;
+              showNotifier.value = false;
+            }
+          },
+        );
+      }
+    });
   }
 
   @override
@@ -328,14 +334,15 @@ class _AnnotationVisibilityState extends ConsumerState<AnnotationVisibility>
 
   @override
   void dispose() {
+    _playerSignalSubscription?.cancel();
+    _videoDurationSubscription?.cancel();
+
     permanentTimer?.cancel();
     showNotifier.dispose();
     alignmentController.dispose();
     visibilityController.dispose();
     controlVisibilityNotifier.dispose();
 
-    _playerSignalSubscription?.cancel();
-    _videoDurationSubscription?.cancel();
     super.dispose();
   }
 

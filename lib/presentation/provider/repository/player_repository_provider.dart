@@ -167,6 +167,7 @@ class PlayerRepository {
     _lock.clear();
     _videoPlayer.stop();
     _ref.read(playerNotifierProvider.notifier).reset();
+    _ref.read(playerViewStateProvider.notifier).clearState();
     _ref.read(_playerOverlayStateProvider.notifier).state = false;
   }
 

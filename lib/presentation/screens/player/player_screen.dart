@@ -1676,8 +1676,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _openSettings();
     } else if (notification is RotatePlayerNotification) {
       if (context.orientation.isLandscape) {
-        _enterExpandedMode(false);
-        _exitFullscreenMode();
+        _exitFullscreenMode().then((_) => _enterExpandedMode(false));
+        // _enterExpandedMode();
       } else {
         _enterFullscreenMode();
       }
@@ -1696,15 +1696,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   Future<void> _handleBackButtonPressed(bool didPop) async {
     if (_commentIsOpened) {
       _closeCommentSheet();
+      return;
     } else if (_descIsOpened) {
       _closeDescSheet();
+      return;
     } else if (_chaptersIsOpened) {
       _closeChaptersSheet();
+      return;
     } else if (!_isMinimized) {
       _enterMinimizedMode();
+      return;
     }
-
-    print('Is Minimise: $_isMinimized');
 
     if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
       // Closes screen when Player is minimized

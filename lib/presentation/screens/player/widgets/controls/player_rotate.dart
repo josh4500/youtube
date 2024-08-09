@@ -12,9 +12,8 @@ class PlayerRotateControl extends StatelessWidget {
       onTap: () => RotatePlayerNotification().dispatch(context),
       backgroundColor: Colors.transparent,
       horizontalPadding: 8,
-      verticalPadding: 10,
       builder: (context, _) {
-        return const Icon(Icons.screen_rotation);
+        return const Icon(Icons.screen_rotation, size: 18);
       },
     );
   }

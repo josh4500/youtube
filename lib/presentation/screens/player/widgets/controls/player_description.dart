@@ -94,13 +94,9 @@ class PlayerDescriptionV2 extends ConsumerWidget {
     super.key,
     this.showOnExpanded = false,
     this.showOnFullscreen = false,
-  })  : assert(
+  }) : assert(
           showOnExpanded || showOnFullscreen,
           'At least showOnExpanded or showOnFullscreen should be true',
-        ),
-        assert(
-          !(showOnExpanded && showOnFullscreen),
-          'showOnExpanded or showOnFullscreen cannot be true at the same time',
         );
   final bool showOnExpanded;
   final bool showOnFullscreen;

@@ -291,7 +291,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
         _showUnlockButton.reverse();
       });
     } else if (signal == PlayerSignal.showControls) {
-      if (context.orientation.isLandscape || isExpanded) {
+      if (mounted && context.orientation.isLandscape || isExpanded) {
         _showPlaybackProgress.value = 1;
       }
 
@@ -1066,21 +1066,14 @@ class _TopControlV2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return const Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _TopOrientationControl(),
-            Spacer(),
-            PlayerAutoplaySwitch(),
-            PlayerCastCaptionControl(),
-            PlayerSettings(),
-          ],
-        ),
-        PlayerDescription(
-          showOnExpanded: true,
-        ),
+        _TopOrientationControl(),
+        Spacer(),
+        PlayerAutoplaySwitch(),
+        PlayerCastCaptionControl(),
+        PlayerSettings(),
       ],
     );
   }
