@@ -620,6 +620,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
         _ensuredForcedFullscreenKept = false;
       }
       _lastLifecycleStates.clear();
+
+      if (localExpanded) {
+        SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.immersiveSticky,
+          overlays: <SystemUiOverlay>[],
+        );
+      }
     }
     super.didChangeAppLifecycleState(state);
   }
@@ -1346,14 +1353,22 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     _showControls();
   }
 
-  Future<void> _enterExpandedMode() async {
+  Future<void> _enterExpandedMode([bool animate = true]) async {
     localExpanded = true;
     _hideControls();
 
-    await _animateAdditionalHeight(maxAdditionalHeight);
+    if (_isResizableExpandingMode) {
+      animate
+          ? await _animateAdditionalHeight(maxAdditionalHeight)
+          : _playerAddedHeightNotifier.value = maxAdditionalHeight;
+    } else {
+      animate
+          ? await _animateAdditionalHeight(maxAdditionalHeight)
+          : _playerAddedHeightNotifier.value = maxAdditionalHeight;
+    }
 
     await SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersive,
+      SystemUiMode.immersiveSticky,
       overlays: <SystemUiOverlay>[],
     );
 
@@ -1649,9 +1664,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   void _handlePlayerControlNotification(PlayerNotification notification) {
     if (notification is MinimizePlayerNotification) {
       _enterMinimizedMode();
-    } else if (notification is ExpandPlayerNotification) {
+    } else if (notification is EnterExpandPlayerNotification) {
       _enterExpandedMode();
-    } else if (notification is DeExpandPlayerNotification) {
+    } else if (notification is ExitExpandPlayerNotification) {
       _exitExpandedMode();
     } else if (notification is EnterFullscreenPlayerNotification) {
       _enterFullscreenMode();
@@ -1659,6 +1674,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       _exitFullscreenMode();
     } else if (notification is SettingsPlayerNotification) {
       _openSettings();
+    } else if (notification is RotatePlayerNotification) {
+      if (context.orientation.isLandscape) {
+        _enterExpandedMode(false);
+        _exitFullscreenMode();
+      } else {
+        _enterFullscreenMode();
+      }
     } else if (notification is SeekStartPlayerNotification) {
       _preventPlayerDragUp = true;
       _preventPlayerDragDown = true;

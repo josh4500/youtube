@@ -75,6 +75,11 @@ class DeviceThemeData {
       .resolveWithDeviceType(deviceType)
       .resolveWithOrientation(orientation);
 
+  double get draggableInitialSize =>
+      AppSizing.draggableInitialSize.resolveWithDeviceType(deviceType);
+  double get draggablePostInitialSize =>
+      AppSizing.draggablePostInitialSize.resolveWithDeviceType(deviceType);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

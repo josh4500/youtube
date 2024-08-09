@@ -42,6 +42,7 @@ class CustomActionChip extends StatefulWidget {
     this.onTap,
     this.onTapCancel,
     this.title,
+    this.onLongPress,
   });
   final String? title;
   final Widget? icon;
@@ -53,6 +54,7 @@ class CustomActionChip extends StatefulWidget {
   final TextStyle? textStyle;
   final Border? border;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final VoidCallback? onTapCancel;
 
   @override
@@ -93,6 +95,7 @@ class _CustomActionChipState extends State<CustomActionChip>
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: widget.onTap,
+        onLongPress: widget.onLongPress,
         onTapCancel: widget.onTapCancel,
         child: ScaleTransition(
           scale: animation,

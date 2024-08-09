@@ -119,51 +119,15 @@ class TappableArea extends StatefulWidget {
 class _TappableAreaState extends State<TappableArea>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late Animation<Border?> _borderAnimation;
   final WidgetStatesController statesController = WidgetStatesController();
-  bool _reversing = false;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
-      reverseDuration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 600),
     );
-
-    _borderAnimation = BorderTween(
-      begin: const Border.fromBorderSide(
-        BorderSide(color: Colors.transparent),
-      ),
-      end: const Border.fromBorderSide(
-        BorderSide(color: Colors.white10),
-      ),
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(
-          0,
-          0.5,
-          curve: Curves.ease,
-        ),
-        reverseCurve: const Interval(
-          0,
-          0.8,
-          curve: Curves.easeOutCubic,
-        ),
-      ),
-    );
-
-    _controller.addStatusListener((AnimationStatus status) {
-      if (status == AnimationStatus.reverse) {
-        _reversing = true;
-      } else if (status == AnimationStatus.completed) {
-        _reversing = false;
-      } else if (status == AnimationStatus.forward) {
-        _reversing = false;
-      }
-    });
   }
 
   @override
@@ -176,7 +140,8 @@ class _TappableAreaState extends State<TappableArea>
   void handleTapUp(TapUpDetails details) async {
     widget.onTapUp?.call(details);
     if (statesController.value.contains(WidgetState.pressed)) {
-      await _controller.reverse(from: 1);
+      await _controller.forward();
+      _controller.reset();
     }
   }
 
@@ -222,7 +187,7 @@ class _TappableAreaState extends State<TappableArea>
               side: BorderSide(color: Colors.white12),
             )
           : const CircleBorder(
-              side: BorderSide(color: Colors.red, width: 4),
+              side: BorderSide(color: Colors.white12, width: 4),
             ),
       borderRadius: widget.borderRadius,
       splashFactory: _CustomSplashFactory.splashFactory,

@@ -33,7 +33,8 @@ import 'package:youtube_clone/presentation/provider/state/player_state_provider.
 import 'player_control.dart';
 
 class PlayPauseRestartControl extends ConsumerStatefulWidget {
-  const PlayPauseRestartControl({super.key});
+  const PlayPauseRestartControl({super.key, this.backgroundColor});
+  final Color? backgroundColor;
 
   @override
   ConsumerState<PlayPauseRestartControl> createState() =>
@@ -83,6 +84,7 @@ class PlayPauseRestartControlState
     final isBuffering = playerNotifier.buffering;
 
     return PlayerControlButton(
+      backgroundColor: widget.backgroundColor ?? Colors.black26,
       onTap: () {
         if (!isRestart) {
           if (isPlaying) {

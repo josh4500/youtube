@@ -32,7 +32,7 @@ class PlayerControlButton extends StatefulWidget {
   const PlayerControlButton({
     super.key,
     this.enabled = true,
-    this.color = Colors.black26,
+    this.backgroundColor = Colors.black26,
     this.verticalPadding = 0,
     this.horizontalPadding = 0,
     required this.onTap,
@@ -43,7 +43,7 @@ class PlayerControlButton extends StatefulWidget {
   final bool enabled;
   final double verticalPadding;
   final double horizontalPadding;
-  final Color color;
+  final Color backgroundColor;
   final Widget Function(BuildContext context, Animation animation) builder;
 
   @override
@@ -77,7 +77,7 @@ class PlayerControlButtonState extends State<PlayerControlButton>
       end: 1.0,
     ).animate(_controller);
     _bgAnimation = ColorTween(
-      begin: widget.color,
+      begin: widget.backgroundColor,
       end: Colors.white12,
     ).animate(_bgController);
   }

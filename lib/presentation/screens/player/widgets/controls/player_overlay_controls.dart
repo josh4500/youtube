@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +36,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_rotate.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/view_models/progress.dart';
 import 'package:youtube_clone/presentation/view_models/state/player_settings_view_model.dart';
@@ -97,7 +99,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   Timer? _releaseTimer;
 
   /// Notifier for showing/hiding playback progress
-  final _showPlaybackProgress = ValueNotifier<bool>(true);
+  final _showPlaybackProgress = ValueNotifier<double>(1);
 
   /// Animation controllers and animations for buffering and progress
   late final AnimationController _bufferController;
@@ -254,7 +256,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   @override
   void didUpdateWidget(covariant PlayerOverlayControls oldWidget) {
     if (context.orientation.isLandscape && _controlsHidden) {
-      _showPlaybackProgress.value = false;
+      _showPlaybackProgress.value = 0;
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -263,90 +265,93 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   void didChangeDependencies() {
     final playerRepo = ref.read(playerRepositoryProvider);
     _playerSignalSubscription ??= playerRepo.playerSignalStream.listen(
-      (signal) async {
-        if (signal == PlayerSignal.lockScreen) {
-          _preventCommonControlGestures = true;
-          ref
-              .read(playerRepositoryProvider)
-              .sendPlayerSignal([PlayerSignal.hideControls]);
-        } else if (signal == PlayerSignal.unlockScreen) {
-          _preventCommonControlGestures = false;
-          _showUnlockButton.reverse(from: 0);
-          _showUnlockTimer?.cancel();
-        } else if (signal == PlayerSignal.showUnlock) {
-          _showUnlockButton.forward();
-          _showUnlockTimer?.cancel();
-          _showUnlockTimer = Timer(const Duration(seconds: 3), () {
-            _showUnlockButton.reverse();
-          });
-        } else if (signal == PlayerSignal.showControls) {
-          final isExpanded = ref.read(playerViewStateProvider).isExpanded;
-          if (context.orientation.isLandscape || isExpanded) {
-            _showPlaybackProgress.value = true;
-          }
+      _onPlayerSignalEvent,
+    );
+    super.didChangeDependencies();
+  }
 
-          _controlsHidden = false;
-          _controlsVisibilityController.forward();
-          _bufferController.reverse();
+  void _onPlayerSignalEvent(signal) async {
+    final hasEnded = ref.read(playerNotifierProvider).ended;
+    final isPlaying = ref.read(playerNotifierProvider).playing;
+    final isExpanded = ref.read(playerViewStateProvider).isExpanded;
 
-          _progressController.forward();
+    if (signal == PlayerSignal.lockScreen) {
+      _preventCommonControlGestures = true;
+      ref
+          .read(playerRepositoryProvider)
+          .sendPlayerSignal([PlayerSignal.hideControls]);
+    } else if (signal == PlayerSignal.unlockScreen) {
+      _preventCommonControlGestures = false;
+      _showUnlockButton.reverse(from: 0);
+      _showUnlockTimer?.cancel();
+    } else if (signal == PlayerSignal.showUnlock) {
+      _showUnlockButton.forward();
+      _showUnlockTimer?.cancel();
+      _showUnlockTimer = Timer(const Duration(seconds: 3), () {
+        _showUnlockButton.reverse();
+      });
+    } else if (signal == PlayerSignal.showControls) {
+      if (context.orientation.isLandscape || isExpanded) {
+        _showPlaybackProgress.value = 1;
+      }
 
-          // Cancels existing timer
-          _controlHideTimer?.cancel();
+      _controlsHidden = false;
+      _controlsVisibilityController.forward();
+      _bufferController.reverse();
 
-          // Auto hide only when video is playing
-          _controlHideTimer = Timer(const Duration(seconds: 3), () async {
-            final isPlaying = ref.read(playerNotifierProvider).playing;
-            if (isPlaying) {
-              _controlsHidden = true;
-              // Note: Hide progress indicator first before hiding main controls
-              _progressController.reverse();
+      _progressController.forward();
 
-              // Reversing before sending signal, animates the reverse on
-              // auto hide
-              await _controlsVisibilityController.reverse();
-              final isExpanded = ref.read(playerViewStateProvider).isExpanded;
-              // Hides PlaybackProgress
-              if (mounted && context.orientation.isLandscape || isExpanded) {
-                _showPlaybackProgress.value = false;
-              }
+      // Cancels existing timer
+      _controlHideTimer?.cancel();
 
-              ref
-                  .read(playerRepositoryProvider)
-                  .sendPlayerSignal([PlayerSignal.hideControls]);
-            }
-          });
-        } else if (signal == PlayerSignal.hideControls) {
+      // Auto hide only when video is playing
+      _controlHideTimer = Timer(const Duration(seconds: 3), () async {
+        if (isPlaying) {
           _controlsHidden = true;
-          _controlHideTimer?.cancel();
-          _bufferController.forward();
-
           // Note: Hide progress indicator first before hiding main controls
           _progressController.reverse();
 
-          // Reverse opacity without animation
-          // NOTE: from: 0 messes up ColorTween for the progress indicator
-          // _controlsVisibilityController is used for progress color indicator
-          await _controlsVisibilityController.reverse(from: 0);
-
-          final isExpanded = ref.read(playerViewStateProvider).isExpanded;
-          // Hides PlaybackProgress while in landscape mode, when controls are
-          // hidden
+          // Reversing before sending signal, animates the reverse on
+          // auto hide
+          await _controlsVisibilityController.reverse();
+          // Hides PlaybackProgress
           if (mounted && context.orientation.isLandscape || isExpanded) {
-            _showPlaybackProgress.value = false;
+            _showPlaybackProgress.value = 0;
           }
-        } else if (signal == PlayerSignal.hidePlaybackProgress) {
-          _showPlaybackProgress.value = false;
-        } else if (signal == PlayerSignal.showPlaybackProgress) {
-          _showPlaybackProgress.value = true;
-        } else if (signal == PlayerSignal.minimize) {
-          _preventCommonControlGestures = true;
-        } else if (signal == PlayerSignal.maximize) {
-          _preventCommonControlGestures = false;
+
+          ref
+              .read(playerRepositoryProvider)
+              .sendPlayerSignal([PlayerSignal.hideControls]);
         }
-      },
-    );
-    super.didChangeDependencies();
+      });
+    } else if (signal == PlayerSignal.hideControls) {
+      _controlsHidden = true;
+      _controlHideTimer?.cancel();
+      _bufferController.forward();
+
+      // Note: Hide progress indicator first before hiding main controls
+      _progressController.reverse();
+      // Reverse opacity without animation
+      // NOTE: from: 0 messes up ColorTween for the progress indicator
+      // _controlsVisibilityController is used for progress color indicator
+      await _controlsVisibilityController.reverse(
+        from: hasEnded || !isPlaying ? null : 0,
+      );
+
+      // Hides PlaybackProgress while in landscape mode, when controls are
+      // hidden
+      if (mounted && context.orientation.isLandscape || isExpanded) {
+        _showPlaybackProgress.value = 0;
+      }
+    } else if (signal == PlayerSignal.hidePlaybackProgress) {
+      _showPlaybackProgress.value = 0;
+    } else if (signal == PlayerSignal.showPlaybackProgress) {
+      _showPlaybackProgress.value = 1;
+    } else if (signal == PlayerSignal.minimize) {
+      _preventCommonControlGestures = true;
+    } else if (signal == PlayerSignal.maximize) {
+      _preventCommonControlGestures = false;
+    }
   }
 
   @override
@@ -472,17 +477,29 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
             AnimatedVisibility(
               animation: _controlsAnimation,
               alignment: Alignment.topCenter,
-              child: const _TopControl(),
+              child: const _TopControlV2(),
             ),
             AnimatedVisibility(
               animation: _controlsAnimation,
               alignment: Alignment.center,
               child: const _MiddleControl(),
             ),
-            AnimatedVisibility(
-              animation: _controlsAnimation,
+            Align(
               alignment: Alignment.bottomCenter,
-              child: const _BottomControl(),
+              child: _BottomControlV2(
+                animation: _controlsAnimation,
+                progress: _OverlayProgress(
+                  slideAnimation: _slideAnimation,
+                  showPlaybackProgress: _showPlaybackProgress,
+                  hideControlAnimation: _controlsAnimation,
+                  progressAnimation: _progressAnimation,
+                  bufferAnimation: _bufferAnimation,
+                  onTap: _onPlaybackProgressTap,
+                  onDragStart: _onPlaybackProgressDragStart,
+                  onChangePosition: _onPlaybackProgressPositionChanged,
+                  onDragEnd: _onPlaybackProgressDragEnd,
+                ),
+              ),
             ),
             AnimatedVisibility(
               animation: _showUnlockButtonAnimation,
@@ -508,16 +525,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
           valueListenable: _showSlideFrame,
           onClose: _onEndSlideFrameSeek,
           seekDurationIndicator: _buildShowSlideSeekDuration(),
-        ),
-        _OverlayProgress(
-          slideAnimation: _slideAnimation,
-          showPlaybackProgress: _showPlaybackProgress,
-          progressAnimation: _progressAnimation,
-          bufferAnimation: _bufferAnimation,
-          onTap: _onPlaybackProgressTap,
-          onDragStart: _onPlaybackProgressDragStart,
-          onChangePosition: _onPlaybackProgressPositionChanged,
-          onDragEnd: _onPlaybackProgressDragEnd,
         ),
       ],
     );
@@ -620,7 +627,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   void _showSlideSeek() {
     _seekIndicatorNotifier.value = SeekNotificationType.slideLeftOrRight;
     _seekIndicatorController.forward();
-    _showPlaybackProgress.value = true;
+    _showPlaybackProgress.value = 1;
     _controlsVisibilityController.reverse(from: 0);
     _showProgressIndicator();
   }
@@ -650,13 +657,13 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     if (!_controlsHidden) {
       if (!ref.read(playerNotifierProvider).playing) {
         _controlsVisibilityController.forward();
-        _showPlaybackProgress.value = true;
+        _showPlaybackProgress.value = 1;
       } else {
         _controlsHidden = true;
-        _showPlaybackProgress.value = false;
+        _showPlaybackProgress.value = 0;
       }
     } else {
-      _showPlaybackProgress.value = false;
+      _showPlaybackProgress.value = 0;
     }
   }
 
@@ -664,7 +671,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _hideSlideSeek();
     _preventCommonControlGestures = false;
     // Show progress indicator
-    _showPlaybackProgress.value = true;
+    _showPlaybackProgress.value = 1;
     SlideSeekEndPlayerNotification().dispatch(context);
   }
 
@@ -906,7 +913,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   }
 }
 
-class _OverlayProgress extends StatelessWidget {
+class _OverlayProgress extends ConsumerWidget {
   const _OverlayProgress({
     required this.slideAnimation,
     required this.showPlaybackProgress,
@@ -916,20 +923,23 @@ class _OverlayProgress extends StatelessWidget {
     this.onDragStart,
     this.onDragEnd,
     this.onChangePosition,
+    required this.hideControlAnimation,
   });
 
-  final void Function(Duration)? onTap;
-  final void Function(Duration position)? onDragStart;
-  final void Function()? onDragEnd;
-  final void Function(Duration position)? onChangePosition;
+  final ValueChanged<Duration>? onTap;
+  final ValueChanged<Duration>? onDragStart;
+  final VoidCallback? onDragEnd;
+  final ValueChanged<Duration>? onChangePosition;
 
   final Animation<Offset> slideAnimation;
-  final ValueNotifier<bool> showPlaybackProgress;
+  final ValueNotifier<double> showPlaybackProgress;
+  final Animation<double> hideControlAnimation;
   final Animation<double> progressAnimation;
   final Animation<Color?> bufferAnimation;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playerRepo = ref.read(playerRepositoryProvider);
     return AnimatedBuilder(
       animation: slideAnimation,
       builder: (BuildContext context, Widget? childWidget) {
@@ -941,22 +951,16 @@ class _OverlayProgress extends StatelessWidget {
       child: Align(
         alignment: Alignment.bottomLeft,
         child: CustomOrientationBuilder(
-          onLandscape: (
-            BuildContext context,
-            Widget? childWidget,
-          ) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12.0,
-                vertical: 58,
+          onLandscape: (BuildContext context, Widget? childWidget) {
+            return AnimatedVisibility(
+              animation: hideControlAnimation,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: childWidget,
               ),
-              child: childWidget,
             );
           },
-          onPortrait: (
-            BuildContext context,
-            Widget? childWidget,
-          ) {
+          onPortrait: (BuildContext context, Widget? progressWidget) {
             return Consumer(
               builder: (
                 BuildContext context,
@@ -964,49 +968,42 @@ class _OverlayProgress extends StatelessWidget {
                 Widget? _,
               ) {
                 final playerViewState = ref.watch(playerViewStateProvider);
-                if (playerViewState.isExpanded) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 58,
-                      horizontal: 8,
+
+                return Row(
+                  children: [
+                    if (playerViewState.isExpanded)
+                      AnimatedVisibility(
+                        animation: hideControlAnimation,
+                        child: const PlayPauseRestartControl(),
+                      ),
+                    Expanded(
+                      child: AnimatedVisibility(
+                        animation: playerViewState.isExpanded
+                            ? hideControlAnimation
+                            : Animation.fromValueListenable(
+                                showPlaybackProgress,
+                              ),
+                        child: progressWidget,
+                      ),
                     ),
-                    child: childWidget,
-                  );
-                }
-                return childWidget!;
+                    if (playerViewState.isExpanded) const SizedBox(width: 12)
+                  ],
+                );
               },
             );
           },
-          child: ValueListenableBuilder<bool>(
-            valueListenable: showPlaybackProgress,
-            builder: (
-              BuildContext context,
-              bool visible,
-              Widget? childWidget,
-            ) {
-              return Visibility(
-                visible: visible,
-                child: childWidget!,
-              );
-            },
-            child: Consumer(
-              builder: (context, ref, child) {
-                final playerRepo = ref.read(playerRepositoryProvider);
-                return PlaybackProgress(
-                  progress: playerRepo.videoProgressStream,
-                  // TODO(Josh4500): Revisit this code
-                  start: playerRepo.currentVideoProgress ?? Progress.zero,
-                  // TODO(Josh4500): Get ready value
-                  end: const Duration(minutes: 1),
-                  animation: progressAnimation,
-                  bufferAnimation: bufferAnimation,
-                  onTap: onTap,
-                  onDragStart: onDragStart,
-                  onChangePosition: onChangePosition,
-                  onDragEnd: onDragEnd,
-                );
-              },
-            ),
+          child: PlaybackProgress(
+            progress: playerRepo.videoProgressStream,
+            // TODO(Josh4500): Revisit this code
+            start: playerRepo.currentVideoProgress ?? Progress.zero,
+            // TODO(Josh4500): Get ready value
+            end: const Duration(minutes: 1),
+            animation: progressAnimation,
+            bufferAnimation: bufferAnimation,
+            onTap: onTap,
+            onDragStart: onDragStart,
+            onChangePosition: onChangePosition,
+            onDragEnd: onDragEnd,
           ),
         ),
       ),
@@ -1044,33 +1041,84 @@ class _TopControl extends StatelessWidget {
   }
 }
 
-class _MiddleControl extends StatelessWidget {
-  const _MiddleControl();
+class _TopOrientationControl extends ConsumerWidget {
+  const _TopOrientationControl();
 
   @override
-  Widget build(BuildContext context) {
-    return const Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isExpanded = ref.watch(playerViewStateProvider).isExpanded;
+
+    return Row(
       children: [
-        PlayerPrevious(),
-        PlayPauseRestartControl(),
-        PlayerNext(),
+        if (context.orientation.isPortrait && !isExpanded)
+          const PlayerMinimize()
+        else ...[
+          const PlayerFullscreen(),
+          const PlayerRotateControl(),
+        ],
       ],
     );
   }
 }
 
-class _BottomControl extends StatelessWidget {
-  const _BottomControl();
+class _TopControlV2 extends StatelessWidget {
+  const _TopControlV2();
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.0),
+    return const Column(
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _TopOrientationControl(),
+            Spacer(),
+            PlayerAutoplaySwitch(),
+            PlayerCastCaptionControl(),
+            PlayerSettings(),
+          ],
+        ),
+        PlayerDescription(
+          showOnExpanded: true,
+        ),
+      ],
+    );
+  }
+}
+
+class _MiddleControl extends StatelessWidget {
+  const _MiddleControl();
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final width = math.min(size.width, size.height);
+    return ConstrainedBox(
+      constraints: BoxConstraints.tightFor(width: width),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          PlayerPrevious(),
+          PlayPauseRestartControl(),
+          PlayerNext(),
+        ],
+      ),
+    );
+  }
+}
+
+class _BottomControl extends StatelessWidget {
+  const _BottomControl({required this.progress});
+  final Widget progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Row(
+          const Row(
             children: [
               PlayerDurationControl(),
               PlayerChapterControl(),
@@ -1078,9 +1126,104 @@ class _BottomControl extends StatelessWidget {
               PlayerFullscreen(),
             ],
           ),
-          PlayerActionsControl(),
+          progress,
+          const PlayerActionsControl(),
         ],
       ),
+    );
+  }
+}
+
+class _BottomControlV2 extends StatelessWidget {
+  const _BottomControlV2({required this.progress, required this.animation});
+  final Widget progress;
+  final Animation<double> animation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        AnimatedVisibility(
+          animation: animation,
+          child: Consumer(
+            builder: (BuildContext context, WidgetRef ref, Widget? _) {
+              final isExpanded = ref.watch(playerViewStateProvider).isExpanded;
+              if (context.orientation.isPortrait && !isExpanded) {
+                return const Row(
+                  children: [
+                    PlayerDurationControl(),
+                    PlayerChapterControl(),
+                    Spacer(),
+                    PlayerFullscreen(),
+                  ],
+                );
+              } else {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: PlayerDescriptionV2(
+                        showOnFullscreen: context.orientation.isLandscape,
+                        showOnExpanded: isExpanded,
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    if (context.orientation.isLandscape)
+                      const Expanded(
+                        child: PlayerActionsControlV2(),
+                      )
+                    else
+                      const PlayerActionsControlV2(
+                        direction: Axis.vertical,
+                      ),
+                  ],
+                );
+              }
+            },
+          ),
+        ),
+        progress,
+        Consumer(
+          builder: (BuildContext context, WidgetRef ref, Widget? childWidget) {
+            bool isExpanded = false;
+            final isLandscape = context.orientation.isLandscape;
+            if (!isLandscape) {
+              isExpanded = ref.watch(playerViewStateProvider).isExpanded;
+            }
+            if (isExpanded || isLandscape) {
+              return AnimatedVisibility(
+                animation: animation,
+                child: Row(
+                  children: [
+                    if (isLandscape) ...[
+                      const Row(
+                        children: [
+                          PlayPauseRestartControl(
+                            backgroundColor: Colors.transparent,
+                          ),
+                          SizedBox(width: 8),
+                          PlayerDurationControl(),
+                        ],
+                      ),
+                      const Spacer(),
+                    ],
+                    const PlayerMoreVideos(),
+                    if (context.orientation.isPortrait) ...[
+                      const Spacer(),
+                      const RotatedBox(
+                        quarterTurns: 2,
+                        child: PlayerMinimize(),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            }
+            return const SizedBox();
+          },
+        ),
+      ],
     );
   }
 }

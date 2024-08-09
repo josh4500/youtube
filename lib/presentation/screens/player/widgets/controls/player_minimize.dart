@@ -28,6 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -39,7 +40,15 @@ class PlayerMinimize extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AppbarAction(
-      onTap: () => MinimizePlayerNotification().dispatch(context),
+      onTap: () {
+        final playerViewState = ref.read(playerViewStateProvider);
+        if (playerViewState.isExpanded) {
+          ExitExpandPlayerNotification().dispatch(context);
+          // MinimizePlayerNotification().dispatch(context);
+        } else {
+          MinimizePlayerNotification().dispatch(context);
+        }
+      },
       icon: YTIcons.chevron_down,
     );
   }

@@ -1,27 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
+
+import 'video/video_channel_button.dart';
 
 class VideoChannelSection extends StatelessWidget {
   const VideoChannelSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Stack(
-      children: [
-        VideoChannelButton(),
-        Positioned(
-          top: 8,
-          right: 12,
-          child: VideoChannelActionButtons(),
-        ),
-      ],
-    );
-  }
-}
-
-class VideoChannelButton extends StatelessWidget {
-  const VideoChannelButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,37 +15,16 @@ class VideoChannelButton extends StatelessWidget {
       ),
       child: Row(
         children: [
-          AccountAvatar(size: 40, name: 'John Jackson'),
-          SizedBox(width: 12),
-          Text.rich(
-            TextSpan(
-              text: 'Harris Craycraft ',
+          Expanded(child: VideoChannelButton()),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                IconSpan(
-                  YTIcons.verified_filled,
-                  color: Color(0xFFAAAAAA),
-                ),
+                VideoChannelMembershipButton(),
+                SizedBox(width: 12),
+                VideoChannelSubscriptionButton(),
               ],
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(width: 8),
-          Text(
-            '101K',
-            style: TextStyle(
-              color: Color(0xFFAAAAAA),
-              fontSize: 13,
-            ),
-          ),
-          Spacer(),
-          SizedBox(
-            width: 74,
-            height: 30,
           ),
         ],
       ),
@@ -76,6 +38,7 @@ class VideoChannelActionButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         VideoChannelMembershipButton(),
         SizedBox(width: 12),
@@ -92,12 +55,12 @@ class VideoChannelMembershipButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        vertical: 9,
+        vertical: 8,
         horizontal: 14,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(15),
       ),
       child: const Text(
         'Join',
@@ -118,12 +81,12 @@ class VideoChannelSubscriptionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        vertical: 9,
+        vertical: 8,
         horizontal: 14,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(15),
       ),
       child: const Text(
         'Subscribe',

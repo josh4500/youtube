@@ -59,18 +59,25 @@ extension RemoveFirstExtension<T> on List<T> {
   }
 }
 
+typedef GroupChecker<T> = bool Function(T item);
+
 class Grouper<T> {
-  Grouper();
+  Grouper({this.checker});
+
+  final GroupChecker<T>? checker;
 
   Type get type => T;
-  bool callback(dynamic item) => item.runtimeType == T;
+  bool callback(dynamic item) => checker?.call(item) ?? item.runtimeType == T;
 }
 
 class GroupedItems<T> {
-  GroupedItems(this.type, {this.items = const []});
+  GroupedItems(this.type);
 
   final Type type;
-  final List<T> items;
+  final List<T> items = [];
+
+  operator [](int index) => items[index];
+  int get length => items.length;
 
   @override
   String toString() => type.toString();
@@ -79,12 +86,17 @@ class GroupedItems<T> {
 extension GrouperExtension<T> on List<T> {
   List<GroupedItems<T>> group(List<Grouper<T>> groupers) {
     final List<GroupedItems<T>> groups = [];
-    GroupedItems<T> currentGroup = GroupedItems<T>(T);
+    GroupedItems<T> currentGroup = GroupedItems<T>(Type);
 
     for (final item in this) {
       for (final grouper in groupers) {
+        // if (grouper.checker != null && grouper.callback(item)) {
+        //   currentGroup = GroupedItems<T>(item.runtimeType);
+        //   break;
+        // }
+        // if (grouper.checker != null) continue;
         if (grouper.callback(item) && grouper.type != currentGroup.type) {
-          currentGroup = GroupedItems<T>(item.runtimeType, items: <T>[]);
+          currentGroup = GroupedItems<T>(item.runtimeType);
           break;
         }
       }
@@ -117,14 +129,11 @@ extension DateGroupingExtension on DateTime {
   }
 
   int weekNum(DateTime date) {
-    final fDY = DateTime(date.year);
-
-    return ((((date.millisecondsSinceEpoch - fDY.millisecondsSinceEpoch) /
-                    86400000) +
-                fDY.day +
-                1) /
-            7)
-        .ceil();
+    final a = DateTime(date.year);
+    final b = DateTime(date.year, date.month, date.day);
+    // Number of days since beginning of the year
+    final d = (b.millisecondsSinceEpoch - a.millisecondsSinceEpoch) / 86400000;
+    return ((d + a.day + 1) / 7).ceil();
   }
 
   String get header {

@@ -33,8 +33,8 @@ import 'package:youtube_clone/presentation/provider/repository/player_repository
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-class VideoDescriptionSection extends ConsumerWidget {
-  const VideoDescriptionSection({super.key});
+class VideoDescriptionButton extends ConsumerWidget {
+  const VideoDescriptionButton({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

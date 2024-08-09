@@ -49,13 +49,10 @@ class PlayerFullscreen extends ConsumerWidget {
           onTap: () {
             if (_isResizableExpandedMode || playerViewState.isExpanded) {
               if (playerViewState.isExpanded) {
-                DeExpandPlayerNotification().dispatch(context);
+                ExitExpandPlayerNotification().dispatch(context);
               } else {
-                ExpandPlayerNotification().dispatch(context);
+                EnterExpandPlayerNotification().dispatch(context);
               }
-              ref.read(playerRepositoryProvider).sendPlayerSignal(
-                [PlayerSignal.showControls],
-              );
             } else {
               if (context.orientation.isPortrait) {
                 EnterFullscreenPlayerNotification().dispatch(context);
@@ -64,9 +61,8 @@ class PlayerFullscreen extends ConsumerWidget {
               }
             }
           },
-          color: Colors.transparent,
+          backgroundColor: Colors.transparent,
           horizontalPadding: 8,
-          verticalPadding: 10,
           builder: (context, _) {
             return playerViewState.isExpanded || context.orientation.isLandscape
                 ? const Icon(YTIcons.exit_fullscreen_outlined)

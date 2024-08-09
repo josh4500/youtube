@@ -45,4 +45,7 @@ abstract final class AppSizing {
       portrait: RelativeSizing(wRatio: 1),
     ),
   );
+
+  static final draggableInitialSize = SizeTriad.single(.7);
+  static final draggablePostInitialSize = SizeTriad.single(.8);
 }

@@ -6,7 +6,7 @@ import 'video_actions.dart';
 import 'video_channel_context.dart';
 import 'video_channel_section.dart';
 import 'video_comment_section.dart';
-import 'video_description_section.dart';
+import 'video/video_description_button.dart';
 
 class PlayerVideoInfo extends StatelessWidget {
   const PlayerVideoInfo({
@@ -36,7 +36,7 @@ class PlayerVideoInfo extends StatelessWidget {
                 PlayerAmbient(),
                 Column(
                   children: <Widget>[
-                    VideoDescriptionSection(),
+                    VideoDescriptionButton(),
                     // VideoContext(),
                     VideoChannelSection(),
                     VideoChannelContext(),

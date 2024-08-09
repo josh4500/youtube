@@ -121,6 +121,7 @@ class VideoActions extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 4),
             icon: const Icon(YTIcons.save_outlined, size: 18),
             onTap: () => onSaveClicked(context),
+            onLongPress: () => onSaveClicked(context),
           ),
           const CustomActionChip(
             title: 'Report',
