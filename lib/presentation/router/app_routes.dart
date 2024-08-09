@@ -220,6 +220,11 @@ class AppRoutes {
     path: '/settings',
   );
 
+  static final tryExperimental = RouteInfo(
+    name: 'tryExperimental',
+    path: '/tryExperimental',
+  );
+
   ///
   ///
   /// Search

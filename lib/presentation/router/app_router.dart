@@ -357,6 +357,34 @@ class AppRouter {
         },
       ),
       GoRoute(
+        name: AppRoutes.tryExperimental.name,
+        path: AppRoutes.tryExperimental.path,
+        parentNavigatorKey: rootKey,
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          return CustomTransitionPage(
+            transitionDuration: const Duration(milliseconds: 200),
+            reverseTransitionDuration: const Duration(milliseconds: 200),
+            transitionsBuilder: (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secAnimation,
+              Widget child,
+            ) {
+              return SlideTransition(
+                position: animation.drive(
+                  Tween<Offset>(
+                    begin: Offset.zero,
+                    end: const Offset(1, 0),
+                  ),
+                ),
+                child: child,
+              );
+            },
+            child: const TryExperimentalFeaturesScreen(),
+          );
+        },
+      ),
+      GoRoute(
         name: AppRoutes.watchOnTv.name,
         path: AppRoutes.watchOnTv.path,
         parentNavigatorKey: rootKey,
@@ -543,6 +571,20 @@ extension GotoExtension on BuildContext {
     Object? extra,
   }) async {
     return pushNamed(
+      routeInfo.name,
+      pathParameters: pathParameters,
+      queryParameters: queryParameters,
+      extra: extra,
+    );
+  }
+
+  void replaceR(
+    RouteInfo routeInfo, {
+    Map<String, String> pathParameters = const <String, String>{},
+    Map<String, dynamic> queryParameters = const <String, dynamic>{},
+    Object? extra,
+  }) {
+    pushReplacementNamed(
       routeInfo.name,
       pathParameters: pathParameters,
       queryParameters: queryParameters,
