@@ -42,16 +42,16 @@ enum ConnectivityType {
 
 /// Represents the state of internet connectivity.
 class ConnectivityState {
-  /// Factory method to create a connected state.
-  factory ConnectivityState.connected() {
-    return const ConnectivityState(isConnected: true);
-  }
-
   const ConnectivityState({
     required this.isConnected,
     this.initializing = false,
     this.type = ConnectivityType.none,
   });
+
+  /// Factory method to create a connected state.
+  factory ConnectivityState.connected() {
+    return const ConnectivityState(isConnected: true);
+  }
 
   /// Factory method to create a disconnected state.
   factory ConnectivityState.disconnected() {

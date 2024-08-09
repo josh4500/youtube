@@ -28,7 +28,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets.dart';
+
+import './gestures/fix.dart';
 
 class CustomBackButton extends StatelessWidget {
   const CustomBackButton({super.key, required this.onPressed, this.icon});
