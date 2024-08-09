@@ -124,7 +124,7 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
 
   void _sharedStateListener() {
     final key = widget.key;
-    if (key != null && key is ValueKey) {
+    if (key != null && key is ValueKey && mounted) {
       if (widget.sharedSlidableState?.value != key.value) {
         _extraSlideController.reverse();
         _slideController.reverse();
@@ -134,6 +134,7 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    widget.sharedSlidableState?.removeListener(_sharedStateListener);
     _slideController.dispose();
     _extraSlideController.dispose();
     super.dispose();
