@@ -109,7 +109,7 @@ final class InternetConnectivity {
     } else if (_lastConnectionTest == false && !state.initializing) {
       await Future.delayed(const Duration(milliseconds: 2000));
       _lastConnectionTest = await _tryConnection(_pingables[_pingableIndex]);
-      if (_lastConnectionTest) {
+      if (!_lastConnectionTest) {
         _updateConnectivityState(ConnectivityState.disconnected());
       }
     }
