@@ -5,5 +5,28 @@
   "@helloWorld": {
     "description": "The conventional newborn programmer greeting"
   },
-  "general" : "General"
+  "general" : "General",
+  "@general": {
+    "description": "General settings"
+  },
+  "settings": "Settings",
+  "dataSaving": "Data Saving",
+  "autoPlay": "Autoplay",
+  "videoQualityPref": "Video quality preferences",
+  "downloads": "Downloads",
+  "privacy": "Privacy",
+  "notifications": "Notifications",
+  "liveChat": "Live chat",
+  "captions": "Captions",
+  "accessibility": "Accessibility",
+  "about": "About",
+  "account": "Account",
+  "addAccount": "Add account",
+  "watchOnTv": "Watch on TV",
+  "manageAllHistory": "Manage all history",
+  "yourDataInYT": "Your data in Youtube",
+  "tryExperimental": "Try experimental new features",
+  "purchases": "Purchases and memberships",
+  "billsAndPayment": "Billing & payments",
+  "connectedApps": "Connected apps"
 }

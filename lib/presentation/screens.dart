@@ -90,6 +90,7 @@ export 'screens/settings/live_chat_settings_screen.dart';
 export 'screens/settings/notifications_settings_screen.dart';
 export 'screens/settings/privacy_settings_screen.dart';
 export 'screens/settings/settings_screen.dart';
+export 'screens/settings/try_experimental_features_screen.dart';
 export 'screens/settings/video_quality_settings_screen.dart';
 
 // Shorts

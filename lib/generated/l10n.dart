@@ -75,6 +75,206 @@ class S {
     return Intl.message(
       'General',
       name: 'general',
+      desc: 'General settings',
+      args: [],
+    );
+  }
+
+  /// `Settings`
+  String get settings {
+    return Intl.message(
+      'Settings',
+      name: 'settings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Data Saving`
+  String get dataSaving {
+    return Intl.message(
+      'Data Saving',
+      name: 'dataSaving',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Autoplay`
+  String get autoPlay {
+    return Intl.message(
+      'Autoplay',
+      name: 'autoPlay',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Video quality preferences`
+  String get videoQualityPref {
+    return Intl.message(
+      'Video quality preferences',
+      name: 'videoQualityPref',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Downloads`
+  String get downloads {
+    return Intl.message(
+      'Downloads',
+      name: 'downloads',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Privacy`
+  String get privacy {
+    return Intl.message(
+      'Privacy',
+      name: 'privacy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notifications`
+  String get notifications {
+    return Intl.message(
+      'Notifications',
+      name: 'notifications',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Live chat`
+  String get liveChat {
+    return Intl.message(
+      'Live chat',
+      name: 'liveChat',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Captions`
+  String get captions {
+    return Intl.message(
+      'Captions',
+      name: 'captions',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Accessibility`
+  String get accessibility {
+    return Intl.message(
+      'Accessibility',
+      name: 'accessibility',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `About`
+  String get about {
+    return Intl.message(
+      'About',
+      name: 'about',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Account`
+  String get account {
+    return Intl.message(
+      'Account',
+      name: 'account',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add account`
+  String get addAccount {
+    return Intl.message(
+      'Add account',
+      name: 'addAccount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Watch on TV`
+  String get watchOnTv {
+    return Intl.message(
+      'Watch on TV',
+      name: 'watchOnTv',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Manage all history`
+  String get manageAllHistory {
+    return Intl.message(
+      'Manage all history',
+      name: 'manageAllHistory',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your data in Youtube`
+  String get yourDataInYT {
+    return Intl.message(
+      'Your data in Youtube',
+      name: 'yourDataInYT',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Try experimental new features`
+  String get tryExperimental {
+    return Intl.message(
+      'Try experimental new features',
+      name: 'tryExperimental',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Purchases and memberships`
+  String get purchases {
+    return Intl.message(
+      'Purchases and memberships',
+      name: 'purchases',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Billing & payments`
+  String get billsAndPayment {
+    return Intl.message(
+      'Billing & payments',
+      name: 'billsAndPayment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connected apps`
+  String get connectedApps {
+    return Intl.message(
+      'Connected apps',
+      name: 'connectedApps',
       desc: '',
       args: [],
     );

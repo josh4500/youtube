@@ -22,8 +22,34 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "about": MessageLookupByLibrary.simpleMessage("About"),
+        "accessibility": MessageLookupByLibrary.simpleMessage("Accessibility"),
+        "account": MessageLookupByLibrary.simpleMessage("Account"),
+        "addAccount": MessageLookupByLibrary.simpleMessage("Add account"),
+        "autoPlay": MessageLookupByLibrary.simpleMessage("Autoplay"),
+        "billsAndPayment":
+            MessageLookupByLibrary.simpleMessage("Billing & payments"),
+        "captions": MessageLookupByLibrary.simpleMessage("Captions"),
+        "connectedApps": MessageLookupByLibrary.simpleMessage("Connected apps"),
+        "dataSaving": MessageLookupByLibrary.simpleMessage("Data Saving"),
+        "downloads": MessageLookupByLibrary.simpleMessage("Downloads"),
         "general": MessageLookupByLibrary.simpleMessage("General"),
         "helloWorld": MessageLookupByLibrary.simpleMessage("Hello World!"),
-        "language": MessageLookupByLibrary.simpleMessage("English")
+        "language": MessageLookupByLibrary.simpleMessage("English"),
+        "liveChat": MessageLookupByLibrary.simpleMessage("Live chat"),
+        "manageAllHistory":
+            MessageLookupByLibrary.simpleMessage("Manage all history"),
+        "notifications": MessageLookupByLibrary.simpleMessage("Notifications"),
+        "privacy": MessageLookupByLibrary.simpleMessage("Privacy"),
+        "purchases":
+            MessageLookupByLibrary.simpleMessage("Purchases and memberships"),
+        "settings": MessageLookupByLibrary.simpleMessage("Settings"),
+        "tryExperimental": MessageLookupByLibrary.simpleMessage(
+            "Try experimental new features"),
+        "videoQualityPref":
+            MessageLookupByLibrary.simpleMessage("Video quality preferences"),
+        "watchOnTv": MessageLookupByLibrary.simpleMessage("Watch on TV"),
+        "yourDataInYT":
+            MessageLookupByLibrary.simpleMessage("Your data in Youtube")
       };
 }

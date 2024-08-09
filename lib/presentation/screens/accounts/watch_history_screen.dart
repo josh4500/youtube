@@ -34,6 +34,7 @@ import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../../widgets/grouped_list.dart';
 import 'widgets/history_search_text_field.dart';
 import 'widgets/popup/show_history_menu.dart';
 import 'widgets/shorts_history.dart';
@@ -129,7 +130,39 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
 
   @override
   Widget build(BuildContext context) {
-    final historyItems = groupedTimes.group([Grouper<A>(), Grouper<B>()]);
+    final groupedTimes = <HistoryItem>[
+      ShortHistoryItem(DateTime.now()),
+      ShortHistoryItem(DateTime.now()),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 1))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 1))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 1))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 2))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 2))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 2))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 2))),
+      // ShortHistoryItem(DateTime.now().subtract(const Duration(days: 2))),
+      // ShortHistoryItem(DateTime.now().subtract(const Duration(days: 2))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 3))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 3))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 3))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 3))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 15))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 15))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 15))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 30))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 30))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 30))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 33))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 33))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 300))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 300))),
+      VideosHistoryItem(DateTime.now().subtract(const Duration(days: 301))),
+    ];
+
+    final historyItems = groupedTimes.group([
+      Grouper<ShortHistoryItem>(),
+      Grouper<VideosHistoryItem>(),
+    ]);
 
     return Scaffold(
       appBar: AppBar(
@@ -162,7 +195,8 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
           ),
         ],
       ),
-      body: DefaultGroupValue(
+      body: DefaultGroupProvider<DateTime>(
+        applyHeadSeg: DateHead.month.index,
         buildAsFirst: (currentDateBuild) {
           final firstGroup = historyItems.first.items;
           return currentDateBuild == firstGroup.first.time;
@@ -196,14 +230,15 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                   ),
                 ),
                 for (final historyItem in historyItems)
-                  if (historyItem.type == A)
-                    SliverSingleDateGroup(
-                      date: historyItem.items.first.time,
+                  if (historyItem.type == ShortHistoryItem)
+                    SliverSingleGroup<DateTime>(
+                      item: historyItem.items.first.time,
                       separatorBuilder: (date) => SeparatorWidget(date: date),
+                      itemHeadGetter: (DateTime item) => item.asHeader.index,
                       child: const ShortsHistory(),
                     )
                   else
-                    SliverDateGroupList(
+                    SliverGroupList<DateTime>(
                       comparator: (a, b) => !a.compareYMD(b),
                       itemBuilder: (BuildContext context, int index) {
                         return HistoryVideo(
@@ -214,12 +249,12 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                       },
                       separatorBuilder: (BuildContext context, int index) {
                         return SeparatorWidget(
-                          date: historyItem.items[index].time,
+                          date: historyItem[index].time,
                         );
                       },
-                      indexedDateItem: (int index) =>
-                          historyItem.items[index].time,
-                      childCount: historyItem.items.length,
+                      itemIndexer: (int index) => historyItem[index].time,
+                      childCount: historyItem.length,
+                      itemHeadGetter: (DateTime item) => item.asHeader.index,
                     ),
               ],
             ),
@@ -278,36 +313,10 @@ abstract class HistoryItem {
   final DateTime time;
 }
 
-class A extends HistoryItem {
-  A(super.time);
+class ShortHistoryItem extends HistoryItem {
+  ShortHistoryItem(super.time);
 }
 
-class B extends HistoryItem {
-  B(super.time);
+class VideosHistoryItem extends HistoryItem {
+  VideosHistoryItem(super.time);
 }
-
-final groupedTimes = <HistoryItem>[
-  A(DateTime.now()),
-  A(DateTime.now()),
-  B(DateTime.now().subtract(const Duration(days: 1))),
-  B(DateTime.now().subtract(const Duration(days: 1))),
-  B(DateTime.now().subtract(const Duration(days: 1))),
-  B(DateTime.now().subtract(const Duration(days: 2))),
-  B(DateTime.now().subtract(const Duration(days: 2))),
-  B(DateTime.now().subtract(const Duration(days: 2))),
-  A(DateTime.now().subtract(const Duration(days: 2))),
-  A(DateTime.now().subtract(const Duration(days: 2))),
-  B(DateTime.now().subtract(const Duration(days: 3))),
-  B(DateTime.now().subtract(const Duration(days: 3))),
-  B(DateTime.now().subtract(const Duration(days: 3))),
-  B(DateTime.now().subtract(const Duration(days: 3))),
-  B(DateTime.now().subtract(const Duration(days: 15))),
-  B(DateTime.now().subtract(const Duration(days: 15))),
-  B(DateTime.now().subtract(const Duration(days: 15))),
-  B(DateTime.now().subtract(const Duration(days: 30))),
-  B(DateTime.now().subtract(const Duration(days: 30))),
-  B(DateTime.now().subtract(const Duration(days: 30))),
-  B(DateTime.now().subtract(const Duration(days: 33))),
-  B(DateTime.now().subtract(const Duration(days: 33))),
-  B(DateTime.now().subtract(const Duration(days: 300))),
-];

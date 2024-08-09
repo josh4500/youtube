@@ -29,7 +29,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/generated/l10n.dart';
-import 'package:youtube_clone/presentation/theme/relative_size.dart';
+import 'package:youtube_clone/presentation/router/app_router.dart';
+import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -56,9 +57,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  int _currentSettingScreen = 0;
-  int _mostRecentSettingScreen = 1;
-  String _currentSettingsTitle = 'Settings';
+  SettingsTab _currentScreen = SettingsTab.settings;
 
   final List<Widget> _settingsPages = const <Widget>[
     GeneralSettingsScreen(),
@@ -74,92 +73,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
     AboutScreen(),
   ];
 
-  Future<void> _showSettingsPrefScreen(String title) async {
-    if (title == S.current.general) {
-      _currentSettingScreen = 1;
-      _mostRecentSettingScreen = 1;
-      _currentSettingsTitle = title;
-      setState(() {});
-    } else if (title == 'Data Saving') {
-      _currentSettingScreen = 2;
-      _mostRecentSettingScreen = 2;
-      _currentSettingsTitle = title;
-      setState(() {});
-    } else if (title == 'Autoplay') {
-      _currentSettingScreen = 3;
-      _mostRecentSettingScreen = 3;
-      _currentSettingsTitle = title;
-      setState(() {});
-    } else if (title == 'Video quality preferences') {
-      _currentSettingScreen = 4;
-      _mostRecentSettingScreen = 4;
-      _currentSettingsTitle = title;
-      setState(() {});
-    } else if (title == 'Downloads') {
-      _currentSettingScreen = 5;
-      _mostRecentSettingScreen = 5;
-      _currentSettingsTitle = title;
-      setState(() {});
-    } else if (title == 'Privacy') {
-      _currentSettingScreen = 6;
-      _mostRecentSettingScreen = 6;
-      _currentSettingsTitle = title;
-      setState(() {});
-    } else if (title == 'Billing & payments') {
-      _currentSettingScreen = 7;
-      _mostRecentSettingScreen = 7;
-      _currentSettingsTitle = title;
-      setState(() {});
-    } else if (title == 'Notifications') {
-      _currentSettingScreen = 8;
-      _mostRecentSettingScreen = 8;
-      _currentSettingsTitle = title;
-      setState(() {});
-    } else if (title == 'Live chat') {
-      _currentSettingScreen = 9;
-      _mostRecentSettingScreen = 9;
-      _currentSettingsTitle = title;
-      setState(() {});
-    } else if (title == 'Accessibility') {
-      _currentSettingScreen = 10;
-      _mostRecentSettingScreen = 10;
-      _currentSettingsTitle = title;
-      setState(() {});
-    } else if (title == 'About') {
-      _currentSettingScreen = 11;
-      _mostRecentSettingScreen = 11;
-      _currentSettingsTitle = title;
-      setState(() {});
-    } else if (title == 'Account') {
-      await showDialog(
-        context: context,
-        builder: (_) {
-          return SettingsPopupContainer(
-            title: title,
-            showDismissButtons: false,
-            action: CustomInkWell(
+  Future<void> _showAccountDialog() async {
+    await showDialog(
+      context: context,
+      builder: (_) {
+        return SettingsPopupContainer(
+          title: S.current.account,
+          showDismissButtons: false,
+          action: CustomInkWell(
+            onTap: () {},
+            child: const Icon(YTIcons.save_outlined),
+          ),
+          child: Container(
+            color: context.theme.appColors.settingsPopupBackgroundColor,
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: SettingsTile(
+              title: S.current.addAccount,
+              networkRequired: true,
               onTap: () {},
-              child: const Icon(YTIcons.save_outlined),
             ),
-            child: Container(
-              color: context.theme.appColors.settingsPopupBackgroundColor,
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: SettingsTile(
-                title: 'Add account',
-                networkRequired: true,
-                onTap: () {},
-              ),
-            ),
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showSettingsPrefScreen(SettingsTab tab) async {
+    if (tab == SettingsTab.account) {
+      await _showAccountDialog();
+      return;
+    } else if (tab == SettingsTab.watchOnTv) {
+      context.goto(AppRoutes.watchOnTv);
+      return;
+    } else if (tab == SettingsTab.tryExperimental) {
+      context.replaceR(AppRoutes.tryExperimental);
     }
+
+    _currentScreen = tab;
+    setState(() {});
   }
 
   void _onNavigateBack() {
-    if (_currentSettingScreen != 0 && context.orientation.isPortrait) {
-      _currentSettingScreen = 0;
-      _currentSettingsTitle = 'Settings';
+    if (!_currentScreen.isSettings && context.orientation.isPortrait) {
+      _currentScreen = SettingsTab.settings;
       setState(() {});
       return;
     }
@@ -167,108 +123,117 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   bool _isSelected(int index) {
-    return context.orientation.isLandscape && _currentSettingScreen == index;
+    if (context.orientation.isLandscape) {
+      if (index == 1 && _currentScreen == SettingsTab.settings) {
+        _currentScreen = SettingsTab.general;
+      }
+      return _currentScreen.index == index;
+    }
+
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
-    final RelativeSizing settingsTileSize =
-        DeviceTheme.of(context).settingsTileSize;
     final SettingsListView settingsList = SettingsListView(
       children: <Widget>[
         SettingsTile(
           title: S.current.general,
-          onTap: () => _showSettingsPrefScreen(S.current.general),
+          onTap: () => _showSettingsPrefScreen(SettingsTab.general),
           selected: _isSelected(1),
         ),
         SettingsTile(
-          title: 'Account',
-          onTap: () => _showSettingsPrefScreen('Account'),
+          title: S.current.account,
+          onTap: () => _showSettingsPrefScreen(SettingsTab.account),
           networkRequired: true,
         ),
         SettingsTile(
-          title: 'Data Saving',
-          onTap: () => _showSettingsPrefScreen('Data Saving'),
+          title: S.current.dataSaving,
+          onTap: () => _showSettingsPrefScreen(SettingsTab.dataSaving),
           selected: _isSelected(2),
         ),
         SettingsTile(
-          title: 'Autoplay',
-          onTap: () => _showSettingsPrefScreen('Autoplay'),
+          title: S.current.autoPlay,
+          onTap: () => _showSettingsPrefScreen(SettingsTab.autoPlay),
           selected: _isSelected(3),
           networkRequired: true,
         ),
         SettingsTile(
-          title: 'Video quality preferences',
-          onTap: () => _showSettingsPrefScreen('Video quality preferences'),
+          title: S.current.videoQualityPref,
+          onTap: () => _showSettingsPrefScreen(SettingsTab.videoQualityPref),
           selected: _isSelected(4),
         ),
         SettingsTile(
-          title: 'Downloads',
-          onTap: () => _showSettingsPrefScreen('Downloads'),
+          title: S.current.downloads,
+          onTap: () => _showSettingsPrefScreen(SettingsTab.downloads),
           selected: _isSelected(5),
           accountRequired: true,
         ),
-        const SettingsTile(title: 'Watch on TV'),
-        const SettingsTile(
-          title: 'Manage all history',
-          networkRequired: true,
-          accountRequired: true,
+        SettingsTile(
+          title: S.current.watchOnTv,
+          onTap: () => _showSettingsPrefScreen(SettingsTab.watchOnTv),
         ),
-        const SettingsTile(
-          title: 'Your data in Youtube',
+        SettingsTile(
+          title: S.current.manageAllHistory,
           networkRequired: true,
           accountRequired: true,
         ),
         SettingsTile(
-          title: 'Privacy',
+          title: S.current.yourDataInYT,
           networkRequired: true,
           accountRequired: true,
-          onTap: () => _showSettingsPrefScreen('Privacy'),
+        ),
+        SettingsTile(
+          title: S.current.privacy,
+          networkRequired: true,
+          accountRequired: true,
+          onTap: () => _showSettingsPrefScreen(SettingsTab.privacy),
           selected: _isSelected(6),
         ),
-        const SettingsTile(
-          title: 'Try experimental new features',
+        SettingsTile(
+          title: S.current.tryExperimental,
+          onTap: () => _showSettingsPrefScreen(SettingsTab.tryExperimental),
           networkRequired: true,
         ),
-        const SettingsTile(
-          title: 'Purchases and memberships',
+        SettingsTile(
+          title: S.current.purchases,
           networkRequired: true,
           accountRequired: true,
         ),
         SettingsTile(
-          title: 'Billing & payments',
+          title: S.current.billsAndPayment,
           networkRequired: true,
           accountRequired: true,
-          onTap: () => _showSettingsPrefScreen('Billing & payments'),
+          onTap: () => _showSettingsPrefScreen(SettingsTab.billsAndPayment),
           selected: _isSelected(7),
         ),
         SettingsTile(
-          title: 'Notifications',
+          title: S.current.notifications,
           networkRequired: true,
-          onTap: () => _showSettingsPrefScreen('Notifications'),
+          onTap: () => _showSettingsPrefScreen(SettingsTab.notifications),
           selected: _isSelected(8),
         ),
-        const SettingsTile(
-          title: 'Connected apps',
+        SettingsTile(
+          title: S.current.connectedApps,
           networkRequired: true,
           accountRequired: true,
         ),
         SettingsTile(
-          title: 'Live chat',
+          title: S.current.liveChat,
           networkRequired: true,
           accountRequired: true,
-          onTap: () => _showSettingsPrefScreen('Live chat'),
+          onTap: () => _showSettingsPrefScreen(SettingsTab.liveChat),
           selected: _isSelected(9),
         ),
-        const SettingsTile(title: 'Captions'),
+        SettingsTile(title: S.current.captions),
         SettingsTile(
-          title: 'Accessibility',
-          onTap: () => _showSettingsPrefScreen('Accessibility'),
+          title: S.current.accessibility,
+          onTap: () => _showSettingsPrefScreen(SettingsTab.accessibility),
           selected: _isSelected(10),
         ),
         SettingsTile(
-          title: 'About',
-          onTap: () => _showSettingsPrefScreen('About'),
+          title: S.current.about,
+          onTap: () => _showSettingsPrefScreen(SettingsTab.about),
           selected: _isSelected(11),
         ),
       ],
@@ -279,29 +244,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Scaffold(
         appBar: AppBar(
           leading: CustomBackButton(onPressed: _onNavigateBack),
-          title: Text(_currentSettingsTitle),
+          title: Text(_getScreenName(_currentScreen)),
         ),
         body: CustomOrientationBuilder(
-          onPortrait: (_, Widget? child) {
+          onPortrait: (BuildContext _, Widget? child) {
             return LazyIndexedStack(
-              index: _currentSettingScreen,
+              index: _currentScreen.index,
               children: <Widget>[
                 settingsList,
                 ..._settingsPages,
               ],
             );
           },
-          onLandscape: (_, Widget? child) {
+          onLandscape: (BuildContext context, Widget? child) {
+            final settingsTileSize = context.deviceTheme.settingsTileSize;
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 SizedBox(
-                  width: settingsTileSize.widthValueOf(_),
+                  width: settingsTileSize.widthValueOf(context),
                   child: settingsList,
                 ),
                 Expanded(
-                  child: IndexedStack(
-                    index: _mostRecentSettingScreen - 1,
+                  child: LazyIndexedStack(
+                    index: (_currentScreen.index - 1).clamp(
+                      0,
+                      SettingsTab.values.length,
+                    ),
                     children: _settingsPages,
                   ),
                 ),
@@ -312,4 +281,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
+
+  String _getScreenName(SettingsTab tab) {
+    return switch (tab) {
+      SettingsTab.settings => S.current.settings,
+      SettingsTab.general => S.current.general,
+      SettingsTab.dataSaving => S.current.dataSaving,
+      SettingsTab.autoPlay => S.current.autoPlay,
+      SettingsTab.videoQualityPref => S.current.videoQualityPref,
+      SettingsTab.downloads => S.current.downloads,
+      SettingsTab.privacy => S.current.privacy,
+      SettingsTab.billsAndPayment => S.current.billsAndPayment,
+      SettingsTab.notifications => S.current.notifications,
+      SettingsTab.liveChat => S.current.liveChat,
+      SettingsTab.accessibility => S.current.accessibility,
+      SettingsTab.about => S.current.about,
+      _ => S.current.settings,
+    };
+  }
+}
+
+enum SettingsTab {
+  settings,
+  general,
+  dataSaving,
+  autoPlay,
+  videoQualityPref,
+  downloads,
+  privacy,
+  billsAndPayment,
+  notifications,
+  liveChat,
+  accessibility,
+  about,
+  captions,
+  account,
+  addAccount,
+  watchOnTv,
+  manageAllHistory,
+  yourDataInYT,
+  tryExperimental,
+  purchases,
+  connectedApps;
+
+  bool get isSettings => this == settings;
 }
