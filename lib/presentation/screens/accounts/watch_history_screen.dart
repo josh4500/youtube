@@ -34,7 +34,6 @@ import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../widgets/grouped_list.dart';
 import 'widgets/history_search_text_field.dart';
 import 'widgets/popup/show_history_menu.dart';
 import 'widgets/shorts_history.dart';
@@ -319,4 +318,19 @@ class ShortHistoryItem extends HistoryItem {
 
 class VideosHistoryItem extends HistoryItem {
   VideosHistoryItem(super.time);
+}
+
+class SeparatorWidget extends StatelessWidget {
+  const SeparatorWidget({super.key, required this.date});
+  final DateTime date;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+      child: Text(
+        date.header,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      ),
+    );
+  }
 }

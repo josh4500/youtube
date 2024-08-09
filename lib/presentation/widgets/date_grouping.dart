@@ -1,198 +1,274 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:youtube_clone/core.dart';
 
-typedef DateTimeIndexer = DateTime Function(int index);
-typedef DateWidgetBuilder = Widget Function(DateTime date);
-typedef SeparatorComparator = bool Function(DateTime a, DateTime b);
+typedef ItemIndexer<E> = E Function(int index);
+typedef ItemHeadGetter<E> = int Function(E item);
+typedef SeparatorWidgetBuilder<E> = Widget Function(E item);
+typedef SeparatorComparator<E> = bool Function(E a, E b);
 typedef IndexWidgetBuilder = Widget Function(BuildContext context, int index);
-typedef BuildAsFirst = bool Function(DateTime currentDateBuild);
+typedef BuildAsFirst<E> = bool Function(E currentItemBuild);
 
-class GroupValue {
-  DateHead value = DateHead.today;
-  DateHead lastBuildValue = DateHead.today;
-  List<DateHead> heads = [];
+enum SeparatedPosition {
+  before,
+  after;
+
+  bool get isBefore => this == SeparatedPosition.before;
+}
+
+class GroupValue<E> {
+  int value = 0;
+
+  /// Segment to group multiple sub heads.
+  ///
+  /// if
+  ///
+  int applyHeadSeg = -1;
+
+  late SeparatedPosition position;
+
+  /// List of heads available in order of items build
+  List<int> heads = [];
+
+  /// Index of heads
   List<int> indexes = [];
-  BuildAsFirst checker = (DateTime currentDateBuild) => false;
+
+  /// Callback to check if item is the first item of the list
+  late BuildAsFirst<E> checker;
 }
 
-class SeparatorWidget extends StatelessWidget {
-  const SeparatorWidget({super.key, required this.date});
-  final DateTime date;
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
-      child: Text(
-        date.header,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-      ),
-    );
-  }
-}
-
-class DefaultGroupValue extends StatefulWidget {
-  const DefaultGroupValue({
-    super.key,
-    required this.buildAsFirst,
-    required this.child,
-  });
-  final BuildAsFirst buildAsFirst;
-  final Widget child;
-
-  @override
-  State<DefaultGroupValue> createState() => _DefaultGroupValueState();
-}
-
-class _DefaultGroupValueState extends State<DefaultGroupValue> {
-  final GroupValue group = GroupValue();
-
-  @override
-  Widget build(BuildContext context) {
-    return DateGroup(
-      group: group
-        ..value = DateHead.today
-        ..checker = widget.buildAsFirst,
-      child: widget.child,
-    );
-  }
-}
-
-class DateGroup extends InheritedWidget {
-  const DateGroup({
+class GroupValueProvider<E> extends InheritedWidget {
+  const GroupValueProvider({
     super.key,
     required this.group,
     required super.child,
   });
 
-  final GroupValue group;
+  final GroupValue<E> group;
 
   @override
   bool updateShouldNotify(covariant InheritedWidget oldWidget) => false;
 
-  static _findAncestorAssertion(DateGroup? ancestor) {
+  static _findAncestorAssertion<E>(GroupValueProvider<E>? ancestor) {
     assert(
       ancestor != null,
-      'Ensure to have a DateGroup widget as an ancestor, or use DefaultGroupingController as an ancestor',
+      'Ensure to have a GroupValueProvider widget as an ancestor, or use DefaultGroupValue as an ancestor',
     );
   }
 
-  static GroupValue of(BuildContext context) {
-    final ancestor = context.findAncestorWidgetOfExactType<DateGroup>();
-    _findAncestorAssertion(ancestor);
+  static GroupValue<E> of<E>(BuildContext context) {
+    final ancestor =
+        context.findAncestorWidgetOfExactType<GroupValueProvider<E>>();
+    _findAncestorAssertion<E>(ancestor);
     return ancestor!.group;
   }
 
-  static void updateValueOf(BuildContext context, DateHead value) {
-    final ancestor = context.findAncestorWidgetOfExactType<DateGroup>();
+  static void updateValueOf<E>(BuildContext context, int value) {
+    final ancestor =
+        context.findAncestorWidgetOfExactType<GroupValueProvider<E>>();
     _findAncestorAssertion(ancestor);
     ancestor!.group.value = value;
   }
 
-  static void updateHeadsOf(BuildContext context, DateHead value, int index) {
-    final ancestor = context.findAncestorWidgetOfExactType<DateGroup>();
+  static void updateHeadsOf<E>(BuildContext context, int value, int index) {
+    final ancestor =
+        context.findAncestorWidgetOfExactType<GroupValueProvider<E>>();
     _findAncestorAssertion(ancestor);
     ancestor!.group.heads.add(value);
     ancestor.group.indexes.add(index);
   }
 }
 
+class DefaultGroupProvider<E> extends StatefulWidget {
+  const DefaultGroupProvider({
+    super.key,
+    this.applyHeadSeg,
+    required this.buildAsFirst,
+    required this.child,
+    this.position = SeparatedPosition.before,
+  });
+
+  final int? applyHeadSeg;
+  final SeparatedPosition position;
+  final BuildAsFirst<E> buildAsFirst;
+  final Widget child;
+
+  @override
+  State<DefaultGroupProvider<E>> createState() =>
+      _DefaultGroupProviderState<E>();
+}
+
+class _DefaultGroupProviderState<E> extends State<DefaultGroupProvider<E>> {
+  GroupValue<E> group = GroupValue<E>();
+
+  @override
+  void didUpdateWidget(covariant DefaultGroupProvider<E> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.position != widget.position) group = GroupValue<E>();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GroupValueProvider(
+      group: group
+        ..position = widget.position
+        ..checker = widget.buildAsFirst
+        ..applyHeadSeg = widget.applyHeadSeg ?? -1,
+      child: widget.child,
+    );
+  }
+}
+
 int _kDefaultSemanticIndexCallback(Widget _, int localIndex) => localIndex;
 
-Widget _separatorLogicBuilder(
-  BuildContext context,
-  IndexWidgetBuilder separatorBuilder,
-  SeparatorComparator comparator,
-  DateTimeIndexer indexer,
+bool _canGroup<E>(
+  E prevOrNextItem,
+  E currentItem,
+  GroupValue<E> group,
+  SeparatorComparator<E> comparator,
+  ItemHeadGetter<E> itemHeadGetter,
   int localIndex,
 ) {
-  final group = DateGroup.of(context);
-  final currentDate = indexer(localIndex);
-  final previousDate = localIndex == 0 ? currentDate : indexer(localIndex - 1);
+  final currentHead = itemHeadGetter(currentItem);
+  final prevOrNextHead = itemHeadGetter(prevOrNextItem);
+  final comparatorResult = comparator(currentItem, prevOrNextItem);
+  final applyHeadSeg = group.applyHeadSeg;
 
-  final currentHead = currentDate.asHeader;
-  final previousHead = previousDate.asHeader;
-  final comparatorResult = comparator(currentDate, previousDate);
+  if (currentHead > applyHeadSeg && comparatorResult) {
+    return true;
+  }
 
-  final canGroup = currentHead.index > DateHead.month.index &&
-          comparatorResult ||
-      (currentHead.index < group.value.index
-          ? () {
-              if (previousHead.index < currentHead.index) {
-                if (group.heads.length >= 2) {
-                  return previousHead.index <
-                      group.heads[group.heads.indexOf(currentHead) - 1].index;
-                }
-              } else if (currentDate == previousDate) {
-                final headIndex = group.heads
-                    .indexOf(currentHead)
-                    .clamp(0, group.heads.length - 1);
-                return group.indexes[headIndex] <= localIndex;
-              }
-              return previousHead != currentHead;
-            }()
-          : currentHead.index != group.value.index &&
-              (previousHead != currentHead || localIndex <= 0));
+  if (currentHead < group.value && localIndex >= 0) {
+    final currentHeadIndex = group.heads.indexOf(currentHead);
+
+    if (currentHeadIndex >= 0) {
+      int attrLocalIndex = group.indexes[currentHeadIndex];
+
+      if (localIndex != attrLocalIndex) {
+        if (prevOrNextHead < currentHead || prevOrNextHead > currentHead) {
+          if (prevOrNextHead < currentHead || prevOrNextHead > currentHead) {
+            group.indexes.insert(currentHeadIndex, localIndex);
+            attrLocalIndex = localIndex;
+          }
+        }
+      }
+
+      return group.position.isBefore
+          ? prevOrNextHead <= currentHead && attrLocalIndex == localIndex
+          : prevOrNextHead > currentHead && attrLocalIndex == localIndex;
+    } else {
+      group.heads
+        ..remove(currentHead)
+        ..add(currentHead)
+        ..sort();
+      final headIndex = group.heads.indexOf(currentHead);
+      group.indexes[headIndex] = localIndex;
+      return true;
+    }
+  }
+
+  return currentHead != group.value || prevOrNextHead != currentHead;
+}
+
+Widget _separatorLogicBuilder<E>(
+  BuildContext context,
+  IndexWidgetBuilder separatorBuilder,
+  SeparatorComparator<E> comparator,
+  ItemHeadGetter<E> itemHeadGetter,
+  ItemIndexer<E> indexer, {
+  int localIndex = -1,
+  int localChildCount = 1,
+}) {
+  final group = GroupValueProvider.of<E>(context);
+  final E currentItem = indexer(localIndex);
+  final E prevOrNextItem;
+  final applyHeadSeg = group.applyHeadSeg;
+  bool lastOrFirstItem = false;
+
+  if (group.position.isBefore) {
+    if (localIndex <= 0) {
+      prevOrNextItem = currentItem;
+      lastOrFirstItem = true;
+    } else {
+      prevOrNextItem = indexer(localIndex - 1);
+    }
+  } else {
+    if (localIndex + 1 >= localChildCount || localIndex <= 0) {
+      prevOrNextItem = currentItem;
+      lastOrFirstItem = true;
+    } else {
+      prevOrNextItem = indexer(localIndex + 1);
+    }
+  }
+
+  final currentHead = itemHeadGetter(currentItem);
+  final canGroup = lastOrFirstItem && currentHead > applyHeadSeg ||
+      _canGroup(
+        prevOrNextItem,
+        currentItem,
+        group,
+        comparator,
+        itemHeadGetter,
+        localIndex,
+      );
   Widget separatorWidget = const SizedBox();
 
-  if (localIndex <= 0 && group.checker(currentDate) || canGroup) {
+  if (group.checker(currentItem) || canGroup) {
     separatorWidget = separatorBuilder(context, localIndex);
   }
 
-  // Updates new DateGroup value
-  if (currentHead.index > group.value.index) {
-    DateGroup.updateValueOf(context, currentHead);
+  if (currentHead > group.value) {
+    GroupValueProvider.updateValueOf<E>(context, currentHead);
   }
 
-  if (group.heads.isEmpty || currentHead.index > group.heads.last.index) {
-    DateGroup.updateHeadsOf(context, currentHead, localIndex);
+  if (group.heads.isEmpty || currentHead > group.heads.last) {
+    GroupValueProvider.updateHeadsOf<E>(context, currentHead, localIndex);
   }
 
   return separatorWidget;
 }
 
-class SliverSingleDateGroup extends StatelessWidget {
-  const SliverSingleDateGroup({
+class SliverSingleGroup<E> extends StatelessWidget {
+  const SliverSingleGroup({
     super.key,
     this.separatorAlignment = Alignment.centerLeft,
     required this.child,
     required this.separatorBuilder,
-    required this.date,
+    required this.item,
+    required this.itemHeadGetter,
   });
+
   final Alignment separatorAlignment;
-  final DateTime date;
-  final DateWidgetBuilder separatorBuilder;
+  final E item;
+  final ItemHeadGetter<E> itemHeadGetter;
+  final SeparatorWidgetBuilder<E> separatorBuilder;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Column(
-        children: [
-          Align(
-            alignment: separatorAlignment,
-            child: _separatorLogicBuilder(
-              context,
-              (context, index) => separatorBuilder(date),
-              (a, b) => false,
-              (index) => date,
-              -1,
-            ),
-          ),
-          child,
-        ],
+    final separatorWidget = Align(
+      alignment: separatorAlignment,
+      child: _separatorLogicBuilder<E>(
+        context,
+        (BuildContext _, int __) => separatorBuilder(item),
+        (E _, E __) => false,
+        itemHeadGetter,
+        (int _) => item,
       ),
+    );
+
+    return SliverToBoxAdapter(
+      child: Column(children: [separatorWidget, child]),
     );
   }
 }
 
-class SliverDateGroupList extends StatelessWidget {
-  const SliverDateGroupList({
+class SliverGroupList<E> extends StatelessWidget {
+  const SliverGroupList({
     super.key,
     required this.itemBuilder,
     required this.separatorBuilder,
-    required this.indexedDateItem,
+    required this.itemIndexer,
     required this.comparator,
     this.addAutomaticKeepAlives = true,
     this.addRepaintBoundaries = true,
@@ -200,10 +276,11 @@ class SliverDateGroupList extends StatelessWidget {
     this.findChildIndexCallback,
     this.semanticIndexCallback = _kDefaultSemanticIndexCallback,
     this.semanticIndexOffset = 0,
-    this.childCount,
+    required this.childCount,
+    required this.itemHeadGetter,
   });
 
-  final int? childCount;
+  final int childCount;
   final bool addAutomaticKeepAlives;
   final bool addRepaintBoundaries;
   final bool addSemanticIndexes;
@@ -212,25 +289,26 @@ class SliverDateGroupList extends StatelessWidget {
   final int semanticIndexOffset;
   final IndexWidgetBuilder itemBuilder;
   final IndexWidgetBuilder separatorBuilder;
-  final SeparatorComparator comparator;
-  final DateTimeIndexer indexedDateItem;
-
-  int? get localChildCount => childCount == null ? null : childCount! * 2;
+  final SeparatorComparator<E> comparator;
+  final ItemHeadGetter<E> itemHeadGetter;
+  final ItemIndexer<E> itemIndexer;
 
   @override
   Widget build(BuildContext context) {
+    final group = GroupValueProvider.of<E>(context);
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           final localIndex = index ~/ 2;
-
-          if (index.isEven) {
+          if (group.position.isBefore ? index.isEven : index.isOdd) {
             return _separatorLogicBuilder(
               context,
               separatorBuilder,
               comparator,
-              indexedDateItem,
-              localIndex,
+              itemHeadGetter,
+              itemIndexer,
+              localIndex: localIndex,
+              localChildCount: childCount,
             );
           }
 
@@ -242,19 +320,18 @@ class SliverDateGroupList extends StatelessWidget {
         findChildIndexCallback: findChildIndexCallback,
         semanticIndexCallback: semanticIndexCallback,
         semanticIndexOffset: semanticIndexOffset,
-        childCount: localChildCount,
+        childCount: childCount * 2,
       ),
     );
   }
 }
 
-class DateGroupList extends StatelessWidget {
-  const DateGroupList({
+class GroupList<E> extends StatelessWidget {
+  const GroupList({
     super.key,
     required this.itemBuilder,
     required this.separatorBuilder,
     required this.comparator,
-    required this.indexedDateItem,
     this.addAutomaticKeepAlives = true,
     this.addRepaintBoundaries = true,
     this.addSemanticIndexes = true,
@@ -268,13 +345,15 @@ class DateGroupList extends StatelessWidget {
     this.itemExtentBuilder,
     this.prototypeItem,
     this.findChildIndexCallback,
-    this.itemCount,
+    required this.itemCount,
     this.cacheExtent,
     required this.dragStartBehavior,
     required this.keyboardDismissBehavior,
     this.restorationId,
     required this.clipBehavior,
     this.semanticChildCount,
+    required this.itemHeadGetter,
+    required this.itemIndexer,
   });
 
   final Axis scrollDirection;
@@ -288,7 +367,7 @@ class DateGroupList extends StatelessWidget {
   final double? Function(int, SliverLayoutDimensions)? itemExtentBuilder;
   final Widget? prototypeItem;
   final int? Function(Key)? findChildIndexCallback;
-  final int? itemCount;
+  final int itemCount;
   final int? semanticChildCount;
   final bool addAutomaticKeepAlives;
   final bool addRepaintBoundaries;
@@ -301,12 +380,14 @@ class DateGroupList extends StatelessWidget {
 
   final IndexWidgetBuilder itemBuilder;
   final IndexWidgetBuilder separatorBuilder;
-  final SeparatorComparator comparator;
-  final DateTimeIndexer indexedDateItem;
+  final SeparatorComparator<E> comparator;
+  final ItemHeadGetter<E> itemHeadGetter;
+  final ItemIndexer<E> itemIndexer;
 
-  int? get localChildCount => itemCount == null ? null : itemCount! * 2;
+  int? get localChildCount => itemCount * 2;
   @override
   Widget build(BuildContext context) {
+    final group = GroupValueProvider.of<E>(context);
     return ListView.builder(
       physics: physics,
       padding: padding,
@@ -331,13 +412,15 @@ class DateGroupList extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         final localIndex = index ~/ 2;
 
-        if (index.isEven) {
+        if (group.position.isBefore ? index.isEven : index.isOdd) {
           return _separatorLogicBuilder(
             context,
             separatorBuilder,
             comparator,
-            indexedDateItem,
-            localIndex,
+            itemHeadGetter,
+            itemIndexer,
+            localIndex: localIndex,
+            localChildCount: itemCount,
           );
         }
 
