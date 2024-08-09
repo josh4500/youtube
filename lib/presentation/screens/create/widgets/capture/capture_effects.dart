@@ -19,6 +19,7 @@ class CaptureEffects extends StatelessWidget {
       items: const <EffectOption>[
         EffectOption(
           icon: YTIcons.flip_camera,
+          animation: EffectTapAnimation.rotate,
           label: 'Flip',
         ),
         EffectOption(

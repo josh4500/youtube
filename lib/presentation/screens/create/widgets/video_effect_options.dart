@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -9,11 +10,13 @@ class EffectOption {
     required this.icon,
     this.activeIcon,
     required this.label,
+    this.animation = EffectTapAnimation.switches,
     this.onTap,
   });
 
   final IconData icon;
   final IconData? activeIcon;
+  final EffectTapAnimation animation;
   final String label;
   final VoidCallback? onTap;
 
@@ -31,6 +34,8 @@ class EffectOption {
 }
 
 enum EffectAction { add, remove }
+
+enum EffectTapAnimation { rotate, switches }
 
 typedef EffectStatusListener = void Function(
   EffectAction action,
@@ -338,7 +343,12 @@ class EffectWidget extends StatefulWidget {
   State<EffectWidget> createState() => _EffectWidgetState();
 }
 
-class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
+class _EffectWidgetState extends State<EffectWidget>
+    with MaterialStateMixin, SingleTickerProviderStateMixin {
+  late final controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  );
   final ValueNotifier<bool> activeNotifier = ValueNotifier(false);
 
   @override
@@ -355,7 +365,12 @@ class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
 
   void changeStateCallback(EffectAction action, EffectOption effect) {
     if (effect == widget.item) {
-      activeNotifier.value = action == EffectAction.add;
+      if (widget.item.animation == EffectTapAnimation.rotate) {
+        controller.reset();
+        controller.forward();
+      } else {
+        activeNotifier.value = action == EffectAction.add;
+      }
     }
   }
 
@@ -370,6 +385,7 @@ class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
 
   @override
   void dispose() {
+    controller.dispose();
     activeNotifier.dispose();
     widget.controller?.removeStatusListener(changeStateCallback);
     super.dispose();
@@ -384,12 +400,27 @@ class _EffectWidgetState extends State<EffectWidget> with MaterialStateMixin {
       icon: ValueListenableBuilder<bool>(
         valueListenable: activeNotifier,
         builder: (BuildContext context, bool active, Widget? _) {
-          return Icon(
+          final child = Icon(
             active
                 ? widget.item.activeIcon ?? widget.item.icon
                 : widget.item.icon,
             size: 24,
           );
+
+          if (widget.item.animation == EffectTapAnimation.rotate) {
+            return AnimatedBuilder(
+              animation: controller,
+              builder: (BuildContext context, Widget? childWidget) {
+                return Transform.rotate(
+                  angle: math.pi * controller.value,
+                  child: childWidget,
+                );
+              },
+              child: child,
+            );
+          }
+
+          return child;
         },
       ),
     );
