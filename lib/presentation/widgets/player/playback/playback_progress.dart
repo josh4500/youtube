@@ -172,7 +172,7 @@ class _PlaybackProgressState extends State<PlaybackProgress>
         Tween<double>(begin: _indicatorHeight, end: 14),
       );
       _trackColorAnimation = widget.animation!.drive(
-        ColorTween(begin: Colors.white70, end: const Color(0xFFFF0000)),
+        ColorTween(begin: Colors.white70, end: widget.color),
       );
     }
   }
