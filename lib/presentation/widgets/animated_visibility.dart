@@ -19,8 +19,6 @@ class AnimatedVisibility extends StatelessWidget {
         return Visibility(
           visible: animation.value != 0,
           maintainState: true,
-          maintainAnimation: true,
-          maintainSize: true,
           child: Align(
             alignment: alignment,
             child: Opacity(

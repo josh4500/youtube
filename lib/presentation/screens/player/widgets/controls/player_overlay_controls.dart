@@ -967,18 +967,20 @@ class _OverlayProgress extends ConsumerWidget {
                 WidgetRef ref,
                 Widget? _,
               ) {
-                final playerViewState = ref.watch(playerViewStateProvider);
+                final isExpanded = ref.watch(
+                  playerViewStateProvider.select((state) => state.isExpanded),
+                );
 
                 return Row(
                   children: [
-                    if (playerViewState.isExpanded)
+                    if (isExpanded)
                       AnimatedVisibility(
                         animation: hideControlAnimation,
                         child: const PlayPauseRestartControl(),
                       ),
                     Expanded(
                       child: AnimatedVisibility(
-                        animation: playerViewState.isExpanded
+                        animation: isExpanded
                             ? hideControlAnimation
                             : Animation.fromValueListenable(
                                 showPlaybackProgress,
@@ -986,7 +988,17 @@ class _OverlayProgress extends ConsumerWidget {
                         child: progressWidget,
                       ),
                     ),
-                    if (playerViewState.isExpanded) const SizedBox(width: 12)
+                    if (isExpanded)
+                      AnimatedVisibility(
+                        animation: hideControlAnimation,
+                        child: const Row(
+                          children: [
+                            SizedBox(width: 12),
+                            PlayerDurationControl(full: false),
+                            SizedBox(width: 12),
+                          ],
+                        ),
+                      ),
                   ],
                 );
               },
@@ -1141,7 +1153,9 @@ class _BottomControlV2 extends StatelessWidget {
           animation: animation,
           child: Consumer(
             builder: (BuildContext context, WidgetRef ref, Widget? _) {
-              final isExpanded = ref.watch(playerViewStateProvider).isExpanded;
+              final isExpanded = ref.watch(
+                playerViewStateProvider.select((state) => state.isExpanded),
+              );
               if (context.orientation.isPortrait && !isExpanded) {
                 return const Row(
                   children: [
@@ -1179,11 +1193,10 @@ class _BottomControlV2 extends StatelessWidget {
         progress,
         Consumer(
           builder: (BuildContext context, WidgetRef ref, Widget? childWidget) {
-            bool isExpanded = false;
+            final isExpanded = ref.watch(
+              playerViewStateProvider.select((state) => state.isExpanded),
+            );
             final isLandscape = context.orientation.isLandscape;
-            if (!isLandscape) {
-              isExpanded = ref.watch(playerViewStateProvider).isExpanded;
-            }
             if (isExpanded || isLandscape) {
               return AnimatedVisibility(
                 animation: animation,

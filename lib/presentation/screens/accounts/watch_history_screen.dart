@@ -132,6 +132,8 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
     final groupedTimes = <HistoryItem>[
       ShortHistoryItem(DateTime.now()),
       ShortHistoryItem(DateTime.now()),
+      ShortHistoryItem(DateTime.now()),
+      ShortHistoryItem(DateTime.now()),
       VideosHistoryItem(DateTime.now().subtract(const Duration(days: 1))),
       VideosHistoryItem(DateTime.now().subtract(const Duration(days: 1))),
       VideosHistoryItem(DateTime.now().subtract(const Duration(days: 1))),

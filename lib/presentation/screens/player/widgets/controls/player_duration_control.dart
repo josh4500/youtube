@@ -33,7 +33,8 @@ import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class PlayerDurationControl extends ConsumerStatefulWidget {
-  const PlayerDurationControl({super.key});
+  const PlayerDurationControl({super.key, this.full = true});
+  final bool full;
 
   @override
   ConsumerState<PlayerDurationControl> createState() =>
@@ -77,27 +78,30 @@ class _PlayerDurationControlState extends ConsumerState<PlayerDurationControl> {
                     ? videoDuration - (snapshot.data ?? Duration.zero)
                     : snapshot.data ?? Duration.zero;
                 return Text(
-                  reversed
-                      ? '-${position.hoursMinutesSeconds}'
-                      : position.hoursMinutesSeconds,
+                  '${reversed ? ' - ' : ''}${position.hoursMinutesSeconds}',
                   style: const TextStyle(fontSize: 11.5),
                 );
               },
             ),
-            const Text(
-              ' / ',
-              style: TextStyle(
-                fontSize: 11.5,
-                color: Colors.white60,
+            if (widget.full)
+              Text.rich(
+                TextSpan(
+                  text: '/',
+                  children: [
+                    TextSpan(
+                      text: videoDuration.hoursMinutesSeconds,
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        color: Colors.white60,
+                      ),
+                    ),
+                  ],
+                ),
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  color: Colors.white60,
+                ),
               ),
-            ),
-            Text(
-              videoDuration.hoursMinutesSeconds,
-              style: const TextStyle(
-                fontSize: 11.5,
-                color: Colors.white60,
-              ),
-            ),
           ],
         ),
       ),

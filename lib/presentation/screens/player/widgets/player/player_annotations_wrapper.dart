@@ -40,6 +40,7 @@ import '../annotations/annotations_notification.dart';
 import '../annotations/video_card_teaser.dart';
 import '../annotations/video_channel_watermark.dart';
 import '../annotations/video_product.dart';
+import '../annotations/video_suggestion.dart';
 
 class PlayerAnnotationsWrapper extends StatefulWidget {
   const PlayerAnnotationsWrapper({
@@ -95,17 +96,20 @@ class _PlayerAnnotationsWrapperState extends State<PlayerAnnotationsWrapper> {
             if (listenable.includesPromotions)
               AnnotationVisibility(
                 visible: listenable.showVisuals,
-                alwaysShow: true,
+                alwaysShow: AlwaysShow.start,
                 hideDuration: const Duration(seconds: 10),
                 alignment: Alignment.topLeft,
                 child: const IncludePromotionButton(margin: EdgeInsets.all(8)),
               ),
-            AnnotationVisibility(
-              visible: listenable.showVisuals,
-              alignment: Alignment.topRight,
-              showAt: const Duration(seconds: 6),
-              child: const VideoCardTeaser(),
-            ),
+            // TODO(josh4500): List of VideoCard
+            ...[
+              AnnotationVisibility(
+                visible: listenable.showVisuals,
+                alignment: Alignment.topRight,
+                showAt: const Duration(seconds: 6),
+                child: const VideoCardTeaser(),
+              ),
+            ],
             Positioned.fill(
               child: Consumer(
                 builder: (context, ref, child) {
@@ -134,13 +138,13 @@ class _PlayerAnnotationsWrapperState extends State<PlayerAnnotationsWrapper> {
                 child: const VideoChannelWatermark(),
               ),
             ),
-            // Positioned.fill(
-            //   child: AnnotationVisibility(
-            //     visible: listenable.showVisuals,
-            //     alwaysShow: true,
-            //     child: const VideoSuggestion(),
-            //   ),
-            // ),
+            Positioned.fill(
+              child: AnnotationVisibility(
+                visible: listenable.showVisuals,
+                alwaysShow: AlwaysShow.end,
+                child: const VideoSuggestion(),
+              ),
+            ),
           ],
         );
       },
@@ -168,11 +172,21 @@ class AnnotationsNotifier extends ChangeNotifier {
   }
 }
 
+enum AlwaysShow {
+  start,
+  between,
+  end;
+
+  bool get isStart => this == start;
+  bool get notBetween => this != between;
+  bool get isEnd => this == end;
+}
+
 class AnnotationVisibility extends ConsumerStatefulWidget {
   const AnnotationVisibility({
     super.key,
     this.showAt,
-    this.alwaysShow = false,
+    this.alwaysShow = AlwaysShow.between,
     this.hideDuration = const Duration(seconds: 5),
     this.alignment = Alignment.center,
     this.visibleControlAlignment,
@@ -189,7 +203,7 @@ class AnnotationVisibility extends ConsumerStatefulWidget {
   /// Whether to always show child
   ///
   /// NOTE: Will still hide child when it reaches [hideDuration]
-  final bool alwaysShow;
+  final AlwaysShow alwaysShow;
 
   /// Whether infographic is to be shown
   final bool visible;
@@ -239,10 +253,10 @@ class _AnnotationVisibilityState extends ConsumerState<AnnotationVisibility>
   @override
   void initState() {
     super.initState();
-    showNotifier.value = widget.visible && widget.alwaysShow;
+    showNotifier.value = widget.visible && widget.alwaysShow.isStart;
     visibilityController = AnimationController(
       vsync: this,
-      value: showNotifier.value || widget.alwaysShow ? 1 : 0,
+      value: showNotifier.value || widget.alwaysShow.isStart ? 1 : 0,
       duration: const Duration(milliseconds: 500),
       reverseDuration: const Duration(milliseconds: 350),
     );
@@ -255,71 +269,102 @@ class _AnnotationVisibilityState extends ConsumerState<AnnotationVisibility>
       vsync: this,
       duration: const Duration(milliseconds: 250),
     );
-    Future(() {
-      if (ref.read(playerViewStateProvider).showControls) {
-        controlVisibilityNotifier.value = false;
-        if (widget.visibleControlAlignment != null) {
-          alignmentController.forward();
-        }
-      } else {
-        controlVisibilityNotifier.value =
-            !hiddenPermanently && !hiddenTemporary;
-        if (widget.visibleControlAlignment != null) {
-          alignmentController.reverse();
-        }
-      }
+  }
 
-      final playerRepo = ref.read(playerRepositoryProvider);
-      _playerSignalSubscription ??= playerRepo.playerSignalStream.listen(
-        (event) {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (ref.read(playerViewStateProvider).showControls) {
+      controlVisibilityNotifier.value = false;
+      if (widget.visibleControlAlignment != null) {
+        alignmentController.forward();
+      }
+    } else {
+      controlVisibilityNotifier.value = !hiddenPermanently && !hiddenTemporary;
+      if (widget.visibleControlAlignment != null) {
+        alignmentController.reverse();
+      }
+    }
+
+    final playerRepo = ref.read(playerRepositoryProvider);
+    _playerSignalSubscription ??= playerRepo.playerSignalStream.listen(
+      (PlayerSignal event) {
+        if (context.mounted == false) return;
+
+        if (event == PlayerSignal.showControls) {
+          controlVisibilityNotifier.value = false;
+          if (widget.visibleControlAlignment != null) {
+            alignmentController.forward();
+          }
+        } else if (event == PlayerSignal.hideControls) {
+          controlVisibilityNotifier.value =
+              !hiddenPermanently && !hiddenTemporary;
+
+          if (widget.visibleControlAlignment != null) {
+            alignmentController.reverse();
+          }
+        }
+      },
+    );
+
+    if (widget.alwaysShow.isStart && !hiddenPermanently) {
+      permanentTimer ??= Timer(widget.hideDuration, permanentHide);
+    } else {
+      _videoDurationSubscription ??= playerRepo.positionStream.listen(
+        (Duration event) {
           if (context.mounted == false) return;
 
-          if (event == PlayerSignal.showControls) {
-            controlVisibilityNotifier.value = false;
-            if (widget.visibleControlAlignment != null) {
-              alignmentController.forward();
-            }
-          } else if (event == PlayerSignal.hideControls) {
-            controlVisibilityNotifier.value =
-                !hiddenPermanently && !hiddenTemporary;
-
-            if (widget.visibleControlAlignment != null) {
-              alignmentController.reverse();
-            }
+          final showing = showNotifier.value;
+          if (event.inSeconds == widget.showAt?.inSeconds) {
+            hiddenTemporary = false;
+            _showAnnotation();
+          } else if (showing &&
+              event.inSeconds ==
+                  (widget.showAt?.inSeconds ?? 0) +
+                      widget.hideDuration.inSeconds) {
+            temporaryHide();
+          } else if (event.inSeconds < (widget.showAt?.inSeconds ?? 0)) {
+            hiddenTemporary = false;
+            showNotifier.value = false;
           }
+
+          _showAtEnd(event);
         },
       );
+    }
+  }
 
-      if (widget.alwaysShow && widget.showAt == null && !hiddenPermanently) {
-        permanentTimer ??= Timer(widget.hideDuration, permanentHide);
-      } else if (widget.showAt != null) {
-        _videoDurationSubscription ??= playerRepo.positionStream.listen(
-          (event) {
-            if (context.mounted == false) return;
+  void _showAnnotation() {
+    final isMinimized = ref.read(playerViewStateProvider).isMinimized;
+    // Avoid showing when minimized
+    controlVisibilityNotifier.value = !isMinimized;
 
-            final showing = showNotifier.value;
-            if (event.inSeconds == widget.showAt?.inSeconds) {
-              hiddenTemporary = false;
+    showNotifier.value = true;
+    visibilityController.forward();
+  }
 
-              final isMinimized = ref.read(playerViewStateProvider).isMinimized;
-              // Avoid showing when minimized
-              controlVisibilityNotifier.value = !isMinimized;
+  void _showAtEnd(Duration event) {
+    if (widget.alwaysShow.isEnd) {
+      print(
+        (
+          'Hello',
+          event >= const Duration(seconds: 53) && widget.alwaysShow.isEnd,
+          showNotifier.value,
+          !hiddenPermanently,
+        ),
+      );
+    }
+    if (showNotifier.value || hiddenPermanently) return;
 
-              showNotifier.value = true;
-              visibilityController.forward();
-            } else if (showing &&
-                event.inSeconds ==
-                    (widget.showAt?.inSeconds ?? 0) +
-                        widget.hideDuration.inSeconds) {
-              temporaryHide();
-            } else if (event.inSeconds < (widget.showAt?.inSeconds ?? 0)) {
-              hiddenTemporary = false;
-              showNotifier.value = false;
-            }
-          },
+    if (event >= const Duration(seconds: 53) && widget.alwaysShow.isEnd) {
+      print('Hello');
+      Future.delayed(const Duration(milliseconds: 500), () {
+        ref.read(playerRepositoryProvider).sendPlayerSignal(
+          [PlayerSignal.hideControls, PlayerSignal.hidePlaybackProgress],
         );
-      }
-    });
+        _showAnnotation();
+      });
+    }
   }
 
   @override

@@ -16,15 +16,14 @@ class VideoChannelSection extends StatelessWidget {
       child: Row(
         children: [
           Expanded(child: VideoChannelButton()),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                VideoChannelMembershipButton(),
-                SizedBox(width: 12),
-                VideoChannelSubscriptionButton(),
-              ],
-            ),
+          SizedBox(width: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              VideoChannelMembershipButton(),
+              SizedBox(width: 12),
+              VideoChannelSubscriptionButton(),
+            ],
           ),
         ],
       ),
@@ -53,22 +52,18 @@ class VideoChannelMembershipButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return CustomActionChip(
+      title: 'Join',
+      backgroundColor: Colors.white,
+      borderRadius: BorderRadius.circular(15),
       padding: const EdgeInsets.symmetric(
         vertical: 8,
         horizontal: 14,
       ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: const Text(
-        'Join',
-        style: TextStyle(
-          fontSize: 12,
-          color: Colors.black,
-          fontWeight: FontWeight.w500,
-        ),
+      textStyle: const TextStyle(
+        fontSize: 12,
+        color: Colors.black,
+        fontWeight: FontWeight.w500,
       ),
     );
   }
@@ -79,23 +74,20 @@ class VideoChannelSubscriptionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return CustomActionButton(
+      title: 'Subscribe',
+      backgroundColor: Colors.white,
+      borderRadius: BorderRadius.circular(15),
       padding: const EdgeInsets.symmetric(
         vertical: 8,
         horizontal: 14,
       ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+      textStyle: const TextStyle(
+        fontSize: 12,
+        color: Colors.black,
+        fontWeight: FontWeight.w500,
       ),
-      child: const Text(
-        'Subscribe',
-        style: TextStyle(
-          fontSize: 12,
-          color: Colors.black,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
+      useTappable: false,
     );
   }
 }

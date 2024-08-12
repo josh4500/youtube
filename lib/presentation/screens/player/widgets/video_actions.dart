@@ -78,7 +78,7 @@ class VideoActions extends StatelessWidget {
             backgroundColor: Color(0xFF272727),
             padding: EdgeInsets.symmetric(horizontal: 12),
             margin: EdgeInsets.symmetric(horizontal: 4),
-            icon: Icon(YTIcons.shared_filled, size: 18),
+            icon: Icon(YTIcons.share_outlined, size: 18),
           ),
           CustomActionChip(
             title: 'Remix',

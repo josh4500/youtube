@@ -108,7 +108,6 @@ class PlayerDescriptionV2 extends ConsumerWidget {
     if (showOnExpanded && !playerViewState.isExpanded) {
       return const SizedBox();
     }
-
     return Padding(
       padding: EdgeInsets.symmetric(vertical: showOnFullscreen ? 8 : 0),
       child: const Column(

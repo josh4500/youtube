@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 import 'core.dart';
 import 'data.dart';
@@ -20,6 +21,7 @@ Future<void> main() async {
 Future<void> setup() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
+  PhotoManager.clearFileCache();
   final Directory dir = await getApplicationDocumentsDirectory();
   final String appPath = dir.path;
 

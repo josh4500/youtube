@@ -24,7 +24,7 @@ class IconSpan extends InlineSpan {
   /// text_widgets value:
   ///
   /// ```dart
-  /// const TextSpan(text_widgets: r'$$', semanticsLabel: 'Double dollars')
+  /// const IconSpan(data: r'$$', semanticsLabel: 'Double dollars')
   /// ```
   final String? semanticsLabel;
 

@@ -1404,16 +1404,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
           : _playerAddedHeightNotifier.value = minAdditionalHeight;
     }
 
+    ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
+      PlayerSignal.exitExpanded,
+    ]);
+
     await SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
       overlays: SystemUiOverlay.values,
     );
-
-    if (_isExpanded) {
-      ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
-        PlayerSignal.exitExpanded,
-      ]);
-    }
 
     _hideGraphicsNotifier.value = false;
     _showControls();
@@ -1693,7 +1691,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   /// Handles when back navigation system tries to pop route
-  Future<void> _handleBackButtonPressed(bool didPop) async {
+  Future<void> _handleBackButtonPressed<T>(bool didPop, T? result) async {
     if (_commentIsOpened) {
       _closeCommentSheet();
       return;
@@ -1874,7 +1872,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     return PopScope(
       canPop: false,
-      onPopInvoked: _handleBackButtonPressed,
+      onPopInvokedWithResult: _handleBackButtonPressed,
       child: Material(
         color: Colors.transparent,
         type: MaterialType.transparency,

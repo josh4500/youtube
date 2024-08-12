@@ -25,9 +25,12 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+// TODO: Remove
 class StackedPosition {
   StackedPosition({this.top, this.bottom, this.left, this.right});
 
@@ -44,8 +47,10 @@ class TappableArea extends StatefulWidget {
       vertical: 4,
       horizontal: 8,
     ),
+    this.shape = BoxShape.rectangle,
     this.behavior,
     this.borderRadius = BorderRadius.zero,
+    // TODO: Remove
     this.stackedPosition,
     this.stackedAlignment = Alignment.center,
     this.stackedChild,
@@ -57,6 +62,7 @@ class TappableArea extends StatefulWidget {
   });
 
   final Widget child;
+  final BoxShape shape;
   final HitTestBehavior? behavior;
   final EdgeInsets padding;
   final Alignment stackedAlignment;

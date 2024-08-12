@@ -96,6 +96,7 @@ class PlayPauseRestartControlState
           ref.read(playerRepositoryProvider).restartVideo();
         }
 
+        // Resets timer on hide controls
         ref.read(playerRepositoryProvider).sendPlayerSignal(
           [PlayerSignal.showControls],
         );

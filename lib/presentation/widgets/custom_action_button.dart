@@ -102,9 +102,9 @@ class CustomActionButton extends StatelessWidget {
               borderRadius: borderRadius ?? BorderRadius.circular(32),
               child: buttonContent,
             )
-          : GestureDetector(
-              behavior: HitTestBehavior.opaque,
+          : InkWell(
               onTap: onTap,
+              splashFactory: NoSplash.splashFactory,
               child: buttonContent,
             ),
     );

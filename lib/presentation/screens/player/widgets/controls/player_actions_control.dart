@@ -105,8 +105,7 @@ class PlayerActionsControlV2 extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerViewState = ref.watch(playerViewStateProvider);
-    final childWidget = Flex(
+    return Flex(
       direction: direction,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -141,20 +140,6 @@ class PlayerActionsControlV2 extends ConsumerWidget {
         ),
       ],
     );
-
-    if (context.orientation.isLandscape) {
-      // Hides Action controls when description or comments is show
-      if (playerViewState.showDescription) {
-        return const SizedBox();
-      }
-      return childWidget;
-    } else {
-      // Shows Action controls when player is expanded
-      if (playerViewState.isExpanded) {
-        return childWidget;
-      }
-      return const SizedBox();
-    }
   }
 }
 

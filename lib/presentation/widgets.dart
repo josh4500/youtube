@@ -86,7 +86,6 @@ export 'widgets/roulette_scroll.dart';
 export 'widgets/slidable.dart';
 export 'widgets/slides_indicator.dart';
 
-export 'widgets/text_widgets/custom_text.dart';
 export 'widgets/text_widgets/icon_span.dart';
 
 export 'widgets/viewable/context/viewable_image_context.dart';
