@@ -92,8 +92,7 @@ class _CustomActionChipState extends State<CustomActionChip>
       onPointerUp: (_) {
         controller.reverse();
       },
-      child: InkWell(
-        splashFactory: NoSplash.splashFactory,
+      child: GestureDetector(
         onTap: widget.onTap,
         onLongPress: widget.onLongPress,
         onTapCancel: widget.onTapCancel,

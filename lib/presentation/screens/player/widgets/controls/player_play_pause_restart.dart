@@ -33,8 +33,8 @@ import 'package:youtube_clone/presentation/provider/state/player_state_provider.
 import 'player_control.dart';
 
 class PlayPauseRestartControl extends ConsumerStatefulWidget {
-  const PlayPauseRestartControl({super.key, this.backgroundColor});
-  final Color? backgroundColor;
+  const PlayPauseRestartControl({super.key, this.useControlButton = true});
+  final bool useControlButton;
 
   @override
   ConsumerState<PlayPauseRestartControl> createState() =>
@@ -83,27 +83,26 @@ class PlayPauseRestartControlState
     final isRestart = playerNotifier.ended;
     final isBuffering = playerNotifier.buffering;
 
-    return PlayerControlButton(
-      backgroundColor: widget.backgroundColor ?? Colors.black26,
-      onTap: () {
-        if (!isRestart) {
-          if (isPlaying) {
-            ref.read(playerRepositoryProvider).pauseVideo();
-          } else {
-            ref.read(playerRepositoryProvider).playVideo();
-          }
+    void onToggleButton() {
+      if (!isRestart) {
+        if (isPlaying) {
+          ref.read(playerRepositoryProvider).pauseVideo();
         } else {
-          ref.read(playerRepositoryProvider).restartVideo();
+          ref.read(playerRepositoryProvider).playVideo();
         }
+      } else {
+        ref.read(playerRepositoryProvider).restartVideo();
+      }
 
-        // Resets timer on hide controls
-        ref.read(playerRepositoryProvider).sendPlayerSignal(
-          [PlayerSignal.showControls],
-        );
-      },
-      builder: (context, _) {
-        if (isBuffering) return const SizedBox(width: 48);
-        return isRestart
+      // Resets timer on hide controls
+      ref.read(playerRepositoryProvider).sendPlayerSignal(
+        [PlayerSignal.showControls],
+      );
+    }
+
+    final child = isBuffering
+        ? const SizedBox(width: 48)
+        : isRestart
             ? const Icon(
                 Icons.restart_alt,
                 size: 48,
@@ -115,7 +114,13 @@ class PlayPauseRestartControlState
                 size: 48,
                 semanticLabel: isPlaying ? 'Pause video' : 'Play video',
               );
-      },
-    );
+    if (widget.useControlButton) {
+      return PlayerControlButton(
+        onTap: onToggleButton,
+        builder: (BuildContext context, Animation _) => child,
+      );
+    }
+
+    return GestureDetector(onTap: onToggleButton, child: child);
   }
 }

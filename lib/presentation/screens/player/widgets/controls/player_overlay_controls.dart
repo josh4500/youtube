@@ -1020,7 +1020,9 @@ class _OverlayProgress extends ConsumerWidget {
                     if (isExpanded)
                       AnimatedVisibility(
                         animation: hideControlAnimation,
-                        child: const PlayPauseRestartControl(),
+                        child: const PlayPauseRestartControl(
+                          useControlButton: false,
+                        ),
                       ),
                     Expanded(
                       child: AnimatedVisibility(
@@ -1225,9 +1227,7 @@ class _BottomControlV2 extends StatelessWidget {
                         child: PlayerActionsControlV2(),
                       )
                     else
-                      const PlayerActionsControlV2(
-                        direction: Axis.vertical,
-                      ),
+                      const PlayerActionsControlV2(direction: Axis.vertical),
                   ],
                 );
               }
@@ -1249,11 +1249,9 @@ class _BottomControlV2 extends StatelessWidget {
                     if (isLandscape) ...[
                       const Row(
                         children: [
-                          PlayPauseRestartControl(
-                            backgroundColor: Colors.transparent,
-                          ),
+                          PlayPauseRestartControl(useControlButton: false),
                           SizedBox(width: 8),
-                          PlayerDurationControl(),
+                          PlayerDurationControl(full: false, reversed: true),
                         ],
                       ),
                       const Spacer(),

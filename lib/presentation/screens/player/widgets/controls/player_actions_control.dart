@@ -108,37 +108,43 @@ class PlayerActionsControlV2 extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Flex(
       direction: direction,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        const _ActionV2(icon: YTIcons.like_outlined, title: '52K'),
-        const _ActionV2(
-          icon: YTIcons.dislike_outlined,
-          title: 'Dislike',
+        Flexible(
+          child: Flex(
+            direction: direction,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const _ActionV2(icon: YTIcons.like_outlined, title: '52K'),
+              const _ActionV2(icon: YTIcons.dislike_outlined, title: 'Dislike'),
+              _ActionV2(
+                icon: YTIcons.reply_outlined,
+                title: '4.9K',
+                onTap: () {
+                  ref.read(playerRepositoryProvider).sendPlayerSignal([
+                    PlayerSignal.hideControls,
+                    PlayerSignal.exitExpanded,
+                    PlayerSignal.openComments,
+                  ]);
+                },
+              ),
+              const _ActionV2(icon: YTIcons.share_outlined, title: 'Share'),
+              const _ActionV2(icon: YTIcons.shorts_outlined, title: 'Remix'),
+              _ActionV2(
+                title: 'More',
+                onTap: () {
+                  ref.read(playerRepositoryProvider).sendPlayerSignal([
+                    PlayerSignal.hideControls,
+                    PlayerSignal.exitExpanded,
+                    PlayerSignal.openDescription,
+                  ]);
+                },
+                icon: YTIcons.more_horiz_outlined,
+              ),
+            ],
+          ),
         ),
-        _ActionV2(
-          icon: YTIcons.reply_outlined,
-          title: '4.9K',
-          onTap: () {
-            ref.read(playerRepositoryProvider).sendPlayerSignal([
-              PlayerSignal.hideControls,
-              PlayerSignal.exitExpanded,
-              PlayerSignal.openComments,
-            ]);
-          },
-        ),
-        const _ActionV2(icon: YTIcons.share_outlined, title: 'Share'),
-        const _ActionV2(icon: YTIcons.shorts_outlined, title: 'Remix'),
-        _ActionV2(
-          title: 'More',
-          onTap: () {
-            ref.read(playerRepositoryProvider).sendPlayerSignal([
-              PlayerSignal.hideControls,
-              PlayerSignal.exitExpanded,
-              PlayerSignal.openDescription,
-            ]);
-          },
-          icon: YTIcons.more_horiz_outlined,
-        ),
+        const SizedBox(width: 8),
       ],
     );
   }
