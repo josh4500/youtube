@@ -33,8 +33,13 @@ import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class PlayerDurationControl extends ConsumerStatefulWidget {
-  const PlayerDurationControl({super.key, this.full = true});
+  const PlayerDurationControl({
+    super.key,
+    this.full = true,
+    this.reversed = false,
+  });
   final bool full;
+  final bool reversed;
 
   @override
   ConsumerState<PlayerDurationControl> createState() =>
@@ -53,7 +58,11 @@ class _PlayerDurationControlState extends ConsumerState<PlayerDurationControl> {
     final positionStream = ref.read(playerRepositoryProvider).positionStream;
 
     return GestureDetector(
-      onTap: () => setState(() => reversed = !reversed),
+      onTap: () {
+        if (widget.reversed == false) {
+          setState(() => reversed = !reversed);
+        }
+      },
       child: CustomOrientationBuilder(
         onLandscape: (context, childWidget) {
           return Padding(
@@ -73,12 +82,15 @@ class _PlayerDurationControlState extends ConsumerState<PlayerDurationControl> {
             StreamBuilder<Duration>(
               stream: positionStream,
               initialData: videoPosition,
-              builder: (context, snapshot) {
-                final position = reversed
+              builder: (
+                BuildContext context,
+                AsyncSnapshot<Duration> snapshot,
+              ) {
+                final position = reversed || widget.reversed
                     ? videoDuration - (snapshot.data ?? Duration.zero)
                     : snapshot.data ?? Duration.zero;
                 return Text(
-                  '${reversed ? ' - ' : ''}${position.hoursMinutesSeconds}',
+                  '${reversed && !widget.reversed ? ' - ' : ''}${position.hoursMinutesSeconds}',
                   style: const TextStyle(fontSize: 11.5),
                 );
               },

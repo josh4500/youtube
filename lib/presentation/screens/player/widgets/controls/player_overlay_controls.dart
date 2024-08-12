@@ -1038,7 +1038,7 @@ class _OverlayProgress extends ConsumerWidget {
                         child: const Row(
                           children: [
                             SizedBox(width: 12),
-                            PlayerDurationControl(full: false),
+                            PlayerDurationControl(full: false, reversed: true),
                             SizedBox(width: 12),
                           ],
                         ),
