@@ -348,6 +348,8 @@ class _PlaybackProgressState extends State<PlaybackProgress>
                         animation: animation,
                         builder: (context, _) {
                           return Positioned(
+                            bottom:
+                                widget.alignment.y > 0 ? animation.value : null,
                             left: clampDouble(
                               (positionValue * constraint.maxWidth) +
                                   animation.value -
