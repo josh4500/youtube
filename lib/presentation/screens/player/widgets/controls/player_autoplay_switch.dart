@@ -47,7 +47,7 @@ class PlayerAutoplaySwitch extends ConsumerWidget {
         onChanged: (value) {
           ref.read(preferencesProvider.notifier).autoPlay = value;
           ref.read(playerRepositoryProvider).sendPlayerSignal(
-            [PlayerSignal.showControls],
+            [PlayerSignal.showControls, PlayerSignal.autoplay],
           );
         },
         activeColor: Colors.white,
@@ -63,7 +63,7 @@ class PlayerAutoplaySwitch extends ConsumerWidget {
               );
             }
             return const Icon(
-              YTIcons.pause,
+              Icons.pause,
               color: Colors.white,
             );
           },

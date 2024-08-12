@@ -61,6 +61,7 @@ PlayerRepository playerRepository(PlayerRepositoryRef ref) {
 }
 
 enum PlayerSignal {
+  autoplay,
   lockScreen,
   unlockScreen,
   showUnlock,

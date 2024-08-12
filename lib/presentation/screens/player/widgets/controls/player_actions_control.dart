@@ -90,6 +90,7 @@ class _ActionV2 extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.white,
+                shadows: <Shadow>[Shadow(offset: Offset(1, 1), blurRadius: 2)],
               ),
             ),
           ],
@@ -125,7 +126,7 @@ class PlayerActionsControlV2 extends ConsumerWidget {
             ]);
           },
         ),
-        const _ActionV2(icon: YTIcons.shared_filled, title: 'Share'),
+        const _ActionV2(icon: YTIcons.share_outlined, title: 'Share'),
         const _ActionV2(icon: YTIcons.shorts_outlined, title: 'Remix'),
         _ActionV2(
           title: 'More',

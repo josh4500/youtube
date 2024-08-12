@@ -98,6 +98,13 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   /// Timer used for hiding `Release` message while slide seeking.
   Timer? _releaseTimer;
 
+  late final _controlMessageController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  );
+  final ValueNotifier<String> _latestControlMessage = ValueNotifier<String>('');
+  Timer? _controlMessageTimer;
+
   /// Notifier for showing/hiding playback progress
   final _showPlaybackProgress = ValueNotifier<double>(1);
 
@@ -351,11 +358,27 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       _preventCommonControlGestures = true;
     } else if (signal == PlayerSignal.maximize) {
       _preventCommonControlGestures = false;
+    } else if (signal == PlayerSignal.autoplay) {
+      print('Auto play');
+      _controlMessageTimer?.cancel(); // Cancels previous timer
+
+      final value = ref.read(preferencesProvider).autoplay ? 'on' : 'off';
+      _latestControlMessage.value = 'Autoplay is $value';
+      _controlMessageController.forward();
+      _controlMessageTimer = Timer(const Duration(seconds: 4), () async {
+        await _controlMessageController.reverse();
+
+        _latestControlMessage.value = '';
+        _controlMessageTimer?.cancel();
+        _controlMessageTimer = null;
+      });
     }
   }
 
   @override
   void dispose() {
+    _controlMessageTimer?.cancel();
+    _latestControlMessage.dispose();
     _playerSignalSubscription?.cancel();
     _showUnlockButton.dispose();
     _showUnlockTimer?.cancel();
@@ -499,6 +522,27 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                   onChangePosition: _onPlaybackProgressPositionChanged,
                   onDragEnd: _onPlaybackProgressDragEnd,
                 ),
+              ),
+            ),
+            // Wrapped with Builder to avoid Orientation listener does not affect top widgets
+            AnimatedVisibility(
+              animation: _controlMessageController,
+              child: ListenableBuilder(
+                listenable: _latestControlMessage,
+                builder: (BuildContext context, Widget? _) {
+                  return AnimatedVisibility(
+                    animation: _controlsAnimation,
+                    alignment: const Alignment(0, -.48),
+                    child: Text(
+                      _latestControlMessage.value,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             AnimatedVisibility(
