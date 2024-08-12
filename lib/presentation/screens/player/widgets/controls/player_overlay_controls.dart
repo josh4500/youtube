@@ -984,6 +984,9 @@ class _OverlayProgress extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playerRepo = ref.read(playerRepositoryProvider);
+    final isExpanded = ref.watch(
+      playerViewStateProvider.select((state) => state.isExpanded),
+    );
     return AnimatedBuilder(
       animation: slideAnimation,
       builder: (BuildContext context, Widget? childWidget) {
@@ -1005,52 +1008,41 @@ class _OverlayProgress extends ConsumerWidget {
             );
           },
           onPortrait: (BuildContext context, Widget? progressWidget) {
-            return Consumer(
-              builder: (
-                BuildContext context,
-                WidgetRef ref,
-                Widget? _,
-              ) {
-                final isExpanded = ref.watch(
-                  playerViewStateProvider.select((state) => state.isExpanded),
-                );
-
-                return Row(
-                  children: [
-                    if (isExpanded)
-                      AnimatedVisibility(
-                        animation: hideControlAnimation,
-                        child: const PlayPauseRestartControl(
-                          useControlButton: false,
-                        ),
-                      ),
-                    Expanded(
-                      child: AnimatedVisibility(
-                        animation: isExpanded
-                            ? hideControlAnimation
-                            : Animation.fromValueListenable(
-                                showPlaybackProgress,
-                              ),
-                        child: progressWidget,
-                      ),
+            return Row(
+              children: [
+                if (isExpanded)
+                  AnimatedVisibility(
+                    animation: hideControlAnimation,
+                    child: const PlayPauseRestartControl(
+                      useControlButton: false,
                     ),
-                    if (isExpanded)
-                      AnimatedVisibility(
-                        animation: hideControlAnimation,
-                        child: const Row(
-                          children: [
-                            SizedBox(width: 12),
-                            PlayerDurationControl(full: false, reversed: true),
-                            SizedBox(width: 12),
-                          ],
-                        ),
-                      ),
-                  ],
-                );
-              },
+                  ),
+                Expanded(
+                  child: AnimatedVisibility(
+                    animation: isExpanded
+                        ? hideControlAnimation
+                        : Animation.fromValueListenable(
+                            showPlaybackProgress,
+                          ),
+                    child: progressWidget,
+                  ),
+                ),
+                if (isExpanded)
+                  AnimatedVisibility(
+                    animation: hideControlAnimation,
+                    child: const Row(
+                      children: [
+                        SizedBox(width: 12),
+                        PlayerDurationControl(full: false, reversed: true),
+                        SizedBox(width: 12),
+                      ],
+                    ),
+                  ),
+              ],
             );
           },
           child: PlaybackProgress(
+            alignment: isExpanded ? Alignment.center : Alignment.bottomCenter,
             progress: playerRepo.videoProgressStream,
             // TODO(Josh4500): Revisit this code
             start: playerRepo.currentVideoProgress ?? Progress.zero,

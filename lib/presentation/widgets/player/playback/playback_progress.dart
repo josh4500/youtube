@@ -64,6 +64,7 @@ class PlaybackProgress extends StatefulWidget {
     super.key,
     this.tapSize = kDefaultPlaybackProgressTapSize,
     this.color = const Color(0xFFFF0000),
+    this.alignment = Alignment.bottomLeft,
     this.animation,
     this.bufferAnimation,
     this.progress,
@@ -85,6 +86,8 @@ class PlaybackProgress extends StatefulWidget {
 
   /// Color of the progress indicator.
   final Color? color;
+
+  final Alignment alignment;
 
   /// Animation for the progress indicator (optional).
   final Animation<double?>? animation;
@@ -319,7 +322,7 @@ class _PlaybackProgressState extends State<PlaybackProgress>
             color: Colors.transparent,
             height: widget.tapSize,
             child: Stack(
-              alignment: Alignment.bottomLeft,
+              alignment: widget.alignment,
               clipBehavior: Clip.none,
               children: <Widget>[
                 // Stacked Position and Buffer indicators
@@ -345,7 +348,6 @@ class _PlaybackProgressState extends State<PlaybackProgress>
                         animation: animation,
                         builder: (context, _) {
                           return Positioned(
-                            bottom: animation.value,
                             left: clampDouble(
                               (positionValue * constraint.maxWidth) +
                                   animation.value -
@@ -353,7 +355,10 @@ class _PlaybackProgressState extends State<PlaybackProgress>
                               0,
                               constraint.maxWidth - 12,
                             ),
-                            child: thumbIndicator!,
+                            child: Align(
+                              alignment: widget.alignment,
+                              child: thumbIndicator,
+                            ),
                           );
                         },
                       );
