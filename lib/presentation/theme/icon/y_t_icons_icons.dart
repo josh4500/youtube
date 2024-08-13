@@ -74,6 +74,7 @@ class YTIcons {
   static const IconData dislike_outlined = IconData(0xe832, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData download_outlined = IconData(0xe833, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData loop_one_outlined = IconData(0xe834, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData add_outlined = IconData(0xe835, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData unmuted = IconData(0xe839, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData chevron_down = IconData(0xe83a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData chevron_up_1 = IconData(0xe83b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
@@ -171,6 +172,7 @@ class YTIcons {
   static const IconData channel_memberships = IconData(0xe8a0, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData message_bubble_overlap = IconData(0xe8a1, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData lighting = IconData(0xe8a2, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData search_outlined = IconData(0xe8a3, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData discover_outlined = IconData(0xe900, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData subscriptions_outlined = IconData(0xe901, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData shorts_outlined = IconData(0xe902, fontFamily: _kFontFam, fontPackage: _kFontPkg);
@@ -182,5 +184,4 @@ class YTIcons {
   static const IconData trending_outlined = IconData(0xe908, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData music_outlined = IconData(0xe909, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData location_outlined = IconData(0xe90a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData search_outlined = IconData(0xe90b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

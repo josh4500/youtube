@@ -46,7 +46,7 @@ class AddNewPlaylist extends StatelessWidget {
               color: Colors.white10,
               shape: BoxShape.circle,
             ),
-            child: const Icon(YTIcons.save_outlined, size: 24),
+            child: const Icon(YTIcons.add_outlined, size: 24),
           ),
           const SizedBox(height: 24),
           const Padding(

@@ -194,7 +194,7 @@ class VideoActions extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: const Row(
                     children: [
-                      Icon(YTIcons.save_outlined, color: Color(0xFF3EA6FF)),
+                      Icon(YTIcons.add_outlined, color: Color(0xFF3EA6FF)),
                       SizedBox(width: 8),
                       Text(
                         'New playlist',

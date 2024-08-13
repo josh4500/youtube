@@ -133,11 +133,23 @@ class PlayerActionsControlV2 extends ConsumerWidget {
               _ActionV2(
                 title: 'More',
                 onTap: () {
-                  ref.read(playerRepositoryProvider).sendPlayerSignal([
-                    PlayerSignal.hideControls,
-                    PlayerSignal.exitExpanded,
-                    PlayerSignal.openDescription,
-                  ]);
+                  showDynamicSheet(
+                    context,
+                    items: [
+                      const DynamicSheetOptionItem(
+                        leading: Icon(YTIcons.save_outlined),
+                        title: 'Save',
+                      ),
+                      const DynamicSheetOptionItem(
+                        leading: Icon(YTIcons.clip_outlined),
+                        title: 'Clip',
+                      ),
+                      const DynamicSheetOptionItem(
+                        leading: Icon(YTIcons.shorts_filled),
+                        title: 'Remix',
+                      ),
+                    ],
+                  );
                 },
                 icon: YTIcons.more_horiz_outlined,
               ),
