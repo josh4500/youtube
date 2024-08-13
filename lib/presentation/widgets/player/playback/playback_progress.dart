@@ -305,17 +305,17 @@ class _PlaybackProgressState extends State<PlaybackProgress>
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraint) {
+        final width = constraint.maxWidth;
         return GestureDetector(
-          onTapDown: (TapDownDetails details) =>
-              _onTapDown(details, constraint.maxWidth),
+          onTapDown: (TapDownDetails details) => _onTapDown(details, width),
           onTapCancel: _scaleOut,
           onTapUp: (TapUpDetails details) => _scaleOut(),
           onHorizontalDragStart: (DragStartDetails details) =>
-              _onHorizontalDragStart(details, constraint.maxWidth),
+              _onHorizontalDragStart(details, width),
           onHorizontalDragUpdate: (DragUpdateDetails details) =>
-              _onHorizontalDragUpdate(details, constraint.maxWidth),
+              _onHorizontalDragUpdate(details, width),
           onHorizontalDragEnd: (DragEndDetails details) =>
-              _onHorizontalDragEnd(details, constraint.maxWidth),
+              _onHorizontalDragEnd(details, width),
           onVerticalDragStart: _onVerticalDragStart,
           onVerticalDragUpdate: _onVerticalDragUpdate,
           child: Container(

@@ -5,3 +5,6 @@ export 'infrastructure/services/cache/read_write_value.dart';
 
 export 'infrastructure/services/internet_connectivity/connectivity_state.dart';
 export 'infrastructure/services/internet_connectivity/internet_connectivity.dart';
+
+export 'infrastructure/services/media/media.dart';
+export 'infrastructure/services/media/media_discovery.dart';
