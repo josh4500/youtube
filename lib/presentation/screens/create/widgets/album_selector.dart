@@ -33,7 +33,7 @@ class AlbumSelector extends ConsumerWidget {
                   automaticallyImplyLeading: false,
                   pinned: true,
                   floating: true,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: Colors.black,
                   title: const Text(
                     'Select album',
                     style: TextStyle(
@@ -74,25 +74,31 @@ class AlbumSelector extends ConsumerWidget {
                                 isOriginal: false,
                               ),
                               const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    album.name,
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      album.name,
+                                      maxLines: 1,
+                                      softWrap: false,
+                                      overflow: TextOverflow.fade,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    album.count.toString(),
-                                    style: const TextStyle(
-                                      color: Colors.grey,
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      album.count.toString(),
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
+                              const SizedBox(width: 12),
                             ],
                           ),
                         ),

@@ -12,6 +12,7 @@ class MediaFilesState extends _$MediaFilesState {
   }
 
   Future<void> loadAlbumFiles(MediaAlbum album) async {
+    // TODO(josh4500): Avoid reloading same album
     MediaDiscovery.getAlbumsFiles(album).then((MediaFileQueryResult result) {
       ref.read(mediaAlbumStateProvider.notifier).loadAlbum(album);
       state = AsyncData<List<MediaFile>>(result.files);

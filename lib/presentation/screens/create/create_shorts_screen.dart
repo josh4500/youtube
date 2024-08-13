@@ -46,6 +46,7 @@ import 'widgets/capture/capture_timeline_control.dart';
 import 'widgets/capture/capture_zoom_indicator.dart';
 import 'widgets/check_permission.dart';
 import 'widgets/create_close_button.dart';
+import 'widgets/create_permission_reason.dart';
 import 'widgets/create_progress.dart';
 import 'widgets/notifications/capture_notification.dart';
 import 'widgets/notifications/create_notification.dart';
@@ -967,7 +968,7 @@ class CreateShortsPermissionRequest extends StatelessWidget {
             child: Builder(
               builder: (BuildContext context) {
                 if (checking) {
-                  return const CheckPermission();
+                  return const CheckingPermission();
                 } else {
                   return SizedBox(
                     width: double.infinity,
@@ -991,14 +992,14 @@ class CreateShortsPermissionRequest extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(height: 12),
-                              CreateListReason(
+                              CreatePermissionReason(
                                 icon: YTIcons.info_outlined,
                                 title: 'Why is this needed?',
                                 subtitle:
                                     'So you can take photos, record videos, and preview effects',
                               ),
                               SizedBox(height: 12),
-                              CreateListReason(
+                              CreatePermissionReason(
                                 icon: YTIcons.settings_outlined,
                                 title: 'You are in control',
                                 subtitle:
@@ -1045,48 +1046,6 @@ class CreateShortsPermissionRequest extends StatelessWidget {
                   );
                 }
               },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class CreateListReason extends StatelessWidget {
-  const CreateListReason({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 16),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: const TextStyle(fontSize: 11.5),
-                ),
-              ],
             ),
           ),
         ],

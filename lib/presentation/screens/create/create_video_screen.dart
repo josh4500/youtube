@@ -1,58 +1,205 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/infrastructure.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'provider/media_album_state.dart';
 import 'provider/media_files_state.dart';
 import 'widgets/album_selector.dart';
+import 'widgets/check_permission.dart';
 import 'widgets/create_close_button.dart';
 import 'widgets/create_media_preview.dart';
+import 'widgets/create_permission_reason.dart';
 
-class CreateVideoScreen extends StatelessWidget {
+final _checkMediaStoragePerm = FutureProvider.autoDispose<bool>(
+  (ref) async {
+    final PermissionState ps = await PhotoManager.requestPermissionExtend();
+    return ps.isAuth;
+  },
+);
+
+class CreateVideoScreen extends ConsumerWidget {
   const CreateVideoScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
       backgroundColor: Colors.black38,
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
-            child: Row(
-              children: [
-                AlbumSelectorButton(),
-                Spacer(),
-                CreateCloseButton(),
-              ],
-            ),
-          ),
-          Expanded(child: FileSelector()),
-        ],
+      body: Builder(
+        builder: (context) {
+          final permResult = ref.watch(_checkMediaStoragePerm);
+          return permResult.when(
+            data: (bool hasPermissions) {
+              if (hasPermissions) {
+                return const SelectMediaView();
+              }
+              return const MediaStoragePermissionRequest(checking: false);
+            },
+            error: (e, _) => const MediaStoragePermissionRequest(),
+            loading: MediaStoragePermissionRequest.new,
+          );
+        },
       ),
     );
   }
 }
 
-class FileSelector extends ConsumerWidget {
-  const FileSelector({super.key});
+class SelectMediaView extends StatelessWidget {
+  const SelectMediaView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final files = ref.watch(mediaFilesStateProvider).value;
-    if (files == null) return const SizedBox();
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
+          child: Row(
+            children: [
+              Expanded(child: AlbumSelectorButton()),
+              SizedBox(width: 24),
+              CreateCloseButton(),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ScrollConfiguration(
+            behavior: const OverScrollGlowBehavior(enabled: false),
+            child: Consumer(
+              builder: (BuildContext context, WidgetRef ref, Widget? _) {
+                final files = ref.watch(mediaFilesStateProvider).value;
+                if (files == null) return const SizedBox();
+                return GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                  ),
+                  itemBuilder: (BuildContext context, int index) {
+                    return AssetThumbnail(media: files[index]);
+                  },
+                  itemCount: files.length,
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class MediaStoragePermissionRequest extends StatelessWidget {
+  const MediaStoragePermissionRequest({
+    super.key,
+    this.checking = true,
+  });
+
+  final bool checking;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        image: checking
+            ? null
+            : const DecorationImage(
+                image: CustomNetworkImage(''),
+              ),
       ),
-      itemBuilder: (BuildContext context, int index) {
-        return AssetThumbnail(media: files[index]);
-      },
-      itemCount: files.length,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const CreateCloseButton(),
+          Expanded(
+            child: Builder(
+              builder: (BuildContext context) {
+                if (checking) {
+                  return const CheckingPermission();
+                } else {
+                  return SizedBox(
+                    width: double.infinity,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Spacer(),
+                        const Padding(
+                          padding: EdgeInsets.all(24.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.photo_outlined, size: 48),
+                              SizedBox(height: 48),
+                              Text(
+                                'Let YouTube access your photos and videos',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(height: 12),
+                              CreatePermissionReason(
+                                icon: YTIcons.info_outlined,
+                                title: 'Why is this needed?',
+                                subtitle:
+                                    'So you can import photos and videos from your gallary',
+                              ),
+                              SizedBox(height: 12),
+                              CreatePermissionReason(
+                                icon: YTIcons.settings_outlined,
+                                title: 'How to enable permission?',
+                                subtitle:
+                                    'Open settings, go to permissions and allow access to photos and videos',
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            return GestureDetector(
+                              onTap: () async {
+                                await Permission.storage.request();
+                                await Permission.mediaLibrary.request();
+
+                                ref.refresh(_checkMediaStoragePerm);
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(32),
+                                ),
+                                alignment: Alignment.center,
+                                child: const Text(
+                                  'Continue',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -158,12 +305,18 @@ class AlbumSelectorButton extends ConsumerWidget {
         showDraggableBottomSheet(context);
       },
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            currentAlbum?.name ?? 'Videos',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
+          Flexible(
+            child: Text(
+              currentAlbum?.name ?? 'No album',
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.fade,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           const SizedBox(width: 8),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CheckPermission extends StatelessWidget {
-  const CheckPermission({super.key});
+class CheckingPermission extends StatelessWidget {
+  const CheckingPermission({super.key});
 
   @override
   Widget build(BuildContext context) {
