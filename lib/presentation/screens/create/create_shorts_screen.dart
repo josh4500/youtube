@@ -41,7 +41,7 @@ import 'package:youtube_clone/presentation/widgets.dart';
 import 'widgets/capture/capture_button.dart';
 import 'widgets/capture/capture_effects.dart';
 import 'widgets/capture/capture_focus_indicator.dart';
-import 'widgets/capture/capture_shorts_duration_timer.dart';
+import 'widgets/capture/capture_shorts_duration.dart';
 import 'widgets/capture/capture_timeline_control.dart';
 import 'widgets/capture/capture_zoom_indicator.dart';
 import 'widgets/check_permission.dart';
@@ -796,7 +796,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                             children: [
                               CreateCloseButton(),
                               CaptureMusicButton(),
-                              CaptureShortsDurationTimer(),
+                              CaptureShortsDuration(),
                             ],
                           ),
                         ),

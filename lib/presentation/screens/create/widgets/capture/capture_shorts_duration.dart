@@ -6,16 +6,16 @@ import 'package:youtube_clone/presentation/screens/create/provider/short_recordi
 
 import '../notifications/capture_notification.dart';
 
-class CaptureShortsDurationTimer extends ConsumerStatefulWidget {
-  const CaptureShortsDurationTimer({super.key});
+class CaptureShortsDuration extends ConsumerStatefulWidget {
+  const CaptureShortsDuration({super.key});
 
   @override
-  ConsumerState<CaptureShortsDurationTimer> createState() =>
+  ConsumerState<CaptureShortsDuration> createState() =>
       _CaptureShortsDurationTimerState();
 }
 
 class _CaptureShortsDurationTimerState
-    extends ConsumerState<CaptureShortsDurationTimer>
+    extends ConsumerState<CaptureShortsDuration>
     with SingleTickerProviderStateMixin {
   int time = 15;
   static const int minTime = 15;
