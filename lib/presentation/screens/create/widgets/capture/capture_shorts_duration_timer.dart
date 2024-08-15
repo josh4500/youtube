@@ -1,18 +1,21 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/screens/create/provider/short_recording_state.dart';
 
 import '../notifications/capture_notification.dart';
 
-class CaptureShortsDurationTimer extends StatefulWidget {
+class CaptureShortsDurationTimer extends ConsumerStatefulWidget {
   const CaptureShortsDurationTimer({super.key});
 
   @override
-  State<CaptureShortsDurationTimer> createState() =>
+  ConsumerState<CaptureShortsDurationTimer> createState() =>
       _CaptureShortsDurationTimerState();
 }
 
-class _CaptureShortsDurationTimerState extends State<CaptureShortsDurationTimer>
+class _CaptureShortsDurationTimerState
+    extends ConsumerState<CaptureShortsDurationTimer>
     with SingleTickerProviderStateMixin {
   int time = 15;
   static const int minTime = 15;
@@ -46,6 +49,10 @@ class _CaptureShortsDurationTimerState extends State<CaptureShortsDurationTimer>
           setState(() {});
           controller.reverse();
         }
+
+        ref.read(shortRecordingProvider.notifier).updateDuration(
+              Duration(seconds: time),
+            );
 
         ShowControlsMessageNotification(
           message: '$time seconds',

@@ -29,9 +29,12 @@ import 'dart:async';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/screens/create/provider/current_timeline_state.dart';
 import 'package:youtube_clone/presentation/screens/create/provider/index_notifier.dart';
+import 'package:youtube_clone/presentation/screens/create/provider/short_recording_state.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -97,14 +100,14 @@ class _CreateShortsScreenState extends State<CreateShortsScreen> {
   }
 }
 
-class CaptureShortsView extends StatefulWidget {
+class CaptureShortsView extends ConsumerStatefulWidget {
   const CaptureShortsView({super.key});
 
   @override
-  State<CaptureShortsView> createState() => _CaptureShortsViewState();
+  ConsumerState<CaptureShortsView> createState() => _CaptureShortsViewState();
 }
 
-class _CaptureShortsViewState extends State<CaptureShortsView>
+class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     with
         WidgetsBindingObserver,
         TickerProviderStateMixin,
@@ -431,6 +434,25 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
     }
   }
 
+  Future<void> _startRecording() async {
+    final CameraController? cameraController = controller;
+    if (cameraController == null || !cameraController.value.isInitialized) {
+      return;
+    }
+    // await cameraController.startVideoRecording(
+    //   onAvailable: (CameraImage cameraImage) {},
+    // );
+    ref.read(currentTimelineProvider.notifier).startRecording();
+  }
+
+  Future<void> _stopRecording() async {
+    // final XFile xFile = await controller!.stopVideoRecording();
+    // xFile.saveTo('path');
+    ref.read(currentTimelineProvider.notifier).stopRecording();
+    final Timeline timeline = ref.read(currentTimelineProvider);
+    ref.read(shortRecordingProvider.notifier).addTimeline(timeline);
+  }
+
   void handleOnTapRecordButton() {
     dragRecordNotifier.value = false; // Not dragging
 
@@ -441,7 +463,11 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
         ? recordOuterButtonController.forward(from: .7)
         : recordOuterButtonController.reverse(from: .7);
 
-    CreateNotification(hideNavigator: recording).dispatch(context);
+    // TODO(josh4500): Prevent recoding when it gets to set Duration
+    // Start or Stop recording
+    recording ? _startRecording() : _stopRecording();
+
+    if (recording) CreateNotification(hideNavigator: true).dispatch(context);
   }
 
   void handleLongPressStartRecordButton(LongPressStartDetails details) {
@@ -450,6 +476,8 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
     dragRecordNotifier.value = true;
     recordingNotifier.value = true;
     hideZoomController.forward();
+    // TODO(josh4500): Prevent recoding when it gets to set Duration
+    _startRecording();
     CreateNotification(hideNavigator: true).dispatch(context);
     recordOuterButtonController.repeat(min: .8, max: 1, reverse: true);
   }
@@ -466,6 +494,7 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
     recordingNotifier.value = false;
     hideZoomController.reverse();
 
+    _stopRecording();
     // Reset positions
     recordOuterButtonPosition.value = getDragCircleInitPosition(constraints);
     recordInnerButtonPosition.value = getCenterButtonInitPosition(constraints);

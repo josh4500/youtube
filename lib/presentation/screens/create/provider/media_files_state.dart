@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:youtube_clone/infrastructure.dart';
-import 'package:youtube_clone/presentation/screens/create/provider/media_album_state.dart';
+import 'media_album_state.dart';
 
 part 'media_files_state.g.dart';
 

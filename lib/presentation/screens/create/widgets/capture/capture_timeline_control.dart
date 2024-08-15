@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/screens/create/provider/short_recording_state.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../provider/media_album_state.dart';
@@ -12,14 +13,11 @@ class CaptureTimelineControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const timelineState = CreateTimelineState(
-      recordDuration: Duration(seconds: 15),
-    );
     return Row(
       children: [
         Consumer(
           builder: (BuildContext context, WidgetRef ref, Widget? _) {
-            final album = ref.read(mediaAlbumStateProvider).value?.selected;
+            final album = ref.watch(mediaAlbumStateProvider).value?.selected;
             if (album == null) {
               return const Icon(Icons.photo_outlined, size: 40);
             }
@@ -43,54 +41,76 @@ class CaptureTimelineControl extends StatelessWidget {
           },
         ),
         const SizedBox(width: 36),
-        if (timelineState.hasTimelines)
-          GestureDetector(
-            onTap: () {
-              timelineState.undo();
-              // ModelBinding.update<CreateTimelineState>(context, timelineState);
-              if (timelineState.timelines.isEmpty) {
-                CreateNotification(hideNavigator: false).dispatch(context);
-              }
+        Expanded(
+          child: Consumer(
+            builder: (BuildContext context, WidgetRef ref, Widget? _) {
+              final timelineState = ref.watch(shortRecordingProvider);
+              return Row(
+                children: [
+                  if (timelineState.hasTimelines)
+                    GestureDetector(
+                      onTap: () {
+                        if (timelineState.hasOneTimeline) {
+                          CreateNotification(hideNavigator: false)
+                              .dispatch(context);
+                        }
+                        ref.read(shortRecordingProvider.notifier).undo();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.black26,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(YTIcons.undo_arrow, size: 30),
+                      ),
+                    )
+                  else
+                    const SizedBox(width: 38),
+                  const Spacer(),
+                  if (timelineState.hasUndidTimeline)
+                    GestureDetector(
+                      onTap: () {
+                        if (timelineState.hasUndidTimeline) {
+                          CreateNotification(hideNavigator: true)
+                              .dispatch(context);
+                        }
+                        ref.read(shortRecordingProvider.notifier).redo();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.black26,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(YTIcons.redo_arrow, size: 30),
+                      ),
+                    )
+                  else
+                    const SizedBox(width: 38),
+                  const SizedBox(width: 36),
+                  if (timelineState.hasTimelines)
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: timelineState.isCompleted
+                            ? Colors.white
+                            : Colors.white24,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        YTIcons.check_outlined,
+                        color: Colors.black,
+                        size: 30,
+                      ),
+                    )
+                  else
+                    const SizedBox(width: 38),
+                ],
+              );
             },
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Colors.black26,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(YTIcons.undo_arrow, size: 30),
-            ),
           ),
-        const Spacer(),
-        if (timelineState.hasUndidTimeline)
-          GestureDetector(
-            onTap: () {
-              timelineState.redo();
-              // ModelBinding.update<CreateTimelineState>(context, timelineState);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Colors.black26,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(YTIcons.redo_arrow, size: 30),
-            ),
-          ),
-        const SizedBox(width: 36),
-        if (timelineState.isCompleted)
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              YTIcons.check_outlined,
-              color: Colors.black,
-              size: 30,
-            ),
-          ),
+        ),
       ],
     );
   }
