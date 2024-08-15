@@ -1799,70 +1799,70 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       ),
     );
 
-    final mainPlayer = Builder(
-      builder: (context) {
-        // Landscape player
-        if (orientation.isLandscape) {
-          return ListenableBuilder(
-            listenable: Listenable.merge([
-              _playerWidthNotifier,
-            ]),
-            builder: (
-              BuildContext context,
-              Widget? childWidget,
-            ) {
-              return Container(
-                constraints: BoxConstraints(
-                  minHeight: playerMinHeight,
-                ),
-                width: playerWidth,
-                height: screenHeight * _screenHeightNotifier.value,
-                child: childWidget,
-              );
-            },
-            child: SlideTransition(
-              position: _playerLandscapeSlideAnimation,
-              child: ScaleTransition(
-                scale: _playerLandscapeScaleAnimation,
-                child: interactivePlayerView,
-              ),
-            ),
-          );
-        }
-
-        // Portrait player
+    Widget createPlayerView(Widget playerView) {
+      if (orientation.isLandscape) {
         return ListenableBuilder(
           listenable: Listenable.merge([
             _playerWidthNotifier,
-            _playerHeightNotifier,
-            _playerAddedHeightNotifier,
-            _playerMarginNotifier,
           ]),
           builder: (
             BuildContext context,
             Widget? childWidget,
           ) {
-            return SizedBox(
-              height: playerBoxHeight,
-              child: Container(
-                constraints: BoxConstraints(
-                  minHeight: playerMinHeight,
-                  maxHeight: playerMaxHeight,
-                ),
-                padding: EdgeInsets.only(
-                  top: playerMargin,
-                  left: playerMargin.clamp(0, 10),
-                  right: playerMargin.clamp(0, 10),
-                ),
-                width: playerWidth,
-                height: playerHeight,
-                child: interactivePlayerView,
+            return Container(
+              constraints: BoxConstraints(
+                minHeight: playerMinHeight,
               ),
+              width: playerWidth,
+              height: screenHeight * _screenHeightNotifier.value,
+              child: childWidget,
             );
           },
+          child: SlideTransition(
+            position: _playerLandscapeSlideAnimation,
+            child: ScaleTransition(
+              scale: _playerLandscapeScaleAnimation,
+              child: playerView,
+            ),
+          ),
         );
-      },
-    );
+      }
+
+      // Portrait player
+      return ListenableBuilder(
+        listenable: Listenable.merge([
+          _playerWidthNotifier,
+          _playerHeightNotifier,
+          _playerAddedHeightNotifier,
+          _playerMarginNotifier,
+        ]),
+        builder: (
+          BuildContext context,
+          Widget? childWidget,
+        ) {
+          return SizedBox(
+            height: playerBoxHeight,
+            child: Container(
+              constraints: BoxConstraints(
+                minHeight: playerMinHeight,
+                maxHeight: playerMaxHeight,
+              ),
+              padding: EdgeInsets.only(
+                top: playerMargin,
+                left: playerMargin.clamp(0, 10),
+                right: playerMargin.clamp(0, 10),
+              ),
+              width: playerWidth,
+              height: playerHeight,
+              child: playerView,
+            ),
+          );
+        },
+      );
+    }
+
+    final mainPlayer = createPlayerView(interactivePlayerView);
+    final placeholderPlayer = createPlayerView(const SizedBox());
 
     final infoScrollview = PlayerVideoInfo(
       physics: _infoScrollPhysics,
@@ -2058,6 +2058,25 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
                 ],
               ),
             ],
+            // Align(
+            //   alignment: Alignment.topLeft,
+            //   child: RepaintBoundary(
+            //     child: FadeTransition(
+            //       opacity: _playerOpacityAnimation,
+            //       child: PlayerAnnotationsWrapper(
+            //         hideGraphicsNotifier: _hideGraphicsNotifier,
+            //         child: GestureDetector(
+            //           onTap: _onTapPlayer,
+            //           onVerticalDragStart: _onDragPlayerStart,
+            //           onVerticalDragUpdate: _onDragPlayer,
+            //           onVerticalDragEnd: _onDragPlayerEnd,
+            //           behavior: HitTestBehavior.opaque,
+            //           child: mainPlayer,
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

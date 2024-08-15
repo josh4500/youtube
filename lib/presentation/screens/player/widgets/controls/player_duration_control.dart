@@ -71,10 +71,7 @@ class _PlayerDurationControlState extends ConsumerState<PlayerDurationControl> {
           );
         },
         onPortrait: (context, childWidget) {
-          return Padding(
-            padding: EdgeInsets.zero,
-            child: childWidget,
-          );
+          return SizedBox(child: childWidget);
         },
         child: Row(
           children: [
