@@ -30,7 +30,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../../../view_models/progress.dart';
+import '../../../view_models/playback/progress.dart';
 
 /// Default size of the tappable area for seeking playback.
 const double kDefaultPlaybackProgressTapSize = 10.0;

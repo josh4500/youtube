@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:media_kit/generated/libmpv/bindings.dart';
 import 'package:media_kit/media_kit.dart' as mkit;
 import 'package:media_kit_video/media_kit_video.dart' as mkit_video;
 import 'package:photo_manager/photo_manager.dart';
@@ -107,7 +106,6 @@ class _VideoMediaPreviewState extends State<_VideoMediaPreview>
   @override
   Widget build(BuildContext context) {
     final media = ModelBinding.of<MediaFile>(context);
-    print(player.state.height?.toDouble());
     final animation = CurvedAnimation(
       parent: ReverseAnimation(animationController),
       curve: Curves.easeInCubic,

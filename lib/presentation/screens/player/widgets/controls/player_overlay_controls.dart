@@ -34,12 +34,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_rotate.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/view_models/progress.dart';
-import 'package:youtube_clone/presentation/view_models/state/player_settings_view_model.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'player_actions_control.dart';
@@ -359,7 +358,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     } else if (signal == PlayerSignal.maximize) {
       _preventCommonControlGestures = false;
     } else if (signal == PlayerSignal.autoplay) {
-      print('Auto play');
       _controlMessageTimer?.cancel(); // Cancels previous timer
 
       final value = ref.read(preferencesProvider).autoplay ? 'on' : 'off';

@@ -27,17 +27,14 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import 'dart:async';
 
-import 'package:camera_platform_interface/camera_platform_interface.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
-import 'package:youtube_clone/presentation/theme/icon/y_t_icons_icons.dart';
+import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/screens/create/provider/index_notifier.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../widgets/camera/camera_controller.dart';
-import '../../widgets/camera/camera_preview.dart';
 import 'widgets/capture/capture_button.dart';
 import 'widgets/capture/capture_effects.dart';
 import 'widgets/capture/capture_focus_indicator.dart';
@@ -53,71 +50,46 @@ import 'widgets/notifications/create_notification.dart';
 import 'widgets/range_selector.dart';
 import 'widgets/video_effect_options.dart';
 
-final _checkMicrophoneCameraPerm =
-    FutureProvider.autoDispose<CreateCameraState>(
-  (ref) async {
-    final result = await Future.wait([
-      Permission.camera.isGranted,
-      Permission.microphone.isGranted,
-    ]);
+class CreateShortsScreen extends StatefulWidget {
+  const CreateShortsScreen({super.key});
 
-    final hasPermission = result.fold<bool>(
-      true,
-      (value, element) => value && element,
-    );
-
-    CreateCameraState state = CreateCameraState(
-      hasPermissions: hasPermission,
-    );
-
-    if (hasPermission) {
-      final cameras = await availableCameras();
-      state = state.copyWith(cameras: cameras);
-    }
-
-    return state;
-  },
-);
-
-class CreateCameraState {
-  CreateCameraState({
-    required this.hasPermissions,
-    this.cameras = const <CameraDescription>[],
-  });
-
-  final bool hasPermissions;
-  final List<CameraDescription> cameras;
-
-  CreateCameraState copyWith({
-    bool? hasPermissions,
-    List<CameraDescription>? cameras,
-  }) {
-    return CreateCameraState(
-      hasPermissions: hasPermissions ?? this.hasPermissions,
-      cameras: cameras ?? this.cameras,
-    );
-  }
+  @override
+  State<CreateShortsScreen> createState() => _CreateShortsScreenState();
 }
 
-class CreateShortsScreen extends StatelessWidget {
-  const CreateShortsScreen({super.key});
+class _CreateShortsScreenState extends State<CreateShortsScreen> {
+  final completer = Completer<CreateCameraState>();
+
+  @override
+  void initState() {
+    super.initState();
+    completer.complete(CreateCameraState.requestCamera());
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Consumer(
-        builder: (context, ref, child) {
-          final permResult = ref.watch(_checkMicrophoneCameraPerm);
-          return permResult.when(
-            data: (CreateCameraState state) {
-              if (state.hasPermissions && state.cameras.isNotEmpty) {
-                return const CaptureShortsView();
-              }
-              return const CreateShortsPermissionRequest(checking: false);
-            },
-            error: (e, _) => const CreateShortsPermissionRequest(),
-            loading: CreateShortsPermissionRequest.new,
+      body: FutureBuilder<CreateCameraState>(
+        initialData: CreateCameraState(hasPermissions: false),
+        future: completer.future,
+        builder: (
+          BuildContext context,
+          AsyncSnapshot<CreateCameraState> snapshot,
+        ) {
+          final CreateCameraState state = snapshot.data!;
+          return ModelBinding<CreateCameraState>(
+            model: state,
+            child: Builder(
+              builder: (BuildContext context) {
+                if (state.hasPermissions && state.cameras.isNotEmpty) {
+                  return const CaptureShortsView();
+                }
+                return CreateShortsPermissionRequest(
+                  checking: !state.requested,
+                );
+              },
+            ),
           );
         },
       ),
@@ -125,17 +97,18 @@ class CreateShortsScreen extends StatelessWidget {
   }
 }
 
-class CaptureShortsView extends ConsumerStatefulWidget {
-  const CaptureShortsView({
-    super.key,
-  });
+class CaptureShortsView extends StatefulWidget {
+  const CaptureShortsView({super.key});
 
   @override
-  ConsumerState<CaptureShortsView> createState() => _CaptureShortsViewState();
+  State<CaptureShortsView> createState() => _CaptureShortsViewState();
 }
 
-class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
-    with WidgetsBindingObserver, TickerProviderStateMixin {
+class _CaptureShortsViewState extends State<CaptureShortsView>
+    with
+        WidgetsBindingObserver,
+        TickerProviderStateMixin,
+        TabIndexListenerMixin {
   CameraController? controller;
 
   bool _controlHidden = false;
@@ -211,8 +184,11 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     effectsController.removeStatusListener(effectStatusListener);
 
-    controller?.dispose();
+    hasInitCameraNotifier.value = null;
     hasInitCameraNotifier.dispose();
+
+    controller?.dispose();
+    controller = null;
 
     controlMessageTimer?.cancel();
     latestControlMessage.dispose();
@@ -229,6 +205,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     recordInnerButtonPosition.dispose();
 
     hideController.dispose();
+    hideSpeedController.dispose();
+    hideZoomController.dispose();
     super.dispose();
   }
 
@@ -255,9 +233,11 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     super.didChangeDependencies();
     if (hasInitCameraNotifier.value == null) {
       Future.microtask(() {
-        final cameraState = ref.read(_checkMicrophoneCameraPerm).value;
-        if (cameraState != null && cameraState.cameras.isNotEmpty) {
-          onNewCameraSelected(cameraState.cameras.first);
+        if (context.mounted) {
+          final cameraState = ModelBinding.of<CreateCameraState>(context);
+          if (cameraState.cameras.isNotEmpty) {
+            onNewCameraSelected(cameraState.cameras.first);
+          }
         }
       });
     }
@@ -272,10 +252,28 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       return;
     }
 
+    if (currentTabIndex != CreateTab.shorts) return;
+
     if (state == AppLifecycleState.inactive) {
       cameraController.dispose();
       hasInitCameraNotifier.value = null;
     } else if (state == AppLifecycleState.resumed) {
+      onNewCameraSelected(cameraController.description);
+    }
+  }
+
+  @override
+  void onIndexChanged(int newIndex) {
+    final CameraController? cameraController = controller;
+
+    // Create tab changed before we got the chance to initialize.
+    if (cameraController == null || !cameraController.value.isInitialized) {
+      return;
+    }
+    if (newIndex != CreateTab.shorts.index) {
+      cameraController.dispose();
+      hasInitCameraNotifier.value = null;
+    } else if (newIndex == CreateTab.shorts.index) {
       onNewCameraSelected(cameraController.description);
     }
   }
@@ -323,12 +321,10 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     final CameraController cameraController = CameraController(
       cameraDescription,
-      mediaSettings: const MediaSettings(
-        resolutionPreset: ResolutionPreset.veryHigh,
-        fps: 30,
-        videoBitrate: 200000,
-        audioBitrate: 32000,
-      ),
+      ResolutionPreset.veryHigh,
+      fps: 30,
+      videoBitrate: 200000,
+      audioBitrate: 32000,
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
 
@@ -425,10 +421,10 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   }
 
   void _flipCamera() {
-    final List<CameraDescription>? cameras =
-        ref.read(_checkMicrophoneCameraPerm).value?.cameras;
+    final cameraState = ModelBinding.of<CreateCameraState>(context);
+    final List<CameraDescription> cameras = cameraState.cameras;
 
-    if (cameras.isNotNull && cameras!.length > 1) {
+    if (cameras.length > 1) {
       onNewCameraSelected(
         cameras.firstWhere(
           (camera) => camera != hasInitCameraNotifier.value,
@@ -614,7 +610,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       begin: .9,
       end: 1,
     ).animate(hideSpeedController);
-
     return NotificationListener<CaptureNotification>(
       onNotification: handleCaptureNotification,
       child: Stack(
@@ -838,9 +833,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 }
 
 class CaptureMusicButton extends StatelessWidget {
-  const CaptureMusicButton({
-    super.key,
-  });
+  const CaptureMusicButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -871,77 +864,6 @@ class ControlMessageEvent extends StatelessWidget {
   }
 }
 
-class OldCreateShortsPermissionRequest extends StatelessWidget {
-  const OldCreateShortsPermissionRequest({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const CreateProgress(),
-        const SizedBox(height: 24),
-        const CreateCloseButton(),
-        Expanded(
-          child: SizedBox(
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Create a Short',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Allow access to your camera and microphone',
-                  style: TextStyle(color: Colors.white24),
-                ),
-                const SizedBox(height: 24),
-                const SizedBox(height: 12),
-                Consumer(
-                  builder: (context, ref, child) {
-                    return GestureDetector(
-                      onTap: () async {
-                        await Permission.camera.request();
-                        await Permission.microphone.request();
-
-                        ref.refresh(_checkMicrophoneCameraPerm);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 9,
-                          horizontal: 14,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(32),
-                        ),
-                        child: const Text(
-                          'Allow access',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class CreateShortsPermissionRequest extends StatelessWidget {
   const CreateShortsPermissionRequest({
     super.key,
@@ -951,104 +873,116 @@ class CreateShortsPermissionRequest extends StatelessWidget {
   final bool checking;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12.0),
+    return DecoratedBox(
       decoration: BoxDecoration(
         image: checking
             ? null
             : const DecorationImage(
-                image: CustomNetworkImage(''),
+                image: CustomNetworkImage(
+                  'https://images.pexels.com/photos/26221937/pexels-photo-26221937/free-photo-of-a-woman-taking-a-photo.jpeg?auto=compress&cs=tinysrgb&w=600',
+                ),
               ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const CreateCloseButton(),
-          Expanded(
-            child: Builder(
-              builder: (BuildContext context) {
-                if (checking) {
-                  return const CheckingPermission();
-                } else {
-                  return SizedBox(
-                    width: double.infinity,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Spacer(),
-                        const Padding(
-                          padding: EdgeInsets.all(24.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(YTIcons.shorts_outline_outlined, size: 48),
-                              SizedBox(height: 48),
-                              Text(
-                                'To record, let YouTube access your camera and microphone',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              SizedBox(height: 12),
-                              CreatePermissionReason(
-                                icon: YTIcons.info_outlined,
-                                title: 'Why is this needed?',
-                                subtitle:
-                                    'So you can take photos, record videos, and preview effects',
-                              ),
-                              SizedBox(height: 12),
-                              CreatePermissionReason(
-                                icon: YTIcons.settings_outlined,
-                                title: 'You are in control',
-                                subtitle:
-                                    'Change your permissions any time in Settings',
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Consumer(
-                          builder: (context, ref, child) {
-                            return GestureDetector(
-                              onTap: () async {
-                                await Permission.camera.request();
-                                await Permission.microphone.request();
-
-                                ref.refresh(_checkMicrophoneCameraPerm);
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                  horizontal: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(32),
-                                ),
-                                alignment: Alignment.center,
-                                child: const Text(
-                                  'Continue',
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const CreateCloseButton(),
+            Expanded(
+              child: Builder(
+                builder: (BuildContext context) {
+                  if (checking) {
+                    return const CheckingPermission();
+                  } else {
+                    return const SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Spacer(),
+                          Padding(
+                            padding: EdgeInsets.all(24.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(YTIcons.shorts_outline_outlined, size: 48),
+                                SizedBox(height: 48),
+                                Text(
+                                  'To record, let YouTube access your camera and microphone',
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    color: Colors.black,
+                                    fontSize: 20,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-                    ),
-                  );
-                }
-              },
+                                SizedBox(height: 12),
+                                CreatePermissionReason(
+                                  icon: YTIcons.info_outlined,
+                                  title: 'Why is this needed?',
+                                  subtitle:
+                                      'So you can take photos, record videos, and preview effects',
+                                ),
+                                SizedBox(height: 12),
+                                CreatePermissionReason(
+                                  icon: YTIcons.settings_outlined,
+                                  title: 'You are in control',
+                                  subtitle:
+                                      'Change your permissions any time in Settings',
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                          PermissionRequestButton(),
+                          SizedBox(height: 12),
+                        ],
+                      ),
+                    );
+                  }
+                },
+              ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PermissionRequestButton extends StatelessWidget {
+  const PermissionRequestButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ModelBinding.of<CreateCameraState>(context);
+    return GestureDetector(
+      onTap: () async {
+        if (state.permissionsDenied == false) {
+          final state = await CreateCameraState.requestCamera();
+          if (context.mounted) {
+            ModelBinding.update<CreateCameraState>(context, state);
+          }
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          vertical: 16,
+          horizontal: 12,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(32),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          state.permissionsDenied ? 'Open settings' : 'Continue',
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
           ),
-        ],
+        ),
       ),
     );
   }

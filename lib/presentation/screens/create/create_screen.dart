@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -6,6 +7,7 @@ import 'create_live_screen.dart';
 import 'create_post_screen.dart';
 import 'create_shorts_screen.dart';
 import 'create_video_screen.dart';
+import 'provider/index_notifier.dart';
 import 'widgets/notifications/create_notification.dart';
 
 class CreateScreen extends StatefulWidget {
@@ -17,7 +19,9 @@ class CreateScreen extends StatefulWidget {
 
 class _CreateScreenState extends State<CreateScreen>
     with SingleTickerProviderStateMixin {
-  final ValueNotifier<int> selectedNotifier = ValueNotifier<int>(1);
+  final IndexNotifier<CreateTab> indexNotifier = IndexNotifier<CreateTab>(
+    CreateTab.shorts,
+  );
   final PageController controller = PageController(
     viewportFraction: 0.18,
     initialPage: 1,
@@ -40,12 +44,12 @@ class _CreateScreenState extends State<CreateScreen>
   void dispose() {
     controller.dispose();
     hideNController.dispose();
-    selectedNotifier.dispose();
+    indexNotifier.dispose();
     super.dispose();
   }
 
   void onPageChangeCallback(int pageIndex) {
-    selectedNotifier.value = pageIndex;
+    indexNotifier.value = CreateTab.values[pageIndex];
   }
 
   @override
@@ -67,19 +71,22 @@ class _CreateScreenState extends State<CreateScreen>
                     }
                     return true;
                   },
-                  child: ListenableBuilder(
-                    listenable: selectedNotifier,
-                    builder: (BuildContext context, Widget? _) {
-                      return IndexedStack(
-                        index: selectedNotifier.value,
-                        children: const <Widget>[
-                          CreateVideoScreen(),
-                          CreateShortsScreen(),
-                          CreateLiveScreen(),
-                          CreatePostScreen(),
-                        ],
-                      );
-                    },
+                  child: ModelBinding<IndexNotifier>(
+                    model: indexNotifier,
+                    child: ListenableBuilder(
+                      listenable: indexNotifier,
+                      builder: (BuildContext context, Widget? _) {
+                        return IndexedStack(
+                          index: indexNotifier.currentIndex,
+                          children: const <Widget>[
+                            CreateVideoScreen(),
+                            CreateShortsScreen(),
+                            CreateLiveScreen(),
+                            CreatePostScreen(),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -107,10 +114,10 @@ class _CreateScreenState extends State<CreateScreen>
                             child: Opacity(
                               opacity: 0,
                               child: ListenableBuilder(
-                                listenable: selectedNotifier,
+                                listenable: indexNotifier,
                                 builder: (BuildContext context, Widget? _) {
                                   return Text(
-                                    tabs[selectedNotifier.value],
+                                    tabs[indexNotifier.currentIndex],
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
@@ -138,7 +145,7 @@ class _CreateScreenState extends State<CreateScreen>
                                       horizontal: 16,
                                     ),
                                     child: ListenableBuilder(
-                                      listenable: selectedNotifier,
+                                      listenable: indexNotifier,
                                       builder: (
                                         BuildContext context,
                                         Widget? _,
@@ -149,7 +156,7 @@ class _CreateScreenState extends State<CreateScreen>
                                             style: TextStyle(
                                               fontSize: 14,
                                               color: index ==
-                                                      selectedNotifier.value
+                                                      indexNotifier.currentIndex
                                                   ? Colors.white
                                                   : Colors.grey,
                                               fontWeight: FontWeight.w500,

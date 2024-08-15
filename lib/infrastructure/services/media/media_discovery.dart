@@ -24,8 +24,8 @@ class MediaDiscovery {
           type: path.type,
           albumType: path.albumType,
           albumTypeEx: path.albumTypeEx,
-          darwinSubtype: path.darwinSubtype,
-          darwinType: path.darwinType,
+          // darwinSubtype: path.darwinSubtype,
+          // darwinType: path.darwinType,
           filterOption: path.filterOption,
           isAll: path.isAll,
           lastModified: path.lastModified,
@@ -46,7 +46,6 @@ class MediaDiscovery {
       page: page,
       size: offset,
     );
-    print(entities);
     return Future.value(
       MediaFileQueryResult(
         files: entities.map(MediaFile.fromAssetEntity).toList(),

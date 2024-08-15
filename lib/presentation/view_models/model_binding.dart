@@ -1,14 +1,31 @@
 import 'package:flutter/widgets.dart';
 
+class _ModelBindingScope<T> extends InheritedWidget {
+  const _ModelBindingScope({
+    super.key,
+    required this.bindingState,
+    required super.child,
+  });
+
+  final _ModelBindingState<T> bindingState;
+
+  @override
+  bool updateShouldNotify(_ModelBindingScope oldWidget) => true;
+}
+
 class ModelBinding<T> extends StatefulWidget {
   const ModelBinding({
     super.key,
     required this.model,
     required this.child,
+    this.onUpdate,
+    this.commands = const <Type, ModelBindingAction>{},
   });
 
   final T model;
   final Widget child;
+  final ValueChanged<T>? onUpdate;
+  final Map<Type, ModelBindingAction> commands;
 
   static T of<T>(BuildContext context) {
     final scope = context.findAncestorStateOfType<_ModelBindingState<T>>();
@@ -30,6 +47,8 @@ class ModelBinding<T> extends StatefulWidget {
   State<ModelBinding<T>> createState() => _ModelBindingState<T>();
 }
 
+abstract class ModelBindingAction {}
+
 class _ModelBindingState<T> extends State<ModelBinding<T>> {
   late T currentModel;
 
@@ -39,15 +58,22 @@ class _ModelBindingState<T> extends State<ModelBinding<T>> {
     currentModel = widget.model;
   }
 
+  @override
+  void didUpdateWidget(covariant ModelBinding<T> oldWidget) {
+    currentModel = widget.model;
+    super.didUpdateWidget(oldWidget);
+  }
+
   void updateModelValue(T value) {
     if (value != currentModel) {
       currentModel = value;
+      widget.onUpdate?.call(value);
       setState(() {});
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.child;
+    return _ModelBindingScope<T>(bindingState: this, child: widget.child);
   }
 }

@@ -80,6 +80,19 @@ class EffectController extends ChangeNotifier {
     _isOpened = false;
     if (oldValue != _isOpened) notifyListeners();
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is EffectController &&
+          runtimeType == other.runtimeType &&
+          _selectedItems == other._selectedItems &&
+          _statusListener == other._statusListener &&
+          _isOpened == other._isOpened;
+
+  @override
+  int get hashCode =>
+      _selectedItems.hashCode ^ _statusListener.hashCode ^ _isOpened.hashCode;
 }
 
 class VideoEffectOptions extends StatefulWidget {
@@ -344,8 +357,8 @@ class EffectWidget extends StatefulWidget {
 }
 
 class _EffectWidgetState extends State<EffectWidget>
-    with MaterialStateMixin, SingleTickerProviderStateMixin {
-  late final controller = AnimationController(
+    with SingleTickerProviderStateMixin {
+  late final AnimationController controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 300),
   );
@@ -385,7 +398,8 @@ class _EffectWidgetState extends State<EffectWidget>
 
   @override
   void dispose() {
-    controller.dispose();
+    // TODO(josh4500): Throws error trying to dispose and this also affects the CameraController dispose (due to exception)
+    // controller.dispose();
     activeNotifier.dispose();
     widget.controller?.removeStatusListener(changeStateCallback);
     super.dispose();
@@ -397,30 +411,36 @@ class _EffectWidgetState extends State<EffectWidget>
       onTap: handleTap,
       margin: widget.margin,
       padding: EdgeInsets.zero,
-      icon: ValueListenableBuilder<bool>(
-        valueListenable: activeNotifier,
-        builder: (BuildContext context, bool active, Widget? _) {
-          final child = Icon(
-            active
-                ? widget.item.activeIcon ?? widget.item.icon
-                : widget.item.icon,
-            size: 24,
-          );
-
+      icon: Builder(
+        builder: (BuildContext context) {
           if (widget.item.animation == EffectTapAnimation.rotate) {
+            final animation = CurvedAnimation(
+              parent: controller,
+              curve: Curves.easeInCirc,
+            );
             return AnimatedBuilder(
-              animation: controller,
+              animation: animation,
               builder: (BuildContext context, Widget? childWidget) {
                 return Transform.rotate(
-                  angle: math.pi * controller.value,
+                  angle: math.pi * animation.value,
                   child: childWidget,
                 );
               },
-              child: child,
+              child: Icon(widget.item.icon, size: 24),
             );
           }
 
-          return child;
+          return ValueListenableBuilder<bool>(
+            valueListenable: activeNotifier,
+            builder: (BuildContext context, bool active, Widget? _) {
+              return Icon(
+                active
+                    ? widget.item.activeIcon ?? widget.item.icon
+                    : widget.item.icon,
+                size: 24,
+              );
+            },
+          );
         },
       ),
     );
