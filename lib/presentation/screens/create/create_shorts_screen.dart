@@ -524,7 +524,7 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
         level.normalizeRange(_minAvailableZoom, _maxAvailableZoom),
       );
       dragZoomLevelNotifier.value = level;
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to set zoom level
       rethrow;
     }
@@ -537,7 +537,7 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
 
     try {
       await controller!.setFlashMode(mode);
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to set flash mode
       rethrow;
     }
@@ -550,7 +550,7 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
 
     try {
       await controller!.setExposureMode(mode);
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to set exposure mode
       rethrow;
     }
@@ -563,7 +563,7 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
 
     try {
       offset = await controller!.setExposureOffset(offset);
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to set exposure
       rethrow;
     }
@@ -576,7 +576,7 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
 
     try {
       await controller!.setFocusMode(mode);
-    } on CameraException catch (e) {
+    } on CameraException {
       // TODO(josh4500): Unable to set focus mode
       rethrow;
     }
