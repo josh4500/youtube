@@ -881,6 +881,7 @@ class CreateShortsPermissionRequest extends StatelessWidget {
                 image: CustomNetworkImage(
                   'https://images.pexels.com/photos/26221937/pexels-photo-26221937/free-photo-of-a-woman-taking-a-photo.jpeg?auto=compress&cs=tinysrgb&w=600',
                 ),
+                fit: BoxFit.cover,
               ),
       ),
       child: Padding(

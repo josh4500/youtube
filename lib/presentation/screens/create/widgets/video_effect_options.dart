@@ -422,7 +422,7 @@ class _EffectWidgetState extends State<EffectWidget>
               animation: animation,
               builder: (BuildContext context, Widget? childWidget) {
                 return Transform.rotate(
-                  angle: math.pi * animation.value,
+                  angle: -math.pi * animation.value,
                   child: childWidget,
                 );
               },
