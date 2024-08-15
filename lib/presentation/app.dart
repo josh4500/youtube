@@ -50,6 +50,7 @@ class App extends StatelessWidget {
             view: View.of(context),
             child: MaterialApp.router(
               title: 'Youtube',
+              restorationScopeId: 'app',
               themeAnimationStyle: AnimationStyle(
                 duration: const Duration(milliseconds: 250),
                 curve: Curves.easeInCubic,

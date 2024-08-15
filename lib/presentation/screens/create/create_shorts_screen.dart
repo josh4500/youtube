@@ -219,11 +219,12 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
 
   static const double offsetYFromCircle =
       (kRecordOuterButtonSize - kRecordInnerButtonSize) / 2;
+
   static const bottomOffset = offsetYFromCircle - bottomPaddingHeight;
 
-  Offset getCenterButtonPosition(BoxConstraints constraints) {
+  Offset getCenterButtonInitPosition(BoxConstraints constraints) {
     return Offset(
-      (constraints.maxWidth / 2) - (kRecordInnerButtonSize / 2) + 0.625,
+      (constraints.maxWidth / 2) - (kRecordInnerButtonSize / 2),
       (constraints.maxHeight) - kRecordOuterButtonSize + bottomOffset,
     );
   }
@@ -232,14 +233,10 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (hasInitCameraNotifier.value == null) {
-      Future.microtask(() {
-        if (context.mounted) {
-          final cameraState = ModelBinding.of<CreateCameraState>(context);
-          if (cameraState.cameras.isNotEmpty) {
-            onNewCameraSelected(cameraState.cameras.first);
-          }
-        }
-      });
+      final cameraState = ModelBinding.of<CreateCameraState>(context);
+      if (cameraState.cameras.isNotEmpty) {
+        onNewCameraSelected(cameraState.cameras.first);
+      }
     }
   }
 
@@ -471,7 +468,7 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
 
     // Reset positions
     recordOuterButtonPosition.value = getDragCircleInitPosition(constraints);
-    recordInnerButtonPosition.value = getCenterButtonPosition(constraints);
+    recordInnerButtonPosition.value = getCenterButtonInitPosition(constraints);
 
     recordOuterButtonController.reverse();
   }
@@ -508,7 +505,8 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
     if (position.dy <= maxHeight * .8) {
       droppedButton = true;
       // TODO(josh4500): Animate
-      recordInnerButtonPosition.value = getCenterButtonPosition(constraints);
+      recordInnerButtonPosition.value =
+          getCenterButtonInitPosition(constraints);
     } else if (droppedButton &&
         position.dy >=
             maxHeight - (kRecordOuterButtonSize / 2) - bottomPaddingHeight) {
@@ -701,7 +699,7 @@ class _CaptureShortsViewState extends State<CaptureShortsView>
                       Offset? position,
                       Widget? childWidget,
                     ) {
-                      position ??= getCenterButtonPosition(constraints);
+                      position ??= getCenterButtonInitPosition(constraints);
 
                       return Positioned(
                         top: position.dy,
