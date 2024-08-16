@@ -421,8 +421,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                     ref.read(currentTimelineProvider.notifier).clear();
                     ref.read(shortRecordingProvider.notifier).clear();
 
-                    showNavigator();
                     context.pop();
+                    showNavigator();
                   },
                 ),
                 ListTile(
@@ -1152,8 +1152,8 @@ class ControlMessageEvent extends StatelessWidget {
       message,
       style: const TextStyle(
         fontSize: 36,
-        color: Colors.white38,
-        fontWeight: FontWeight.w800,
+        color: Colors.white54,
+        fontWeight: FontWeight.w500,
       ),
     );
   }

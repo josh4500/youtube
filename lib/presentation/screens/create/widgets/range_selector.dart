@@ -61,7 +61,7 @@ class _RangeSelectorState<T> extends State<RangeSelector>
     ).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Curves.easeInCubic,
+        curve: Curves.linearToEaseOut,
       ),
     );
     tween.addListener(() => alignmentNotifier.value = tween.value);
@@ -81,10 +81,11 @@ class _RangeSelectorState<T> extends State<RangeSelector>
 
   Future<void> _updateAlignment(double position, double width) async {
     final value = _getIndexFromPosition(position, width);
+
+    _updateSelected(value);
     await _tweenAnimateNotifier(
       Alignment((value / (itemCount - 1)).normalizeRange(-1, 1), 0),
     );
-    _updateSelected(value);
   }
 
   void _updateSelected(int selectedValue) {

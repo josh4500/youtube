@@ -17,7 +17,6 @@ class CaptureShortsDuration extends ConsumerStatefulWidget {
 class _CaptureShortsDurationTimerState
     extends ConsumerState<CaptureShortsDuration>
     with SingleTickerProviderStateMixin {
-  int time = 15;
   static const int minTime = 15;
   static const int maxTime = 60;
   late final AnimationController controller = AnimationController(
@@ -31,6 +30,17 @@ class _CaptureShortsDurationTimerState
   ).animate(controller);
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Future.microtask(() {
+      final recordDuration = ref.read(shortRecordingProvider).recordDuration;
+      if (recordDuration.inSeconds == maxTime) {
+        controller.forward();
+      }
+    });
+  }
+
+  @override
   void dispose() {
     controller.dispose();
     super.dispose();
@@ -38,12 +48,15 @@ class _CaptureShortsDurationTimerState
 
   @override
   Widget build(BuildContext context) {
+    final shortsRecordDuration = ref.watch(
+      shortRecordingProvider.select((state) => state.recordDuration.inSeconds),
+    );
     return GestureDetector(
       onTap: () {
         bool updateValue = true;
-        if (time == minTime) {
+        int time = 0;
+        if (shortsRecordDuration == minTime) {
           time = maxTime;
-          setState(() {});
           controller.forward();
         } else {
           final shortsRecording = ref.read(shortRecordingProvider);
@@ -52,7 +65,6 @@ class _CaptureShortsDurationTimerState
             // TODO(josh4500): Show "Record up to 60s" pointer message
           } else {
             time = minTime;
-            setState(() {});
             controller.reverse();
           }
         }
@@ -76,7 +88,10 @@ class _CaptureShortsDurationTimerState
               color: Colors.black38,
               shape: BoxShape.circle,
             ),
-            child: Text('${time}s', style: const TextStyle(fontSize: 14)),
+            child: Text(
+              '${shortsRecordDuration}s',
+              style: const TextStyle(fontSize: 14),
+            ),
           ),
           Positioned.fill(
             child: AnimatedBuilder(
