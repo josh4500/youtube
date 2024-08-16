@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
-import 'package:youtube_clone/presentation/models.dart';
-import 'package:youtube_clone/presentation/screens/create/provider/short_recording_state.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../provider/media_album_state.dart';
+import '../../provider/short_recording_state.dart';
 import '../notifications/create_notification.dart';
 
 class CaptureTimelineControl extends StatelessWidget {
@@ -93,7 +92,7 @@ class CaptureTimelineControl extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: timelineState.isCompleted
+                        color: timelineState.isPublishable
                             ? Colors.white
                             : Colors.white24,
                         shape: BoxShape.circle,

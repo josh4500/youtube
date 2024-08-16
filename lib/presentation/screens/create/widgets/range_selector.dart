@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
 
 class RangeSelector extends StatefulWidget {
-  const RangeSelector({super.key});
+  const RangeSelector({
+    super.key,
+    required this.itemBuilder,
+    required this.itemCount,
+    this.initialIndex,
+    this.onChanged,
+  });
+  final int? initialIndex;
+  final Widget Function(BuildContext context, int selectedIndex, int index)
+      itemBuilder;
+  final int itemCount;
+  final ValueChanged<int>? onChanged;
 
   @override
   State<RangeSelector> createState() => _RangeSelectorState();
 }
 
-class _RangeSelectorState extends State<RangeSelector>
+class _RangeSelectorState<T> extends State<RangeSelector>
     with SingleTickerProviderStateMixin {
   late final AnimationController controller;
-  final notifier = ValueNotifier<Alignment>(Alignment.center);
-  final selected = ValueNotifier<int>(2);
+  final alignmentNotifier = ValueNotifier<Alignment>(Alignment.center);
+  late final indexNotifier = ValueNotifier<int>(
+    widget.initialIndex ?? widget.itemCount ~/ 2,
+  );
 
   @override
   void initState() {
@@ -22,17 +35,18 @@ class _RangeSelectorState extends State<RangeSelector>
     );
   }
 
+  int get itemCount => widget.itemCount;
   @override
   void dispose() {
-    notifier.dispose();
-    selected.dispose();
+    alignmentNotifier.dispose();
+    indexNotifier.dispose();
     controller.dispose();
     super.dispose();
   }
 
   Future<void> _tweenAnimateNotifier(Alignment value) async {
     final Animation<Alignment> tween = AlignmentTween(
-      begin: notifier.value,
+      begin: alignmentNotifier.value,
       end: value,
     ).animate(
       CurvedAnimation(
@@ -40,7 +54,7 @@ class _RangeSelectorState extends State<RangeSelector>
         curve: Curves.easeInCubic,
       ),
     );
-    tween.addListener(() => notifier.value = tween.value);
+    tween.addListener(() => alignmentNotifier.value = tween.value);
 
     // Reset the animation controller to its initial state
     controller.reset();
@@ -58,15 +72,16 @@ class _RangeSelectorState extends State<RangeSelector>
           return GestureDetector(
             onTapDown: (details) async {
               final value = details.localPosition.dx / constraints.maxWidth;
-              final selectedValue = (value * 5).floor();
+              final selectedValue = (value * itemCount).floor();
               await _tweenAnimateNotifier(
                 Alignment.lerp(
                   Alignment.centerLeft,
                   Alignment.centerRight,
-                  (selectedValue / 4).clamp(0, 1),
+                  (selectedValue / (itemCount - 1)).clamp(0, 1),
                 )!,
               );
-              selected.value = selectedValue;
+              indexNotifier.value = selectedValue;
+              widget.onChanged?.call(selectedValue);
             },
             onHorizontalDragUpdate: (details) async {
               // TODO(josh4500): Cancel duplicate future and enable code
@@ -92,15 +107,15 @@ class _RangeSelectorState extends State<RangeSelector>
                 children: [
                   Positioned.fill(
                     child: ListenableBuilder(
-                      listenable: notifier,
+                      listenable: alignmentNotifier,
                       builder: (BuildContext context, Widget? childWidget) {
                         return Align(
-                          alignment: notifier.value,
+                          alignment: alignmentNotifier.value,
                           child: childWidget,
                         );
                       },
                       child: Container(
-                        width: constraints.maxWidth / 6,
+                        width: constraints.maxWidth / (itemCount + 1),
                         margin: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -111,9 +126,9 @@ class _RangeSelectorState extends State<RangeSelector>
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: List.generate(5, (index) {
+                    children: List.generate(itemCount, (index) {
                       return ValueListenableBuilder<int>(
-                        valueListenable: selected,
+                        valueListenable: indexNotifier,
                         builder: (
                           BuildContext context,
                           int selectedIndex,
@@ -124,15 +139,10 @@ class _RangeSelectorState extends State<RangeSelector>
                             height: 36,
                             margin: const EdgeInsets.all(2),
                             alignment: Alignment.center,
-                            child: Text(
-                              '${index + 1}X',
-                              style: TextStyle(
-                                color: index == selectedIndex
-                                    ? Colors.black
-                                    : null,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
+                            child: widget.itemBuilder(
+                              context,
+                              selectedIndex,
+                              index,
                             ),
                           );
                         },

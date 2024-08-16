@@ -71,7 +71,7 @@ class CreateTimelineState {
   /// Whether recorded timelines elapse the assigned [recordDuration]
   bool get isCompleted => duration >= recordDuration;
 
-  bool get isEnough => duration >= const Duration(seconds: 5);
+  bool get isPublishable => duration >= const Duration(seconds: 5);
 
   bool get hasOneTimeline => timelines.length == 1;
 
