@@ -2,12 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../provider/current_timeline_state.dart';
+import '../notifications/capture_notification.dart';
 import '../range_selector.dart';
 
 class CaptureSpeed extends ConsumerWidget {
   const CaptureSpeed({super.key});
 
   static const List<num> speeds = [0.3, 0.5, 1, 2, 3];
+  static const List<String> speedMessage = [
+    'Very slow',
+    'Slow',
+    'Normal',
+    'Fast',
+    'Very fast',
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,6 +39,9 @@ class CaptureSpeed extends ConsumerWidget {
         ref.read(currentTimelineProvider.notifier).updateSpeed(
               speeds[index].toDouble(),
             );
+        ShowControlsMessageNotification(
+          message: speedMessage[index],
+        ).dispatch(context);
       },
     );
   }
