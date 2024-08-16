@@ -8,8 +8,8 @@ enum RecordingState {
 }
 
 class Timeline {
-  Timeline( {
-    this.speed = 0,
+  Timeline({
+    this.speed = 1,
     this.duration = Duration.zero,
     this.extraSound,
     this.state = RecordingState.idle,
