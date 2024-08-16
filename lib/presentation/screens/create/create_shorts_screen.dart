@@ -28,6 +28,7 @@
 import 'dart:async';
 
 import 'package:camera/camera.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
@@ -167,6 +168,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   static const double bottomPaddingHeight = 48;
 
   final Set<CaptureEffect> _enabledCaptureEffects = {};
+  Timer? _doubleTapTimer;
 
   @override
   void initState() {
@@ -201,6 +203,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     focusPosition.dispose();
     focusController.dispose();
+    _doubleTapTimer?.cancel();
 
     recordOuterButtonController.dispose();
     recordingNotifier.dispose();
@@ -450,24 +453,27 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       return;
     }
 
-    final CameraController cameraController = controller!;
+    // Using timer to prevent accidental focus action on double tap
+    _doubleTapTimer = Timer(kDoubleTapMinTime * 2, () {
+      final CameraController cameraController = controller!;
 
-    final Offset offset = Offset(
-      details.localPosition.dx / constraints.maxWidth,
-      details.localPosition.dy / constraints.maxHeight,
-    );
-    cameraController.setExposurePoint(offset);
-    cameraController.setFocusPoint(offset);
+      final Offset offset = Offset(
+        details.localPosition.dx / constraints.maxWidth,
+        details.localPosition.dy / constraints.maxHeight,
+      );
+      cameraController.setExposurePoint(offset);
+      cameraController.setFocusPoint(offset);
 
-    // Set focus position tapped by user
-    focusPosition.value = Offset(
-      details.localPosition.dx - kFocusSize,
-      details.localPosition.dy - kFocusSize,
-    );
+      // Set focus position tapped by user
+      focusPosition.value = Offset(
+        details.localPosition.dx - kFocusSize,
+        details.localPosition.dy - kFocusSize,
+      );
 
-    // Show focus points
-    focusController.reset();
-    focusController.forward();
+      // Show focus points
+      focusController.reset();
+      focusController.forward();
+    });
   }
 
   void handleOnDoubleTapCameraView(
@@ -478,7 +484,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       effectsController.close();
       return;
     }
-
+    _doubleTapTimer?.cancel();
     _flipCamera();
   }
 
