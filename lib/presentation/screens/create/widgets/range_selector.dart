@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/core/utils/normalization.dart';
 
 class RangeSelector extends StatefulWidget {
   const RangeSelector({
@@ -63,6 +64,16 @@ class _RangeSelectorState<T> extends State<RangeSelector>
     await controller.forward();
   }
 
+  Future<void> _updateAlignment(Offset localPosition, double width) async {
+    final value = localPosition.dx / width;
+    final selectedValue = (value * itemCount).floor();
+    await _tweenAnimateNotifier(
+      Alignment((selectedValue / (itemCount - 1)).normalizeRange(-1, 1), 0),
+    );
+    indexNotifier.value = selectedValue;
+    widget.onChanged?.call(selectedValue);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -71,32 +82,19 @@ class _RangeSelectorState<T> extends State<RangeSelector>
         builder: (BuildContext context, BoxConstraints constraints) {
           return GestureDetector(
             onTapDown: (details) async {
-              final value = details.localPosition.dx / constraints.maxWidth;
-              final selectedValue = (value * itemCount).floor();
-              await _tweenAnimateNotifier(
-                Alignment.lerp(
-                  Alignment.centerLeft,
-                  Alignment.centerRight,
-                  (selectedValue / (itemCount - 1)).clamp(0, 1),
-                )!,
-              );
-              indexNotifier.value = selectedValue;
-              widget.onChanged?.call(selectedValue);
+              _updateAlignment(details.localPosition, constraints.maxWidth);
             },
             onHorizontalDragUpdate: (details) async {
-              // TODO(josh4500): Cancel duplicate future and enable code
-              // final value = details.localPosition.dx / constraints.maxWidth;
-              // final selectedValue = (value * 5).floor();
-              // if (selected.value != selectedValue) {
-              //   await _tweenAnimateNotifier(
-              //     Alignment.lerp(
-              //       Alignment.centerLeft,
-              //       Alignment.centerRight,
-              //       (selectedValue / 4).clamp(0, 1),
-              //     )!,
-              //   );
-              //   selected.value = selectedValue;
-              // }
+              final value = details.localPosition.dx / constraints.maxWidth;
+              alignmentNotifier.value = Alignment(
+                value.normalizeRange(-1, 1),
+                0,
+              );
+              final selectedValue = (value * itemCount).floor();
+              indexNotifier.value = selectedValue;
+            },
+            onHorizontalDragEnd: (DragEndDetails details) async {
+              _updateAlignment(details.localPosition, constraints.maxWidth);
             },
             child: Container(
               decoration: BoxDecoration(
