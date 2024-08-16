@@ -23,7 +23,7 @@ class CurrentTimeline extends _$CurrentTimeline {
     state = Timeline();
   }
 
-  void startRecording() {
+  void startRecording(void Function(Timeline timeline) callback) {
     // Stop any previous recordings
     _stopRecording();
 
@@ -37,6 +37,7 @@ class CurrentTimeline extends _$CurrentTimeline {
         duration: newDuration,
         state: RecordingState.recording,
       );
+      callback(state);
     });
   }
 

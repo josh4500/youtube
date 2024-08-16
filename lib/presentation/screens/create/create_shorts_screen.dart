@@ -434,6 +434,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     }
   }
 
+  bool get _guardRecording => ref.read(shortRecordingProvider).isCompleted;
+
   Future<void> _startRecording() async {
     final CameraController? cameraController = controller;
     if (cameraController == null || !cameraController.value.isInitialized) {
@@ -442,7 +444,34 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     // await cameraController.startVideoRecording(
     //   onAvailable: (CameraImage cameraImage) {},
     // );
-    ref.read(currentTimelineProvider.notifier).startRecording();
+    ref
+        .read(currentTimelineProvider.notifier)
+        .startRecording((Timeline timeline) {
+      final shortsRecording = ref.read(shortRecordingProvider);
+      final totalDuration = shortsRecording.duration + timeline.duration;
+      if (totalDuration >= shortsRecording.recordDuration) {
+        _stopRecording();
+        _onAutoStopRecording();
+      }
+    });
+  }
+
+  Future<void> _onAutoStopRecording() async {
+    final revertDrag = disableDragMode;
+    disableDragMode = false;
+    recordingNotifier.value = false;
+    recordOuterButtonController.reverse(from: .7);
+    droppedButton = false;
+
+    if (revertDrag) {
+      dragRecordNotifier.value = false;
+      recordingNotifier.value = false;
+      hideZoomController.reverse();
+      // Reset positions
+      recordOuterButtonPosition.value = null;
+      recordInnerButtonPosition.value = null;
+      recordOuterButtonController.reverse();
+    }
   }
 
   Future<void> _stopRecording() async {
@@ -454,30 +483,34 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   }
 
   void handleOnTapRecordButton() {
+    if (_guardRecording) return;
     dragRecordNotifier.value = false; // Not dragging
 
     final recording = !recordingNotifier.value;
+
+    // TODO(josh4500): Prevent recoding when it gets to set Duration
+    // Start or Stop recording
+    recording ? _startRecording() : _stopRecording();
+
     disableDragMode = recording;
     recordingNotifier.value = recording;
     recording
         ? recordOuterButtonController.forward(from: .7)
         : recordOuterButtonController.reverse(from: .7);
 
-    // TODO(josh4500): Prevent recoding when it gets to set Duration
-    // Start or Stop recording
-    recording ? _startRecording() : _stopRecording();
-
     if (recording) CreateNotification(hideNavigator: true).dispatch(context);
   }
 
   void handleLongPressStartRecordButton(LongPressStartDetails details) {
-    if (disableDragMode) return;
+    if (disableDragMode || _guardRecording) return;
+
+    // TODO(josh4500): Prevent recoding when it gets to set Duration
+    _startRecording();
 
     dragRecordNotifier.value = true;
     recordingNotifier.value = true;
     hideZoomController.forward();
-    // TODO(josh4500): Prevent recoding when it gets to set Duration
-    _startRecording();
+
     CreateNotification(hideNavigator: true).dispatch(context);
     recordOuterButtonController.repeat(min: .8, max: 1, reverse: true);
   }
@@ -486,7 +519,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     LongPressEndDetails details,
     BoxConstraints constraints,
   ) async {
-    if (disableDragMode) return;
+    if (disableDragMode || _guardRecording) return;
+
+    _stopRecording();
 
     droppedButton = false;
 
@@ -494,7 +529,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     recordingNotifier.value = false;
     hideZoomController.reverse();
 
-    _stopRecording();
     // Reset positions
     recordOuterButtonPosition.value = getDragCircleInitPosition(constraints);
     recordInnerButtonPosition.value = getCenterButtonInitPosition(constraints);
@@ -506,7 +540,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     LongPressMoveUpdateDetails details,
     BoxConstraints constraints,
   ) {
-    if (disableDragMode) return;
+    if (disableDragMode || _guardRecording) return;
 
     final position = details.globalPosition;
     final maxHeight = constraints.maxHeight;
