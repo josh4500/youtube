@@ -100,12 +100,14 @@ class VideoEffectOptions extends StatefulWidget {
     super.key,
     this.controller,
     this.items = const <EffectOption>[],
+    this.labelGetter,
     this.onOpenChanged,
   });
 
   final EffectController? controller;
   final List<EffectOption> items;
   final ValueChanged<bool>? onOpenChanged;
+  final String Function(Enum enumValue)? labelGetter;
 
   @override
   State<VideoEffectOptions> createState() => _VideoEffectOptionsState();
@@ -226,7 +228,9 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
                                 child: Container(
                                   margin: labelVerticalMargin,
                                   child: Text(
-                                    widget.items[i].value.name,
+                                    widget.labelGetter
+                                            ?.call(widget.items[i].value) ??
+                                        widget.items[i].value.name,
                                     style: labelTextStyle,
                                   ),
                                 ),
@@ -248,7 +252,8 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
                                     child: Container(
                                       margin: labelVerticalMargin,
                                       child: Text(
-                                        item.value.name,
+                                        widget.labelGetter?.call(item.value) ??
+                                            item.value.name,
                                         style: labelTextStyle,
                                       ),
                                     ),

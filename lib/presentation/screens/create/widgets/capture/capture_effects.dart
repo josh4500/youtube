@@ -17,8 +17,7 @@ enum CaptureEffect {
   flash,
   trim;
 
-  // TODO(josh4500): Fix name not overridden
-  String get name {
+  String get stringValue {
     return switch (this) {
       CaptureEffect.flip => 'Flip',
       CaptureEffect.speed => 'Speed',
@@ -47,6 +46,7 @@ class CaptureEffects extends StatelessWidget {
             ? HideCaptureControlsNotification().dispatch(context)
             : ShowCaptureControlsNotification().dispatch(context);
       },
+      labelGetter: (Enum enumValue) => (enumValue as CaptureEffect).stringValue,
       items: const <EffectOption>[
         EffectOption(
           icon: YTIcons.flip_camera,
