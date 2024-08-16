@@ -257,6 +257,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     if (currentTabIndex != CreateTab.shorts) return;
 
     if (state == AppLifecycleState.inactive) {
+      _handleFailedRecording();
       cameraController.dispose();
       hasInitCameraNotifier.value = null;
     } else if (state == AppLifecycleState.resumed) {
@@ -266,6 +267,21 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
           _onUpdateCaptureEffect(effect, true);
         }
       });
+
+      if (_hasFailedRecording) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            dismissDirection: DismissDirection.down,
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+            content: const Text('Last recording failed.'),
+          ),
+        );
+      }
     }
   }
 
@@ -281,7 +297,23 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       cameraController.dispose();
       hasInitCameraNotifier.value = null;
     } else if (newIndex == CreateTab.shorts.index) {
-      onNewCameraSelected(cameraController.description);
+      onNewCameraSelected(cameraController.description).then((_) {
+        // Re-add effects that was previously removed when controller was disposed
+        for (final effect in _enabledCaptureEffects) {
+          _onUpdateCaptureEffect(effect, true);
+        }
+      });
+    }
+  }
+
+  bool _hasFailedRecording = false;
+
+  void _handleFailedRecording() {
+    if (recordingNotifier.value) {
+      _hasFailedRecording = true;
+
+      _stopRecording(false);
+      _onAutoStopRecording();
     }
   }
 
@@ -504,12 +536,14 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     }
   }
 
-  Future<void> _stopRecording() async {
+  Future<void> _stopRecording([bool addTimeline = true]) async {
     // final XFile xFile = await controller!.stopVideoRecording();
     // xFile.saveTo('path');
     ref.read(currentTimelineProvider.notifier).stopRecording();
-    final Timeline timeline = ref.read(currentTimelineProvider);
-    ref.read(shortRecordingProvider.notifier).addTimeline(timeline);
+    if (addTimeline) {
+      final Timeline timeline = ref.read(currentTimelineProvider);
+      ref.read(shortRecordingProvider.notifier).addTimeline(timeline);
+    }
   }
 
   void handleOnTapRecordButton() {
