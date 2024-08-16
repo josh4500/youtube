@@ -35,6 +35,7 @@ import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/screens/create/provider/current_timeline_state.dart';
 import 'package:youtube_clone/presentation/screens/create/provider/index_notifier.dart';
 import 'package:youtube_clone/presentation/screens/create/provider/short_recording_state.dart';
+import 'package:youtube_clone/presentation/screens/create/widgets/capture/capture_speed.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -165,7 +166,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   double _maxAvailableExposureOffset = 0.0;
 
   static const double bottomPaddingHeight = 48;
-  static const List<num> speeds = [0.3, 0.5, 1, 2, 3];
 
   @override
   void initState() {
@@ -875,26 +875,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                           animation: hideSpeedController,
                           child: ScaleTransition(
                             scale: speedSelectorScaleAnimation,
-                            child: RangeSelector(
-                              itemCount: speeds.length,
-                              itemBuilder: (
-                                BuildContext context,
-                                int selectedIndex,
-                                int index,
-                              ) {
-                                return Text(
-                                  '${speeds[index]}X',
-                                  style: TextStyle(
-                                    color: index == selectedIndex
-                                        ? Colors.black
-                                        : null,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                );
-                              },
-                              onChanged: (int index) {},
-                            ),
+                            child: const CaptureSpeed(),
                           ),
                         ),
                         const SizedBox(height: 36),

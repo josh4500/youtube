@@ -8,7 +8,8 @@ enum RecordingState {
 }
 
 class Timeline {
-  Timeline({
+  Timeline( {
+    this.speed = 0,
     this.duration = Duration.zero,
     this.extraSound,
     this.state = RecordingState.idle,
@@ -17,13 +18,16 @@ class Timeline {
   final ExtraSound? extraSound;
   final Duration duration;
   final RecordingState state;
+  final double speed;
 
   Timeline copyWith({
     ExtraSound? extraSound,
     Duration? duration,
     RecordingState? state,
+    double? speed,
   }) {
     return Timeline(
+      speed: speed ?? this.speed,
       extraSound: extraSound ?? this.extraSound,
       duration: duration ?? this.duration,
       state: state ?? this.state,

@@ -27,6 +27,8 @@ class _RangeSelectorState<T> extends State<RangeSelector>
     widget.initialIndex ?? widget.itemCount ~/ 2,
   );
 
+  int get itemCount => widget.itemCount;
+
   @override
   void initState() {
     super.initState();
@@ -36,7 +38,14 @@ class _RangeSelectorState<T> extends State<RangeSelector>
     );
   }
 
-  int get itemCount => widget.itemCount;
+  @override
+  void didUpdateWidget(RangeSelector oldWidget) {
+    if (oldWidget.initialIndex != widget.initialIndex) {
+      indexNotifier.value = widget.initialIndex ?? widget.itemCount ~/ 2;
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
   @override
   void dispose() {
     alignmentNotifier.dispose();
@@ -98,8 +107,8 @@ class _RangeSelectorState<T> extends State<RangeSelector>
             },
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.black45,
-                borderRadius: BorderRadius.circular(4),
+                color: Colors.black87,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Stack(
                 children: [

@@ -18,21 +18,18 @@ class CurrentTimeline extends _$CurrentTimeline {
     // Logic for adding sound
   }
 
-  void clear() {
-    _stopRecording();
-    state = Timeline();
-  }
+  void updateSpeed(double speed) => state = state.copyWith(speed: speed);
 
   void startRecording(void Function(Timeline timeline) callback) {
     // Stop any previous recordings
     _stopRecording();
 
     // Start a new recording
-    state = Timeline();
+    // Copies old speed to new timeline
+    state = Timeline(speed: state.speed);
     const addedDuration = Duration(milliseconds: 100);
     _recordingTimer = Timer.periodic(addedDuration, (timer) {
       final newDuration = state.duration + addedDuration;
-      // TODO(josh4500): Terminate recoding when it gets to set Duration
       state = state.copyWith(
         duration: newDuration,
         state: RecordingState.recording,
