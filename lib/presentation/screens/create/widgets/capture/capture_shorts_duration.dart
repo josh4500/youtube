@@ -40,23 +40,32 @@ class _CaptureShortsDurationTimerState
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        bool updateValue = true;
         if (time == minTime) {
           time = maxTime;
           setState(() {});
           controller.forward();
         } else {
-          time = minTime;
-          setState(() {});
-          controller.reverse();
+          final shortsRecording = ref.read(shortRecordingProvider);
+          if (shortsRecording.duration.inSeconds > minTime) {
+            updateValue = false;
+            // TODO(josh4500): Show "Record up to 60s" pointer message
+          } else {
+            time = minTime;
+            setState(() {});
+            controller.reverse();
+          }
         }
 
-        ref.read(shortRecordingProvider.notifier).updateDuration(
-              Duration(seconds: time),
-            );
+        if (updateValue) {
+          ref.read(shortRecordingProvider.notifier).updateDuration(
+                Duration(seconds: time),
+              );
 
-        ShowControlsMessageNotification(
-          message: '$time seconds',
-        ).dispatch(context);
+          ShowControlsMessageNotification(
+            message: '$time seconds',
+          ).dispatch(context);
+        }
       },
       child: Stack(
         alignment: Alignment.center,
