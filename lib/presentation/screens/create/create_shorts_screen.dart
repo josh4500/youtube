@@ -51,7 +51,6 @@ import 'widgets/create_permission_reason.dart';
 import 'widgets/create_progress.dart';
 import 'widgets/notifications/capture_notification.dart';
 import 'widgets/notifications/create_notification.dart';
-import 'widgets/range_selector.dart';
 import 'widgets/video_effect_options.dart';
 
 class CreateShortsScreen extends StatefulWidget {
@@ -167,6 +166,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   static const double bottomPaddingHeight = 48;
 
+  final Set<CaptureEffect> _enabledCaptureEffects = {};
+
   @override
   void initState() {
     super.initState();
@@ -259,7 +260,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       cameraController.dispose();
       hasInitCameraNotifier.value = null;
     } else if (state == AppLifecycleState.resumed) {
-      onNewCameraSelected(cameraController.description);
+      onNewCameraSelected(cameraController.description).then((_) {
+        // Re-add effects that was previously removed when controller was disposed
+        for (final effect in _enabledCaptureEffects) {
+          _onUpdateCaptureEffect(effect, true);
+        }
+      });
     }
   }
 
@@ -279,32 +285,55 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     }
   }
 
-  void effectStatusListener(EffectAction action, EffectOption option) {
-    if (option.label == 'Flip') {
-      _flipCamera();
-    } else if (option.label == 'Speed') {
-      if (action == EffectAction.add) {
-        hideSpeedController.forward();
-      } else {
-        hideSpeedController.reverse();
-      }
-    } else if (option.label == 'Lighting') {
-      if (action == EffectAction.add) {
-        setExposureOffset(
-          .75.normalizeRange(
-            _minAvailableExposureOffset,
-            _maxAvailableExposureOffset,
-          ),
-        );
-      } else {
-        setExposureOffset(_minAvailableExposureOffset);
-      }
-    } else if (option.label == 'Flash') {
-      if (action == EffectAction.add) {
-        setFlashMode(FlashMode.torch);
-      } else {
-        setFlashMode(FlashMode.off);
-      }
+  void _onUpdateCaptureEffect(CaptureEffect effect, bool isAdded) {
+    switch (effect) {
+      case CaptureEffect.flip:
+        _flipCamera();
+      case CaptureEffect.speed:
+        isAdded ? hideSpeedController.forward() : hideSpeedController.reverse();
+      case CaptureEffect.timer:
+      // TODO: Handle this case.
+      case CaptureEffect.effect:
+      // TODO: Handle this case.
+      case CaptureEffect.greenScreen:
+      // TODO: Handle this case.
+      case CaptureEffect.retouch:
+      // TODO: Handle this case.
+      case CaptureEffect.filter:
+      // TODO: Handle this case.
+      case CaptureEffect.align:
+      // TODO: Handle this case.
+      case CaptureEffect.lighting:
+        if (isAdded) {
+          setExposureOffset(
+            .75.normalizeRange(
+              _minAvailableExposureOffset,
+              _maxAvailableExposureOffset,
+            ),
+          );
+        } else {
+          setExposureOffset(_minAvailableExposureOffset);
+        }
+      case CaptureEffect.flash:
+        isAdded ? setFlashMode(FlashMode.torch) : setFlashMode(FlashMode.off);
+      case CaptureEffect.trim:
+      // TODO: Handle this case.
+    }
+  }
+
+  void effectStatusListener(
+    EffectAction action,
+    EffectOption option,
+  ) {
+    final effect = option.value as CaptureEffect;
+    final isAdded = action == EffectAction.add;
+
+    _onUpdateCaptureEffect(effect, isAdded);
+
+    if ([CaptureEffect.flip, CaptureEffect.speed].contains(effect)) {
+      isAdded
+          ? _enabledCaptureEffects.add(effect)
+          : _enabledCaptureEffects.remove(effect);
     }
   }
 

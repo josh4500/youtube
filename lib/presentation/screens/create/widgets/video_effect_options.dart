@@ -9,7 +9,7 @@ class EffectOption {
   const EffectOption({
     required this.icon,
     this.activeIcon,
-    required this.label,
+    required this.value,
     this.animation = EffectTapAnimation.switches,
     this.onTap,
   });
@@ -17,7 +17,7 @@ class EffectOption {
   final IconData icon;
   final IconData? activeIcon;
   final EffectTapAnimation animation;
-  final String label;
+  final Enum value;
   final VoidCallback? onTap;
 
   @override
@@ -27,10 +27,10 @@ class EffectOption {
           runtimeType == other.runtimeType &&
           icon == other.icon &&
           activeIcon == other.activeIcon &&
-          label == other.label;
+          value == other.value;
 
   @override
-  int get hashCode => icon.hashCode ^ activeIcon.hashCode ^ label.hashCode;
+  int get hashCode => icon.hashCode ^ activeIcon.hashCode ^ value.hashCode;
 }
 
 enum EffectAction { add, remove }
@@ -226,7 +226,7 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
                                 child: Container(
                                   margin: labelVerticalMargin,
                                   child: Text(
-                                    widget.items[i].label,
+                                    widget.items[i].value.name,
                                     style: labelTextStyle,
                                   ),
                                 ),
@@ -248,7 +248,7 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
                                     child: Container(
                                       margin: labelVerticalMargin,
                                       child: Text(
-                                        item.label,
+                                        item.value.name,
                                         style: labelTextStyle,
                                       ),
                                     ),

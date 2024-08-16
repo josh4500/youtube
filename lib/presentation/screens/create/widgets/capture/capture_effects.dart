@@ -4,6 +4,37 @@ import 'package:youtube_clone/presentation/themes.dart';
 import '../notifications/capture_notification.dart';
 import '../video_effect_options.dart';
 
+enum CaptureEffect {
+  flip,
+  speed,
+  timer,
+  effect,
+  greenScreen,
+  retouch,
+  filter,
+  align,
+  lighting,
+  flash,
+  trim;
+
+  // TODO(josh4500): Fix name not overridden
+  String get name {
+    return switch (this) {
+      CaptureEffect.flip => 'Flip',
+      CaptureEffect.speed => 'Speed',
+      CaptureEffect.timer => 'Timer',
+      CaptureEffect.effect => 'Effects',
+      CaptureEffect.greenScreen => 'Green Screen',
+      CaptureEffect.retouch => 'Retouch',
+      CaptureEffect.filter => 'Filter',
+      CaptureEffect.align => 'Align',
+      CaptureEffect.lighting => 'Lighting',
+      CaptureEffect.flash => 'Flash',
+      CaptureEffect.trim => 'Trim',
+    };
+  }
+}
+
 class CaptureEffects extends StatelessWidget {
   const CaptureEffects({super.key, this.controller});
   final EffectController? controller;
@@ -20,49 +51,49 @@ class CaptureEffects extends StatelessWidget {
         EffectOption(
           icon: YTIcons.flip_camera,
           animation: EffectTapAnimation.rotate,
-          label: 'Flip',
+          value: CaptureEffect.flip,
         ),
         EffectOption(
           icon: YTIcons.speed,
-          label: 'Speed',
+          value: CaptureEffect.speed,
         ),
         EffectOption(
           icon: Icons.timer_sharp,
-          label: 'Timer',
+          value: CaptureEffect.timer,
         ),
         EffectOption(
           icon: YTIcons.sparkle,
-          label: 'Effects',
+          value: CaptureEffect.effect,
         ),
         EffectOption(
           icon: YTIcons.green_screen,
-          label: 'Green Screen',
+          value: CaptureEffect.greenScreen,
         ),
         EffectOption(
           icon: YTIcons.retouch,
-          label: 'Retouch',
+          value: CaptureEffect.retouch,
         ),
         EffectOption(
           icon: YTIcons.filter_photo,
-          label: 'Filter',
+          value: CaptureEffect.filter,
         ),
         EffectOption(
           icon: YTIcons.align,
-          label: 'Align',
+          value: CaptureEffect.align,
         ),
         EffectOption(
           icon: YTIcons.lighting,
           activeIcon: Icons.light_mode,
-          label: 'Lighting',
+          value: CaptureEffect.lighting,
         ),
         EffectOption(
           icon: YTIcons.flash_off,
           activeIcon: Icons.flash_on,
-          label: 'Flash',
+          value: CaptureEffect.flash,
         ),
         EffectOption(
           icon: YTIcons.trim,
-          label: 'Trim',
+          value: CaptureEffect.trim,
         ),
       ],
     );
