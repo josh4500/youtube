@@ -73,12 +73,22 @@ class _RangeSelectorState<T> extends State<RangeSelector>
     await controller.forward();
   }
 
-  Future<void> _updateAlignment(Offset localPosition, double width) async {
-    final value = localPosition.dx / width;
-    final selectedValue = (value * itemCount).floor();
+  int _getIndexFromPosition(double position, double width) {
+    return (position.clamp(0, width) / (width / itemCount))
+        .floor()
+        .clamp(0, itemCount - 1);
+  }
+
+  Future<void> _updateAlignment(double position, double width) async {
+    final value = _getIndexFromPosition(position, width);
     await _tweenAnimateNotifier(
-      Alignment((selectedValue / (itemCount - 1)).normalizeRange(-1, 1), 0),
+      Alignment((value / (itemCount - 1)).normalizeRange(-1, 1), 0),
     );
+    _updateSelected(value);
+  }
+
+  void _updateSelected(int selectedValue) {
+    selectedValue = selectedValue.clamp(0, itemCount - 1);
     indexNotifier.value = selectedValue;
     widget.onChanged?.call(selectedValue);
   }
@@ -91,19 +101,19 @@ class _RangeSelectorState<T> extends State<RangeSelector>
         builder: (BuildContext context, BoxConstraints constraints) {
           return GestureDetector(
             onTapDown: (details) async {
-              _updateAlignment(details.localPosition, constraints.maxWidth);
+              _updateAlignment(details.localPosition.dx, constraints.maxWidth);
             },
             onHorizontalDragUpdate: (details) async {
               final value = details.localPosition.dx / constraints.maxWidth;
               alignmentNotifier.value = Alignment(
-                value.normalizeRange(-1, 1),
+                value.clamp(0, 1).toDouble().normalizeRange(-1, 1),
                 0,
               );
               final selectedValue = (value * itemCount).floor();
-              indexNotifier.value = selectedValue;
+              _updateSelected(selectedValue);
             },
             onHorizontalDragEnd: (DragEndDetails details) async {
-              _updateAlignment(details.localPosition, constraints.maxWidth);
+              _updateAlignment(details.localPosition.dx, constraints.maxWidth);
             },
             child: Container(
               decoration: BoxDecoration(
@@ -142,7 +152,7 @@ class _RangeSelectorState<T> extends State<RangeSelector>
                           Widget? _,
                         ) {
                           return Container(
-                            width: constraints.maxWidth / 6,
+                            width: constraints.maxWidth / (itemCount + 1),
                             height: 36,
                             margin: const EdgeInsets.all(2),
                             alignment: Alignment.center,
