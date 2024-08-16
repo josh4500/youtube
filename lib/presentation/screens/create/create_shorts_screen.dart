@@ -31,8 +31,11 @@ import 'package:camera/camera.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/screens/create/provider/current_timeline_state.dart';
 import 'package:youtube_clone/presentation/screens/create/provider/index_notifier.dart';
 import 'package:youtube_clone/presentation/screens/create/provider/short_recording_state.dart';
@@ -158,6 +161,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     vsync: this,
     duration: const Duration(milliseconds: 900),
   );
+  bool _hasFailedRecording = false;
 
   double _minAvailableZoom = 1.0;
   double _maxAvailableZoom = 1.0;
@@ -243,7 +247,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     if (hasInitCameraNotifier.value == null) {
       final cameraState = ModelBinding.of<CreateCameraState>(context);
       if (cameraState.cameras.isNotEmpty) {
-        onNewCameraSelected(cameraState.cameras.first);
+        onNewCameraSelected(cameraState.cameras.first).then((_) {
+          _showDraftDecision();
+        });
       }
     }
   }
@@ -309,7 +315,155 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     }
   }
 
-  bool _hasFailedRecording = false;
+  Future<void> _showDraftDecision() async {
+    final hasDraft = ref.read(shortRecordingProvider.notifier).loadDraft();
+    if (hasDraft && context.mounted) {
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: Material(
+              color: AppPalette.black,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.sizeOf(context).width * .85,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 8),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Continue your draft video?',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Starting over will discard your last draft.',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              ref.read(shortRecordingProvider.notifier).clear();
+                              context.pop();
+                            },
+                            child: const Text('Start over'),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton(
+                            onPressed: context.pop,
+                            child: const Text('Continue'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  bool _onPopInvoked() {
+    if (recordingNotifier.value) {
+      _stopRecording();
+      _onAutoStopRecording();
+      return false;
+    }
+    final shortsRecording = ref.read(shortRecordingProvider);
+    if (shortsRecording.hasTimelines) {
+      // Note: Using current screen context
+      void popCurrentScreen() => context.pop();
+      void showNavigator() {
+        CreateNotification(hideNavigator: false).dispatch(context);
+      }
+
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        useRootNavigator: true,
+        builder: (BuildContext context) {
+          return Material(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(YTIcons.delete_outlined),
+                  title: const Text('Delete'),
+                  titleTextStyle: const TextStyle(fontSize: 12.5),
+                  hoverColor: Colors.white24,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                  ),
+                  onTap: () {
+                    ref.read(currentTimelineProvider.notifier).clear();
+                    ref.read(shortRecordingProvider.notifier).clear();
+
+                    showNavigator();
+                    context.pop();
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(YTIcons.exit_outlined),
+                  title: const Text('Save and Exit'),
+                  titleTextStyle: const TextStyle(fontSize: 12.5),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                  ),
+                  hoverColor: Colors.white24,
+                  onTap: () async {
+                    ref.read(shortRecordingProvider.notifier).save();
+                    context.pop();
+                    popCurrentScreen();
+                  },
+                ),
+                const Divider(height: 0),
+                ListTile(
+                  leading: const Icon(YTIcons.close_outlined),
+                  title: const Text('Cancel'),
+                  titleTextStyle: const TextStyle(fontSize: 12.5),
+                  hoverColor: Colors.white24,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                  ),
+                  onTap: context.pop,
+                ),
+              ],
+            ),
+          );
+        },
+      );
+
+      return false;
+    }
+    return true;
+  }
+
+  void _onPopInvokedWithResult<T>(bool didPop, T? result) {
+    if (_onPopInvoked()) context.pop();
+  }
 
   void _handleFailedRecording() {
     if (recordingNotifier.value) {
@@ -741,223 +895,233 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       begin: .9,
       end: 1,
     ).animate(hideSpeedController);
-    return NotificationListener<CaptureNotification>(
-      onNotification: handleCaptureNotification,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          LayoutBuilder(
-            builder: (
-              BuildContext context,
-              BoxConstraints constraints,
-            ) {
-              return Stack(
-                fit: StackFit.expand,
-                children: [
-                  ValueListenableBuilder(
-                    valueListenable: hasInitCameraNotifier,
-                    builder: (
-                      BuildContext context,
-                      CameraDescription? cameraDesc,
-                      Widget? _,
-                    ) {
-                      if (cameraDesc == null) {
-                        return const SizedBox();
-                      } else {
-                        return CameraPreview(
-                          controller!,
-                          child: GestureDetector(
-                            onTapDown: (TapDownDetails details) {
-                              handleOnTapCameraView(details, constraints);
-                            },
-                            onDoubleTapDown: (TapDownDetails details) {
-                              handleOnDoubleTapCameraView(details, constraints);
-                            },
-                            behavior: HitTestBehavior.opaque,
-                            child: const SizedBox.expand(),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  ValueListenableBuilder(
-                    valueListenable: focusPosition,
-                    builder: (
-                      BuildContext context,
-                      Offset position,
-                      Widget? childWidget,
-                    ) {
-                      return Positioned(
-                        top: position.dy,
-                        left: position.dx,
-                        child: childWidget!,
-                      );
-                    },
-                    child: CaptureFocusIndicator(animation: focusController),
-                  ),
-                  ValueListenableBuilder(
-                    valueListenable: recordOuterButtonPosition,
-                    builder: (
-                      BuildContext context,
-                      Offset? position,
-                      Widget? childWidget,
-                    ) {
-                      position ??= getDragCircleInitPosition(constraints);
 
-                      return Positioned(
-                        top: position.dy,
-                        left: position.dx,
-                        child: childWidget!,
-                      );
-                    },
-                    child: AnimatedVisibility(
-                      animation: hideAnimation,
-                      alignment: Alignment.bottomCenter,
-                      child: ListenableBuilder(
-                        listenable: recordingNotifier,
-                        builder: (BuildContext context, Widget? _) {
-                          return CaptureDragZoomButton(
-                            animation: recordOuterButtonController,
-                            isDragging: dragRecordNotifier.value,
-                            isRecording: recordingNotifier.value,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: _onPopInvokedWithResult,
+      child: NotificationListener<CaptureNotification>(
+        onNotification: handleCaptureNotification,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            LayoutBuilder(
+              builder: (
+                BuildContext context,
+                BoxConstraints constraints,
+              ) {
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ValueListenableBuilder(
+                      valueListenable: hasInitCameraNotifier,
+                      builder: (
+                        BuildContext context,
+                        CameraDescription? cameraDesc,
+                        Widget? _,
+                      ) {
+                        if (cameraDesc == null) {
+                          return const SizedBox();
+                        } else {
+                          return CameraPreview(
+                            controller!,
+                            child: GestureDetector(
+                              onTapDown: (TapDownDetails details) {
+                                handleOnTapCameraView(details, constraints);
+                              },
+                              onDoubleTapDown: (TapDownDetails details) {
+                                handleOnDoubleTapCameraView(
+                                    details, constraints);
+                              },
+                              behavior: HitTestBehavior.opaque,
+                              child: const SizedBox.expand(),
+                            ),
                           );
-                        },
-                      ),
+                        }
+                      },
                     ),
-                  ),
-                  ValueListenableBuilder(
-                    valueListenable: recordInnerButtonPosition,
-                    builder: (
-                      BuildContext context,
-                      Offset? position,
-                      Widget? childWidget,
-                    ) {
-                      position ??= getCenterButtonInitPosition(constraints);
+                    ValueListenableBuilder(
+                      valueListenable: focusPosition,
+                      builder: (
+                        BuildContext context,
+                        Offset position,
+                        Widget? childWidget,
+                      ) {
+                        return Positioned(
+                          top: position.dy,
+                          left: position.dx,
+                          child: childWidget!,
+                        );
+                      },
+                      child: CaptureFocusIndicator(animation: focusController),
+                    ),
+                    ValueListenableBuilder(
+                      valueListenable: recordOuterButtonPosition,
+                      builder: (
+                        BuildContext context,
+                        Offset? position,
+                        Widget? childWidget,
+                      ) {
+                        position ??= getDragCircleInitPosition(constraints);
 
-                      return Positioned(
-                        top: position.dy,
-                        left: position.dx,
-                        child: childWidget!,
-                      );
-                    },
-                    child: AnimatedVisibility(
-                      animation: hideAnimation,
-                      alignment: Alignment.bottomCenter,
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: handleOnTapRecordButton,
-                        onLongPressStart: handleLongPressStartRecordButton,
-                        onLongPressEnd: (LongPressEndDetails details) {
-                          handleLongPressEndRecordButton(details, constraints);
-                        },
-                        onLongPressMoveUpdate:
-                            (LongPressMoveUpdateDetails details) {
-                          handleLongPressUpdateRecordButton(
-                            details,
-                            constraints,
-                          );
-                        },
+                        return Positioned(
+                          top: position.dy,
+                          left: position.dx,
+                          child: childWidget!,
+                        );
+                      },
+                      child: AnimatedVisibility(
+                        animation: hideAnimation,
+                        alignment: Alignment.bottomCenter,
                         child: ListenableBuilder(
-                          listenable: Listenable.merge(
-                            [
-                              recordingNotifier,
-                              dragRecordNotifier,
-                            ],
-                          ),
+                          listenable: recordingNotifier,
                           builder: (BuildContext context, Widget? _) {
-                            return CaptureButton(
-                              isRecording: recordingNotifier.value &&
-                                  !dragRecordNotifier.value,
+                            return CaptureDragZoomButton(
+                              animation: recordOuterButtonController,
+                              isDragging: dragRecordNotifier.value,
+                              isRecording: recordingNotifier.value,
                             );
                           },
                         ),
                       ),
                     ),
+                    ValueListenableBuilder(
+                      valueListenable: recordInnerButtonPosition,
+                      builder: (
+                        BuildContext context,
+                        Offset? position,
+                        Widget? childWidget,
+                      ) {
+                        position ??= getCenterButtonInitPosition(constraints);
+
+                        return Positioned(
+                          top: position.dy,
+                          left: position.dx,
+                          child: childWidget!,
+                        );
+                      },
+                      child: AnimatedVisibility(
+                        animation: hideAnimation,
+                        alignment: Alignment.bottomCenter,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: handleOnTapRecordButton,
+                          onLongPressStart: handleLongPressStartRecordButton,
+                          onLongPressEnd: (LongPressEndDetails details) {
+                            handleLongPressEndRecordButton(
+                              details,
+                              constraints,
+                            );
+                          },
+                          onLongPressMoveUpdate: (
+                            LongPressMoveUpdateDetails details,
+                          ) {
+                            handleLongPressUpdateRecordButton(
+                              details,
+                              constraints,
+                            );
+                          },
+                          child: ListenableBuilder(
+                            listenable: Listenable.merge(
+                              [
+                                recordingNotifier,
+                                dragRecordNotifier,
+                              ],
+                            ),
+                            builder: (BuildContext context, Widget? _) {
+                              return CaptureButton(
+                                isRecording: recordingNotifier.value &&
+                                    !dragRecordNotifier.value,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Stack(
+                children: [
+                  AnimatedVisibility(
+                    animation: hideAnimation,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 6,
+                        horizontal: 4.0,
+                      ),
+                      child: Column(
+                        children: [
+                          const CreateProgress(),
+                          const SizedBox(height: 12),
+                          HideOnRecording(
+                            notifier: recordingNotifier,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CreateCloseButton(onPopInvoked: _onPopInvoked),
+                                const CaptureMusicButton(),
+                                const CaptureShortsDuration(),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: ListenableBuilder(
+                      listenable: latestControlMessage,
+                      builder: (BuildContext context, Widget? _) {
+                        return ControlMessageEvent(
+                          message: latestControlMessage.value,
+                        );
+                      },
+                    ),
+                  ),
+                  AnimatedVisibility(
+                    animation: hideZoomController,
+                    alignment: Alignment.centerLeft,
+                    child: CaptureZoomIndicator(
+                      controller: dragZoomLevelNotifier,
+                    ),
+                  ),
+                  HideOnRecording(
+                    notifier: recordingNotifier,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: CaptureEffects(controller: effectsController),
+                    ),
+                  ),
+                  HideOnRecording(
+                    notifier: recordingNotifier,
+                    child: AnimatedVisibility(
+                      animation: hideAnimation,
+                      alignment: Alignment.bottomCenter,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          AnimatedVisibility(
+                            animation: hideSpeedController,
+                            child: ScaleTransition(
+                              scale: speedSelectorScaleAnimation,
+                              child: const CaptureSpeed(),
+                            ),
+                          ),
+                          const SizedBox(height: 36),
+                          const CaptureTimelineControl(),
+                          const SizedBox(height: bottomPaddingHeight),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
-              );
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Stack(
-              children: [
-                AnimatedVisibility(
-                  animation: hideAnimation,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 6,
-                      horizontal: 4.0,
-                    ),
-                    child: Column(
-                      children: [
-                        const CreateProgress(),
-                        const SizedBox(height: 12),
-                        HideOnRecording(
-                          notifier: recordingNotifier,
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CreateCloseButton(),
-                              CaptureMusicButton(),
-                              CaptureShortsDuration(),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Center(
-                  child: ListenableBuilder(
-                    listenable: latestControlMessage,
-                    builder: (BuildContext context, Widget? _) {
-                      return ControlMessageEvent(
-                        message: latestControlMessage.value,
-                      );
-                    },
-                  ),
-                ),
-                AnimatedVisibility(
-                  animation: hideZoomController,
-                  alignment: Alignment.centerLeft,
-                  child: CaptureZoomIndicator(
-                    controller: dragZoomLevelNotifier,
-                  ),
-                ),
-                HideOnRecording(
-                  notifier: recordingNotifier,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: CaptureEffects(controller: effectsController),
-                  ),
-                ),
-                HideOnRecording(
-                  notifier: recordingNotifier,
-                  child: AnimatedVisibility(
-                    animation: hideAnimation,
-                    alignment: Alignment.bottomCenter,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        AnimatedVisibility(
-                          animation: hideSpeedController,
-                          child: ScaleTransition(
-                            scale: speedSelectorScaleAnimation,
-                            child: const CaptureSpeed(),
-                          ),
-                        ),
-                        const SizedBox(height: 36),
-                        const CaptureTimelineControl(),
-                        const SizedBox(height: bottomPaddingHeight),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

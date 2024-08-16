@@ -24,9 +24,7 @@ class CurrentTimeline extends _$CurrentTimeline {
     // Stop any previous recordings
     _stopRecording();
 
-    // Start a new recording
-    // Copies old speed to new timeline
-    state = Timeline(speed: state.speed);
+    _clear();
     const addedDuration = Duration(milliseconds: 100);
     _recordingTimer = Timer.periodic(addedDuration, (timer) {
       final newDuration = state.duration + addedDuration;
@@ -46,5 +44,15 @@ class CurrentTimeline extends _$CurrentTimeline {
     _recordingTimer?.cancel();
     _recordingTimer = null;
     state = state.copyWith(state: RecordingState.stopped);
+  }
+
+  void clear() {
+    _clear();
+  }
+
+  void _clear() {
+    // Start a new recording
+    // Copies old speed to new timeline
+    state = Timeline(speed: state.speed);
   }
 }

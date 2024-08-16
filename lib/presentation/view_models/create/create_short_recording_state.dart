@@ -49,8 +49,8 @@ class Timeline {
 
 class ExtraSound {}
 
-class CreateTimelineState {
-  CreateTimelineState({
+class CreateShortRecordingState {
+  CreateShortRecordingState({
     required this.recordDuration,
     List<Timeline>? timelines,
     List<Timeline>? removedTimelines,
@@ -80,12 +80,12 @@ class CreateTimelineState {
   bool get hasOneTimeline => timelines.length == 1;
 
   /// Copy with method to return a new instance of the state with updated properties
-  CreateTimelineState copyWith({
+  CreateShortRecordingState copyWith({
     Duration? recordDuration,
     List<Timeline>? timelines,
     List<Timeline>? removedTimelines,
   }) {
-    return CreateTimelineState(
+    return CreateShortRecordingState(
       recordDuration: recordDuration ?? this.recordDuration,
       timelines: timelines ?? List.unmodifiable(this.timelines),
       removedTimelines:
@@ -93,7 +93,7 @@ class CreateTimelineState {
     );
   }
 
-  CreateTimelineState addTimeline(Timeline timeline) {
+  CreateShortRecordingState addTimeline(Timeline timeline) {
     final updatedTimelines = [...timelines, timeline];
     return copyWith(
       timelines: updatedTimelines,
@@ -101,7 +101,7 @@ class CreateTimelineState {
     );
   }
 
-  CreateTimelineState redo() {
+  CreateShortRecordingState redo() {
     if (removedTimelines.isNotEmpty) {
       final lastRemoved = removedTimelines.last;
       final updatedTimelines = [...timelines, lastRemoved];
@@ -115,7 +115,7 @@ class CreateTimelineState {
     return this;
   }
 
-  CreateTimelineState undo() {
+  CreateShortRecordingState undo() {
     if (timelines.isNotEmpty) {
       final lastTimeline = timelines.last;
       final updatedTimelines = List<Timeline>.from(timelines)..removeLast();
@@ -128,7 +128,7 @@ class CreateTimelineState {
     return this;
   }
 
-  CreateTimelineState updateDuration(Duration duration) {
+  CreateShortRecordingState updateDuration(Duration duration) {
     return copyWith(recordDuration: duration);
   }
 
@@ -178,7 +178,7 @@ class CreateTimelineState {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CreateTimelineState &&
+      other is CreateShortRecordingState &&
           runtimeType == other.runtimeType &&
           recordDuration == other.recordDuration &&
           listEquals(timelines, other.timelines) &&
@@ -187,4 +187,12 @@ class CreateTimelineState {
   @override
   int get hashCode =>
       recordDuration.hashCode ^ timelines.hashCode ^ removedTimelines.hashCode;
+
+  CreateShortRecordingState clear() {
+    return copyWith(
+      recordDuration: recordDuration,
+      removedTimelines: [],
+      timelines: [],
+    );
+  }
 }

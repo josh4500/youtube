@@ -3,14 +3,17 @@ import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/theme/icon/y_t_icons_icons.dart';
 
 class CreateCloseButton extends StatelessWidget {
-  const CreateCloseButton({
-    super.key,
-  });
+  const CreateCloseButton({super.key, this.onPopInvoked});
+  final bool Function()? onPopInvoked;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: context.pop,
+      onTap: () {
+        bool shouldPop = true;
+        if (onPopInvoked != null) shouldPop = onPopInvoked!();
+        if (shouldPop) context.pop();
+      },
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: const BoxDecoration(
