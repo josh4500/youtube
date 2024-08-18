@@ -8,12 +8,18 @@ class RangeSelector extends StatefulWidget {
     required this.itemCount,
     this.initialIndex,
     this.onChanged,
+    this.backgroundColor,
+    this.selectedColor,
+    this.indicatorHeight = 36,
   });
   final int? initialIndex;
   final Widget Function(BuildContext context, int selectedIndex, int index)
       itemBuilder;
   final int itemCount;
+  final double indicatorHeight;
   final ValueChanged<int>? onChanged;
+  final Color? backgroundColor;
+  final Color? selectedColor;
 
   @override
   State<RangeSelector> createState() => _RangeSelectorState();
@@ -22,7 +28,13 @@ class RangeSelector extends StatefulWidget {
 class _RangeSelectorState<T> extends State<RangeSelector>
     with SingleTickerProviderStateMixin {
   late final AnimationController controller;
-  final alignmentNotifier = ValueNotifier<Alignment>(Alignment.center);
+  late final alignmentNotifier = ValueNotifier<Alignment>(
+    Alignment(
+      ((widget.initialIndex ?? widget.itemCount ~/ 2) / (itemCount - 1))
+          .normalizeRange(-1, 1),
+      0,
+    ),
+  );
   late final indexNotifier = ValueNotifier<int>(
     widget.initialIndex ?? widget.itemCount ~/ 2,
   );
@@ -96,83 +108,78 @@ class _RangeSelectorState<T> extends State<RangeSelector>
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          return GestureDetector(
-            onTapDown: (details) async {
-              _updateAlignment(details.localPosition.dx, constraints.maxWidth);
-            },
-            onHorizontalDragUpdate: (details) async {
-              final value = details.localPosition.dx / constraints.maxWidth;
-              alignmentNotifier.value = Alignment(
-                value.clamp(0, 1).toDouble().normalizeRange(-1, 1),
-                0,
-              );
-              final selectedValue = (value * itemCount).floor();
-              _updateSelected(selectedValue);
-            },
-            onHorizontalDragEnd: (DragEndDetails details) async {
-              _updateAlignment(details.localPosition.dx, constraints.maxWidth);
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black87,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: ListenableBuilder(
-                      listenable: alignmentNotifier,
-                      builder: (BuildContext context, Widget? childWidget) {
-                        return Align(
-                          alignment: alignmentNotifier.value,
-                          child: childWidget,
-                        );
-                      },
-                      child: Container(
-                        width: constraints.maxWidth / (itemCount + 1),
-                        margin: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return GestureDetector(
+          onTapDown: (details) async {
+            _updateAlignment(details.localPosition.dx, constraints.maxWidth);
+          },
+          onHorizontalDragUpdate: (details) async {
+            final value = details.localPosition.dx / constraints.maxWidth;
+            alignmentNotifier.value = Alignment(
+              value.clamp(0, 1).toDouble().normalizeRange(-1, 1),
+              0,
+            );
+            final selectedValue = (value * itemCount).floor();
+            _updateSelected(selectedValue);
+          },
+          onHorizontalDragEnd: (DragEndDetails details) async {
+            _updateAlignment(details.localPosition.dx, constraints.maxWidth);
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: widget.backgroundColor ?? Colors.black87,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Stack(
+              children: [
+                ListenableBuilder(
+                  listenable: alignmentNotifier,
+                  builder: (BuildContext context, Widget? childWidget) {
+                    return Align(
+                      alignment: alignmentNotifier.value,
+                      child: childWidget,
+                    );
+                  },
+                  child: Container(
+                    height: widget.indicatorHeight,
+                    width: (constraints.maxWidth / itemCount) - 8,
+                    margin: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: widget.selectedColor ?? Colors.white,
+                      borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: List.generate(itemCount, (index) {
-                      return ValueListenableBuilder<int>(
+                ),
+                Row(
+                  children: List.generate(itemCount, (index) {
+                    return Container(
+                      height: widget.indicatorHeight,
+                      width: (constraints.maxWidth / itemCount) - 8,
+                      margin: const EdgeInsets.all(4),
+                      alignment: Alignment.center,
+                      child: ValueListenableBuilder<int>(
                         valueListenable: indexNotifier,
                         builder: (
                           BuildContext context,
                           int selectedIndex,
                           Widget? _,
                         ) {
-                          return Container(
-                            width: constraints.maxWidth / (itemCount + 1),
-                            height: 36,
-                            margin: const EdgeInsets.all(2),
-                            alignment: Alignment.center,
-                            child: widget.itemBuilder(
-                              context,
-                              selectedIndex,
-                              index,
-                            ),
+                          return widget.itemBuilder(
+                            context,
+                            selectedIndex,
+                            index,
                           );
                         },
-                      );
-                    }),
-                  ),
-                ],
-              ),
+                      ),
+                    );
+                  }),
+                ),
+              ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
