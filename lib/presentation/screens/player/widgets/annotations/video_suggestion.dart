@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/app.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/annotations/annotations_notification.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
+
+import 'annotations_notification.dart';
 
 class VideoSuggestion extends StatelessWidget {
   const VideoSuggestion({super.key});

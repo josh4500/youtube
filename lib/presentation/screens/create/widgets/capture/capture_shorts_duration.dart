@@ -70,7 +70,7 @@ class _CaptureShortsDurationTimerState
         }
 
         if (updateValue) {
-          ref.read(shortRecordingProvider.notifier).updateDuration(
+          ref.read(shortRecordingProvider.notifier).updateRecordDuration(
                 Duration(seconds: time),
               );
 

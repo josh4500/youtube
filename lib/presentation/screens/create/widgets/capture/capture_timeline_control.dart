@@ -46,10 +46,10 @@ class CaptureTimelineControl extends StatelessWidget {
               final timelineState = ref.watch(shortRecordingProvider);
               return Row(
                 children: [
-                  if (timelineState.hasTimelines)
+                  if (timelineState.hasRecordings)
                     GestureDetector(
                       onTap: () {
-                        if (timelineState.hasOneTimeline) {
+                        if (timelineState.hasOneRecording) {
                           CreateNotification(hideNavigator: false)
                               .dispatch(context);
                         }
@@ -67,10 +67,10 @@ class CaptureTimelineControl extends StatelessWidget {
                   else
                     const SizedBox(width: 38),
                   const Spacer(),
-                  if (timelineState.hasUndidTimeline)
+                  if (timelineState.hasUndidRecording)
                     GestureDetector(
                       onTap: () {
-                        if (timelineState.hasUndidTimeline) {
+                        if (timelineState.hasUndidRecording) {
                           CreateNotification(hideNavigator: true)
                               .dispatch(context);
                         }
@@ -88,7 +88,7 @@ class CaptureTimelineControl extends StatelessWidget {
                   else
                     const SizedBox(width: 38),
                   const SizedBox(width: 36),
-                  if (timelineState.hasTimelines)
+                  if (timelineState.hasRecordings)
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(

@@ -46,7 +46,11 @@ class OverScrollGlowBehavior extends ScrollBehavior {
     switch (getPlatform(context)) {
       case TargetPlatform.iOS:
         return child;
-      default:
+      case TargetPlatform.android ||
+            TargetPlatform.fuchsia ||
+            TargetPlatform.linux ||
+            TargetPlatform.macOS ||
+            TargetPlatform.windows:
         return GlowingOverscrollIndicator(
           showLeading: enabled,
           showTrailing: enabled,
@@ -70,7 +74,11 @@ class NoOverScrollGlowBehavior extends ScrollBehavior {
     switch (getPlatform(context)) {
       case TargetPlatform.iOS:
         return child;
-      default:
+      case TargetPlatform.android ||
+            TargetPlatform.fuchsia ||
+            TargetPlatform.linux ||
+            TargetPlatform.macOS ||
+            TargetPlatform.windows:
         return GlowingOverscrollIndicator(
           showLeading: false,
           showTrailing: false,

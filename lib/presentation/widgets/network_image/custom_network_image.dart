@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/rendering.dart';
 import 'package:youtube_clone/presentation/widgets/network_image/image_replacement.dart';
 import '_custom_network_image_io.dart' as custom_network_image;

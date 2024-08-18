@@ -7,8 +7,8 @@ enum RecordingState {
   stopped,
 }
 
-class Timeline {
-  Timeline({
+class Recording {
+  Recording({
     this.speed = 1,
     this.duration = Duration.zero,
     this.extraSound,
@@ -20,13 +20,13 @@ class Timeline {
   final RecordingState state;
   final double speed;
 
-  Timeline copyWith({
+  Recording copyWith({
     ExtraSound? extraSound,
     Duration? duration,
     RecordingState? state,
     double? speed,
   }) {
-    return Timeline(
+    return Recording(
       speed: speed ?? this.speed,
       extraSound: extraSound ?? this.extraSound,
       duration: duration ?? this.duration,
@@ -37,7 +37,7 @@ class Timeline {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Timeline &&
+      other is Recording &&
           runtimeType == other.runtimeType &&
           extraSound == other.extraSound &&
           duration == other.duration &&
@@ -49,26 +49,26 @@ class Timeline {
 
 class ExtraSound {}
 
-class CreateShortRecordingState {
-  CreateShortRecordingState({
+class ShortRecordingState {
+  ShortRecordingState({
     required this.recordDuration,
     this.countdownStoppage,
-    List<Timeline>? timelines,
-    List<Timeline>? removedTimelines,
-  })  : timelines = timelines ?? const [],
-        removedTimelines = removedTimelines ?? const [];
+    List<Recording>? recordings,
+    List<Recording>? removedRecordings,
+  })  : recordings = recordings ?? const [],
+        removedRecordings = removedRecordings ?? const [];
 
   final Duration recordDuration;
   final Duration? countdownStoppage;
-  final List<Timeline> timelines;
-  final List<Timeline> removedTimelines;
+  final List<Recording> recordings;
+  final List<Recording> removedRecordings;
 
-  bool get hasTimelines => timelines.isNotEmpty;
-  bool get hasUndidTimeline => removedTimelines.isNotEmpty;
+  bool get hasRecordings => recordings.isNotEmpty;
+  bool get hasUndidRecording => removedRecordings.isNotEmpty;
 
   // Total duration of timelines
   Duration get duration {
-    return timelines.fold(
+    return recordings.fold(
       Duration.zero,
       (current, prev) => current + prev.duration,
     );
@@ -79,91 +79,90 @@ class CreateShortRecordingState {
 
   bool get isPublishable => duration >= const Duration(seconds: 5);
 
-  bool get hasOneTimeline => timelines.length == 1;
+  bool get hasOneRecording => recordings.length == 1;
 
   /// Copy with method to return a new instance of the state with updated properties
-  CreateShortRecordingState copyWith({
+  ShortRecordingState copyWith({
     Duration? recordDuration,
-    Duration? timerStopDuration,
-    List<Timeline>? timelines,
-    List<Timeline>? removedTimelines,
+    Duration? countdownStoppage,
+    List<Recording>? recordings,
+    List<Recording>? removedRecordings,
   }) {
-    return CreateShortRecordingState(
+    return ShortRecordingState(
       recordDuration: recordDuration ?? this.recordDuration,
-      countdownStoppage: timerStopDuration ?? this.countdownStoppage,
-      timelines: timelines ?? List.unmodifiable(this.timelines),
-      removedTimelines:
-          removedTimelines ?? List.unmodifiable(this.removedTimelines),
+      countdownStoppage: countdownStoppage ?? this.countdownStoppage,
+      recordings: recordings ?? List.unmodifiable(this.recordings),
+      removedRecordings:
+          removedRecordings ?? List.unmodifiable(this.removedRecordings),
     );
   }
 
-  CreateShortRecordingState addTimeline(Timeline timeline) {
-    final updatedTimelines = [...timelines, timeline];
+  ShortRecordingState addTimeline(Recording timeline) {
+    final updatedRecordings = [...recordings, timeline];
     return copyWith(
-      timelines: updatedTimelines,
-      removedTimelines: [], // Clear removed timelines on add
+      recordings: updatedRecordings,
+      removedRecordings: [], // Clear removed timelines on add
     );
   }
 
-  CreateShortRecordingState redo() {
-    if (removedTimelines.isNotEmpty) {
-      final lastRemoved = removedTimelines.last;
-      final updatedTimelines = [...timelines, lastRemoved];
-      final updatedRemovedTimelines = List<Timeline>.from(removedTimelines)
+  ShortRecordingState redo() {
+    if (removedRecordings.isNotEmpty) {
+      final lastRemoved = removedRecordings.last;
+      final updatedRecordings = [...recordings, lastRemoved];
+      final updatedRemovedRecordings = List<Recording>.from(removedRecordings)
         ..removeLast();
       return copyWith(
-        timelines: updatedTimelines,
-        removedTimelines: updatedRemovedTimelines,
+        recordings: updatedRecordings,
+        removedRecordings: updatedRemovedRecordings,
       );
     }
     return this;
   }
 
-  CreateShortRecordingState undo() {
-    if (timelines.isNotEmpty) {
-      final lastTimeline = timelines.last;
-      final updatedTimelines = List<Timeline>.from(timelines)..removeLast();
-      final updatedRemovedTimelines = [...removedTimelines, lastTimeline];
+  ShortRecordingState undo() {
+    if (recordings.isNotEmpty) {
+      final lastRecording = recordings.last;
+      final updatedRecordings = List<Recording>.from(recordings)..removeLast();
+      final updatedRemovedRecordings = [...removedRecordings, lastRecording];
       return copyWith(
-        timelines: updatedTimelines,
-        removedTimelines: updatedRemovedTimelines,
+        recordings: updatedRecordings,
+        removedRecordings: updatedRemovedRecordings,
       );
     }
     return this;
   }
 
-  CreateShortRecordingState updateDuration(Duration duration) {
+  ShortRecordingState updateRecordDuration(Duration duration) {
     return copyWith(recordDuration: duration);
   }
 
-  CreateShortRecordingState updateCountdownStoppage(Duration? duration) {
-    return CreateShortRecordingState(
+  ShortRecordingState updateCountdownStoppage(Duration? duration) {
+    return ShortRecordingState(
       recordDuration: recordDuration,
       countdownStoppage: duration,
-      timelines: timelines,
-      removedTimelines: removedTimelines,
+      recordings: recordings,
+      removedRecordings: removedRecordings,
     );
-    ;
   }
 
   List<double> getEndPositions() {
     return _calculateTimelineEnds(
       [
-        ...timelines,
-        if (countdownStoppage != null) Timeline(duration: countdownStoppage!),
+        ...recordings,
+        if (countdownStoppage != null) Recording(duration: countdownStoppage!),
       ],
       recordDuration,
     );
   }
 
   List<double> _calculateTimelineEnds(
-    List<Timeline> timelines,
+    List<Recording> timelines,
     Duration totalDuration,
   ) {
     final List<double> progressList = [];
     double accumulatedProgress = 0.0;
 
-    for (final Timeline timeline in timelines) {
+    for (final Recording timeline in timelines) {
       double progress =
           timeline.duration.inMilliseconds / totalDuration.inMilliseconds;
 
@@ -177,8 +176,8 @@ class CreateShortRecordingState {
     return progressList;
   }
 
-  double getProgress(Timeline currentTimeline) {
-    final Duration totalTimelineDuration = duration;
+  double getProgress(Recording currentTimeline) {
+    final Duration totalRecordDuration = duration;
 
     final Duration addedDuration =
         currentTimeline.state == RecordingState.recording
@@ -186,7 +185,7 @@ class CreateShortRecordingState {
             : Duration.zero;
 
     final Duration totalDurationWithCurrent =
-        totalTimelineDuration + addedDuration;
+        totalRecordDuration + addedDuration;
 
     // Calculate progress ratio between 0.0 and 1.0
     final double progressValue =
@@ -198,21 +197,23 @@ class CreateShortRecordingState {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CreateShortRecordingState &&
+      other is ShortRecordingState &&
           runtimeType == other.runtimeType &&
           recordDuration == other.recordDuration &&
-          listEquals(timelines, other.timelines) &&
-          listEquals(removedTimelines, other.removedTimelines);
+          listEquals(recordings, other.recordings) &&
+          listEquals(removedRecordings, other.removedRecordings);
 
   @override
   int get hashCode =>
-      recordDuration.hashCode ^ timelines.hashCode ^ removedTimelines.hashCode;
+      recordDuration.hashCode ^
+      recordings.hashCode ^
+      removedRecordings.hashCode;
 
-  CreateShortRecordingState clear() {
+  ShortRecordingState clear() {
     return copyWith(
       recordDuration: recordDuration,
-      removedTimelines: [],
-      timelines: [],
+      removedRecordings: [],
+      recordings: [],
     );
   }
 }

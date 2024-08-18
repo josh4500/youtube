@@ -8,9 +8,11 @@ class Worker {
   Worker._(this._commands, this._responses) {
     _responses.listen(_handleResponsesFromIsolate);
   }
+
   final SendPort _commands;
   final ReceivePort _responses;
   final Map<int, Completer<Object?>> _activeRequests = {};
+
   bool _closed = false;
   int _idCounter = 0;
 

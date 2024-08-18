@@ -417,7 +417,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     }
 
     final shortsRecording = ref.read(shortRecordingProvider);
-    if (shortsRecording.hasTimelines) {
+    if (shortsRecording.hasRecordings) {
       // Note: Using current screen context
       void popCurrentScreen() => context.pop();
       void showNavigator() {
@@ -719,7 +719,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     countdownTimer?.cancel();
     countdownTimer = null;
     ref.read(shortRecordingProvider.notifier).updateCountdownStoppage(null);
-    if (!ref.read(shortRecordingProvider).hasTimelines) {
+    if (!ref.read(shortRecordingProvider).hasRecordings) {
       CreateNotification(hideNavigator: false).dispatch(context);
     }
   }
@@ -736,7 +736,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     ref
         .read(currentTimelineProvider.notifier)
-        .startRecording((Timeline timeline) {
+        .startRecording((Recording timeline) {
       final shortsRecording = ref.read(shortRecordingProvider);
       final totalDuration = shortsRecording.duration + timeline.duration;
       final countdownStoppage = shortsRecording.countdownStoppage;
@@ -792,8 +792,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     // xFile.saveTo('path');
     ref.read(currentTimelineProvider.notifier).stopRecording();
     if (addTimeline) {
-      final Timeline timeline = ref.read(currentTimelineProvider);
-      ref.read(shortRecordingProvider.notifier).addTimeline(timeline);
+      final Recording timeline = ref.read(currentTimelineProvider);
+      ref.read(shortRecordingProvider.notifier).addRecording(timeline);
     }
   }
 

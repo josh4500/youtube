@@ -58,7 +58,7 @@ final class InternetConnectivity {
   static InternetConnectivity get instance => _instance;
 
   final _connectivity = Connectivity();
-  late StreamSubscription<ConnectivityResult> _subscription;
+  late StreamSubscription<List<ConnectivityResult>> _subscription;
   ConnectivityState _state = ConnectivityState.initializing();
   ConnectivityState get state => _state;
   ConnectivityType _connectivityType = ConnectivityType.none;
@@ -99,11 +99,13 @@ final class InternetConnectivity {
   }
 
   /// Handles the change in connectivity status and updates the state accordingly.
-  Future<void> _onConnectivityResultChange(ConnectivityResult result) async {
+  Future<void> _onConnectivityResultChange(
+    List<ConnectivityResult> result,
+  ) async {
     // Update the connectivity type
     _connectivityType = result.toConnectivityType();
 
-    if (result == ConnectivityResult.none) {
+    if (_connectivityType == ConnectivityType.none) {
       _lastConnectionTest = false;
       _updateConnectivityState(ConnectivityState.disconnected());
     } else if (_lastConnectionTest == false && !state.initializing) {

@@ -87,14 +87,6 @@ class MediaFile extends AssetEntity {
       subtype: entity.subtype,
     );
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      super == other && other is MediaFile && runtimeType == other.runtimeType;
-
-  @override
-  int get hashCode => super.hashCode;
 }
 
 class MediaFileQueryResult {

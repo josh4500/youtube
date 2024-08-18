@@ -344,20 +344,9 @@ class _AnnotationVisibilityState extends ConsumerState<AnnotationVisibility>
   }
 
   void _showAtEnd(Duration event) {
-    if (widget.alwaysShow.isEnd) {
-      print(
-        (
-          'Hello',
-          event >= const Duration(seconds: 53) && widget.alwaysShow.isEnd,
-          showNotifier.value,
-          !hiddenPermanently,
-        ),
-      );
-    }
     if (showNotifier.value || hiddenPermanently) return;
 
     if (event >= const Duration(seconds: 53) && widget.alwaysShow.isEnd) {
-      print('Hello');
       Future.delayed(const Duration(milliseconds: 500), () {
         ref.read(playerRepositoryProvider).sendPlayerSignal(
           [PlayerSignal.hideControls, PlayerSignal.hidePlaybackProgress],

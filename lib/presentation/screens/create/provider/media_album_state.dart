@@ -24,12 +24,12 @@ class MediaAlbumSelector {
 
 @riverpod
 class MediaAlbumState extends _$MediaAlbumState {
-  final cacheProvider = HiveCacheProvider<MediaAlbum>('media_album_state');
+  final _cacheProvider = HiveCacheProvider<MediaAlbum>('media_album_state');
 
   @override
   Future<MediaAlbumSelector> build() async {
     state = const AsyncLoading<MediaAlbumSelector>();
-    final selected = cacheProvider.read('selected');
+    final selected = _cacheProvider.read('selected');
 
     MediaDiscovery.getAlbums([MediaType.video, MediaType.images]).then(
       (List<MediaAlbum> albums) {
@@ -50,7 +50,7 @@ class MediaAlbumState extends _$MediaAlbumState {
       },
     );
 
-    final albums = cacheProvider.values.toList();
+    final albums = _cacheProvider.values.toList();
     if (albums.isNotEmpty) {
       return MediaAlbumSelector(
         albums: albums,

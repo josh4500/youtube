@@ -240,7 +240,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     return PopScope(
       canPop: false,
-      onPopInvoked: (bool canPop) => _onNavigateBack(),
+      onPopInvokedWithResult: <T>(bool canPop, T? result) => _onNavigateBack(),
       child: Scaffold(
         appBar: AppBar(
           leading: CustomBackButton(onPressed: _onNavigateBack),

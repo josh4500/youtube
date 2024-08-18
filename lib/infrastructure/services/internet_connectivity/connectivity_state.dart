@@ -81,10 +81,14 @@ class ConnectivityState {
   }
 }
 
-extension ConnectivityResultToTypeExtension on ConnectivityResult {
+extension ConnectivityResultToTypeExtension on List<ConnectivityResult> {
   ConnectivityType toConnectivityType() {
+    final List<String> names = map(
+      (ConnectivityResult result) => result.name,
+    ).toList();
+
     return ConnectivityType.values.firstWhere(
-      (element) => element.name == name,
+      (element) => names.contains(element.name),
       orElse: () => ConnectivityType.other,
     );
   }

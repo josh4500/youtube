@@ -10,8 +10,8 @@ class CurrentTimeline extends _$CurrentTimeline {
   Timer? _recordingTimer;
 
   @override
-  Timeline build() {
-    return Timeline();
+  Recording build() {
+    return Recording();
   }
 
   void addSound(ExtraSound sound) {
@@ -20,7 +20,7 @@ class CurrentTimeline extends _$CurrentTimeline {
 
   void updateSpeed(double speed) => state = state.copyWith(speed: speed);
 
-  void startRecording(void Function(Timeline timeline) callback) {
+  void startRecording(void Function(Recording timeline) callback) {
     // Stop any previous recordings
     _stopRecording();
 
@@ -53,6 +53,6 @@ class CurrentTimeline extends _$CurrentTimeline {
   void _clear() {
     // Start a new recording
     // Copies old speed to new timeline
-    state = Timeline(speed: state.speed);
+    state = Recording(speed: state.speed);
   }
 }

@@ -59,7 +59,7 @@ class _PlayerSeekSlideFrameState extends State<PlayerSeekSlideFrame> {
       value = duration.inSeconds;
     }
 
-    return 8;
+    return value;
   }
 
   @override

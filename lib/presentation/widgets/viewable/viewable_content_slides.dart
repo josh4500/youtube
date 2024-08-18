@@ -15,7 +15,7 @@ class ViewableContentSlides extends StatefulWidget {
 class _ViewableContentSlidesState extends State<ViewableContentSlides> {
   int _currentPage = 0;
   final PageController _pageController = PageController();
-  bool _enablePreviewMode = true;
+  final bool _enablePreviewMode = true;
   Timer? _timer;
 
   @override

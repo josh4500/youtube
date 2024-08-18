@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'controls/player_ambient.dart';
+import 'video/video_description_button.dart';
 import 'video_actions.dart';
 import 'video_channel_context.dart';
 import 'video_channel_section.dart';
 import 'video_comment_section.dart';
-import 'video/video_description_button.dart';
 
 class PlayerVideoInfo extends StatelessWidget {
   const PlayerVideoInfo({
