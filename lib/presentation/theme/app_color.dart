@@ -41,7 +41,10 @@ abstract final class AppPalette {
   // GREY
 
   // BLACK
-  static const Color black = Color(0xFF282828);
+  static const Color black = Color(0xFF232323);
+
+  // BLUE
+  static const Color blue = Color(0xFF3EA6FF);
 
   static const BrightnessPair<Color> primary = BrightnessPair<Color>(
     light: Color(0xFF000000),

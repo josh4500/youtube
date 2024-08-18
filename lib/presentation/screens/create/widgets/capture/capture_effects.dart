@@ -43,8 +43,8 @@ class CaptureEffects extends StatelessWidget {
       controller: controller,
       onOpenChanged: (bool isOpened) {
         isOpened
-            ? HideCaptureControlsNotification().dispatch(context)
-            : ShowCaptureControlsNotification().dispatch(context);
+            ? HideControlsNotification().dispatch(context)
+            : ShowControlsNotification().dispatch(context);
       },
       labelGetter: (Enum enumValue) => (enumValue as CaptureEffect).stringValue,
       items: const <EffectOption>[

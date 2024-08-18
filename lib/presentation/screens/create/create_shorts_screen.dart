@@ -32,21 +32,19 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hive/hive.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/models.dart';
-import 'package:youtube_clone/presentation/router/app_router.dart';
-import 'package:youtube_clone/presentation/screens/create/provider/current_timeline_state.dart';
-import 'package:youtube_clone/presentation/screens/create/provider/index_notifier.dart';
-import 'package:youtube_clone/presentation/screens/create/provider/short_recording_state.dart';
-import 'package:youtube_clone/presentation/screens/create/widgets/capture/capture_speed.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import 'provider/current_timeline_state.dart';
+import 'provider/index_notifier.dart';
+import 'provider/short_recording_state.dart';
 import 'widgets/capture/capture_button.dart';
 import 'widgets/capture/capture_effects.dart';
 import 'widgets/capture/capture_focus_indicator.dart';
 import 'widgets/capture/capture_shorts_duration.dart';
+import 'widgets/capture/capture_speed.dart';
 import 'widgets/capture/capture_timeline_control.dart';
 import 'widgets/capture/capture_zoom_indicator.dart';
 import 'widgets/check_permission.dart';
@@ -55,6 +53,7 @@ import 'widgets/create_permission_reason.dart';
 import 'widgets/create_progress.dart';
 import 'widgets/notifications/capture_notification.dart';
 import 'widgets/notifications/create_notification.dart';
+import 'widgets/range_selector.dart';
 import 'widgets/video_effect_options.dart';
 
 class CreateShortsScreen extends StatefulWidget {
@@ -169,10 +168,18 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   double _minAvailableExposureOffset = 0.0;
   double _maxAvailableExposureOffset = 0.0;
 
-  static const double bottomPaddingHeight = 48;
+  static const double bottomPadding = 48;
 
   final Set<CaptureEffect> _enabledCaptureEffects = {};
   Timer? _doubleTapTimer;
+
+  final countdownHidden = ValueNotifier<bool>(true);
+  final countdownSeconds = ValueNotifier<int>(0);
+  late final AnimationController countdownController = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 1),
+  );
+  Timer? countdownTimer;
 
   @override
   void initState() {
@@ -201,6 +208,10 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     controller?.dispose();
     controller = null;
 
+    countdownHidden.dispose();
+    countdownController.dispose();
+    countdownTimer?.cancel();
+
     controlMessageTimer?.cancel();
     latestControlMessage.dispose();
     effectsController.dispose();
@@ -225,14 +236,14 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   Offset getDragCircleInitPosition(BoxConstraints constraints) {
     return Offset(
       (constraints.maxWidth / 2) - (kRecordOuterButtonSize / 2),
-      (constraints.maxHeight) - kRecordOuterButtonSize - bottomPaddingHeight,
+      (constraints.maxHeight) - kRecordOuterButtonSize - bottomPadding,
     );
   }
 
   static const double offsetYFromCircle =
       (kRecordOuterButtonSize - kRecordInnerButtonSize) / 2;
 
-  static const bottomOffset = offsetYFromCircle - bottomPaddingHeight;
+  static const bottomOffset = offsetYFromCircle - bottomPadding;
 
   Offset getCenterButtonInitPosition(BoxConstraints constraints) {
     return Offset(
@@ -240,6 +251,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       (constraints.maxHeight) - kRecordOuterButtonSize + bottomOffset,
     );
   }
+
+  bool get _guardRecording => ref.read(shortRecordingProvider).isCompleted;
 
   @override
   void didChangeDependencies() {
@@ -266,9 +279,10 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     if (currentTabIndex != CreateTab.shorts) return;
 
     if (state == AppLifecycleState.inactive) {
-      _handleFailedRecording();
-      cameraController.dispose();
       hasInitCameraNotifier.value = null;
+      cameraController.dispose();
+
+      _handleFailedRecording();
     } else if (state == AppLifecycleState.resumed) {
       onNewCameraSelected(cameraController.description).then((_) {
         // Re-add effects that was previously removed when controller was disposed
@@ -278,18 +292,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       });
 
       if (_hasFailedRecording) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            dismissDirection: DismissDirection.down,
-            duration: const Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-            ),
-            content: const Text('Last recording failed.'),
-          ),
-        );
+        _showErrorSnackbar('Last recording failed.');
       }
     }
   }
@@ -303,8 +306,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       return;
     }
     if (newIndex != CreateTab.shorts.index) {
-      cameraController.dispose();
       hasInitCameraNotifier.value = null;
+      cameraController.dispose();
     } else if (newIndex == CreateTab.shorts.index) {
       onNewCameraSelected(cameraController.description).then((_) {
         // Re-add effects that was previously removed when controller was disposed
@@ -313,6 +316,21 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
         }
       });
     }
+  }
+
+  Future<void> _showErrorSnackbar(String title) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        dismissDirection: DismissDirection.down,
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+        ),
+        content: Text(title),
+      ),
+    );
   }
 
   Future<void> _showDraftDecision() async {
@@ -387,11 +405,17 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   }
 
   bool _onPopInvoked() {
+    if (countdownHidden.value == false) {
+      _stopCountdown();
+      return false;
+    }
+
     if (recordingNotifier.value) {
       _stopRecording();
       _onAutoStopRecording();
       return false;
     }
+
     final shortsRecording = ref.read(shortRecordingProvider);
     if (shortsRecording.hasTimelines) {
       // Note: Using current screen context
@@ -481,17 +505,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       case CaptureEffect.speed:
         isAdded ? hideSpeedController.forward() : hideSpeedController.reverse();
       case CaptureEffect.timer:
-      // TODO: Handle this case.
+        _showCountdownSelector();
       case CaptureEffect.effect:
-      // TODO: Handle this case.
       case CaptureEffect.greenScreen:
-      // TODO: Handle this case.
       case CaptureEffect.retouch:
-      // TODO: Handle this case.
       case CaptureEffect.filter:
-      // TODO: Handle this case.
       case CaptureEffect.align:
-      // TODO: Handle this case.
       case CaptureEffect.lighting:
         if (isAdded) {
           setExposureOffset(
@@ -506,7 +525,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       case CaptureEffect.flash:
         isAdded ? setFlashMode(FlashMode.torch) : setFlashMode(FlashMode.off);
       case CaptureEffect.trim:
-      // TODO: Handle this case.
     }
   }
 
@@ -519,7 +537,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     _onUpdateCaptureEffect(effect, isAdded);
 
-    if ([CaptureEffect.flip, CaptureEffect.speed].contains(effect)) {
+    if ([CaptureEffect.flip, CaptureEffect.speed, CaptureEffect.timer]
+        .contains(effect)) {
       isAdded
           ? _enabledCaptureEffects.add(effect)
           : _enabledCaptureEffects.remove(effect);
@@ -551,7 +570,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     try {
       await cameraController.initialize();
-      await Future.wait(
+      Future.wait(
         <Future<Object?>>[
           cameraController
               .getMinExposureOffset()
@@ -568,30 +587,34 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
         ],
       );
     } on CameraException catch (e) {
-      switch (e.code) {
-        case 'CameraAccessDenied':
-        // TODO(josh4500): 'You have denied camera access.'
-        case 'CameraAccessDeniedWithoutPrompt':
-        // iOS only
-        // TODO(josh4500): 'Please go to Settings app to enable camera access.'
-        case 'CameraAccessRestricted':
-        // iOS only
-        // TODO(josh4500): 'Camera access is restricted.'
-        case 'AudioAccessDenied':
-        // TODO(josh4500): 'You have denied audio access.'
-        case 'AudioAccessDeniedWithoutPrompt':
-        // iOS only
-        // TODO(josh4500): 'Please go to Settings app to enable audio access.'
-        case 'AudioAccessRestricted':
-        // iOS only
-        // TODO(josh4500): 'Audio access is restricted.'
-        default:
-          // TODO(josh4500): Error
-          break;
-      }
+      _handleCameraException(e);
     }
 
     hasInitCameraNotifier.value = cameraDescription;
+  }
+
+  void _handleCameraException(CameraException e) {
+    if (context.mounted) {
+      final cameraState = ModelBinding.of<CreateCameraState>(context);
+      switch (e.code) {
+        case 'CameraAccessDenied' ||
+              'CameraAccessDeniedWithoutPrompt' ||
+              'CameraAccessRestricted':
+          ModelBinding.update<CreateCameraState>(
+            context,
+            cameraState.copyWith(permissionsDenied: true),
+          );
+        case 'AudioAccessDenied' ||
+              'AudioAccessDeniedWithoutPrompt' ||
+              'AudioAccessRestricted':
+          ModelBinding.update<CreateCameraState>(
+            context,
+            cameraState.copyWith(permissionsDenied: true),
+          );
+        case _:
+          return;
+      }
+    }
   }
 
   void handleOnTapCameraView(
@@ -656,26 +679,94 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     }
   }
 
-  bool get _guardRecording => ref.read(shortRecordingProvider).isCompleted;
+  Future<void> _showCountdownSelector() async {
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return CaptureTimerSelector(onStart: _startCountdown);
+      },
+    );
+  }
+
+  void _startCountdown(int countdownSeconds) {
+    countdownHidden.value = false;
+    this.countdownSeconds.value = countdownSeconds;
+    CreateNotification(hideNavigator: true).dispatch(context);
+    countdownTimer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      if (countdownSeconds == 1) {
+        countdownHidden.value = true;
+        countdownController.reset();
+
+        timer.cancel();
+        countdownTimer = null;
+
+        _startRecording();
+        _onAutoStartRecording();
+        return;
+      }
+
+      countdownSeconds -= 1;
+      this.countdownSeconds.value = countdownSeconds;
+      countdownController.reset();
+      countdownController.forward();
+    });
+  }
+
+  void _stopCountdown() {
+    countdownHidden.value = true;
+    countdownController.reset();
+    countdownTimer?.cancel();
+    countdownTimer = null;
+    ref.read(shortRecordingProvider.notifier).updateCountdownStoppage(null);
+    if (!ref.read(shortRecordingProvider).hasTimelines) {
+      CreateNotification(hideNavigator: false).dispatch(context);
+    }
+  }
 
   Future<void> _startRecording() async {
     final CameraController? cameraController = controller;
     if (cameraController == null || !cameraController.value.isInitialized) {
       return;
     }
+
     // await cameraController.startVideoRecording(
     //   onAvailable: (CameraImage cameraImage) {},
     // );
+
     ref
         .read(currentTimelineProvider.notifier)
         .startRecording((Timeline timeline) {
       final shortsRecording = ref.read(shortRecordingProvider);
       final totalDuration = shortsRecording.duration + timeline.duration;
-      if (totalDuration >= shortsRecording.recordDuration) {
+      final countdownStoppage = shortsRecording.countdownStoppage;
+
+      bool autoStop = false;
+      if (countdownStoppage != null && timeline.duration >= countdownStoppage) {
+        autoStop = true;
+        ref
+            .read(shortRecordingProvider.notifier)
+            .updateCountdownStoppage(null); // Remove Countdown stoppage
+      } else if (totalDuration >= shortsRecording.recordDuration) {
+        autoStop = true;
+      }
+
+      if (autoStop) {
         _stopRecording();
         _onAutoStopRecording();
       }
     });
+  }
+
+  void _onAutoStartRecording() {
+    dragRecordNotifier.value = false; // Not dragging
+
+    final recording = !recordingNotifier.value;
+    disableDragMode = recording;
+    recordingNotifier.value = recording;
+    recording
+        ? recordOuterButtonController.forward(from: .7)
+        : recordOuterButtonController.reverse(from: .7);
   }
 
   Future<void> _onAutoStopRecording() async {
@@ -712,7 +803,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     final recording = !recordingNotifier.value;
 
-    // TODO(josh4500): Prevent recoding when it gets to set Duration
     // Start or Stop recording
     recording ? _startRecording() : _stopRecording();
 
@@ -728,7 +818,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   void handleLongPressStartRecordButton(LongPressStartDetails details) {
     if (disableDragMode || _guardRecording) return;
 
-    // TODO(josh4500): Prevent recoding when it gets to set Duration
     _startRecording();
 
     dragRecordNotifier.value = true;
@@ -783,9 +872,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     // Update zoom level
     setZoomLevel(
-      (1 -
-              (position.dy /
-                  (maxHeight - kRecordOuterButtonSize - bottomPaddingHeight)))
+      (1 - (position.dy / (maxHeight - kRecordOuterButtonSize - bottomPadding)))
           .clamp(0, 1),
     );
 
@@ -796,7 +883,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
           getCenterButtonInitPosition(constraints);
     } else if (droppedButton &&
         position.dy >=
-            maxHeight - (kRecordOuterButtonSize / 2) - bottomPaddingHeight) {
+            maxHeight - (kRecordOuterButtonSize / 2) - bottomPadding) {
       droppedButton = false;
     }
   }
@@ -812,8 +899,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       );
       dragZoomLevelNotifier.value = level;
     } on CameraException {
-      // TODO(josh4500): Unable to set zoom level
-      rethrow;
+      _showErrorSnackbar('Unable to zoom camera');
     }
   }
 
@@ -825,8 +911,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     try {
       await controller!.setFlashMode(mode);
     } on CameraException {
-      // TODO(josh4500): Unable to set flash mode
-      rethrow;
+      _showErrorSnackbar('Unable to change flash');
     }
   }
 
@@ -838,8 +923,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     try {
       await controller!.setExposureMode(mode);
     } on CameraException {
-      // TODO(josh4500): Unable to set exposure mode
-      rethrow;
+      _showErrorSnackbar('Camera unable to set Exposure Mode');
     }
   }
 
@@ -851,8 +935,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     try {
       offset = await controller!.setExposureOffset(offset);
     } on CameraException {
-      // TODO(josh4500): Unable to set exposure
-      rethrow;
+      _showErrorSnackbar('Camera unable to set lighting');
     }
   }
 
@@ -864,17 +947,16 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     try {
       await controller!.setFocusMode(mode);
     } on CameraException {
-      // TODO(josh4500): Unable to set focus mode
-      rethrow;
+      _showErrorSnackbar('Camera unable to focus');
     }
   }
 
   bool handleCaptureNotification(CaptureNotification notification) {
-    if (notification is HideCaptureControlsNotification) {
+    if (notification is HideControlsNotification) {
       _controlHidden = true;
       hideController.forward();
       CreateNotification(hideNavigator: true).dispatch(context);
-    } else if (notification is ShowCaptureControlsNotification) {
+    } else if (notification is ShowControlsNotification) {
       _controlHidden = false;
       hideController.reverse();
       CreateNotification(hideNavigator: false).dispatch(context);
@@ -885,6 +967,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
         const Duration(seconds: 2),
         () => latestControlMessage.value = '',
       );
+    } else if (notification is StartCountdownNotification) {
+      countdownHidden.value = false;
+      CreateNotification(hideNavigator: true).dispatch(context);
+    } else if (notification is StopCountdownNotification) {
+      countdownHidden.value = true;
+      CreateNotification(hideNavigator: false).dispatch(context);
     }
     return true;
   }
@@ -930,7 +1018,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                               },
                               onDoubleTapDown: (TapDownDetails details) {
                                 handleOnDoubleTapCameraView(
-                                    details, constraints);
+                                  details,
+                                  constraints,
+                                );
                               },
                               behavior: HitTestBehavior.opaque,
                               child: const SizedBox.expand(),
@@ -969,18 +1059,21 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                           child: childWidget!,
                         );
                       },
-                      child: AnimatedVisibility(
-                        animation: hideAnimation,
-                        alignment: Alignment.bottomCenter,
-                        child: ListenableBuilder(
-                          listenable: recordingNotifier,
-                          builder: (BuildContext context, Widget? _) {
-                            return CaptureDragZoomButton(
-                              animation: recordOuterButtonController,
-                              isDragging: dragRecordNotifier.value,
-                              isRecording: recordingNotifier.value,
-                            );
-                          },
+                      child: HideOnCountdown(
+                        notifier: countdownHidden,
+                        child: AnimatedVisibility(
+                          animation: hideAnimation,
+                          alignment: Alignment.bottomCenter,
+                          child: ListenableBuilder(
+                            listenable: recordingNotifier,
+                            builder: (BuildContext context, Widget? _) {
+                              return CaptureDragZoomButton(
+                                animation: recordOuterButtonController,
+                                isDragging: dragRecordNotifier.value,
+                                isRecording: recordingNotifier.value,
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -999,43 +1092,93 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                           child: childWidget!,
                         );
                       },
-                      child: AnimatedVisibility(
-                        animation: hideAnimation,
-                        alignment: Alignment.bottomCenter,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: handleOnTapRecordButton,
-                          onLongPressStart: handleLongPressStartRecordButton,
-                          onLongPressEnd: (LongPressEndDetails details) {
-                            handleLongPressEndRecordButton(
-                              details,
-                              constraints,
-                            );
-                          },
-                          onLongPressMoveUpdate: (
-                            LongPressMoveUpdateDetails details,
-                          ) {
-                            handleLongPressUpdateRecordButton(
-                              details,
-                              constraints,
-                            );
-                          },
-                          child: ListenableBuilder(
-                            listenable: Listenable.merge(
-                              [
-                                recordingNotifier,
-                                dragRecordNotifier,
-                              ],
-                            ),
-                            builder: (BuildContext context, Widget? _) {
-                              return CaptureButton(
-                                isRecording: recordingNotifier.value &&
-                                    !dragRecordNotifier.value,
+                      child: HideOnCountdown(
+                        notifier: countdownHidden,
+                        child: AnimatedVisibility(
+                          animation: hideAnimation,
+                          alignment: Alignment.bottomCenter,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: handleOnTapRecordButton,
+                            onLongPressStart: handleLongPressStartRecordButton,
+                            onLongPressEnd: (LongPressEndDetails details) {
+                              handleLongPressEndRecordButton(
+                                details,
+                                constraints,
                               );
                             },
+                            onLongPressMoveUpdate: (
+                              LongPressMoveUpdateDetails details,
+                            ) {
+                              handleLongPressUpdateRecordButton(
+                                details,
+                                constraints,
+                              );
+                            },
+                            child: ListenableBuilder(
+                              listenable: Listenable.merge(
+                                [
+                                  recordingNotifier,
+                                  dragRecordNotifier,
+                                ],
+                              ),
+                              builder: (BuildContext context, Widget? _) {
+                                return CaptureButton(
+                                  isRecording: recordingNotifier.value &&
+                                      !dragRecordNotifier.value,
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
+                    ),
+                    ListenableBuilder(
+                      listenable: countdownHidden,
+                      builder: (BuildContext context, Widget? _) {
+                        if (countdownHidden.value) {
+                          return const SizedBox();
+                        }
+
+                        return Center(
+                          child: ScaleTransition(
+                            scale: Tween<double>(begin: 1, end: 1.5).animate(
+                              ReverseAnimation(countdownController),
+                            ),
+                            child: ListenableBuilder(
+                              listenable: countdownSeconds,
+                              builder: (BuildContext context, Widget? _) {
+                                return Text(
+                                  countdownSeconds.value.toString(),
+                                  style: const TextStyle(
+                                    fontSize: 100,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    ListenableBuilder(
+                      listenable: countdownHidden,
+                      builder: (BuildContext context, Widget? _) {
+                        if (countdownHidden.value) {
+                          return const SizedBox();
+                        }
+                        return Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Transform.translate(
+                            offset: const Offset(0, -bottomPadding),
+                            child: GestureDetector(
+                              onTap: _stopCountdown,
+                              behavior: HitTestBehavior.opaque,
+                              child: const CaptureCountdownButton(),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 );
@@ -1056,15 +1199,21 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                         children: [
                           const CreateProgress(),
                           const SizedBox(height: 12),
-                          HideOnRecording(
-                            notifier: recordingNotifier,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                CreateCloseButton(onPopInvoked: _onPopInvoked),
-                                const CaptureMusicButton(),
-                                const CaptureShortsDuration(),
-                              ],
+                          HideOnCountdown(
+                            notifier: countdownHidden,
+                            child: HideOnRecording(
+                              notifier: recordingNotifier,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  CreateCloseButton(
+                                    onPopInvoked: _onPopInvoked,
+                                  ),
+                                  const CaptureMusicButton(),
+                                  const CaptureShortsDuration(),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -1088,32 +1237,38 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                       controller: dragZoomLevelNotifier,
                     ),
                   ),
-                  HideOnRecording(
-                    notifier: recordingNotifier,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: CaptureEffects(controller: effectsController),
+                  HideOnCountdown(
+                    notifier: countdownHidden,
+                    child: HideOnRecording(
+                      notifier: recordingNotifier,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: CaptureEffects(controller: effectsController),
+                      ),
                     ),
                   ),
-                  HideOnRecording(
-                    notifier: recordingNotifier,
-                    child: AnimatedVisibility(
-                      animation: hideAnimation,
-                      alignment: Alignment.bottomCenter,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          AnimatedVisibility(
-                            animation: hideSpeedController,
-                            child: ScaleTransition(
-                              scale: speedSelectorScaleAnimation,
-                              child: const CaptureSpeed(),
+                  HideOnCountdown(
+                    notifier: countdownHidden,
+                    child: HideOnRecording(
+                      notifier: recordingNotifier,
+                      child: AnimatedVisibility(
+                        animation: hideAnimation,
+                        alignment: Alignment.bottomCenter,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            AnimatedVisibility(
+                              animation: hideSpeedController,
+                              child: ScaleTransition(
+                                scale: speedSelectorScaleAnimation,
+                                child: const CaptureSpeed(),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 36),
-                          const CaptureTimelineControl(),
-                          const SizedBox(height: bottomPaddingHeight),
-                        ],
+                            const SizedBox(height: 36),
+                            const CaptureTimelineControl(),
+                            const SizedBox(height: bottomPadding),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -1306,7 +1461,408 @@ class HideOnRecording extends StatelessWidget {
   }
 }
 
+class HideOnCountdown extends StatelessWidget {
+  const HideOnCountdown({
+    super.key,
+    required this.notifier,
+    required this.child,
+  });
+  final ValueNotifier<bool> notifier;
+  final Widget child;
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: notifier,
+      builder: (BuildContext context, bool hidden, Widget? _) {
+        return Offstage(
+          offstage: hidden == false,
+          child: child,
+        );
+      },
+    );
+  }
+}
+
 extension IfNullExtension<T> on T? {
   bool get isNull => this == null;
   bool get isNotNull => this != null;
+}
+
+class CaptureTimerSelector extends StatelessWidget {
+  const CaptureTimerSelector({super.key, this.onStart});
+  final ValueChanged<int>? onStart;
+
+  @override
+  Widget build(BuildContext context) {
+    final countdowns = [3, 10, 20];
+    int selectedIndex = 0;
+    return Material(
+      color: AppPalette.black,
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Text(
+                  'Timer',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                ),
+                const Spacer(),
+                Consumer(
+                  builder: (BuildContext context, WidgetRef ref, Widget? _) {
+                    return GestureDetector(
+                      onTap: () {
+                        ref
+                            .read(shortRecordingProvider.notifier)
+                            .updateCountdownStoppage(null);
+                        context.pop();
+                      },
+                      child: const Icon(
+                        YTIcons.close_outlined,
+                        color: Colors.white70,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Text('Countdown'),
+            const SizedBox(height: 8),
+            RangeSelector(
+              initialIndex: selectedIndex,
+              indicatorHeight: 40,
+              backgroundColor: Colors.white12,
+              selectedColor: Colors.white12,
+              itemBuilder: (
+                BuildContext context,
+                int selectedIndex,
+                int index,
+              ) {
+                return Text(
+                  '${countdowns[index]}s',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                );
+              },
+              onChanged: (int index) => selectedIndex = index,
+              itemCount: countdowns.length,
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Drag to change where recording stops',
+              style: TextStyle(fontSize: 15),
+            ),
+            const SizedBox(height: 12),
+            const CountdownRangeSlider(),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () {
+                  onStart?.call(countdowns[selectedIndex]);
+                  context.pop();
+                },
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateColor.resolveWith(
+                    (_) => AppPalette.blue,
+                  ),
+                  overlayColor: WidgetStateColor.resolveWith(
+                    (_) => Colors.white12,
+                  ),
+                  textStyle: WidgetStateTextStyle.resolveWith(
+                    (_) => const TextStyle(
+                      fontSize: 15,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                child: const Text(
+                  'START',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CountdownRangeSlider extends ConsumerWidget {
+  const CountdownRangeSlider({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final shortsRecording = ref.read(shortRecordingProvider);
+    final start = shortsRecording.duration.inSeconds /
+        shortsRecording.recordDuration.inSeconds;
+
+    const textStyle = TextStyle(fontSize: 14, color: Colors.white24);
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('0s', style: textStyle),
+            Text(
+              '${shortsRecording.recordDuration.inSeconds}s',
+              style: textStyle,
+            ),
+          ],
+        ),
+        RangeSlider(
+          value: RangeValue(start: start, end: 1),
+          onChanged: (double value) {
+            final milli = shortsRecording.recordDuration.inMilliseconds;
+            final stopMilliseconds = (milli * value).ceil() -
+                shortsRecording.duration.inMilliseconds;
+
+            final duration = Duration(milliseconds: stopMilliseconds);
+
+            ref.read(shortRecordingProvider.notifier).updateCountdownStoppage(
+                  stopMilliseconds == 0 || value == 1 ? null : duration,
+                );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class RangeSlider extends StatefulWidget {
+  const RangeSlider({
+    super.key,
+    required this.value,
+    this.trackHeight = 16,
+    this.activeColor = Colors.white24,
+    this.trackColor = Colors.black87,
+    this.markerColor = Colors.blue,
+    this.onChanged,
+  });
+  final RangeValue value;
+  final double trackHeight;
+  final Color trackColor;
+  final Color activeColor;
+  final Color markerColor;
+  final ValueChanged<double>? onChanged;
+
+  @override
+  State<RangeSlider> createState() => _RangeSliderState();
+}
+
+class _RangeSliderState extends State<RangeSlider> {
+  late final ValueNotifier<RangeValue> rangeValueNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    rangeValueNotifier = ValueNotifier<RangeValue>(
+      widget.value,
+    );
+  }
+
+  @override
+  void dispose() {
+    rangeValueNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: (details) {
+            final currentValue = rangeValueNotifier.value;
+            final maxWidth = constraints.maxWidth;
+            final positionX = details.localPosition.dx;
+            rangeValueNotifier.value = currentValue.copyWith(
+              end: (positionX / maxWidth).clamp(
+                rangeValueNotifier.value.start,
+                1,
+              ),
+            );
+            widget.onChanged?.call(rangeValueNotifier.value.end);
+          },
+          onHorizontalDragUpdate: (details) {
+            final currentValue = rangeValueNotifier.value;
+            final maxWidth = constraints.maxWidth;
+            final positionX = details.localPosition.dx;
+            rangeValueNotifier.value = currentValue.copyWith(
+              end: (positionX / maxWidth).clamp(
+                rangeValueNotifier.value.start,
+                1,
+              ),
+            );
+            widget.onChanged?.call(rangeValueNotifier.value.end);
+          },
+          child: Column(
+            children: [
+              const SizedBox(height: 4),
+              SizedBox(
+                width: double.infinity,
+                height: widget.trackHeight,
+                child: ListenableBuilder(
+                  listenable: rangeValueNotifier,
+                  builder: (BuildContext context, Widget? _) {
+                    return CustomPaint(
+                      foregroundPainter: RangeSliderPainter(
+                        value: rangeValueNotifier.value,
+                        trackColor: widget.trackColor,
+                        activeColor: widget.activeColor,
+                        markerColor: widget.markerColor,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class RangeValue {
+  const RangeValue({required this.start, required this.end});
+
+  final double start;
+  final double end;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RangeValue &&
+          runtimeType == other.runtimeType &&
+          start == other.start &&
+          end == other.end;
+
+  @override
+  int get hashCode => start.hashCode ^ end.hashCode;
+
+  RangeValue copyWith({
+    double? start,
+    double? end,
+  }) {
+    return RangeValue(
+      start: start ?? this.start,
+      end: end ?? this.end,
+    );
+  }
+}
+
+class RangeSliderPainter extends CustomPainter {
+  RangeSliderPainter({
+    super.repaint,
+    required this.value,
+    required this.trackColor,
+    required this.activeColor,
+    required this.markerColor,
+    this.paddleRadius = 10,
+  });
+
+  final RangeValue value;
+  final Color activeColor;
+  final Color trackColor;
+  final Color markerColor;
+  final double paddleRadius;
+
+  static const double strokeWidth = 2.5;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint markerPaint = Paint()
+      ..color = markerColor
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    final Paint markerPaddlePaint = Paint()
+      ..color = markerColor
+      ..strokeWidth = 1
+      ..style = PaintingStyle.fill;
+
+    final Paint activePaint = Paint()
+      ..color = activeColor
+      ..strokeWidth = size.height - 4;
+
+    final Paint backgroundPaint = Paint()
+      ..color = trackColor
+      ..strokeWidth = size.height
+      ..strokeCap = StrokeCap.round;
+
+    // Draws background
+    canvas.drawLine(
+      Offset(0, size.height / 2),
+      Offset(size.width, size.height / 2),
+      backgroundPaint,
+    );
+
+    final Offset startBeginOffset = Offset(0, size.height / 2);
+    final Offset startEndOffset = Offset(
+      size.width * value.start,
+      size.height / 2,
+    );
+
+    // Draws start range
+    canvas.drawLine(startBeginOffset, startEndOffset, activePaint);
+
+    if (value.start > 0) {
+      final double markerX1 = (size.width * value.start) + (strokeWidth / 2);
+
+      // Draws start maker
+      canvas.drawLine(
+        Offset(markerX1, 2),
+        Offset(markerX1, size.height - 2),
+        markerPaint,
+      );
+    }
+
+    final Offset endBeginOffset = Offset(
+      size.width * value.end,
+      size.height / 2,
+    );
+    final Offset beginEndOffset = Offset(
+      size.width,
+      size.height / 2,
+    );
+
+    // Draws end range
+    canvas.drawLine(endBeginOffset, beginEndOffset, activePaint);
+
+    // Draws end marker
+    final double markerX2 = (size.width * value.end) - (strokeWidth / 2);
+    canvas.drawLine(
+      Offset(markerX2, -(paddleRadius + 2)),
+      Offset(markerX2, size.height + paddleRadius + 2),
+      markerPaint,
+    );
+    // Draws paddle
+    canvas.drawCircle(
+      Offset(markerX2, size.height + paddleRadius + 2),
+      paddleRadius,
+      markerPaddlePaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

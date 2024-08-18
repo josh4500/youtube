@@ -143,8 +143,8 @@ class _RangeSelectorState<T> extends State<RangeSelector>
                   },
                   child: Container(
                     height: widget.indicatorHeight,
-                    width: (constraints.maxWidth / itemCount) - 8,
-                    margin: const EdgeInsets.all(4),
+                    width: (constraints.maxWidth / itemCount) - 4,
+                    margin: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
                       color: widget.selectedColor ?? Colors.white,
                       borderRadius: BorderRadius.circular(4),
@@ -155,8 +155,8 @@ class _RangeSelectorState<T> extends State<RangeSelector>
                   children: List.generate(itemCount, (index) {
                     return Container(
                       height: widget.indicatorHeight,
-                      width: (constraints.maxWidth / itemCount) - 8,
-                      margin: const EdgeInsets.all(4),
+                      width: (constraints.maxWidth / itemCount) - 4,
+                      margin: const EdgeInsets.all(2),
                       alignment: Alignment.center,
                       child: ValueListenableBuilder<int>(
                         valueListenable: indexNotifier,

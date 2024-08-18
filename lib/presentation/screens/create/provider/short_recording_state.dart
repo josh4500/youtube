@@ -49,4 +49,8 @@ class ShortRecording extends _$ShortRecording {
     state = state.clear();
     _cachedState.value = null;
   }
+
+  void updateCountdownStoppage(Duration? duration) {
+    state = state.updateCountdownStoppage(duration);
+  }
 }

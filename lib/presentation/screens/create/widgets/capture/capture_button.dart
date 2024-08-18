@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 const double kRecordButtonStrokeWidth = 4;
 const double kRecordOuterButtonSize = 66.0;
@@ -33,6 +34,30 @@ class CaptureDragZoomButton extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class CaptureCountdownButton extends StatelessWidget {
+  const CaptureCountdownButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(width: 4, color: Colors.white),
+      ),
+      child: Container(
+        width: kRecordOuterButtonSize - 8,
+        height: kRecordOuterButtonSize - 8,
+        margin: const EdgeInsets.all(4),
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.black87,
+        ),
+        child: const Icon(YTIcons.cancel_outlined),
+      ),
     );
   }
 }

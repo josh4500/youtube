@@ -52,12 +52,14 @@ class ExtraSound {}
 class CreateShortRecordingState {
   CreateShortRecordingState({
     required this.recordDuration,
+    this.countdownStoppage,
     List<Timeline>? timelines,
     List<Timeline>? removedTimelines,
   })  : timelines = timelines ?? const [],
         removedTimelines = removedTimelines ?? const [];
 
   final Duration recordDuration;
+  final Duration? countdownStoppage;
   final List<Timeline> timelines;
   final List<Timeline> removedTimelines;
 
@@ -82,11 +84,13 @@ class CreateShortRecordingState {
   /// Copy with method to return a new instance of the state with updated properties
   CreateShortRecordingState copyWith({
     Duration? recordDuration,
+    Duration? timerStopDuration,
     List<Timeline>? timelines,
     List<Timeline>? removedTimelines,
   }) {
     return CreateShortRecordingState(
       recordDuration: recordDuration ?? this.recordDuration,
+      countdownStoppage: timerStopDuration ?? this.countdownStoppage,
       timelines: timelines ?? List.unmodifiable(this.timelines),
       removedTimelines:
           removedTimelines ?? List.unmodifiable(this.removedTimelines),
@@ -132,8 +136,24 @@ class CreateShortRecordingState {
     return copyWith(recordDuration: duration);
   }
 
+  CreateShortRecordingState updateCountdownStoppage(Duration? duration) {
+    return CreateShortRecordingState(
+      recordDuration: recordDuration,
+      countdownStoppage: duration,
+      timelines: timelines,
+      removedTimelines: removedTimelines,
+    );
+    ;
+  }
+
   List<double> getEndPositions() {
-    return _calculateTimelineEnds(timelines, recordDuration);
+    return _calculateTimelineEnds(
+      [
+        ...timelines,
+        if (countdownStoppage != null) Timeline(duration: countdownStoppage!),
+      ],
+      recordDuration,
+    );
   }
 
   List<double> _calculateTimelineEnds(
@@ -160,13 +180,13 @@ class CreateShortRecordingState {
   double getProgress(Timeline currentTimeline) {
     final Duration totalTimelineDuration = duration;
 
-    final Duration addDuration =
+    final Duration addedDuration =
         currentTimeline.state == RecordingState.recording
             ? currentTimeline.duration
             : Duration.zero;
 
     final Duration totalDurationWithCurrent =
-        totalTimelineDuration + addDuration;
+        totalTimelineDuration + addedDuration;
 
     // Calculate progress ratio between 0.0 and 1.0
     final double progressValue =
