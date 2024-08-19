@@ -419,7 +419,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     final shortsRecording = ref.read(shortRecordingProvider);
     if (shortsRecording.hasRecordings) {
       // Note: Using current screen context
-      void popCurrentScreen() => context.pop();
       void showNavigator() {
         CreateNotification(hideNavigator: false).dispatch(context);
       }
@@ -429,53 +428,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
         backgroundColor: Colors.transparent,
         useRootNavigator: true,
         builder: (BuildContext context) {
-          return Material(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(YTIcons.delete_outlined),
-                  title: const Text('Delete'),
-                  titleTextStyle: const TextStyle(fontSize: 12.5),
-                  hoverColor: Colors.white24,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                  ),
-                  onTap: () {
-                    ref.read(currentRecordingProvider.notifier).clear();
-                    ref.read(shortRecordingProvider.notifier).clear();
-
-                    context.pop();
-                    showNavigator();
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(YTIcons.exit_outlined),
-                  title: const Text('Save and Exit'),
-                  titleTextStyle: const TextStyle(fontSize: 12.5),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                  ),
-                  hoverColor: Colors.white24,
-                  onTap: () async {
-                    ref.read(shortRecordingProvider.notifier).save();
-                    context.pop();
-                    popCurrentScreen();
-                  },
-                ),
-                const Divider(height: 0),
-                ListTile(
-                  leading: const Icon(YTIcons.close_outlined),
-                  title: const Text('Cancel'),
-                  titleTextStyle: const TextStyle(fontSize: 12.5),
-                  hoverColor: Colors.white24,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                  ),
-                  onTap: context.pop,
-                ),
-              ],
-            ),
+          return PreExitCaptureOptionsSheet(
+            exit: context.pop,
+            showNavigator: showNavigator,
           );
         },
       );
@@ -1500,6 +1455,71 @@ class HideOnCountdown extends StatelessWidget {
           child: child,
         );
       },
+    );
+  }
+}
+
+class PreExitCaptureOptionsSheet extends ConsumerWidget {
+  const PreExitCaptureOptionsSheet({
+    super.key,
+    required this.exit,
+    required this.showNavigator,
+  });
+  final VoidCallback exit;
+  final VoidCallback showNavigator;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Material(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(YTIcons.delete_outlined),
+            title: const Text('Delete'),
+            titleTextStyle: const TextStyle(fontSize: 12.5),
+            hoverColor: Colors.white24,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+            ),
+            onTap: () {
+              ref.read(currentRecordingProvider.notifier).clear();
+              ref.read(shortRecordingProvider.notifier).clear();
+
+              context.pop();
+              showNavigator();
+            },
+          ),
+          ListTile(
+            leading: const RotatedBox(
+              quarterTurns: -2,
+              child: Icon(YTIcons.exit_outlined),
+            ),
+            title: const Text('Save and Exit'),
+            titleTextStyle: const TextStyle(fontSize: 12.5),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+            ),
+            hoverColor: Colors.white24,
+            onTap: () async {
+              ref.read(shortRecordingProvider.notifier).save();
+              context.pop();
+              exit();
+            },
+          ),
+          const Divider(height: 0),
+          ListTile(
+            leading: const Icon(YTIcons.close_outlined),
+            title: const Text('Cancel'),
+            titleTextStyle: const TextStyle(fontSize: 12.5),
+            hoverColor: Colors.white24,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+            ),
+            onTap: context.pop,
+          ),
+        ],
+      ),
     );
   }
 }
