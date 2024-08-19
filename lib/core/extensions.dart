@@ -180,3 +180,8 @@ extension AgoExtension on DateTime {
     return 'ago';
   }
 }
+
+extension IfNullExtension<T> on T? {
+  bool get isNull => this == null;
+  bool get isNotNull => this != null;
+}

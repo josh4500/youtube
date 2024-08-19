@@ -7,8 +7,8 @@ import '../../provider/media_album_state.dart';
 import '../../provider/short_recording_state.dart';
 import '../notifications/create_notification.dart';
 
-class CaptureTimelineControl extends StatelessWidget {
-  const CaptureTimelineControl({super.key});
+class CaptureRecordingControl extends StatelessWidget {
+  const CaptureRecordingControl({super.key});
 
   @override
   Widget build(BuildContext context) {

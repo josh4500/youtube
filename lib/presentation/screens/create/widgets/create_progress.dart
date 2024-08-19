@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/screens/create/provider/current_timeline_state.dart';
+import 'package:youtube_clone/presentation/screens/create/provider/current_recording_state.dart';
 import 'package:youtube_clone/presentation/screens/create/provider/short_recording_state.dart';
 import 'package:youtube_clone/presentation/theme/app_color.dart';
 
@@ -13,8 +13,8 @@ class CreateProgress extends ConsumerWidget {
 
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? _) {
-        final currentTimeline = ref.watch(currentTimelineProvider);
-        final double value = shortRecording.getProgress(currentTimeline);
+        final currentRecording = ref.watch(currentRecordingProvider);
+        final double value = shortRecording.getProgress(currentRecording);
         return CustomPaint(
           foregroundPainter: _TimelineSeparator(
             progressList: shortRecording.getEndPositions(),

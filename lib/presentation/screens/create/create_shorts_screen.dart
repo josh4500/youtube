@@ -37,15 +37,15 @@ import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import 'provider/current_timeline_state.dart';
+import 'provider/current_recording_state.dart';
 import 'provider/index_notifier.dart';
 import 'provider/short_recording_state.dart';
 import 'widgets/capture/capture_button.dart';
 import 'widgets/capture/capture_effects.dart';
 import 'widgets/capture/capture_focus_indicator.dart';
+import 'widgets/capture/capture_recording_control.dart';
 import 'widgets/capture/capture_shorts_duration.dart';
 import 'widgets/capture/capture_speed.dart';
-import 'widgets/capture/capture_timeline_control.dart';
 import 'widgets/capture/capture_zoom_indicator.dart';
 import 'widgets/check_permission.dart';
 import 'widgets/create_close_button.dart';
@@ -442,7 +442,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                     horizontal: 12,
                   ),
                   onTap: () {
-                    ref.read(currentTimelineProvider.notifier).clear();
+                    ref.read(currentRecordingProvider.notifier).clear();
                     ref.read(shortRecordingProvider.notifier).clear();
 
                     context.pop();
@@ -735,14 +735,15 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     // );
 
     ref
-        .read(currentTimelineProvider.notifier)
-        .startRecording((Recording timeline) {
+        .read(currentRecordingProvider.notifier)
+        .startRecording((Recording recording) {
       final shortsRecording = ref.read(shortRecordingProvider);
-      final totalDuration = shortsRecording.duration + timeline.duration;
+      final totalDuration = shortsRecording.duration + recording.duration;
       final countdownStoppage = shortsRecording.countdownStoppage;
 
       bool autoStop = false;
-      if (countdownStoppage != null && timeline.duration >= countdownStoppage) {
+      if (countdownStoppage != null &&
+          recording.duration >= countdownStoppage) {
         autoStop = true;
         ref
             .read(shortRecordingProvider.notifier)
@@ -761,10 +762,10 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   void _onAutoStartRecording() {
     dragRecordNotifier.value = false; // Not dragging
 
-    final recording = !recordingNotifier.value;
-    disableDragMode = recording;
-    recordingNotifier.value = recording;
-    recording
+    final isRecording = !recordingNotifier.value;
+    disableDragMode = isRecording;
+    recordingNotifier.value = isRecording;
+    isRecording
         ? recordOuterButtonController.forward(from: .7)
         : recordOuterButtonController.reverse(from: .7);
   }
@@ -790,10 +791,10 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   Future<void> _stopRecording([bool addTimeline = true]) async {
     // final XFile xFile = await controller!.stopVideoRecording();
     // xFile.saveTo('path');
-    ref.read(currentTimelineProvider.notifier).stopRecording();
+    ref.read(currentRecordingProvider.notifier).stopRecording();
     if (addTimeline) {
-      final Recording timeline = ref.read(currentTimelineProvider);
-      ref.read(shortRecordingProvider.notifier).addRecording(timeline);
+      final Recording recording = ref.read(currentRecordingProvider);
+      ref.read(shortRecordingProvider.notifier).addRecording(recording);
     }
   }
 
@@ -801,18 +802,18 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     if (_guardRecording) return;
     dragRecordNotifier.value = false; // Not dragging
 
-    final recording = !recordingNotifier.value;
+    final isRecording = !recordingNotifier.value;
 
     // Start or Stop recording
-    recording ? _startRecording() : _stopRecording();
+    isRecording ? _startRecording() : _stopRecording();
 
-    disableDragMode = recording;
-    recordingNotifier.value = recording;
-    recording
+    disableDragMode = isRecording;
+    recordingNotifier.value = isRecording;
+    isRecording
         ? recordOuterButtonController.forward(from: .7)
         : recordOuterButtonController.reverse(from: .7);
 
-    if (recording) CreateNotification(hideNavigator: true).dispatch(context);
+    if (isRecording) CreateNotification(hideNavigator: true).dispatch(context);
   }
 
   void handleLongPressStartRecordButton(LongPressStartDetails details) {
@@ -1265,7 +1266,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                               ),
                             ),
                             const SizedBox(height: 36),
-                            const CaptureTimelineControl(),
+                            const CaptureRecordingControl(),
                             const SizedBox(height: bottomPadding),
                           ],
                         ),
@@ -1483,11 +1484,6 @@ class HideOnCountdown extends StatelessWidget {
   }
 }
 
-extension IfNullExtension<T> on T? {
-  bool get isNull => this == null;
-  bool get isNotNull => this != null;
-}
-
 class CaptureTimerSelector extends StatelessWidget {
   const CaptureTimerSelector({super.key, this.onStart});
   final ValueChanged<int>? onStart;
@@ -1527,6 +1523,7 @@ class CaptureTimerSelector extends StatelessWidget {
                       child: const Icon(
                         YTIcons.close_outlined,
                         color: Colors.white70,
+                        size: 20,
                       ),
                     );
                   },

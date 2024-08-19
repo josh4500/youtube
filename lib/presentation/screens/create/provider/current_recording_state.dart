@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:youtube_clone/presentation/models.dart';
 
-part 'current_timeline_state.g.dart';
+part 'current_recording_state.g.dart';
 
 @riverpod
-class CurrentTimeline extends _$CurrentTimeline {
+class CurrentRecording extends _$CurrentRecording {
   Timer? _recordingTimer;
 
   @override

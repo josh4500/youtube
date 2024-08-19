@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../provider/current_timeline_state.dart';
+import '../../provider/current_recording_state.dart';
 import '../notifications/capture_notification.dart';
 import '../range_selector.dart';
 
@@ -19,12 +19,12 @@ class CaptureSpeed extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final timeline = ref.watch(currentTimelineProvider);
+    final recording = ref.watch(currentRecordingProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: RangeSelector(
         initialIndex: speeds.indexWhere(
-          (num item) => item.toDouble() == timeline.speed,
+          (num item) => item.toDouble() == recording.speed,
         ),
         itemCount: speeds.length,
         itemBuilder: (BuildContext context, int selectedIndex, int index) {
@@ -38,7 +38,7 @@ class CaptureSpeed extends ConsumerWidget {
           );
         },
         onChanged: (int index) {
-          ref.read(currentTimelineProvider.notifier).updateSpeed(
+          ref.read(currentRecordingProvider.notifier).updateSpeed(
                 speeds[index].toDouble(),
               );
           ShowControlsMessageNotification(
