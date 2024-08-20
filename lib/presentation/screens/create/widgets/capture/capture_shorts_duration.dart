@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/screens/create/provider/short_recording_state.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../../provider/short_recording_state.dart';
 import '../notifications/capture_notification.dart';
 
 class CaptureShortsDuration extends ConsumerStatefulWidget {
@@ -24,17 +26,19 @@ class _CaptureShortsDurationTimerState
     duration: const Duration(milliseconds: 150),
   );
 
-  late final animation = Tween<double>(
+  late final Animation<double> animation = Tween<double>(
     begin: minTime / maxTime,
     end: 1,
   ).animate(controller);
+
+  final _overlayController = OverlayPortalController();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     Future.microtask(() {
       final recordDuration = ref.read(shortRecordingProvider).recordDuration;
-      if (recordDuration.inSeconds == maxTime) {
+      if (recordDuration.inSeconds > minTime) {
         controller.forward();
       }
     });
@@ -51,6 +55,10 @@ class _CaptureShortsDurationTimerState
     final shortsRecordDuration = ref.watch(
       shortRecordingProvider.select((state) => state.recordDuration.inSeconds),
     );
+    final animation = Tween<double>(
+      begin: minTime / maxTime,
+      end: 1,
+    ).animate(controller);
     return GestureDetector(
       onTap: () {
         bool updateValue = true;
@@ -62,7 +70,9 @@ class _CaptureShortsDurationTimerState
           final shortsRecording = ref.read(shortRecordingProvider);
           if (shortsRecording.duration.inSeconds > minTime) {
             updateValue = false;
-            // TODO(josh4500): Show "Record up to 60s" pointer message
+            _overlayController.show();
+            // TODO(josh4500): This should be controllable outside of this widget
+            Timer(const Duration(seconds: 5), _overlayController.hide);
           } else {
             time = minTime;
             controller.reverse();
@@ -79,10 +89,21 @@ class _CaptureShortsDurationTimerState
           ).dispatch(context);
         }
       },
-      child: Stack(
-        alignment: Alignment.center,
-        children: <Widget>[
-          Container(
+      child: CallOut(
+        text: 'Record up to 60s',
+        controller: _overlayController,
+        child: AnimatedBuilder(
+          animation: animation,
+          builder: (BuildContext context, Widget? childWidget) {
+            return CustomPaint(
+              foregroundPainter: CircleProgressPainter(
+                progress: animation.value,
+                strokeWidth: 1.8,
+              ),
+              child: childWidget, // Set progress here
+            );
+          },
+          child: Container(
             padding: const EdgeInsets.all(12),
             decoration: const BoxDecoration(
               color: Colors.black38,
@@ -93,21 +114,7 @@ class _CaptureShortsDurationTimerState
               style: const TextStyle(fontSize: 14),
             ),
           ),
-          Positioned.fill(
-            child: AnimatedBuilder(
-              animation: animation,
-              builder: (BuildContext context, Widget? _) {
-                return CustomPaint(
-                  size: const Size(32, 32), // Size of the canvas
-                  painter: CircleProgressPainter(
-                    progress: animation.value,
-                    strokeWidth: 1.8,
-                  ), // Set progress here
-                );
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

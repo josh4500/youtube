@@ -181,6 +181,10 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   );
   Timer? countdownTimer;
 
+  final CallOutLink callOutLink = CallOutLink(
+    offset: const Offset(-12, 0),
+  );
+
   @override
   void initState() {
     super.initState();
@@ -336,71 +340,16 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   Future<void> _showDraftDecision() async {
     final hasDraft = ref.read(shortRecordingProvider.notifier).loadDraft();
     if (hasDraft && context.mounted) {
-      await showDialog(
+      final result = await showDialog<bool?>(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) {
-          return Center(
-            child: Material(
-              color: AppPalette.black,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.sizeOf(context).width * .85,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 8),
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Continue your draft video?',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Starting over will discard your last draft.',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              ref.read(shortRecordingProvider.notifier).clear();
-                              context.pop();
-                            },
-                            child: const Text('Start over'),
-                          ),
-                          const SizedBox(width: 8),
-                          TextButton(
-                            onPressed: context.pop,
-                            child: const Text('Continue'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
+        builder: (BuildContext context) => const DraftDecision(),
       );
+      if (result != null && result) {
+        ref.read(shortRecordingProvider.notifier).clear();
+      } else if (context.mounted) {
+        CreateNotification(hideNavigator: true).dispatch(context);
+      }
     }
   }
 
@@ -1171,28 +1120,35 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                         vertical: 6,
                         horizontal: 4.0,
                       ),
-                      child: Column(
-                        children: [
-                          const CreateProgress(),
-                          const SizedBox(height: 12),
-                          HideOnCountdown(
-                            notifier: countdownHidden,
-                            child: HideOnRecording(
-                              notifier: recordingNotifier,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CreateCloseButton(
-                                    onPopInvoked: _onPopInvoked,
+                      child: ModelBinding<CallOutLink>(
+                        model: callOutLink,
+                        child: CompositedTransformTarget(
+                          link: callOutLink.link,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const CreateProgress(),
+                              const SizedBox(height: 12),
+                              HideOnCountdown(
+                                notifier: countdownHidden,
+                                child: HideOnRecording(
+                                  notifier: recordingNotifier,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CreateCloseButton(
+                                        onPopInvoked: _onPopInvoked,
+                                      ),
+                                      const CaptureMusicButton(),
+                                      const CaptureShortsDuration(),
+                                    ],
                                   ),
-                                  const CaptureMusicButton(),
-                                  const CaptureShortsDuration(),
-                                ],
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
@@ -1636,6 +1592,70 @@ class CaptureTimerSelector extends StatelessWidget {
             ),
             const SizedBox(height: 4),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class DraftDecision extends StatelessWidget {
+  const DraftDecision({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Material(
+        color: AppPalette.black,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.sizeOf(context).width * .85,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 8),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Continue your draft video?',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Starting over will discard your last draft.',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => context.pop(true),
+                      child: const Text('Start over'),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () => context.pop(false),
+                      child: const Text('Continue'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+              ],
+            ),
+          ),
         ),
       ),
     );
