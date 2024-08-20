@@ -877,7 +877,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     } else if (notification is ShowControlsNotification) {
       _controlHidden = false;
       hideController.reverse();
-      CreateNotification(hideNavigator: false).dispatch(context);
+      if (!ref.read(shortRecordingProvider).hasRecordings) {
+        CreateNotification(hideNavigator: false).dispatch(context);
+      }
     } else if (notification is ShowControlsMessageNotification) {
       latestControlMessage.value = notification.message;
       controlMessageTimer?.cancel();
@@ -890,7 +892,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       CreateNotification(hideNavigator: true).dispatch(context);
     } else if (notification is StopCountdownNotification) {
       countdownHidden.value = true;
-      CreateNotification(hideNavigator: false).dispatch(context);
+      if (!ref.read(shortRecordingProvider).hasRecordings) {
+        CreateNotification(hideNavigator: false).dispatch(context);
+      }
     }
     return true;
   }
