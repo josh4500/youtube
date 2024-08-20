@@ -52,6 +52,16 @@ class _CaptureShortsDurationTimerState
 
   @override
   Widget build(BuildContext context) {
+    // ref.listen(
+    //   shortRecordingProvider.select(
+    //     (state) => state.recordDuration.inSeconds,
+    //   ),
+    //   (current, next) {
+    //     if (current != next) {
+    //       next > minTime ? controller.forward() : controller.reverse();
+    //     }
+    //   },
+    // );
     final shortsRecordDuration = ref.watch(
       shortRecordingProvider.select((state) => state.recordDuration.inSeconds),
     );

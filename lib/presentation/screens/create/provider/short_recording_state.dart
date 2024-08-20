@@ -30,6 +30,7 @@ class ShortRecording extends _$ShortRecording {
   }
 
   void redo() {
+    // TODO(josh4500): Update recordDuration if added more than current recordDuration
     state = state.redo();
   }
 
