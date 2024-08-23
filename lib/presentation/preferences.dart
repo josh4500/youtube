@@ -28,12 +28,16 @@
 
 import 'dart:convert';
 
+import 'package:country_selector/country_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:riverpod/src/notifier.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/infrastructure.dart';
 
-class Preferences extends Notifier<PreferenceState> {
+part 'preferences.g.dart';
+
+@riverpod
+class Preferences extends _$Preferences {
   /// Dynamic Preference [HiveCacheProvider]
   final HiveCacheProvider _prefBox = HiveCacheProvider('preferences');
 
@@ -128,7 +132,11 @@ class Preferences extends Notifier<PreferenceState> {
     _prefBox,
   );
 
-  late final Country _location;
+  late final ReadWriteValue<Country?> _location = ReadWriteValue<Country?>(
+    'location',
+    null,
+    _prefBox,
+  );
 
   late final ReadWriteEnum<UploadNetwork> _uploadNetwork =
       ReadWriteEnum<UploadNetwork>(
@@ -686,15 +694,7 @@ class AccessibilityPreferences {
   }
 }
 
-/// TODO: Add country selector package
-class Country {}
-
 extension IsDarkExtension on ThemeMode {
   bool get isDark => this == ThemeMode.dark;
   bool get isSystem => this == ThemeMode.system;
 }
-
-final NotifierProviderImpl<Preferences, PreferenceState> preferencesProvider =
-    NotifierProvider<Preferences, PreferenceState>(
-  Preferences.new,
-);

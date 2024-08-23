@@ -13,6 +13,8 @@ dependencies:
   camera_android_camerax: ^0.6.5+5
   camera_platform_interface: ^2.6.0
   connectivity_plus: ^6.0.5
+  country_selector:
+    git: https://github.com/josh4500/country_selector
   extended_image: ^8.2.0
   ffmpeg_kit_flutter: ^6.0.3
   flutter:
