@@ -30,7 +30,6 @@ class CreateMediaPreview extends StatelessWidget {
             constraints: BoxConstraints(
               minWidth: size.width * .6,
               maxWidth: size.width * .8,
-              minHeight: size.height * .4,
               maxHeight: size.height * .8,
             ),
             child: Stack(
@@ -39,10 +38,10 @@ class CreateMediaPreview extends StatelessWidget {
                   color: AppPalette.black,
                   child: media.type == AssetType.image
                       ? const _ImageMediaPreview()
-                      : _VideoMediaPreview(media),
+                      : const _VideoMediaPreview(),
                 ),
                 const Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(12.0),
                   child: CreateCloseButton(),
                 ),
               ],
@@ -65,8 +64,7 @@ class _ImageMediaPreview extends StatelessWidget {
 }
 
 class _VideoMediaPreview extends StatefulWidget {
-  const _VideoMediaPreview(this.mediaFile);
-  final MediaFile mediaFile;
+  const _VideoMediaPreview();
 
   @override
   State<_VideoMediaPreview> createState() => _VideoMediaPreviewState();
@@ -91,7 +89,8 @@ class _VideoMediaPreviewState extends State<_VideoMediaPreview>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    widget.mediaFile.file.then((File? file) {
+    final media = ModelBinding.of<MediaFile>(context);
+    media.file.then((File? file) {
       if (file != null) player.open(mkit.Media(file.path));
     });
   }
@@ -110,6 +109,7 @@ class _VideoMediaPreviewState extends State<_VideoMediaPreview>
       parent: ReverseAnimation(animationController),
       curve: Curves.easeInCubic,
     );
+    final aspectRatio = media.size.width / media.size.height;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -127,13 +127,14 @@ class _VideoMediaPreviewState extends State<_VideoMediaPreview>
           thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8),
         ),
         child: AspectRatio(
-          aspectRatio: media.width / media.height,
+          aspectRatio: aspectRatio <= 0 ? 1 : aspectRatio,
           child: Stack(
+            fit: StackFit.expand,
             children: [
               mkit_video.Video(
                 controls: null,
                 fit: BoxFit.cover,
-                aspectRatio: media.size.width / media.size.height,
+                aspectRatio: aspectRatio <= 0 ? 1 : aspectRatio,
                 height: player.state.height?.toDouble(),
                 wakelock: false,
                 controller: controller,
@@ -142,7 +143,7 @@ class _VideoMediaPreviewState extends State<_VideoMediaPreview>
                 child: AnimatedVisibility(
                   animation: animation,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     child: Column(
                       children: [
                         const SizedBox(height: 48),
