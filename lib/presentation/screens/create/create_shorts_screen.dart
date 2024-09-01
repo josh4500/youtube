@@ -340,12 +340,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   Future<void> _showDraftDecision() async {
     final hasDraft = ref.read(shortRecordingProvider.notifier).loadDraft();
     if (hasDraft && context.mounted) {
-      final result = await showDialog<bool?>(
+      final startOver = await showDialog<bool?>(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) => const DraftDecision(),
       );
-      if (result != null && result) {
+      if (startOver != null && startOver) {
         ref.read(shortRecordingProvider.notifier).clear();
       } else if (context.mounted) {
         CreateNotification(hideNavigator: true).dispatch(context);
@@ -716,7 +716,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     recordingNotifier.value = isRecording;
     isRecording
         ? recordOuterButtonController.forward(from: .7)
-        : recordOuterButtonController.reverse(from: .7);
+        : recordOuterButtonController.reverse();
 
     if (isRecording) CreateNotification(hideNavigator: true).dispatch(context);
   }
@@ -1589,7 +1589,7 @@ class CaptureTimerSelector extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.black,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -1647,12 +1647,22 @@ class DraftDecision extends StatelessWidget {
                   children: [
                     TextButton(
                       onPressed: () => context.pop(true),
-                      child: const Text('Start over'),
+                      child: const Text(
+                        'Start over',
+                        style: TextStyle(
+                          color: AppPalette.blue,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     TextButton(
                       onPressed: () => context.pop(false),
-                      child: const Text('Continue'),
+                      child: const Text(
+                        'Continue',
+                        style: TextStyle(
+                          color: AppPalette.blue,
+                        ),
+                      ),
                     ),
                   ],
                 ),

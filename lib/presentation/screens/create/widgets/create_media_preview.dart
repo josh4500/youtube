@@ -41,7 +41,7 @@ class CreateMediaPreview extends StatelessWidget {
                       : const _VideoMediaPreview(),
                 ),
                 const Padding(
-                  padding: EdgeInsets.all(12.0),
+                  padding: EdgeInsets.all(16.0),
                   child: CreateCloseButton(),
                 ),
               ],
