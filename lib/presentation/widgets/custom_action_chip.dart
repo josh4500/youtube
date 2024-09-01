@@ -95,6 +95,7 @@ class _CustomActionChipState extends State<CustomActionChip>
       child: GestureDetector(
         onTap: widget.onTap,
         onLongPress: widget.onLongPress,
+        // TODO (josh4500): Add TapCancel to fixed TappableArea
         onTapCancel: widget.onTapCancel,
         child: ScaleTransition(
           scale: animation,

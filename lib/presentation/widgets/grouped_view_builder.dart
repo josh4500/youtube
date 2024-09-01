@@ -27,7 +27,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets.dart';
+
+import 'custom_action_chip.dart';
+import 'gestures/tappable_area.dart';
+import 'over_scroll_glow_behavior.dart';
 
 class GroupedViewBuilder extends StatelessWidget {
   const GroupedViewBuilder({
@@ -64,45 +67,52 @@ class GroupedViewBuilder extends StatelessWidget {
         TappableArea(
           padding: const EdgeInsets.symmetric(
             horizontal: 16,
-            vertical: 12,
+            vertical: 8,
           ),
           onTap: onTap,
-          stackedPosition: StackedPosition(top: 6, right: 16),
-          stackedChild: CustomActionChip(
-            title: 'View all',
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.symmetric(
-              vertical: 8,
-              horizontal: 12,
-            ),
-            border: const Border.fromBorderSide(
-              BorderSide(color: Colors.white12),
-            ),
-            onTap: onTap,
-          ),
-          child: Column(
+          child: Row(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
+              Expanded(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 80),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 80),
-                ],
-              ),
-              if (subtitle != null)
-                Text(
-                  subtitle!,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    if (subtitle != null)
+                      Text(
+                        subtitle!,
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                  ],
                 ),
+              ),
+              CustomActionChip(
+                title: 'View all',
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 12,
+                ),
+                margin: const EdgeInsets.only(left: 12),
+                border: const Border.fromBorderSide(
+                  BorderSide(color: Colors.white12),
+                ),
+                onTap: onTap,
+              ),
             ],
           ),
         ),

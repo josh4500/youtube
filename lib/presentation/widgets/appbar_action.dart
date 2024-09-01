@@ -28,7 +28,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'gestures/fix.dart';
+import 'gestures/tappable.dart';
 
 class AppbarAction extends StatelessWidget {
   const AppbarAction({
@@ -46,10 +46,14 @@ class AppbarAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 1.0, top: 2, bottom: 2),
+      // TODO(josh4500): Why vertical (4.0) is needed to make it rounded in
+      //  Account Appbar and it's bad in Subscription
+      padding: const EdgeInsets.only(left: 1.0, top: 4, bottom: 4),
       child: TappableArea(
         onTap: onTap,
         onTapDown: onTapDown,
+        releasedColor: Colors.white10,
+        highlightColor: Colors.white10,
         padding: const EdgeInsets.all(12.0),
         borderRadius: BorderRadius.circular(24),
         child: Icon(icon),

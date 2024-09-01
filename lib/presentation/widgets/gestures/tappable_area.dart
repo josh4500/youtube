@@ -27,7 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import 'package:flutter/material.dart';
 
-// TODO: Remove
+@Deprecated('Use new tappable.dart')
 class StackedPosition {
   StackedPosition({this.top, this.bottom, this.left, this.right});
 
@@ -37,6 +37,7 @@ class StackedPosition {
   final double? right;
 }
 
+@Deprecated('Use new tappable.dart')
 class TappableArea extends StatefulWidget {
   const TappableArea({
     super.key,
