@@ -77,7 +77,10 @@ final class InternetConnectivity {
 
     // Set the connectivity type
     _connectivityType = cResult.toConnectivityType();
+    _start();
+  }
 
+  void _start() {
     // Set subscription to change in connectivity result
     _subscription = _connectivity.onConnectivityChanged.listen(
       _onConnectivityResultChange,
@@ -178,8 +181,43 @@ final class InternetConnectivity {
   }
 
   /// Cancels listeners and subscription
-  void destroy() {
+  void _pause() {
     _connectionTimer.cancel();
     _subscription.cancel();
+    debugPrint('Pause InternetConnectivity');
+  }
+
+  // Recreates listeners and subscription
+  void _resume() {
+    _start();
+    debugPrint('Resume InternetConnectivity');
+  }
+}
+
+/// [InternetConnectivityMixin] listen to didChangeAppLifecycleState from [WidgetsBindingObserver]
+/// to pause or resume the [InternetConnectivity] subscriptions and listeners depending on the
+/// [AppLifecycleState] of the App
+mixin InternetConnectivityMixin<T extends StatefulWidget>
+    on State<T>, WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      InternetConnectivity._instance._resume();
+    } else {
+      InternetConnectivity._instance._pause();
+    }
   }
 }
