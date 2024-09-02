@@ -79,6 +79,9 @@ class PlaybackProgress extends StatefulWidget {
     this.onDragStart,
     this.onDragEnd,
     this.onChangePosition,
+    this.onVerticalDrag,
+    this.onVerticalDragEnd,
+    this.onVerticalDragStart,
   });
 
   /// Size of the tappable area for seeking playback.
@@ -130,6 +133,10 @@ class PlaybackProgress extends StatefulWidget {
 
   /// Callback triggered when the user changes the playback position (during drag).
   final void Function(Duration position)? onChangePosition;
+
+  final void Function(double)? onVerticalDrag;
+  final VoidCallback? onVerticalDragEnd;
+  final VoidCallback? onVerticalDragStart;
 
   @override
   State<PlaybackProgress> createState() => _PlaybackProgressState();
@@ -318,6 +325,7 @@ class _PlaybackProgressState extends State<PlaybackProgress>
               _onHorizontalDragEnd(details, width),
           onVerticalDragStart: _onVerticalDragStart,
           onVerticalDragUpdate: _onVerticalDragUpdate,
+          onVerticalDragEnd: _onVerticalDragEnd,
           child: Container(
             color: Colors.transparent,
             height: widget.tapSize,
@@ -439,10 +447,18 @@ class _PlaybackProgressState extends State<PlaybackProgress>
 
   void _onVerticalDragStart(DragStartDetails details) {
     _longPressYStartPosition = details.globalPosition.dy;
+    widget.onVerticalDragStart?.call();
   }
 
   void _onVerticalDragUpdate(DragUpdateDetails details) {
-    if (_longPressYStartPosition - details.delta.dy >= 30) {}
+    widget.onVerticalDrag?.call(
+      _longPressYStartPosition - details.globalPosition.dy,
+    );
+  }
+
+  void _onVerticalDragEnd(DragEndDetails details) {
+    _longPressYStartPosition = 0;
+    widget.onVerticalDragEnd?.call();
   }
 
   /// Calculates the position in milliseconds relative to the widget width.

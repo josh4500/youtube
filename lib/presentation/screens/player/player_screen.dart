@@ -1013,6 +1013,8 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
   /// Handles tap events on the player.
   Future<void> _onTapPlayer() async {
+    if (_isSeeking) return; // Do not show controls when seeking
+
     if (_preventGestures) {
       ref.read(playerRepositoryProvider).sendPlayerSignal(
         [PlayerSignal.showUnlock],

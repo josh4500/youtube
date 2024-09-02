@@ -34,9 +34,15 @@ enum SeekNotificationType {
   speedUp2X,
   pullUp,
   slideLeftOrRight,
+  slideFrame,
   release;
 
-  bool get isSlide => this == slideLeftOrRight;
+  bool get isSlideSeeking {
+    return this == slideLeftOrRight || this == slideFrame || this == release;
+  }
+
+  bool get isSlideFrame => this == slideFrame;
+  bool get isNone => this == none;
 }
 
 class SeekIndicator extends StatelessWidget {
@@ -55,6 +61,9 @@ class SeekIndicator extends StatelessWidget {
         SeekNotificationType type,
         Widget? childWidget,
       ) {
+        if (type.isNone || type.isSlideFrame) {
+          return const SizedBox();
+        }
         return Container(
           margin: const EdgeInsets.all(12),
           padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
