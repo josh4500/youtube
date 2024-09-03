@@ -1122,11 +1122,11 @@ class _MiddleControl extends StatelessWidget {
   }
 }
 
-class _SlideFramePlayButton extends StatelessWidget {
+class _SlideFramePlayButton extends ConsumerWidget {
   const _SlideFramePlayButton({required this.onClose});
   final VoidCallback onClose;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         Align(
@@ -1141,7 +1141,10 @@ class _SlideFramePlayButton extends StatelessWidget {
         ),
         Expanded(
           child: GestureDetector(
-            onTap: onClose,
+            onTap: () {
+              onClose();
+              ref.read(playerRepositoryProvider).playVideo();
+            },
             child: Container(
               constraints: const BoxConstraints.tightFor(
                 width: 54,
