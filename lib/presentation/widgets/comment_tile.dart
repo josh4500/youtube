@@ -69,13 +69,6 @@ class CommentTile extends StatelessWidget {
               TappableArea(
                 onTap: openReply,
                 padding: const EdgeInsets.all(16),
-                stackedAlignment: Alignment.topRight,
-                stackedChild: CustomInkWell(
-                  onTap: () {},
-                  padding: const EdgeInsets.all(16.0),
-                  borderRadius: BorderRadius.circular(32),
-                  child: const Icon(YTIcons.more_vert_outlined, size: 16),
-                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -181,7 +174,12 @@ class CommentTile extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    CustomInkWell(
+                      onTap: () {},
+                      padding: const EdgeInsets.all(16.0),
+                      borderRadius: BorderRadius.circular(32),
+                      child: const Icon(YTIcons.more_vert_outlined, size: 16),
+                    ),
                   ],
                 ),
               ),

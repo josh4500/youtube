@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets/gestures/tappable_area.dart';
 
 class CustomActionChip extends StatefulWidget {
   const CustomActionChip({
@@ -92,10 +93,12 @@ class _CustomActionChipState extends State<CustomActionChip>
       onPointerUp: (_) {
         controller.reverse();
       },
-      child: GestureDetector(
+      child: TappableArea(
         onTap: widget.onTap,
         onLongPress: widget.onLongPress,
-        // TODO (josh4500): Add TapCancel to fixed TappableArea
+        highlightColor: Colors.transparent,
+        releasedColor: Colors.transparent,
+        borderRadius: widget.borderRadius ?? BorderRadius.circular(32),
         onTapCancel: widget.onTapCancel,
         child: ScaleTransition(
           scale: animation,

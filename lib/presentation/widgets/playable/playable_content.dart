@@ -29,7 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
-import '../gestures/custom_ink_well.dart';
+import '../gestures/tappable_area.dart';
 import '../network_image/custom_network_image.dart';
 
 class PlayableContent extends StatelessWidget {
@@ -182,10 +182,16 @@ class PlayableContent extends StatelessWidget {
                     const SizedBox(height: 8)
                   else
                     const SizedBox(width: 8),
-                  CustomInkWell(
-                    onTap: onMore,
-                    borderRadius: BorderRadius.circular(16),
-                    child: const Icon(YTIcons.more_vert_outlined, size: 14),
+                  // TODO(josh4500): Fix left space layout caused by outer paddings
+                  Transform.translate(
+                    offset: const Offset(4, -4),
+                    child: TappableArea(
+                      onTap: onMore,
+                      padding: const EdgeInsets.all(4),
+                      releasedColor: Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                      child: const Icon(YTIcons.more_vert_outlined, size: 14),
+                    ),
                   ),
                 ],
               ),

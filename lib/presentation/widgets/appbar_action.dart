@@ -28,7 +28,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'gestures/tappable.dart';
+import 'gestures/tappable_area.dart';
 
 class AppbarAction extends StatelessWidget {
   const AppbarAction({

@@ -173,6 +173,7 @@ class PlayableVideoContent extends StatelessWidget {
                     onTap: () {},
                     padding: const EdgeInsets.all(8),
                     borderRadius: BorderRadius.circular(24),
+                    splashFactory: NoSplash.splashFactory,
                     child: const Icon(YTIcons.more_vert_outlined, size: 16),
                   ),
                 ),

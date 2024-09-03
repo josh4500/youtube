@@ -27,7 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets/gestures/tappable_area.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 Future<T?> showAccountPlaylistsSortMenu<T>(
   BuildContext context,

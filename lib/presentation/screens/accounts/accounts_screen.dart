@@ -88,6 +88,11 @@ class AccountsScreen extends StatelessWidget {
                       onTap: () => context.goto(AppRoutes.watchHistory),
                       itemBuilder: (BuildContext context, int index) {
                         return TappableArea(
+                          onTap: () {},
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 8,
+                          ),
                           child: PlayableContent(
                             width: 145,
                             height: 88,
@@ -147,6 +152,10 @@ class AccountsScreen extends StatelessWidget {
                       itemBuilder: (BuildContext context, int index) {
                         return TappableArea(
                           onTap: () => context.goto(AppRoutes.playlist),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 8,
+                          ),
                           child: index == 7
                               ? const AddNewPlaylist()
                               : PlayableContent(

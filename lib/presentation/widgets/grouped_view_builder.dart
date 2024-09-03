@@ -107,7 +107,6 @@ class GroupedViewBuilder extends StatelessWidget {
                   vertical: 8,
                   horizontal: 12,
                 ),
-                margin: const EdgeInsets.only(left: 12),
                 border: const Border.fromBorderSide(
                   BorderSide(color: Colors.white12),
                 ),

@@ -165,61 +165,61 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
               onTap: _openComment,
               padding: EdgeInsets.zero,
               borderRadius: BorderRadius.circular(16),
-              stackedPosition: StackedPosition(bottom: 5),
-              stackedChild: showHighlighted
-                  ? isLiveVideo
-                      ? SizedBox(
-                          height: 45,
-                          width: c.maxWidth,
-                          child: PageView(
-                            controller: _pageController,
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            onPageChanged: (page) => currentPage = page,
-                            children: [
-                              TappableArea(
-                                onTap: _openComment,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12.0,
-                                  vertical: 8,
-                                ),
-                                child: const VideoHighlightedComment(),
-                              ),
-                              const TappableArea(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 12.0,
-                                  vertical: 8,
-                                ),
-                                child: VideoHighlightedLiveComment(),
-                              ),
-                            ],
-                          ),
-                        )
-                      : null
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 12,
-                      ),
-                      child: TappableArea(
-                        padding: EdgeInsets.zero,
-                        borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0,
-                            vertical: 4.0,
-                          ),
-                          width: c.maxWidth - 24 - 8,
-                          decoration: BoxDecoration(
-                            color: Colors.white10,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Text(
-                            'Add a comment...',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      ),
-                    ),
+              // stackedPosition: StackedPosition(bottom: 5),
+              // stackedChild: showHighlighted
+              //     ? isLiveVideo
+              //         ? SizedBox(
+              //             height: 45,
+              //             width: c.maxWidth,
+              //             child: PageView(
+              //               controller: _pageController,
+              //               physics: const AlwaysScrollableScrollPhysics(),
+              //               onPageChanged: (page) => currentPage = page,
+              //               children: [
+              //                 TappableArea(
+              //                   onTap: _openComment,
+              //                   padding: const EdgeInsets.symmetric(
+              //                     horizontal: 12.0,
+              //                     vertical: 8,
+              //                   ),
+              //                   child: const VideoHighlightedComment(),
+              //                 ),
+              //                 const TappableArea(
+              //                   padding: EdgeInsets.symmetric(
+              //                     horizontal: 12.0,
+              //                     vertical: 8,
+              //                   ),
+              //                   child: VideoHighlightedLiveComment(),
+              //                 ),
+              //               ],
+              //             ),
+              //           )
+              //         : null
+              //     : Padding(
+              //         padding: const EdgeInsets.symmetric(
+              //           horizontal: 16.0,
+              //           vertical: 12,
+              //         ),
+              //         child: TappableArea(
+              //           padding: EdgeInsets.zero,
+              //           borderRadius: BorderRadius.circular(16),
+              //           child: Container(
+              //             padding: const EdgeInsets.symmetric(
+              //               horizontal: 12.0,
+              //               vertical: 4.0,
+              //             ),
+              //             width: c.maxWidth - 24 - 8,
+              //             decoration: BoxDecoration(
+              //               color: Colors.white10,
+              //               borderRadius: BorderRadius.circular(16),
+              //             ),
+              //             child: const Text(
+              //               'Add a comment...',
+              //               style: TextStyle(fontSize: 12),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
               child: childWidget,
             );
           },

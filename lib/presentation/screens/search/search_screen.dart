@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:youtube_clone/generated/l10n.dart';
+import 'package:youtube_clone/infrastructure.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/screens/search/widgets/search_results.dart';
@@ -131,122 +133,130 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Column(
-          children: [
-            Row(
+        child: NetworkBuilder(
+          builder: (BuildContext context, ConnectivityState state) {
+            final hintText = state.isConnected
+                ? S.current.searchYoutube
+                : S.current.searchDownloads;
+            return Column(
               children: [
-                CustomBackButton(onPressed: _onPressBack),
-                Expanded(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white10,
-                          borderRadius: BorderRadius.circular(24),
-                        ),
+                Row(
+                  children: [
+                    CustomBackButton(onPressed: _onPressBack),
+                    Expanded(
+                      child: Stack(
                         alignment: Alignment.center,
-                        child: ListenableBuilder(
-                          listenable: _hasTextNotifier,
-                          builder: (
-                            BuildContext context,
-                            Widget? childWidget,
-                          ) {
-                            return Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    autofocus: true,
-                                    focusNode: _focusNode,
-                                    controller: _textController,
-                                    decoration: const InputDecoration(
-                                      isDense: true,
-                                      hintText: 'Search YouTube',
-                                      border: InputBorder.none,
-                                      contentPadding: EdgeInsets.symmetric(
-                                        vertical: 6.5,
-                                        horizontal: 10,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white10,
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            alignment: Alignment.center,
+                            child: ListenableBuilder(
+                              listenable: _hasTextNotifier,
+                              builder: (
+                                BuildContext context,
+                                Widget? childWidget,
+                              ) {
+                                return Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        autofocus: true,
+                                        focusNode: _focusNode,
+                                        controller: _textController,
+                                        decoration: InputDecoration(
+                                          isDense: true,
+                                          hintText: hintText,
+                                          border: InputBorder.none,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                            vertical: 6.5,
+                                            horizontal: 10,
+                                          ),
+                                        ),
+                                        keyboardType: TextInputType.text,
+                                        textInputAction: TextInputAction.search,
+                                        cursorColor: _hasTextNotifier.value
+                                            ? Colors.white
+                                            : Colors.white54,
+                                        cursorWidth:
+                                            _hasTextNotifier.value ? 1.5 : 3,
+                                        onSubmitted: _onSubmitSearch,
+                                        onTap: _onTapSearchField,
+                                        showCursor: true,
                                       ),
                                     ),
-                                    keyboardType: TextInputType.text,
-                                    textInputAction: TextInputAction.search,
-                                    cursorColor: _hasTextNotifier.value
-                                        ? Colors.white
-                                        : Colors.white54,
-                                    cursorWidth:
-                                        _hasTextNotifier.value ? 1.5 : 3,
-                                    onSubmitted: _onSubmitSearch,
-                                    onTap: _onTapSearchField,
-                                    showCursor: true,
-                                  ),
-                                ),
-                                const SizedBox(width: 28),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                      ValueListenableBuilder<bool>(
-                        valueListenable: _hasTextNotifier,
-                        builder: (
-                          BuildContext context,
-                          bool hasText,
-                          Widget? _,
-                        ) {
-                          return Visibility(
-                            visible: hasText,
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 4.0,
-                                ),
-                                child: TappableArea(
-                                  onTap: _clearSearchField,
-                                  padding: const EdgeInsets.all(16),
-                                  borderRadius: BorderRadius.circular(24),
-                                  child: const Icon(
-                                    YTIcons.close_outlined,
-                                    size: 16,
-                                  ),
-                                ),
-                              ),
+                                    const SizedBox(width: 28),
+                                  ],
+                                );
+                              },
                             ),
-                          );
-                        },
+                          ),
+                          ValueListenableBuilder<bool>(
+                            valueListenable: _hasTextNotifier,
+                            builder: (
+                              BuildContext context,
+                              bool hasText,
+                              Widget? _,
+                            ) {
+                              return Visibility(
+                                visible: hasText,
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 4.0,
+                                    ),
+                                    child: TappableArea(
+                                      onTap: _clearSearchField,
+                                      padding: const EdgeInsets.all(16),
+                                      borderRadius: BorderRadius.circular(24),
+                                      child: const Icon(
+                                        YTIcons.close_outlined,
+                                        size: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
+                    SearchActions(
+                      focusNode: _focusNode,
+                      showSearchResultNotifier: _showSearchResultNotifier,
+                      hasTextNotifier: _hasTextNotifier,
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: ListenableBuilder(
+                    listenable: Listenable.merge([
+                      _focusNode,
+                      _showSearchResultNotifier,
+                    ]),
+                    builder: (
+                      BuildContext context,
+                      Widget? childWidget,
+                    ) {
+                      final hasFocus = _focusNode.hasFocus;
+                      final showSearchResult = _showSearchResultNotifier.value;
+                      return IndexedStack(
+                        index: hasFocus || !showSearchResult
+                            ? 0
+                            : _searchedTextHistory.length,
+                        children: _screens,
+                      );
+                    },
                   ),
                 ),
-                SearchActions(
-                  focusNode: _focusNode,
-                  showSearchResultNotifier: _showSearchResultNotifier,
-                  hasTextNotifier: _hasTextNotifier,
-                ),
               ],
-            ),
-            Expanded(
-              child: ListenableBuilder(
-                listenable: Listenable.merge([
-                  _focusNode,
-                  _showSearchResultNotifier,
-                ]),
-                builder: (
-                  BuildContext context,
-                  Widget? childWidget,
-                ) {
-                  final hasFocus = _focusNode.hasFocus;
-                  final showSearchResult = _showSearchResultNotifier.value;
-                  return IndexedStack(
-                    index: hasFocus || !showSearchResult
-                        ? 0
-                        : _searchedTextHistory.length,
-                    children: _screens,
-                  );
-                },
-              ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

@@ -54,50 +54,43 @@ class _PlayerSeekSlideFrameState extends State<PlayerSeekSlideFrame> {
       animation: widget.sizeAnimation,
       child: SizeTransition(
         sizeFactor: widget.sizeAnimation,
-        child: ColoredBox(
-          color: Colors.black26,
-          child: Column(
-            children: [
-              Stack(
-                children: [
-                  SizedBox(
-                    height: widget.frameHeight,
-                    child: LayoutBuilder(
-                      builder: (context, constraint) {
-                        return ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            if (index == 0) {
-                              return SizedBox(
-                                width: constraint.maxWidth / 2,
-                              );
-                            } else if (index == framesCount - 1) {
-                              return SizedBox(
-                                width: constraint.maxWidth / 2,
-                              );
-                            } else {
-                              return Container(
-                                color: Colors.blue.shade100,
-                                width: 50,
-                              );
-                            }
-                          },
-                          itemCount: framesCount,
+        child: Stack(
+          children: [
+            SizedBox(
+              height: widget.frameHeight,
+              child: LayoutBuilder(
+                builder: (context, constraint) {
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return SizedBox(
+                          width: constraint.maxWidth / 2,
                         );
-                      },
-                    ),
-                  ),
-                  Center(
-                    child: Container(
-                      width: 3,
-                      height: widget.frameHeight,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+                      } else if (index == framesCount - 1) {
+                        return SizedBox(
+                          width: constraint.maxWidth / 2,
+                        );
+                      } else {
+                        return Container(
+                          color: Colors.blueGrey,
+                          width: 50,
+                        );
+                      }
+                    },
+                    itemCount: framesCount,
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+            Center(
+              child: Container(
+                width: 3,
+                height: widget.frameHeight,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
       ),
     );

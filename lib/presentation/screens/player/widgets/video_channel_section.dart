@@ -8,12 +8,13 @@ class VideoChannelSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const TappableArea(
-      padding: EdgeInsets.symmetric(
+    return TappableArea(
+      onTap: () {},
+      padding: const EdgeInsets.symmetric(
         vertical: 4,
         horizontal: 12,
       ),
-      child: Row(
+      child: const Row(
         children: [
           Expanded(child: VideoChannelButton()),
           SizedBox(width: 12),
@@ -54,6 +55,7 @@ class VideoChannelMembershipButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomActionChip(
       title: 'Join',
+      onTap: () {},
       backgroundColor: Colors.white,
       borderRadius: BorderRadius.circular(15),
       padding: const EdgeInsets.symmetric(
@@ -76,6 +78,7 @@ class VideoChannelSubscriptionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomActionButton(
       title: 'Subscribe',
+      onTap: () {},
       backgroundColor: Colors.white,
       borderRadius: BorderRadius.circular(15),
       padding: const EdgeInsets.symmetric(
@@ -87,7 +90,6 @@ class VideoChannelSubscriptionButton extends StatelessWidget {
         color: Colors.black,
         fontWeight: FontWeight.w500,
       ),
-      useTappable: false,
     );
   }
 }

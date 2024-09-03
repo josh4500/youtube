@@ -29,7 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
-import './gestures/fix.dart';
+import './gestures/tappable_area.dart';
 
 class CustomBackButton extends StatelessWidget {
   const CustomBackButton({super.key, required this.onPressed, this.icon});

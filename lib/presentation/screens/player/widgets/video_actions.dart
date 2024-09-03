@@ -97,7 +97,7 @@ class VideoActions extends StatelessWidget {
           ),
           CustomActionButton(
             title: 'Download',
-            backgroundColor: const Color(0xFF272727),
+            backgroundColor: Colors.white10,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             margin: const EdgeInsets.symmetric(horizontal: 4),
             icon: const Icon(YTIcons.download_outlined, size: 18),

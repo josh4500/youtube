@@ -1,245 +1,963 @@
-// Copyright (c) 2023, Ajibola Akinmosin (https://github.com/josh4500)
+import 'dart:async';
+import 'dart:collection';
 
-// All rights reserved.
-
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-
-//     * Redistributions of source code must retain the above copyright notice,
-//       this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright notice,
-//       this list of conditions and the following disclaimer in the documentation
-//       and/or other materials provided with the distribution.
-//     * Neither the name of {{ project }} nor the names of its contributors
-//       may be used to endorse or promote products derived from this software
-//       without specific prior written permission.
-
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-@Deprecated('Use new tappable.dart')
-class StackedPosition {
-  StackedPosition({this.top, this.bottom, this.left, this.right});
+import 'tap_release_highlight.dart';
 
-  final double? top;
-  final double? bottom;
-  final double? left;
-  final double? right;
+enum GestureEvent {
+  add,
+  remove;
+
+  bool get value => this == GestureEvent.add;
+  static GestureEvent fromBool(bool value) {
+    return value ? GestureEvent.add : GestureEvent.remove;
+  }
 }
 
-@Deprecated('Use new tappable.dart')
-class TappableArea extends StatefulWidget {
-  const TappableArea({
+abstract class GestureResponseState {
+  void markChildInkResponsePressed(
+    GestureResponseState childState,
+    GestureEvent event,
+  );
+}
+
+class GestureResponseProvider extends InheritedWidget {
+  const GestureResponseProvider({
     super.key,
-    this.padding = const EdgeInsets.symmetric(
-      vertical: 4,
-      horizontal: 8,
-    ),
-    this.shape = BoxShape.rectangle,
-    this.behavior,
-    this.borderRadius = BorderRadius.zero,
-    // TODO: Remove
-    this.stackedPosition,
-    this.stackedAlignment = Alignment.center,
-    this.stackedChild,
-    required this.child,
-    this.onTap,
-    this.onLongPress,
-    this.splashColor,
-    this.onTapDown,
+    required this.state,
+    required super.child,
   });
 
-  final Widget child;
-  final BoxShape shape;
-  final HitTestBehavior? behavior;
-  final EdgeInsets padding;
-  final Alignment stackedAlignment;
-  final StackedPosition? stackedPosition;
-  final Widget? stackedChild;
-  final BorderRadius borderRadius;
-  final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
-  final Color? splashColor;
-  final void Function(TapDownDetails details)? onTapDown;
+  final GestureResponseState state;
 
   @override
-  State<TappableArea> createState() => _TappableAreaState();
+  bool updateShouldNotify(GestureResponseProvider oldWidget) =>
+      state != oldWidget.state;
+
+  static GestureResponseState? maybeOf(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<GestureResponseProvider>()
+        ?.state;
+  }
 }
 
-class _TappableAreaState extends State<TappableArea>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late Animation<Color?> _backgroundAnimation;
-  late Animation<Border?> _borderAnimation;
+enum HighlightType {
+  pressed,
+  hover,
+  released,
+  focus,
+}
 
-  bool _reversing = false;
+class Tappable extends StatelessWidget {
+  const Tappable({
+    super.key,
+    this.child,
+    this.padding,
+    this.focusNode,
+    this.parentState,
+    this.onTap,
+    this.statesController,
+    this.highlightColor,
+    this.releasedColor,
+    this.focusColor,
+    this.hoverColor,
+    this.overlayColor,
+    this.borderRadius,
+    this.customBorder,
+    this.radius,
+    this.hoverDuration,
+    this.highlightShape = BoxShape.rectangle,
+    this.splashFactory,
+    this.splashColor,
+    this.onFocusChange,
+    this.autofocus = false,
+    this.canRequestFocus = true,
+    this.containedInkWell = false,
+    this.enabled = true,
+    this.enableFeedback = true,
+    this.excludeFromSemantics = false,
+    this.onDoubleTap,
+    this.onLongPress,
+    this.onTapUp,
+    this.onTapDown,
+    this.onSecondaryTap,
+    this.onSecondaryTapUp,
+    this.onSecondaryTapDown,
+    this.onTapCancel,
+    this.onSecondaryTapCancel,
+    this.mouseCursor,
+    this.enableHighlights = true,
+    this.enableReleaseHighlights = true,
+  });
+
+  final bool autofocus;
+  final EdgeInsets? padding;
+  final FocusNode? focusNode;
+  final bool canRequestFocus;
+  final bool enabled;
+  final bool containedInkWell;
+  final Color? highlightColor;
+  final Color? focusColor;
+  final Color? hoverColor;
+  final Color? releasedColor;
+  final Color? splashColor;
+  final double? radius;
+  final Duration? hoverDuration;
+  final BoxShape highlightShape;
+  final InteractiveInkFeatureFactory? splashFactory;
+  final WidgetStateProperty<Color?>? overlayColor;
+  final BorderRadius? borderRadius;
+  final ShapeBorder? customBorder;
+  final bool enableFeedback;
+  final WidgetStatesController? statesController;
+  final GestureResponseState? parentState;
+  final Widget? child;
+
+  final ValueChanged<bool>? onFocusChange;
+
+  final GestureTapCallback? onTap;
+  final GestureDoubleTapCallback? onDoubleTap;
+  final GestureLongPressCallback? onLongPress;
+  final GestureTapUpCallback? onTapUp;
+  final GestureTapDownCallback? onTapDown;
+  final GestureTapCancelCallback? onTapCancel;
+
+  final GestureTapCallback? onSecondaryTap;
+  final GestureTapUpCallback? onSecondaryTapUp;
+  final GestureTapDownCallback? onSecondaryTapDown;
+  final GestureTapCancelCallback? onSecondaryTapCancel;
+
+  RectCallback? getRectCallback(RenderBox referenceBox) => null;
+  final bool excludeFromSemantics;
+
+  final MouseCursor? mouseCursor;
+  final bool enableHighlights;
+  final bool enableReleaseHighlights;
+
+  @override
+  Widget build(BuildContext context) {
+    final GestureResponseState? parentState =
+        GestureResponseProvider.maybeOf(context);
+    return _TappableWidget(
+      onTap: onTap,
+      padding: padding,
+      releasedColor: releasedColor,
+      onTapDown: onTapDown,
+      onTapUp: onTapUp,
+      onTapCancel: onTapCancel,
+      onDoubleTap: onDoubleTap,
+      onLongPress: onLongPress,
+      onSecondaryTap: onSecondaryTap,
+      onSecondaryTapUp: onSecondaryTapUp,
+      onSecondaryTapDown: onSecondaryTapDown,
+      onSecondaryTapCancel: onSecondaryTapCancel,
+      mouseCursor: mouseCursor,
+      containedInkWell: containedInkWell,
+      highlightShape: highlightShape,
+      radius: radius,
+      borderRadius: borderRadius,
+      customBorder: customBorder,
+      focusColor: focusColor,
+      hoverColor: hoverColor,
+      highlightColor: highlightColor,
+      overlayColor: overlayColor,
+      splashColor: splashColor,
+      splashFactory: splashFactory,
+      enableFeedback: enableFeedback,
+      excludeFromSemantics: excludeFromSemantics,
+      focusNode: focusNode,
+      canRequestFocus: canRequestFocus,
+      onFocusChange: onFocusChange,
+      autofocus: autofocus,
+      parentState: parentState,
+      getRectCallback: getRectCallback,
+      statesController: statesController,
+      hoverDuration: hoverDuration,
+      enabled: true,
+      enableHighlights: enableHighlights,
+      enableReleaseHighlights: enableReleaseHighlights,
+      child: child,
+    );
+  }
+}
+
+class _TappableWidget extends StatefulWidget {
+  const _TappableWidget({
+    required this.autofocus,
+    this.padding,
+    this.focusNode,
+    required this.canRequestFocus,
+    required this.enabled,
+    required this.containedInkWell,
+    this.highlightColor,
+    this.focusColor,
+    this.hoverColor,
+    this.releasedColor,
+    this.splashColor,
+    this.radius,
+    this.hoverDuration,
+    required this.highlightShape,
+    this.splashFactory,
+    this.getRectCallback,
+    this.overlayColor,
+    this.borderRadius,
+    this.customBorder,
+    required this.enableFeedback,
+    this.statesController,
+    this.parentState,
+    this.child,
+    this.onFocusChange,
+    this.onTap,
+    this.onDoubleTap,
+    this.onLongPress,
+    this.onTapUp,
+    this.onTapDown,
+    this.onTapCancel,
+    this.onSecondaryTap,
+    this.onSecondaryTapUp,
+    this.onSecondaryTapDown,
+    this.onSecondaryTapCancel,
+    required this.excludeFromSemantics,
+    this.mouseCursor,
+    required this.enableHighlights,
+    required this.enableReleaseHighlights,
+  });
+
+  final bool autofocus;
+  final EdgeInsets? padding;
+  final FocusNode? focusNode;
+  final bool canRequestFocus;
+  final bool enabled;
+  final bool containedInkWell;
+  final Color? highlightColor;
+  final Color? focusColor;
+  final Color? hoverColor;
+  final Color? releasedColor;
+  final Color? splashColor;
+  final double? radius;
+  final Duration? hoverDuration;
+  final BoxShape highlightShape;
+  final InteractiveInkFeatureFactory? splashFactory;
+  final RectCallback? Function(RenderBox referenceBox)? getRectCallback;
+  final WidgetStateProperty<Color?>? overlayColor;
+  final BorderRadius? borderRadius;
+  final ShapeBorder? customBorder;
+  final bool enableFeedback;
+  final WidgetStatesController? statesController;
+  final GestureResponseState? parentState;
+  final Widget? child;
+
+  final ValueChanged<bool>? onFocusChange;
+
+  final GestureTapCallback? onTap;
+  final GestureDoubleTapCallback? onDoubleTap;
+  final GestureLongPressCallback? onLongPress;
+  final GestureTapUpCallback? onTapUp;
+  final GestureTapDownCallback? onTapDown;
+  final GestureTapCancelCallback? onTapCancel;
+
+  final GestureTapCallback? onSecondaryTap;
+  final GestureTapUpCallback? onSecondaryTapUp;
+  final GestureTapDownCallback? onSecondaryTapDown;
+  final GestureTapCancelCallback? onSecondaryTapCancel;
+
+  final bool excludeFromSemantics;
+
+  final MouseCursor? mouseCursor;
+  final bool enableHighlights;
+  final bool enableReleaseHighlights;
+
+  @override
+  State<_TappableWidget> createState() => _TappableWidgetState();
+}
+
+class _TappableWidgetState extends State<_TappableWidget>
+    with AutomaticKeepAliveClientMixin<_TappableWidget>
+    implements GestureResponseState {
+  bool _hasFocus = false;
+  bool _pressing = false;
+  bool _hovering = false;
+
+  // GestureResponseState
+  final ObserverList<GestureResponseState> _activeChildren =
+      ObserverList<GestureResponseState>();
+  bool get _anyChildInkResponsePressed => _activeChildren.isNotEmpty;
+
+  // Splash
+  Set<InteractiveInkFeature>? _splashes;
+  InteractiveInkFeature? _currentSplash;
+
+  // Highlights
+  final Map<HighlightType, InkHighlight?> _highlights =
+      <HighlightType, InkHighlight?>{};
+  bool get hasHighlights => _highlights.isNotEmpty;
+  bool get highlightsExist => _highlights.values
+      .where((InkHighlight? highlight) => highlight != null)
+      .isNotEmpty;
+  bool get showHighlights => widget.enableHighlights;
+  bool get showReleaseHighlights => widget.enableReleaseHighlights;
+
+  // Intents
+  late final Map<Type, Action<Intent>> _actionMap = <Type, Action<Intent>>{
+    ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: activateOnIntent),
+    ButtonActivateIntent:
+        CallbackAction<ButtonActivateIntent>(onInvoke: activateOnIntent),
+  };
+  static const Duration _activationDuration = Duration(milliseconds: 100);
+  Timer? _activationTimer;
+
+  @override
+  bool get wantKeepAlive =>
+      highlightsExist || (_splashes != null && _splashes!.isNotEmpty);
+
+  bool isWidgetEnabled(_TappableWidget widget) {
+    return _primaryButtonEnabled(widget) || _secondaryButtonEnabled(widget);
+  }
+
+  bool _primaryButtonEnabled(_TappableWidget widget) {
+    return widget.onTap != null ||
+        widget.onDoubleTap != null ||
+        widget.onLongPress != null ||
+        widget.onTapUp != null ||
+        widget.onTapDown != null;
+  }
+
+  bool _secondaryButtonEnabled(_TappableWidget widget) {
+    return widget.onSecondaryTap != null ||
+        widget.onSecondaryTapUp != null ||
+        widget.onSecondaryTapDown != null;
+  }
+
+  bool get enabled => isWidgetEnabled(widget);
+
+  bool get _primaryEnabled => _primaryButtonEnabled(widget);
+  bool get _secondaryEnabled => _secondaryButtonEnabled(widget);
+
+  WidgetStatesController? internalStatesController;
+  WidgetStatesController get statesController =>
+      widget.statesController ?? internalStatesController!;
+
+  void initStatesController() {
+    if (widget.statesController == null) {
+      internalStatesController = WidgetStatesController();
+    }
+    statesController.update(WidgetState.disabled, !enabled);
+    statesController.addListener(handleStatesControllerChange);
+  }
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-      reverseDuration: const Duration(milliseconds: 600),
+    initStatesController();
+    FocusManager.instance.addHighlightModeListener(
+      handleFocusHighlightModeChange,
     );
-
-    _backgroundAnimation = ColorTween(
-      begin: Colors.transparent,
-      end: Colors.white10,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(
-          0.0,
-          1.0,
-          curve: Curves.ease,
-        ),
-      ),
-    );
-
-    _borderAnimation = BorderTween(
-      begin: const Border.fromBorderSide(
-        BorderSide(color: Colors.transparent),
-      ),
-      end: const Border.fromBorderSide(
-        BorderSide(color: Colors.white10),
-      ),
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(
-          0,
-          0.5,
-          curve: Curves.ease,
-        ),
-        reverseCurve: const Interval(
-          0,
-          0.8,
-          curve: Curves.easeOutCubic,
-        ),
-      ),
-    );
-
-    _controller.addStatusListener((AnimationStatus status) {
-      if (status == AnimationStatus.reverse) {
-        _reversing = true;
-      } else if (status == AnimationStatus.completed) {
-        _reversing = false;
-      } else if (status == AnimationStatus.forward) {
-        _reversing = false;
-      }
-    });
-  }
-
-  @override
-  void didUpdateWidget(covariant TappableArea oldWidget) {
-    if (oldWidget.splashColor != widget.splashColor) {
-      _backgroundAnimation = ColorTween(
-        begin: Colors.transparent,
-        end: widget.splashColor ?? Colors.white10,
-      ).animate(
-        CurvedAnimation(
-          parent: _controller,
-          curve: const Interval(
-            0.0,
-            1.0,
-            curve: Curves.ease,
-          ),
-        ),
-      );
-
-      _borderAnimation = BorderTween(
-        begin: const Border.fromBorderSide(
-          BorderSide(color: Colors.transparent),
-        ),
-        end: Border.fromBorderSide(
-          BorderSide(color: widget.splashColor ?? Colors.white10),
-        ),
-      ).animate(
-        CurvedAnimation(
-          parent: _controller,
-          curve: const Interval(
-            0,
-            0.5,
-            curve: Curves.ease,
-          ),
-          reverseCurve: const Interval(
-            0,
-            0.8,
-            curve: Curves.easeOutCubic,
-          ),
-        ),
-      );
-    }
-    super.didUpdateWidget(oldWidget);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    FocusManager.instance.removeHighlightModeListener(
+      handleFocusHighlightModeChange,
+    );
+    statesController.removeListener(handleStatesControllerChange);
+    internalStatesController?.dispose();
+    _activationTimer?.cancel();
+    _activationTimer = null;
     super.dispose();
+  }
+
+  void handleStatesControllerChange() {
+    // Force a rebuild to resolve widget.overlayColor, widget.mouseCursor
+    setState(() {});
+  }
+
+  @override
+  void didUpdateWidget(covariant _TappableWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.statesController != oldWidget.statesController) {
+      oldWidget.statesController?.removeListener(handleStatesControllerChange);
+      if (widget.statesController != null) {
+        internalStatesController?.dispose();
+        internalStatesController = null;
+      }
+      initStatesController();
+    }
+    if (widget.radius != oldWidget.radius ||
+        widget.highlightShape != oldWidget.highlightShape ||
+        widget.borderRadius != oldWidget.borderRadius) {
+      final InkHighlight? hoverHighlight = _highlights[HighlightType.hover];
+      if (hoverHighlight != null) {
+        hoverHighlight.dispose();
+        updateHighlight(
+          HighlightType.hover,
+          event: GestureEvent.fromBool(_hovering),
+        );
+      }
+      final InkHighlight? focusHighlight = _highlights[HighlightType.focus];
+      if (focusHighlight != null) {
+        focusHighlight.dispose();
+        // Do not call updateFocusHighlights() here because it is called below
+      }
+    }
+
+    if (widget.customBorder != oldWidget.customBorder) {
+      _widgetUpdateHighlightsAndSplashes();
+    }
+
+    if (enabled != isWidgetEnabled(oldWidget)) {
+      statesController.update(WidgetState.disabled, !enabled);
+      if (!enabled) {
+        statesController.update(WidgetState.pressed, false);
+        // Remove the existing hover highlight immediately when enabled is false.
+        // Do not rely on updateHighlight or InkHighlight.deactivate to not break
+        // the expected lifecycle which is updating _hovering when the mouse exit.
+        // Manually updating _hovering here or calling InkHighlight.deactivate
+        // will lead to onHover not being called or call when it is not allowed.
+        final InkHighlight? hoverHighlight = _highlights[HighlightType.hover];
+        hoverHighlight?.dispose();
+      }
+      // Don't call widget.onHover because many widgets, including the button
+      // widgets, apply setState to an ancestor context from onHover.
+      updateHighlight(
+        HighlightType.hover,
+        event: GestureEvent.fromBool(_hovering),
+      );
+    }
+    updateFocusHighlights();
+  }
+
+  @override
+  void markChildInkResponsePressed(
+    GestureResponseState childState,
+    GestureEvent event,
+  ) {
+    final bool lastAnyPressed = _anyChildInkResponsePressed;
+    if (event == GestureEvent.add) {
+      _activeChildren.add(childState);
+    } else {
+      _activeChildren.remove(childState);
+    }
+
+    final bool nowAnyPressed = _anyChildInkResponsePressed;
+    if (nowAnyPressed != lastAnyPressed) {
+      widget.parentState?.markChildInkResponsePressed(this, event);
+    }
+  }
+
+  void _widgetUpdateHighlightsAndSplashes() {
+    for (final InkHighlight? highlight in _highlights.values) {
+      if (highlight != null) {
+        highlight.customBorder = widget.customBorder;
+      }
+    }
+    if (_currentSplash != null) {
+      _currentSplash!.customBorder = widget.customBorder;
+    }
+    if (_splashes != null && _splashes!.isNotEmpty) {
+      for (final InteractiveInkFeature inkFeature in _splashes!) {
+        inkFeature.customBorder = widget.customBorder;
+      }
+    }
+  }
+
+  void activateOnIntent(Intent? intent) {
+    _activationTimer?.cancel();
+    _activationTimer = null;
+    _startNewSplash(context: context);
+    _currentSplash?.confirm();
+    _currentSplash = null;
+    if (widget.onTap != null) {
+      if (widget.enableFeedback) {
+        Feedback.forTap(context);
+      }
+      widget.onTap?.call();
+    }
+    // Delay the call to `updateHighlight` to simulate a pressed delay
+    // and give MaterialStatesController listeners a chance to react.
+    _activationTimer = Timer(_activationDuration, () {
+      updateHighlight(HighlightType.pressed, event: GestureEvent.remove);
+    });
+  }
+
+  // There are 2 ways of creating new splash,
+  //  1: [TapDownDetails] When Tappable is been interacted physically through the
+  //     device touch or pointer surface. Pass the TapDownDetails
+  //  2: [BuildContext] When interactions is through accessibility interfaces on device
+  void _startNewSplash({TapDownDetails? details, BuildContext? context}) {
+    assert(details != null || context != null);
+
+    final Offset globalPosition;
+
+    if (context != null) {
+      final RenderBox referenceBox = context.findRenderObject()! as RenderBox;
+      assert(
+        referenceBox.hasSize,
+        'InkResponse must be done with layout before starting a splash.',
+      );
+      globalPosition = referenceBox.localToGlobal(
+        referenceBox.paintBounds.center,
+      );
+    } else {
+      globalPosition = details!.globalPosition;
+    }
+    statesController.update(WidgetState.pressed, true);
+    final InteractiveInkFeature splash = _createSplash(globalPosition);
+    _splashes ??= HashSet<InteractiveInkFeature>();
+    _splashes!.add(splash);
+    _currentSplash?.cancel();
+    _currentSplash = splash;
+    updateKeepAlive();
+    updateHighlight(HighlightType.pressed, event: GestureEvent.add);
+  }
+
+  Duration getFadeDurationForType(HighlightType type) {
+    switch (type) {
+      case HighlightType.pressed:
+        return const Duration(milliseconds: 200);
+      case HighlightType.released:
+        return const Duration(milliseconds: 400);
+      case HighlightType.hover:
+      case HighlightType.focus:
+        return widget.hoverDuration ?? const Duration(milliseconds: 50);
+    }
+  }
+
+  Color getOverlayColorForType(HighlightType type) {
+    return widget.overlayColor?.resolve(statesController.value) ??
+        switch (type) {
+          HighlightType.pressed =>
+            widget.highlightColor ?? Theme.of(context).highlightColor,
+          HighlightType.focus =>
+            widget.focusColor ?? Theme.of(context).focusColor,
+          HighlightType.hover =>
+            widget.hoverColor ?? Theme.of(context).hoverColor,
+          HighlightType.released =>
+            widget.releasedColor ?? Theme.of(context).highlightColor,
+        };
+  }
+
+  void _createHighlight(HighlightType type, {required VoidCallback onRemoved}) {
+    final Color resolvedOverlayColor = getOverlayColorForType(type);
+    final RenderBox referenceBox = context.findRenderObject()! as RenderBox;
+    // TODO(josh4500): Use predefined InkHighlights
+    _highlights[type] = type == HighlightType.released
+        ? TapReleaseHighlight(
+            controller: Material.of(context),
+            referenceBox: referenceBox,
+            color: enabled
+                ? resolvedOverlayColor
+                : resolvedOverlayColor.withAlpha(0),
+            shape: widget.highlightShape,
+            radius: widget.radius,
+            borderRadius: widget.borderRadius,
+            customBorder: widget.customBorder,
+            rectCallback: widget.getRectCallback!(referenceBox),
+            textDirection: Directionality.of(context),
+            fadeDuration: getFadeDurationForType(type),
+            onRemoved: onRemoved,
+          )
+        : InkHighlight(
+            controller: Material.of(context),
+            referenceBox: referenceBox,
+            color: enabled
+                ? resolvedOverlayColor
+                : resolvedOverlayColor.withAlpha(0),
+            shape: widget.highlightShape,
+            radius: widget.radius,
+            borderRadius: widget.borderRadius,
+            customBorder: widget.customBorder,
+            rectCallback: widget.getRectCallback!(referenceBox),
+            textDirection: Directionality.of(context),
+            fadeDuration: getFadeDurationForType(type),
+            onRemoved: onRemoved,
+          );
+  }
+
+  InteractiveInkFeature _createSplash(Offset globalPosition) {
+    final MaterialInkController inkController = Material.of(context);
+    final RenderBox referenceBox = context.findRenderObject()! as RenderBox;
+    final Offset position = referenceBox.globalToLocal(globalPosition);
+    final Color color = widget.overlayColor?.resolve(statesController.value) ??
+        widget.splashColor ??
+        Theme.of(context).splashColor;
+    final RectCallback? rectCallback =
+        widget.containedInkWell ? widget.getRectCallback!(referenceBox) : null;
+    final BorderRadius? borderRadius = widget.borderRadius;
+    final ShapeBorder? customBorder = widget.customBorder;
+
+    InteractiveInkFeature? splash;
+    void onRemoved() {
+      if (_splashes != null) {
+        assert(_splashes!.contains(splash));
+        _splashes!.remove(splash);
+        if (_currentSplash == splash) {
+          _currentSplash = null;
+        }
+        updateKeepAlive();
+      } // else we're probably in deactivate()
+    }
+
+    splash = (widget.splashFactory ?? Theme.of(context).splashFactory).create(
+      controller: inkController,
+      referenceBox: referenceBox,
+      position: position,
+      color: color,
+      containedInkWell: widget.containedInkWell,
+      rectCallback: rectCallback,
+      radius: widget.radius,
+      borderRadius: borderRadius,
+      customBorder: customBorder,
+      onRemoved: onRemoved,
+      textDirection: Directionality.of(context),
+    );
+
+    return splash;
+  }
+
+  void updateReleaseHighlight() {
+    updateHighlight(HighlightType.released, event: GestureEvent.add);
+  }
+
+  void updateHighlight(
+    HighlightType type, {
+    required GestureEvent event,
+  }) {
+    // Get current highlight for type
+    final InkHighlight? highlight = _highlights[type];
+
+    switch (type) {
+      case HighlightType.pressed:
+        statesController.update(WidgetState.pressed, event.value);
+      case HighlightType.hover:
+        statesController.update(WidgetState.hovered, event.value);
+      case HighlightType.focus:
+        // see handleFocusUpdate()
+        break;
+      case HighlightType.released:
+        // see handleTapUp and handleTapCancel
+        break;
+    }
+
+    if (type == HighlightType.pressed || type == HighlightType.released) {
+      widget.parentState?.markChildInkResponsePressed(this, event);
+    }
+
+    // Returns when current highlight for type is active
+    if (event.value == (highlight != null && highlight.active)) {
+      return;
+    }
+
+    // if (type == HighlightType.released && !showReleaseHighlights) {
+    //   return;
+    // }
+
+    if (event.value) {
+      if (highlight == null) {
+        // Adds a new highlight
+        _createHighlight(
+          type,
+          onRemoved: () {
+            assert(_highlights[type] != null);
+            _highlights[type] = null;
+            updateKeepAlive();
+            if (type == HighlightType.released) {
+              widget.parentState?.markChildInkResponsePressed(
+                this,
+                GestureEvent.remove,
+              );
+            }
+          },
+        );
+
+        updateKeepAlive();
+      } else {
+        highlight.activate();
+      }
+    } else {
+      // Removes highlight
+      highlight!.deactivate();
+    }
+  }
+
+  bool get _canRequestFocus {
+    return switch (MediaQuery.maybeNavigationModeOf(context)) {
+      NavigationMode.traditional || null => enabled && widget.canRequestFocus,
+      NavigationMode.directional => true,
+    };
+  }
+
+  bool get _shouldShowFocus {
+    return switch (MediaQuery.maybeNavigationModeOf(context)) {
+      NavigationMode.traditional || null => enabled && _hasFocus,
+      NavigationMode.directional => _hasFocus,
+    };
+  }
+
+  void handleFocusUpdate(bool hasFocus) {
+    _hasFocus = hasFocus;
+    // Set here rather than updateHighlight because this widget's
+    // (MaterialState) states include MaterialState.focused if
+    // the InkWell _has_ the focus, rather than if it's showing
+    // the focus per FocusManager.instance.highlightMode.
+    statesController.update(WidgetState.focused, hasFocus);
+    updateFocusHighlights();
+    widget.onFocusChange?.call(hasFocus);
+  }
+
+  void updateFocusHighlights() {
+    updateHighlight(
+      HighlightType.focus,
+      event: GestureEvent.fromBool(_shouldShowFocus),
+    );
+  }
+
+  void handleFocusHighlightModeChange(FocusHighlightMode mode) {
+    if (!mounted) return;
+    setState(updateFocusHighlights);
+  }
+
+  void handleTap() {
+    _currentSplash?.confirm();
+    _currentSplash = null;
+    updateHighlight(HighlightType.pressed, event: GestureEvent.remove);
+    if (widget.onTap != null) {
+      if (widget.enableFeedback) {
+        Feedback.forTap(context);
+      }
+      _pressing = true;
+      widget.onTap?.call();
+    }
+  }
+
+  void handleTapUp(TapUpDetails details) {
+    _pressing = false;
+    if (!_anyChildInkResponsePressed && enabled) updateReleaseHighlight();
+
+    widget.onTapUp?.call(details);
+  }
+
+  void handleTapDown(TapDownDetails details) {
+    handleAnyTapDown(details);
+    widget.onTapDown?.call(details);
+  }
+
+  void handleAnyTapDown(TapDownDetails details) {
+    if (_anyChildInkResponsePressed) {
+      return; // Prevent showing highlights and splashes when child is marked
+    }
+    _startNewSplash(details: details);
+  }
+
+  void handleDoubleTap() {
+    _currentSplash?.confirm();
+    _currentSplash = null;
+    updateHighlight(HighlightType.pressed, event: GestureEvent.remove);
+    widget.onDoubleTap?.call();
+  }
+
+  void handleTapCancel() {
+    _currentSplash?.cancel();
+    _currentSplash = null;
+    widget.onTapCancel?.call();
+    _pressing = false;
+    updateHighlight(HighlightType.pressed, event: GestureEvent.remove);
+    if (!_anyChildInkResponsePressed && enabled) updateReleaseHighlight();
+  }
+
+  void handleLongPress() {
+    _currentSplash?.confirm();
+    _currentSplash = null;
+    if (widget.onLongPress != null) {
+      if (widget.enableFeedback) {
+        Feedback.forLongPress(context);
+      }
+      widget.onLongPress!();
+    }
+  }
+
+  void handleSecondaryTap() {
+    _currentSplash?.confirm();
+    _currentSplash = null;
+    updateHighlight(HighlightType.pressed, event: GestureEvent.remove);
+    widget.onSecondaryTap?.call();
+  }
+
+  void handleSecondaryTapCancel() {
+    _currentSplash?.cancel();
+    _currentSplash = null;
+    widget.onSecondaryTapCancel?.call();
+    updateHighlight(HighlightType.pressed, event: GestureEvent.remove);
+  }
+
+  void handleSecondaryTapDown(TapDownDetails details) {
+    handleAnyTapDown(details);
+    widget.onSecondaryTapDown?.call(details);
+  }
+
+  void handleSecondaryTapUp(TapUpDetails details) {
+    widget.onSecondaryTapUp?.call(details);
+  }
+
+  void handleMouseEnter(PointerEnterEvent event) {
+    _hovering = true;
+    if (enabled) {
+      updateHighlight(HighlightType.hover, event: GestureEvent.add);
+    }
+  }
+
+  void handleMouseExit(PointerExitEvent event) {
+    _hovering = false;
+    updateHighlight(HighlightType.hover, event: GestureEvent.remove);
+  }
+
+  @override
+  void deactivate() {
+    if (_splashes != null) {
+      final Set<InteractiveInkFeature> splashes = _splashes!;
+      _splashes = null;
+      for (final InteractiveInkFeature splash in splashes) {
+        splash.dispose();
+      }
+      _currentSplash = null;
+    }
+    assert(_currentSplash == null);
+    for (final HighlightType highlight in _highlights.keys) {
+      _highlights[highlight]?.dispose();
+      _highlights[highlight] = null;
+    }
+    widget.parentState?.markChildInkResponsePressed(this, GestureEvent.remove);
+    super.deactivate();
+  }
+
+  void semanticTap() {
+    _startNewSplash(context: context);
+    handleTap();
+  }
+
+  void semanticLongPress() {
+    _startNewSplash(context: context);
+    handleLongPress();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        GestureDetector(
-          behavior: widget.behavior,
-          onTap: widget.onTap,
-          onLongPress: widget.onLongPress,
-          onTapDown: (details) async {
-            widget.onTapDown?.call(details);
-            await _controller.forward();
-          },
-          onTapUp: (_) async => await _controller.reverse(),
-          onTapCancel: () async => await _controller.reverse(),
-          child: AnimatedBuilder(
-            animation: _backgroundAnimation,
-            builder: (BuildContext context, Widget? backgroundChild) {
-              return DecoratedBox(
-                decoration: BoxDecoration(
-                  // Border animation will show only when reversing
-                  border: _reversing ? _borderAnimation.value : null,
-                  color: _backgroundAnimation.value,
-                  borderRadius: widget.borderRadius,
-                ),
-                child: backgroundChild,
-              );
-            },
-            child: Padding(
-              padding: widget.padding,
-              child: widget.child,
-            ),
-          ),
-        ),
-        if (widget.stackedChild != null && widget.stackedPosition != null)
-          Positioned.fill(
-            top: widget.stackedPosition?.top,
-            bottom: widget.stackedPosition?.bottom,
-            left: widget.stackedPosition?.left,
-            right: widget.stackedPosition?.right,
-            child: Align(
-              alignment: widget.stackedAlignment,
-              child: widget.stackedChild,
-            ),
-          ),
-        if (widget.stackedChild != null && widget.stackedPosition == null)
-          Align(
-            alignment: widget.stackedAlignment,
-            child: widget.stackedChild,
-          ),
-      ],
+    super.build(context);
+
+    _currentSplash?.color =
+        widget.overlayColor?.resolve(statesController.value) ??
+            widget.splashColor ??
+            Theme.of(context).splashColor;
+    final effectiveMouseCursor = WidgetStateProperty.resolveAs<MouseCursor>(
+      widget.mouseCursor ?? WidgetStateMouseCursor.clickable,
+      statesController.value,
+    );
+
+    // GestureDetector
+    Widget child = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      excludeFromSemantics: true,
+      onTapDown: _primaryEnabled ? handleTapDown : null,
+      onTapUp: _primaryEnabled ? handleTapUp : null,
+      onTap: _primaryEnabled ? handleTap : null,
+      onTapCancel: _primaryEnabled ? handleTapCancel : null,
+      onDoubleTap: widget.onDoubleTap != null ? handleDoubleTap : null,
+      onLongPress: widget.onLongPress != null ? handleLongPress : null,
+      onSecondaryTapDown: _secondaryEnabled ? handleSecondaryTapDown : null,
+      onSecondaryTapUp: _secondaryEnabled ? handleSecondaryTapUp : null,
+      onSecondaryTap: _secondaryEnabled ? handleSecondaryTap : null,
+      onSecondaryTapCancel: _secondaryEnabled ? handleSecondaryTapCancel : null,
+      child: widget.child,
+    );
+
+    // Semantics
+    child = Semantics(
+      enabled: enabled,
+      onTap: widget.excludeFromSemantics || widget.onTap == null
+          ? null
+          : semanticTap,
+      onLongPress: widget.excludeFromSemantics || widget.onLongPress == null
+          ? null
+          : semanticLongPress,
+      child: child,
+    );
+
+    // MouseRegion
+    child = MouseRegion(
+      cursor: effectiveMouseCursor,
+      onEnter: handleMouseEnter,
+      onExit: handleMouseExit,
+      child: DefaultSelectionStyle.merge(
+        mouseCursor: effectiveMouseCursor,
+        child: child,
+      ),
+    );
+
+    // Focus
+    child = Focus(
+      autofocus: widget.autofocus,
+      focusNode: widget.focusNode,
+      canRequestFocus: _canRequestFocus,
+      onFocusChange: handleFocusUpdate,
+      child: child,
+    );
+
+    // Action
+    child = Actions(actions: _actionMap, child: child);
+
+    return GestureResponseProvider(
+      state: this,
+      child: Padding(
+        padding: widget.padding ?? EdgeInsets.zero,
+        child: child,
+      ),
     );
   }
+}
+
+class TappableArea extends Tappable {
+  const TappableArea({
+    super.key,
+    super.child,
+    super.padding,
+    super.onTap,
+    super.onDoubleTap,
+    super.onLongPress,
+    super.onTapDown,
+    super.onTapUp,
+    super.onTapCancel,
+    super.onSecondaryTap,
+    super.onSecondaryTapUp,
+    super.onSecondaryTapDown,
+    super.onSecondaryTapCancel,
+    super.mouseCursor,
+    super.focusColor,
+    super.hoverColor,
+    super.highlightColor,
+    super.overlayColor,
+    super.splashColor,
+    super.releasedColor,
+    super.radius,
+    super.borderRadius,
+    super.customBorder,
+    super.excludeFromSemantics,
+    super.focusNode,
+    super.canRequestFocus,
+    super.onFocusChange,
+    super.autofocus,
+    super.statesController,
+    super.hoverDuration,
+    bool? enableFeedback = true,
+    InteractiveInkFeatureFactory? splashFactory,
+    // TODO(josh4500): New properties
+    super.enableHighlights,
+    super.enableReleaseHighlights,
+    super.containedInkWell,
+  }) : super(
+          splashFactory: splashFactory ?? NoSplash.splashFactory,
+          highlightShape: BoxShape.rectangle,
+          enableFeedback: enableFeedback ?? true,
+        );
 }

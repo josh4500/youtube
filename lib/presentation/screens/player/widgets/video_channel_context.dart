@@ -39,8 +39,8 @@ class VideoChannelContext extends StatelessWidget {
     // return const SizedBox(height: 8);
     return Container(
       padding: const EdgeInsets.symmetric(
-        vertical: 12,
-        horizontal: 16,
+        vertical: 6,
+        horizontal: 12,
       ),
       margin: const EdgeInsets.only(left: 12, right: 12, top: 5, bottom: 12),
       decoration: BoxDecoration(
@@ -49,6 +49,7 @@ class VideoChannelContext extends StatelessWidget {
       ),
       child: Row(
         children: [
+          const SizedBox(width: 4),
           Expanded(
             child: RichText(
               text: const TextSpan(
@@ -69,7 +70,12 @@ class VideoChannelContext extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 24),
-          const Icon(YTIcons.more_vert_outlined, size: 16),
+          CustomInkWell(
+            onTap: () {},
+            splashFactory: NoSplash.splashFactory,
+            padding: const EdgeInsets.all(4),
+            child: const Icon(YTIcons.more_vert_outlined, size: 16),
+          ),
         ],
       ),
     );

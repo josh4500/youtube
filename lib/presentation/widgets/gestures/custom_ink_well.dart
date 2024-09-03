@@ -8,12 +8,14 @@ class CustomInkWell extends StatelessWidget {
     this.onTap,
     this.borderRadius,
     this.padding,
+    this.splashFactory = CustomInkSplash.splashFactory,
   });
 
   final VoidCallback? onTap;
   final BorderRadius? borderRadius;
   final EdgeInsets? padding;
   final Widget child;
+  final InteractiveInkFeatureFactory splashFactory;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class CustomInkWell extends StatelessWidget {
       borderRadius: borderRadius,
       splashColor: Colors.white10,
       highlightColor: Colors.white10,
-      splashFactory: CustomInkSplash.splashFactory,
+      splashFactory: splashFactory,
       child: padding == null ? child : Padding(padding: padding!, child: child),
     );
   }
@@ -30,7 +32,7 @@ class CustomInkWell extends StatelessWidget {
 
 /// Copied from Flutter code
 
-const Duration _kUnconfirmedSplashDuration = Duration(seconds: 1);
+const Duration _kUnconfirmedSplashDuration = Duration(milliseconds: 300);
 const Duration _kSplashFadeDuration = Duration(milliseconds: 50);
 
 const double _kSplashInitialSize = 0.5; // logical pixels

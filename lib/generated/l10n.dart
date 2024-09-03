@@ -279,6 +279,26 @@ class S {
       args: [],
     );
   }
+
+  /// `Search YouTube`
+  String get searchYoutube {
+    return Intl.message(
+      'Search YouTube',
+      name: 'searchYoutube',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search downloads`
+  String get searchDownloads {
+    return Intl.message(
+      'Search downloads',
+      name: 'searchDownloads',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

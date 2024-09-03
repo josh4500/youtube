@@ -5,5 +5,7 @@
   "@helloWorld": {
     "description": "The conventional newborn programmer greeting"
   },
-  "general" : "General"
+  "general" : "General",
+  "searchYoutube": "Search YouTube",
+  "searchDownloads": "Search downloads"
 }

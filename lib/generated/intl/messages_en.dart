@@ -43,6 +43,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "privacy": MessageLookupByLibrary.simpleMessage("Privacy"),
         "purchases":
             MessageLookupByLibrary.simpleMessage("Purchases and memberships"),
+        "searchDownloads":
+            MessageLookupByLibrary.simpleMessage("Search downloads"),
+        "searchYoutube": MessageLookupByLibrary.simpleMessage("Search YouTube"),
         "settings": MessageLookupByLibrary.simpleMessage("Settings"),
         "tryExperimental": MessageLookupByLibrary.simpleMessage(
             "Try experimental new features"),
