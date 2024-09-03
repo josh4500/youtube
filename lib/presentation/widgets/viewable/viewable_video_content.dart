@@ -31,7 +31,6 @@ import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../account_avatar.dart';
-import '../gestures/custom_ink_well.dart';
 import '../gestures/tappable_area.dart';
 import '../network_image/custom_network_image.dart';
 import '../player/playback/playback_view.dart';
@@ -44,131 +43,113 @@ class ViewableVideoContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        TappableArea(
-          onTap: onTap,
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Column(
-            children: <Widget>[
-              ConstrainedBox(
-                constraints: const BoxConstraints.expand(height: 200),
-                child: PlaybackView(
-                  placeholder: Container(
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF656565),
-                      image: DecorationImage(
-                        image: CustomNetworkImage(
-                          'https://picsum.photos/900/500',
-                        ),
-                        fit: BoxFit.cover,
-                      ),
+    return TappableArea(
+      onTap: onTap,
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        children: <Widget>[
+          ConstrainedBox(
+            constraints: const BoxConstraints.expand(height: 200),
+            child: PlaybackView(
+              placeholder: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFF656565),
+                  image: DecorationImage(
+                    image: CustomNetworkImage(
+                      'https://picsum.photos/900/500',
                     ),
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
-              Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        const SizedBox(width: 44),
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 12.0,
-                              horizontal: 4,
+            ),
+          ),
+          Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    TappableArea(
+                      onTap: () {},
+                      containedInkWell: true,
+                      padding: const EdgeInsets.all(4),
+                      borderRadius: BorderRadius.circular(36),
+                      releasedColor: Colors.transparent,
+                      child: const AccountAvatar(
+                        size: 36,
+                        name: 'John Jackson',
+                      ),
+                    ),
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            const Text(
+                              'Future, Metro BoomIn - Like That (Official Audio)',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFFF1F1F1),
+                              ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            const SizedBox(height: 6),
+                            Row(
                               children: <Widget>[
-                                const Text(
-                                  'Future, Metro BoomIn - Like That (Official Audio)',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFFF1F1F1),
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Row(
-                                  children: <Widget>[
-                                    RichText(
-                                      text: const TextSpan(
-                                        text: 'Future',
-                                        children: <InlineSpan>[
-                                          TextSpan(
-                                            text: kDotSeparator,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          TextSpan(text: '1.8M views'),
-                                          TextSpan(
-                                            text: kDotSeparator,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          TextSpan(text: '1 day ago'),
-                                        ],
+                                RichText(
+                                  text: const TextSpan(
+                                    text: 'Future',
+                                    children: <InlineSpan>[
+                                      TextSpan(
+                                        text: kDotSeparator,
                                         style: TextStyle(
-                                          color: Color(0xFFAAAAAA),
-                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
+                                      TextSpan(text: '1.8M views'),
+                                      TextSpan(
+                                        text: kDotSeparator,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      TextSpan(text: '1 day ago'),
+                                    ],
+                                    style: TextStyle(
+                                      color: Color(0xFFAAAAAA),
+                                      fontSize: 11,
                                     ),
-                                  ],
+                                  ),
                                 ),
-                                const SizedBox(height: 4),
                               ],
                             ),
-                          ),
+                            const SizedBox(height: 4),
+                          ],
                         ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 2,
-                          ),
-                          child: SizedBox(width: 32, height: 24),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                    Transform.translate(
+                      offset: const Offset(8, -4),
+                      child: TappableArea(
+                        onTap: onMore,
+                        padding: const EdgeInsets.all(8.0),
+                        borderRadius: BorderRadius.circular(32),
+                        releasedColor: Colors.transparent,
+                        child: const Icon(
+                          YTIcons.more_vert_outlined,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-        ),
-        const Positioned(
-          left: 8,
-          top: 200,
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 12.0,
-              horizontal: 4,
-            ),
-            child: AccountAvatar(
-              size: 36,
-              name: 'John Jackson',
-            ),
-          ),
-        ),
-        Positioned(
-          right: 8,
-          top: 204,
-          child: CustomInkWell(
-            onTap: onMore,
-            padding: const EdgeInsets.all(8.0),
-            borderRadius: BorderRadius.circular(32),
-            child: const Icon(
-              YTIcons.more_vert_outlined,
-              size: 18,
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
