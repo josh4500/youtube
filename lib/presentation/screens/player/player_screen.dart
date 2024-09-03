@@ -1285,7 +1285,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   }
 
   void _onDragPlayerStart(DragStartDetails details) {
-    if (_preventGestures) return;
+    if (_preventGestures || _isSeeking) return;
 
     // Hide controls
     _hideControls();
@@ -1294,7 +1294,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Handles drag updates for the player, determining the drag behavior based on
   /// it state.
   void _onDragPlayer(DragUpdateDetails details) {
-    if (_preventGestures) return;
+    if (_preventGestures || _isSeeking) return;
 
     // If active zoom panning is in progress, update zoom panning and return
     if (_activeZoomPanning) {
