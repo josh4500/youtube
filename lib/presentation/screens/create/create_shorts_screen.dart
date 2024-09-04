@@ -34,6 +34,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/screens/create/add_sound_screen.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -1244,12 +1245,18 @@ class CaptureMusicButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CustomActionChip(
+    return CustomActionChip(
       title: 'Add sound',
-      icon: Icon(YTIcons.music, size: 18),
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => const AddSoundScreen(),
+        );
+      },
+      icon: const Icon(YTIcons.music, size: 18),
       backgroundColor: Colors.black38,
-      textStyle: TextStyle(fontSize: 13),
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      textStyle: const TextStyle(fontSize: 13),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
     );
   }
 }
