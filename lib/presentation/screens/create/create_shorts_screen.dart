@@ -590,6 +590,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     // Hiding widget should use one notifier
     await showModalBottomSheet(
       context: context,
+      isDismissible: false,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return const CaptureFilterSelector();
