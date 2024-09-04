@@ -414,6 +414,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       case CaptureEffect.greenScreen:
       case CaptureEffect.retouch:
       case CaptureEffect.filter:
+        _showFilterSelector();
       case CaptureEffect.align:
       case CaptureEffect.lighting:
         if (isAdded) {
@@ -581,6 +582,16 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
         ),
       );
     }
+  }
+
+  Future<void> _showFilterSelector() async {
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return const CaptureFilterSelector();
+      },
+    );
   }
 
   Future<void> _showCountdownSelector() async {
@@ -911,307 +922,312 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       onPopInvokedWithResult: _onPopInvokedWithResult,
       child: NotificationListener<CaptureNotification>(
         onNotification: handleCaptureNotification,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            LayoutBuilder(
-              builder: (
-                BuildContext context,
-                BoxConstraints constraints,
-              ) {
-                return Listener(
-                  onPointerMove: (PointerMoveEvent event) {
-                    handlePointerMoveEvent(event, constraints);
-                  },
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ValueListenableBuilder(
-                        valueListenable: hasInitCameraNotifier,
-                        builder: (
-                          BuildContext context,
-                          CameraDescription? cameraDesc,
-                          Widget? _,
-                        ) {
-                          if (cameraDesc == null) {
-                            return const SizedBox();
-                          } else {
-                            return CameraPreview(
-                              controller!,
-                              child: GestureDetector(
-                                onTapDown: (TapDownDetails details) {
-                                  handleOnTapCameraView(details, constraints);
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              LayoutBuilder(
+                builder: (
+                  BuildContext context,
+                  BoxConstraints constraints,
+                ) {
+                  return Listener(
+                    onPointerMove: (PointerMoveEvent event) {
+                      handlePointerMoveEvent(event, constraints);
+                    },
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        ValueListenableBuilder(
+                          valueListenable: hasInitCameraNotifier,
+                          builder: (
+                            BuildContext context,
+                            CameraDescription? cameraDesc,
+                            Widget? _,
+                          ) {
+                            if (cameraDesc == null) {
+                              return const SizedBox();
+                            } else {
+                              return CameraPreview(
+                                controller!,
+                                child: GestureDetector(
+                                  onTapDown: (TapDownDetails details) {
+                                    handleOnTapCameraView(details, constraints);
+                                  },
+                                  onDoubleTapDown: (TapDownDetails details) {
+                                    handleOnDoubleTapCameraView(
+                                      details,
+                                      constraints,
+                                    );
+                                  },
+                                  behavior: HitTestBehavior.opaque,
+                                  child: const SizedBox.expand(),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        ValueListenableBuilder(
+                          valueListenable: focusPosition,
+                          builder: (
+                            BuildContext context,
+                            Offset position,
+                            Widget? childWidget,
+                          ) {
+                            return Positioned(
+                              top: position.dy,
+                              left: position.dx,
+                              child: childWidget!,
+                            );
+                          },
+                          child:
+                              CaptureFocusIndicator(animation: focusController),
+                        ),
+                        ValueListenableBuilder(
+                          valueListenable: recordOuterButtonPosition,
+                          builder: (
+                            BuildContext context,
+                            Offset? position,
+                            Widget? childWidget,
+                          ) {
+                            position ??= getDragCircleInitPosition(constraints);
+
+                            return Positioned(
+                              top: position.dy,
+                              left: position.dx,
+                              child: childWidget!,
+                            );
+                          },
+                          child: HideOnCountdown(
+                            notifier: countdownHidden,
+                            child: AnimatedVisibility(
+                              animation: hideAnimation,
+                              alignment: Alignment.bottomCenter,
+                              child: ListenableBuilder(
+                                listenable: recordingNotifier,
+                                builder: (BuildContext context, Widget? _) {
+                                  return CaptureDragZoomButton(
+                                    animation: recordOuterButtonController,
+                                    isDragging: dragRecordNotifier.value,
+                                    isRecording: recordingNotifier.value,
+                                  );
                                 },
-                                onDoubleTapDown: (TapDownDetails details) {
-                                  handleOnDoubleTapCameraView(
+                              ),
+                            ),
+                          ),
+                        ),
+                        ValueListenableBuilder(
+                          valueListenable: recordInnerButtonPosition,
+                          builder: (
+                            BuildContext context,
+                            Offset? position,
+                            Widget? childWidget,
+                          ) {
+                            position ??=
+                                getCenterButtonInitPosition(constraints);
+
+                            return Positioned(
+                              top: position.dy,
+                              left: position.dx,
+                              child: childWidget!,
+                            );
+                          },
+                          child: HideOnCountdown(
+                            notifier: countdownHidden,
+                            child: AnimatedVisibility(
+                              animation: hideAnimation,
+                              alignment: Alignment.bottomCenter,
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: handleOnTapRecordButton,
+                                onLongPressStart:
+                                    handleLongPressStartRecordButton,
+                                onLongPressEnd: (LongPressEndDetails details) {
+                                  handleLongPressEndRecordButton(
                                     details,
                                     constraints,
                                   );
                                 },
-                                behavior: HitTestBehavior.opaque,
-                                child: const SizedBox.expand(),
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                      ValueListenableBuilder(
-                        valueListenable: focusPosition,
-                        builder: (
-                          BuildContext context,
-                          Offset position,
-                          Widget? childWidget,
-                        ) {
-                          return Positioned(
-                            top: position.dy,
-                            left: position.dx,
-                            child: childWidget!,
-                          );
-                        },
-                        child:
-                            CaptureFocusIndicator(animation: focusController),
-                      ),
-                      ValueListenableBuilder(
-                        valueListenable: recordOuterButtonPosition,
-                        builder: (
-                          BuildContext context,
-                          Offset? position,
-                          Widget? childWidget,
-                        ) {
-                          position ??= getDragCircleInitPosition(constraints);
-
-                          return Positioned(
-                            top: position.dy,
-                            left: position.dx,
-                            child: childWidget!,
-                          );
-                        },
-                        child: HideOnCountdown(
-                          notifier: countdownHidden,
-                          child: AnimatedVisibility(
-                            animation: hideAnimation,
-                            alignment: Alignment.bottomCenter,
-                            child: ListenableBuilder(
-                              listenable: recordingNotifier,
-                              builder: (BuildContext context, Widget? _) {
-                                return CaptureDragZoomButton(
-                                  animation: recordOuterButtonController,
-                                  isDragging: dragRecordNotifier.value,
-                                  isRecording: recordingNotifier.value,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      ValueListenableBuilder(
-                        valueListenable: recordInnerButtonPosition,
-                        builder: (
-                          BuildContext context,
-                          Offset? position,
-                          Widget? childWidget,
-                        ) {
-                          position ??= getCenterButtonInitPosition(constraints);
-
-                          return Positioned(
-                            top: position.dy,
-                            left: position.dx,
-                            child: childWidget!,
-                          );
-                        },
-                        child: HideOnCountdown(
-                          notifier: countdownHidden,
-                          child: AnimatedVisibility(
-                            animation: hideAnimation,
-                            alignment: Alignment.bottomCenter,
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: handleOnTapRecordButton,
-                              onLongPressStart:
-                                  handleLongPressStartRecordButton,
-                              onLongPressEnd: (LongPressEndDetails details) {
-                                handleLongPressEndRecordButton(
-                                  details,
-                                  constraints,
-                                );
-                              },
-                              onLongPressMoveUpdate: (
-                                LongPressMoveUpdateDetails details,
-                              ) {
-                                handleLongPressUpdateRecordButton(
-                                  details,
-                                  constraints,
-                                );
-                              },
-                              child: ListenableBuilder(
-                                listenable: Listenable.merge(
-                                  [
-                                    recordingNotifier,
-                                    dragRecordNotifier,
-                                  ],
-                                ),
-                                builder: (BuildContext context, Widget? _) {
-                                  return CaptureButton(
-                                    isRecording: recordingNotifier.value &&
-                                        !dragRecordNotifier.value,
+                                onLongPressMoveUpdate: (
+                                  LongPressMoveUpdateDetails details,
+                                ) {
+                                  handleLongPressUpdateRecordButton(
+                                    details,
+                                    constraints,
                                   );
                                 },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      ListenableBuilder(
-                        listenable: countdownHidden,
-                        builder: (BuildContext context, Widget? _) {
-                          if (countdownHidden.value) {
-                            return const SizedBox();
-                          }
-
-                          return Center(
-                            child: ScaleTransition(
-                              scale: Tween<double>(begin: 1, end: 1.5).animate(
-                                ReverseAnimation(countdownController),
-                              ),
-                              child: ListenableBuilder(
-                                listenable: countdownSeconds,
-                                builder: (BuildContext context, Widget? _) {
-                                  return Text(
-                                    countdownSeconds.value.toString(),
-                                    style: const TextStyle(
-                                      fontSize: 100,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      ListenableBuilder(
-                        listenable: countdownHidden,
-                        builder: (BuildContext context, Widget? _) {
-                          if (countdownHidden.value) {
-                            return const SizedBox();
-                          }
-                          return Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Transform.translate(
-                              offset: const Offset(0, -bottomPadding),
-                              child: GestureDetector(
-                                onTap: _stopCountdown,
-                                behavior: HitTestBehavior.opaque,
-                                child: const CaptureCountdownButton(),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Stack(
-                children: [
-                  AnimatedVisibility(
-                    animation: hideAnimation,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 6,
-                        horizontal: 4.0,
-                      ),
-                      child: ModelBinding<CallOutLink>(
-                        model: callOutLink,
-                        child: CompositedTransformTarget(
-                          link: callOutLink.link,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const CreateProgress(),
-                              const SizedBox(height: 12),
-                              HideOnCountdown(
-                                notifier: countdownHidden,
-                                child: HideOnRecording(
-                                  notifier: recordingNotifier,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CreateCloseButton(
-                                        onPopInvoked: _onPopInvoked,
-                                      ),
-                                      const CaptureMusicButton(),
-                                      const CaptureShortsDuration(),
+                                child: ListenableBuilder(
+                                  listenable: Listenable.merge(
+                                    [
+                                      recordingNotifier,
+                                      dragRecordNotifier,
                                     ],
                                   ),
+                                  builder: (BuildContext context, Widget? _) {
+                                    return CaptureButton(
+                                      isRecording: recordingNotifier.value &&
+                                          !dragRecordNotifier.value,
+                                    );
+                                  },
                                 ),
                               ),
+                            ),
+                          ),
+                        ),
+                        ListenableBuilder(
+                          listenable: countdownHidden,
+                          builder: (BuildContext context, Widget? _) {
+                            if (countdownHidden.value) {
+                              return const SizedBox();
+                            }
+
+                            return Center(
+                              child: ScaleTransition(
+                                scale:
+                                    Tween<double>(begin: 1, end: 1.5).animate(
+                                  ReverseAnimation(countdownController),
+                                ),
+                                child: ListenableBuilder(
+                                  listenable: countdownSeconds,
+                                  builder: (BuildContext context, Widget? _) {
+                                    return Text(
+                                      countdownSeconds.value.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 100,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        ListenableBuilder(
+                          listenable: countdownHidden,
+                          builder: (BuildContext context, Widget? _) {
+                            if (countdownHidden.value) {
+                              return const SizedBox();
+                            }
+                            return Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Transform.translate(
+                                offset: const Offset(0, -bottomPadding),
+                                child: GestureDetector(
+                                  onTap: _stopCountdown,
+                                  behavior: HitTestBehavior.opaque,
+                                  child: const CaptureCountdownButton(),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Stack(
+                  children: [
+                    AnimatedVisibility(
+                      animation: hideAnimation,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 6,
+                          horizontal: 4.0,
+                        ),
+                        child: ModelBinding<CallOutLink>(
+                          model: callOutLink,
+                          child: CompositedTransformTarget(
+                            link: callOutLink.link,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const CreateProgress(),
+                                const SizedBox(height: 12),
+                                HideOnCountdown(
+                                  notifier: countdownHidden,
+                                  child: HideOnRecording(
+                                    notifier: recordingNotifier,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        CreateCloseButton(
+                                          onPopInvoked: _onPopInvoked,
+                                        ),
+                                        const CaptureMusicButton(),
+                                        const CaptureShortsDuration(),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: ListenableBuilder(
+                        listenable: latestControlMessage,
+                        builder: (BuildContext context, Widget? _) {
+                          return ControlMessageEvent(
+                            message: latestControlMessage.value,
+                          );
+                        },
+                      ),
+                    ),
+                    AnimatedVisibility(
+                      animation: hideZoomController,
+                      alignment: Alignment.centerLeft,
+                      child: CaptureZoomIndicator(
+                        controller: dragZoomLevelNotifier,
+                      ),
+                    ),
+                    HideOnCountdown(
+                      notifier: countdownHidden,
+                      child: HideOnRecording(
+                        notifier: recordingNotifier,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: CaptureEffects(controller: effectsController),
+                        ),
+                      ),
+                    ),
+                    HideOnCountdown(
+                      notifier: countdownHidden,
+                      child: HideOnRecording(
+                        notifier: recordingNotifier,
+                        child: AnimatedVisibility(
+                          animation: hideAnimation,
+                          alignment: Alignment.bottomCenter,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              AnimatedVisibility(
+                                animation: hideSpeedController,
+                                child: ScaleTransition(
+                                  scale: speedSelectorScaleAnimation,
+                                  child: const CaptureSpeed(),
+                                ),
+                              ),
+                              const SizedBox(height: 36),
+                              const CaptureRecordingControl(),
+                              const SizedBox(height: bottomPadding),
                             ],
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  Center(
-                    child: ListenableBuilder(
-                      listenable: latestControlMessage,
-                      builder: (BuildContext context, Widget? _) {
-                        return ControlMessageEvent(
-                          message: latestControlMessage.value,
-                        );
-                      },
-                    ),
-                  ),
-                  AnimatedVisibility(
-                    animation: hideZoomController,
-                    alignment: Alignment.centerLeft,
-                    child: CaptureZoomIndicator(
-                      controller: dragZoomLevelNotifier,
-                    ),
-                  ),
-                  HideOnCountdown(
-                    notifier: countdownHidden,
-                    child: HideOnRecording(
-                      notifier: recordingNotifier,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: CaptureEffects(controller: effectsController),
-                      ),
-                    ),
-                  ),
-                  HideOnCountdown(
-                    notifier: countdownHidden,
-                    child: HideOnRecording(
-                      notifier: recordingNotifier,
-                      child: AnimatedVisibility(
-                        animation: hideAnimation,
-                        alignment: Alignment.bottomCenter,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            AnimatedVisibility(
-                              animation: hideSpeedController,
-                              child: ScaleTransition(
-                                scale: speedSelectorScaleAnimation,
-                                child: const CaptureSpeed(),
-                              ),
-                            ),
-                            const SizedBox(height: 36),
-                            const CaptureRecordingControl(),
-                            const SizedBox(height: bottomPadding),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -1243,7 +1259,7 @@ class ControlMessageEvent extends StatelessWidget {
       message,
       style: const TextStyle(
         fontSize: 36,
-        color: Colors.white54,
+        color: Colors.white60,
         fontWeight: FontWeight.w500,
       ),
     );
@@ -1479,6 +1495,86 @@ class PreExitCaptureOptionsSheet extends ConsumerWidget {
             onTap: context.pop,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CaptureFilterSelector extends StatelessWidget {
+  const CaptureFilterSelector({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppPalette.black,
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  const Text(
+                    'Filter',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: context.pop,
+                    child: const Text(
+                      'DONE',
+                      style: TextStyle(
+                        color: AppPalette.blue,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 80,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  return Column(
+                    children: [
+                      const SizedBox(height: 4),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white60,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                          ),
+                          padding: const EdgeInsets.all(12),
+                          child: const Icon(
+                            YTIcons.not_interested_outlined,
+                            size: 32,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'No filter',
+                        style: TextStyle(fontSize: 10.5),
+                      ),
+                    ],
+                  );
+                },
+                itemCount: 20,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

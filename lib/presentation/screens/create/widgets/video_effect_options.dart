@@ -328,10 +328,10 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
                           padding: const EdgeInsets.all(2),
                           margin: itemVerticalMargin,
                           decoration: const BoxDecoration(
-                            color: Colors.white30,
+                            color: Colors.white38,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(YTIcons.chevron_down, size: 22),
+                          child: const Icon(YTIcons.chevron_down, size: 20),
                         ),
                       ),
                     ),

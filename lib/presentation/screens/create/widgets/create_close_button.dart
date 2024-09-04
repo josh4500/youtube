@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/theme/icon/y_t_icons_icons.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class CreateCloseButton extends StatelessWidget {
   const CreateCloseButton({super.key, this.onPopInvoked});
@@ -8,12 +9,13 @@ class CreateCloseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return CustomInkWell(
       onTap: () {
         bool shouldPop = true;
         if (onPopInvoked != null) shouldPop = onPopInvoked!();
         if (shouldPop) context.pop();
       },
+      splashFactory: NoSplash.splashFactory,
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: const BoxDecoration(
