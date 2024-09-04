@@ -140,6 +140,7 @@ class ViewablePostContent extends StatelessWidget {
           child: Row(
             children: <Widget>[
               TappableArea(
+                onTap: () {},
                 padding: const EdgeInsets.all(8),
                 borderRadius: BorderRadius.circular(32),
                 child: const Icon(YTIcons.like_outlined),
@@ -148,13 +149,22 @@ class ViewablePostContent extends StatelessWidget {
               const SizedBox(width: 24),
               CustomInkWell(
                 onTap: () {},
+                splashFactory: NoSplash.splashFactory,
                 padding: const EdgeInsets.all(8),
                 borderRadius: BorderRadius.circular(32),
                 child: const Icon(YTIcons.dislike_outlined),
               ),
               const Spacer(),
-              const TappableArea(
-                child: Row(
+              TappableArea(
+                onTap: () {},
+                padding: const EdgeInsets.all(8),
+                borderRadius: BorderRadius.circular(32),
+                child: const Icon(YTIcons.share_outlined),
+              ),
+              const SizedBox(width: 12),
+              TappableArea(
+                onTap: () {},
+                child: const Row(
                   children: [
                     Icon(YTIcons.comments_outlined),
                     SizedBox(width: 8),

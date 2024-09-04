@@ -7,7 +7,7 @@ class ChannelSubscribeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(Josh): Make second type that is bigger
+    // TODO(josh4500): Make second type that is bigger
     return ColoredBox(
       color: Colors.white10,
       child: Padding(

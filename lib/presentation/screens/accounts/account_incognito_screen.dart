@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/account_repository_provider.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class AccountIncognitoScreen extends ConsumerWidget {
@@ -77,7 +78,7 @@ class AccountIncognitoScreen extends ConsumerWidget {
                 child: const Text(
                   'Turn off Incognito',
                   style: TextStyle(
-                    color: Color(0xFF3EA6FF),
+                    color: AppPalette.blue,
                   ),
                 ),
               ),
@@ -87,7 +88,11 @@ class AccountIncognitoScreen extends ConsumerWidget {
         const Expanded(
           child: Column(
             children: <Widget>[
-              Center(child: CircularProgressIndicator()),
+              Center(
+                child: CircularProgressIndicator(
+                  color: AppPalette.blue,
+                ),
+              ),
             ],
           ),
         ),

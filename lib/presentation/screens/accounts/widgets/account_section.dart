@@ -115,6 +115,7 @@ class AccountSection extends ConsumerWidget {
                     icon: const Icon(YTIcons.switch_accounts, size: 16),
                     padding: const EdgeInsets.symmetric(horizontal: 8.55),
                     backgroundColor: const Color(0xFF272727),
+                    padEnd: true,
                   ),
                   const SizedBox(width: 8),
                   CustomActionChip(
@@ -123,6 +124,7 @@ class AccountSection extends ConsumerWidget {
                     icon: const Icon(YTIcons.google, size: 16),
                     padding: const EdgeInsets.symmetric(horizontal: 8.55),
                     backgroundColor: const Color(0xFF272727),
+                    padEnd: true,
                   ),
                   const SizedBox(width: 8),
                   CustomActionChip(
@@ -133,6 +135,16 @@ class AccountSection extends ConsumerWidget {
                     icon: const Icon(Icons.privacy_tip, size: 16),
                     padding: const EdgeInsets.symmetric(horizontal: 8.55),
                     backgroundColor: const Color(0xFF272727),
+                    padEnd: true,
+                  ),
+                  const SizedBox(width: 8),
+                  CustomActionChip(
+                    title: 'Share channel',
+                    onTap: () {},
+                    icon: const Icon(YTIcons.share_outlined, size: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.55),
+                    backgroundColor: const Color(0xFF272727),
+                    padEnd: true,
                   ),
                 ],
               ),

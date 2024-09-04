@@ -44,6 +44,7 @@ class CustomActionChip extends StatefulWidget {
     this.onTapCancel,
     this.title,
     this.onLongPress,
+    this.padEnd = false,
   });
   final String? title;
   final Widget? icon;
@@ -57,6 +58,7 @@ class CustomActionChip extends StatefulWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final VoidCallback? onTapCancel;
+  final bool padEnd;
 
   @override
   State<CustomActionChip> createState() => _CustomActionChipState();
@@ -128,7 +130,7 @@ class _CustomActionChipState extends State<CustomActionChip>
                           fontWeight: FontWeight.w500,
                         ),
                   ),
-                  const SizedBox(width: 4),
+                  if (widget.padEnd) const SizedBox(width: 4),
                 ],
               ],
             ),

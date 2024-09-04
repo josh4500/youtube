@@ -28,6 +28,7 @@
 
 abstract class Account {
   bool get isChannel => false;
+  bool get isPremium => false;
 }
 
 class GuestAccount extends Account {}
