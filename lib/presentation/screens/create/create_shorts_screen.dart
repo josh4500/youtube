@@ -585,6 +585,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   }
 
   Future<void> _showFilterSelector() async {
+    hideController.forward();
+    // TODO(josh4500): Hide CaptureEffects widget
+    // Hiding widget should use one notifier
     await showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -592,6 +595,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
         return const CaptureFilterSelector();
       },
     );
+    hideController.reverse();
   }
 
   Future<void> _showCountdownSelector() async {
