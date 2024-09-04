@@ -59,7 +59,7 @@ class GroupedViewBuilder extends StatelessWidget {
   final VoidCallback? onTap;
   final Widget Function(BuildContext context, int index) itemBuilder;
   final int? itemCount;
-  // TODO(Josh): Add useTappable property for the title tile
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -128,6 +128,117 @@ class GroupedViewBuilder extends StatelessWidget {
               itemBuilder: itemBuilder,
               scrollDirection: direction,
             ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class GroupedPageViewBuilder extends StatefulWidget {
+  const GroupedPageViewBuilder({
+    super.key,
+    this.leading,
+    required this.title,
+    this.subtitle,
+    this.physics,
+    required this.itemBuilder,
+    this.onTap,
+    this.itemCount,
+  });
+
+  final String title;
+  final Widget? leading;
+  final String? subtitle;
+  final ScrollPhysics? physics;
+  final VoidCallback? onTap;
+  final Widget Function(BuildContext context, int index) itemBuilder;
+  final int? itemCount;
+
+  @override
+  State<GroupedPageViewBuilder> createState() => _GroupedPageViewBuilderState();
+}
+
+class _GroupedPageViewBuilderState extends State<GroupedPageViewBuilder> {
+  final PageController pageController = PageController(viewportFraction: 0.92);
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        TappableArea(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
+          onTap: widget.onTap,
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        if (widget.leading != null) ...[
+                          widget.leading!,
+                          const SizedBox(width: 16),
+                        ],
+                        Expanded(
+                          child: Text(
+                            widget.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 80),
+                      ],
+                    ),
+                    if (widget.subtitle != null)
+                      Text(
+                        widget.subtitle!,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              CustomActionChip(
+                title: 'See more',
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 12,
+                ),
+                border: const Border.fromBorderSide(
+                  BorderSide(color: Colors.white12),
+                ),
+                onTap: widget.onTap,
+              ),
+            ],
+          ),
+        ),
+        ConstrainedBox(
+          constraints: const BoxConstraints.expand(height: 216),
+          child: PageView.builder(
+            physics: widget.physics,
+            padEnds: false,
+            controller: pageController,
+            itemCount: widget.itemCount,
+            itemBuilder: widget.itemBuilder,
           ),
         ),
       ],
