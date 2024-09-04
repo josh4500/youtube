@@ -46,7 +46,6 @@ class _CaptureFocusIndicatorState extends State<CaptureFocusIndicator> {
 
 class _FocusPainter extends CustomPainter {
   _FocusPainter({
-    super.repaint,
     required this.sizeFactor,
     required this.opacity,
   });

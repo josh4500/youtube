@@ -24,7 +24,6 @@ class TapReleaseHighlight extends InkHighlight {
   }
 
   late AnimationController _animationController;
-  late Animation<double> _opacityAnimation;
   late Animation<int> _alphaAnimation;
 
   void _setupAnimation(Duration duration) {
@@ -33,12 +32,8 @@ class TapReleaseHighlight extends InkHighlight {
       duration: duration,
     );
 
-    _alphaAnimation = _animationController.drive(
-      IntTween(begin: color.alpha, end: 0),
-    );
-
-    _opacityAnimation =
-        Tween<double>(begin: 1.0, end: 0.0).animate(_animationController)
+    _alphaAnimation =
+        IntTween(begin: color.alpha, end: 0).animate(_animationController)
           ..addListener(() {
             controller.markNeedsPaint();
           })

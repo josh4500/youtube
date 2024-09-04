@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/providers.dart';
-import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class PlayerSeekSlideFrame extends StatefulWidget {
@@ -30,7 +27,7 @@ class _PlayerSeekSlideFrameState extends State<PlayerSeekSlideFrame> {
   }
 
   int get framesCount {
-    // TODO: Get real value
+    // TODO(josh4500): Get real value
     const duration = Duration(minutes: 1);
     int value;
     if (duration < const Duration(minutes: 3)) {

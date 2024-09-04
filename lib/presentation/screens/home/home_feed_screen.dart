@@ -77,33 +77,34 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
     super.dispose();
   }
 
-  SliverGridDelegate _getGridDelegate(
-    bool isBigScreen,
-    bool isMediumScreen,
-  ) {
-    return SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: isMediumScreen
-          ? 2
-          : isBigScreen
-              ? 3
-              : 1,
-      mainAxisSpacing: isMediumScreen
-          ? 4
-          : isBigScreen
-              ? 12
-              : 0,
-      crossAxisSpacing: isMediumScreen
-          ? 4
-          : isBigScreen
-              ? 12
-              : 0,
-      childAspectRatio: isMediumScreen
-          ? 1.25
-          : isBigScreen
-              ? 1.3
-              : 1,
-    );
-  }
+  // TODO(josh4500): To be used for Auto layout
+  // SliverGridDelegate _getGridDelegate(
+  //   bool isBigScreen,
+  //   bool isMediumScreen,
+  // ) {
+  //   return SliverGridDelegateWithFixedCrossAxisCount(
+  //     crossAxisCount: isMediumScreen
+  //         ? 2
+  //         : isBigScreen
+  //             ? 3
+  //             : 1,
+  //     mainAxisSpacing: isMediumScreen
+  //         ? 4
+  //         : isBigScreen
+  //             ? 12
+  //             : 0,
+  //     crossAxisSpacing: isMediumScreen
+  //         ? 4
+  //         : isBigScreen
+  //             ? 12
+  //             : 0,
+  //     childAspectRatio: isMediumScreen
+  //         ? 1.25
+  //         : isBigScreen
+  //             ? 1.3
+  //             : 1,
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

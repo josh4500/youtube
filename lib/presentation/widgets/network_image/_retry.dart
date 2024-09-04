@@ -16,7 +16,7 @@ class Retry {
       if (await stream.firstWhere((retry) => retry)) {
         try {
           return await logic();
-        } on Exception catch (e) {
+        } on Exception {
           // Retry on any exception if internet is connected
           attempt++;
           await Future.delayed(retryDelay);

@@ -444,9 +444,7 @@ class NoSubscriptionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: CustomScrollView(
-        slivers: [],
-      ),
+      body: CustomScrollView(),
     );
   }
 }

@@ -3,6 +3,9 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   plugins:
     custom_lint
+  exclude:
+    - lib/generated/**
+    - lib/presentation/theme/icon/y_t_icons_icons.dart
 
 linter:
   rules:

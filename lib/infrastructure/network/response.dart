@@ -1,1 +1,1 @@
-abstract class NetworkResponse<T>{}
+abstract class NetworkResponse<T> {}

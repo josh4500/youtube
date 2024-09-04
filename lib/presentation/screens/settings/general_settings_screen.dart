@@ -473,6 +473,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
   }
 
   void _onChangeZoomFill(bool value) {
+    debugPrint('Change Zoom Fill');
     ref.read(preferencesProvider.notifier).zoomFillScreen = value;
   }
 
@@ -511,35 +512,41 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
     );
     if (result != null) {
       ref.read(preferencesProvider.notifier).uploadNetwork = result;
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            dismissDirection: DismissDirection.down,
-            duration: const Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-            ),
-            content: const Text(
-              'This changes will affect your data saving settings',
-            ),
-            action: SnackBarAction(
-              label: 'View',
-              textColor: AppStyle.settingsTextButtonTextStyle.light.color,
-              onPressed: () {},
-            ),
+      _showDataSettingsAffect();
+    }
+  }
+
+  void _showDataSettingsAffect() {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          dismissDirection: DismissDirection.down,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4),
           ),
-        );
-      }
+          content: const Text(
+            'This changes will affect your data saving settings',
+          ),
+          action: SnackBarAction(
+            label: 'View',
+            textColor: AppStyle.settingsTextButtonTextStyle.light.color,
+            onPressed: () {},
+          ),
+        ),
+      );
     }
   }
 
   void _changeRestrictedMode(bool value) {
+    debugPrint('Changed Restricted Mode');
     ref.read(preferencesProvider.notifier).restrictedMode = value;
   }
 
   void _changeEnableStatsForNerds(bool value) {
+    debugPrint('Changed stats');
     ref.read(preferencesProvider.notifier).enableStatsForNerds = value;
   }
 }

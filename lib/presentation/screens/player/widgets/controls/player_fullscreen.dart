@@ -40,14 +40,14 @@ class PlayerFullscreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // TODO(josh4500): Check if Expanded mode is on
-    const bool _isResizableExpandedMode = false;
+    const bool isResizableExpandedMode = false;
 
     final playerViewState = ref.watch(playerViewStateProvider);
     return OrientationBuilder(
       builder: (BuildContext context, Orientation orientation) {
         return PlayerControlButton(
           onTap: () {
-            if (_isResizableExpandedMode || playerViewState.isExpanded) {
+            if (isResizableExpandedMode || playerViewState.isExpanded) {
               if (playerViewState.isExpanded) {
                 ExitExpandPlayerNotification().dispatch(context);
               } else {

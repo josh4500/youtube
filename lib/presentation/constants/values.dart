@@ -1,4 +1,4 @@
-// TODO: Fix this
+// TODO(josh4500): Fix this
 const double kMiniPlayerHeight = 56;
 
 const double kMaxVideoViewPortHeight = 0.7;
