@@ -30,7 +30,9 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import 'account_avatar.dart';
-import 'gestures/custom_ink_well.dart';
+import 'comment_tile.dart';
+import 'dynamic_sheet.dart';
+import 'gestures/tappable_area.dart';
 
 class ReplyTile extends StatelessWidget {
   const ReplyTile({super.key, this.creatorLikes = false});
@@ -38,106 +40,139 @@ class ReplyTile extends StatelessWidget {
   final bool creatorLikes;
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const SizedBox(width: 52),
-              CustomInkWell(
-                onTap: () {},
-                padding: const EdgeInsets.all(8),
-                borderRadius: BorderRadius.circular(32),
-                child: const AccountAvatar(size: 32),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    return TappableArea(
+      onTap: () {},
+      highlightColor: Colors.white10,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          const SizedBox(width: 52),
+          TappableArea(
+            onTap: () => showCommenterProfile(context),
+            releasedColor: Colors.transparent,
+            padding: const EdgeInsets.all(8),
+            borderRadius: BorderRadius.circular(32),
+            child: const AccountAvatar(size: 32),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  RichText(
+                    text: const TextSpan(
+                      text: '@BussyBoyBonanza',
+                      children: <InlineSpan>[
+                        TextSpan(text: ' · '),
+                        TextSpan(text: '7mo ago'),
+                      ],
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'OMG This is so fun 😂',
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      RichText(
-                        text: const TextSpan(
-                          text: '@BussyBoyBonanza',
-                          children: <InlineSpan>[
-                            TextSpan(text: ' · '),
-                            TextSpan(text: '7mo ago'),
-                          ],
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
+                      TappableArea(
+                        onTap: () {},
+                        releasedColor: Colors.transparent,
+                        padding: const EdgeInsets.all(8),
+                        borderRadius: BorderRadius.circular(24),
+                        child: const Icon(
+                          YTIcons.like_outlined,
+                          size: 18,
+                        ),
+                      ),
+                      const Text('7', style: TextStyle(fontSize: 12)),
+                      const SizedBox(width: 16),
+                      TappableArea(
+                        onTap: () {},
+                        releasedColor: Colors.transparent,
+                        padding: const EdgeInsets.all(8),
+                        borderRadius: BorderRadius.circular(24),
+                        child: const Icon(
+                          YTIcons.dislike_outlined,
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      if (creatorLikes)
+                        TappableArea(
+                          onTap: () {},
+                          releasedColor: Colors.transparent,
+                          padding: const EdgeInsets.all(8),
+                          borderRadius: BorderRadius.circular(24),
+                          child: const Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              AccountAvatar(size: 18),
+                              Positioned(
+                                top: 9,
+                                left: 9,
+                                child: Icon(
+                                  YTIcons.heart_filled,
+                                  size: 14,
+                                  color: Color(0xFFFF0000),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'OMG This is so fun 😂',
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          CustomInkWell(
-                            onTap: () {},
-                            padding: const EdgeInsets.all(8),
-                            borderRadius: BorderRadius.circular(24),
-                            child: const Icon(
-                              YTIcons.like_outlined,
-                              size: 18,
-                            ),
-                          ),
-                          const Text('7', style: TextStyle(fontSize: 12)),
-                          const SizedBox(width: 16),
-                          CustomInkWell(
-                            onTap: () {},
-                            padding: const EdgeInsets.all(8),
-                            borderRadius: BorderRadius.circular(24),
-                            child: const Icon(
-                              YTIcons.dislike_outlined,
-                              size: 18,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          if (creatorLikes)
-                            CustomInkWell(
-                              onTap: () {},
-                              padding: const EdgeInsets.all(8),
-                              borderRadius: BorderRadius.circular(24),
-                              child: const Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  AccountAvatar(size: 18),
-                                  Positioned(
-                                    top: 9,
-                                    left: 9,
-                                    child: Icon(
-                                      YTIcons.heart_filled,
-                                      size: 14,
-                                      color: Color(0xFFFF0000),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
                     ],
                   ),
-                ),
+                ],
               ),
-              CustomInkWell(
-                onTap: () {},
-                padding: const EdgeInsets.all(16.0),
-                borderRadius: BorderRadius.circular(32),
-                child: const Icon(YTIcons.more_vert_outlined, size: 16),
-              ),
-            ],
+            ),
           ),
+          TappableArea(
+            onTap: () => showReplyOption(context),
+            releasedColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            padding: const EdgeInsets.all(16.0),
+            borderRadius: BorderRadius.circular(32),
+            child: const Icon(YTIcons.more_vert_outlined, size: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showReplyOption(BuildContext context) {
+    showDynamicSheet(
+      context,
+      title: const Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: 8,
+          horizontal: 12.0,
+        ),
+        child: Text(
+          'Comment',
+          style: TextStyle(
+            color: Colors.grey,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      items: <DynamicSheetItem>[
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.reply_outlined),
+          title: 'Reply',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.report_outlined),
+          title: 'Report',
         ),
       ],
     );

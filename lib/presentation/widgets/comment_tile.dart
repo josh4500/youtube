@@ -293,250 +293,6 @@ class CommentTile extends StatelessWidget {
     );
   }
 
-  void showCommenterProfile(BuildContext context) {
-    showDynamicSheet(
-      context,
-      items: <DynamicSheetItem>[
-        DynamicSheetSection(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 4),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8.0,
-                  horizontal: 12,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const AccountAvatar(size: 64),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Bussy Boy',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            '@BussyBoyBonanza',
-                            style: TextStyle(fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Joined 1 year ago $kDotSeparator 11 subscribers',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              CustomActionButton(
-                                title: 'Subscribe',
-                                onTap: () {},
-                                backgroundColor: Colors.white,
-                                borderRadius: BorderRadius.circular(24),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 10,
-                                  horizontal: 14,
-                                ),
-                                textStyle: const TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Transform.translate(
-                      offset: const Offset(8, -8),
-                      child: GestureDetector(
-                        onTap: () {
-                          showDynamicSheet(
-                            context,
-                            items: [
-                              const DynamicSheetOptionItem(
-                                leading: Icon(YTIcons.info_outlined),
-                                title: 'Learn more about this feature',
-                              ),
-                              const DynamicSheetOptionItem(
-                                leading: Icon(YTIcons.feedbck_outlined),
-                                title: 'Send feedback',
-                              ),
-                            ],
-                          );
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(YTIcons.more_vert_outlined),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8.0,
-                  horizontal: 12,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const Text(
-                      'On this channel',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      '5 comments',
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          decoration: const BoxDecoration(
-                            color: AppPalette.red,
-                            shape: BoxShape.circle,
-                          ),
-                          padding: const EdgeInsets.all(3),
-                          child: Transform.translate(
-                            offset: const Offset(0, -1),
-                            child: const Icon(
-                              YTIcons.subscriptions_filled,
-                              size: 10,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Public subscriber',
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                'Allows everyone to see their subscriptions',
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(),
-              Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 8.0,
-                      horizontal: 12,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Recent comments on this channel',
-                          style: TextStyle(fontSize: 15),
-                        ),
-                        SubCommentTile(),
-                        SubCommentTile(),
-                        SubCommentTile(),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 8.0,
-                          horizontal: 12,
-                        ),
-                        child: Text(
-                          'Subscriptions',
-                          style: TextStyle(fontSize: 15),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 76,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                          ),
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
-                              child: const Column(
-                                children: [
-                                  AccountAvatar(size: 52),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'Bussy Boy',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                          itemCount: 10,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Divider(height: 0),
-                    ],
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: CustomInkWell(
-                      onTap: () {},
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10.0,
-                        horizontal: 12,
-                      ),
-                      borderRadius: BorderRadius.circular(24),
-                      splashFactory: NoSplash.splashFactory,
-                      child: const Text(
-                        'View Channel',
-                        style: TextStyle(color: AppPalette.blue),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   void showCommentOption(BuildContext context) {
     showDynamicSheet(
       context,
@@ -556,6 +312,261 @@ class CommentTile extends StatelessWidget {
         const DynamicSheetOptionItem(
           leading: Icon(YTIcons.report_outlined),
           title: 'Report',
+        ),
+      ],
+    );
+  }
+}
+
+void showCommenterProfile(BuildContext context) {
+  showDynamicSheet(
+    context,
+    items: <DynamicSheetItem>[
+      const DynamicSheetSection(
+        child: CommenterProfileCard(),
+      ),
+    ],
+  );
+}
+
+class CommenterProfileCard extends StatelessWidget {
+  const CommenterProfileCard({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 8.0,
+            horizontal: 12,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const AccountAvatar(size: 64),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Bussy Boy',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      '@BussyBoyBonanza',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Joined 1 year ago $kDotSeparator 11 subscribers',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        CustomActionButton(
+                          title: 'Subscribe',
+                          onTap: () {},
+                          backgroundColor: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 14,
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 15,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Transform.translate(
+                offset: const Offset(8, -8),
+                child: GestureDetector(
+                  onTap: () {
+                    showDynamicSheet(
+                      context,
+                      items: [
+                        const DynamicSheetOptionItem(
+                          leading: Icon(YTIcons.info_outlined),
+                          title: 'Learn more about this feature',
+                        ),
+                        const DynamicSheetOptionItem(
+                          leading: Icon(YTIcons.feedbck_outlined),
+                          title: 'Send feedback',
+                        ),
+                      ],
+                    );
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(YTIcons.more_vert_outlined),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const Divider(),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 8.0,
+            horizontal: 12,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const Text(
+                'On this channel',
+                style: TextStyle(fontSize: 15),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                '5 comments',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: AppPalette.red,
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(3),
+                    child: Transform.translate(
+                      offset: const Offset(0, -1),
+                      child: const Icon(
+                        YTIcons.subscriptions_filled,
+                        size: 10,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Public subscriber',
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Allows everyone to see their subscriptions',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const Divider(),
+        Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 12,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Recent comments on this channel',
+                    style: TextStyle(fontSize: 15),
+                  ),
+                  SubCommentTile(),
+                  SubCommentTile(),
+                  SubCommentTile(),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 8.0,
+                    horizontal: 12,
+                  ),
+                  child: Text(
+                    'Subscriptions',
+                    style: TextStyle(fontSize: 15),
+                  ),
+                ),
+                SizedBox(
+                  height: 76,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                    ),
+                    itemBuilder: (BuildContext context, int index) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                        ),
+                        child: const Column(
+                          children: [
+                            AccountAvatar(size: 52),
+                            SizedBox(height: 8),
+                            Text(
+                              'Bussy Boy',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    itemCount: 10,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Divider(height: 0),
+              ],
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: CustomInkWell(
+                onTap: () {},
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10.0,
+                  horizontal: 12,
+                ),
+                borderRadius: BorderRadius.circular(24),
+                splashFactory: NoSplash.splashFactory,
+                child: const Text(
+                  'View Channel',
+                  style: TextStyle(color: AppPalette.blue),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
