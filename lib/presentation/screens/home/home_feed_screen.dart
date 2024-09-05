@@ -235,78 +235,78 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                   ],
                 ),
               ),
-              floatingActionButton: Visibility(
-                visible: state.isAuthenticated,
-                child: Consumer(
-                  builder: (
-                    BuildContext context,
-                    WidgetRef ref,
-                    Widget? childWidget,
-                  ) {
-                    final bool isPlayerActive =
-                        ref.watch(playerOverlayStateProvider);
-
-                    return Visibility(
-                      child: Transform.translate(
-                        offset: isPlayerActive
-                            ? const Offset(0, -kMiniPlayerHeight)
-                            : Offset.zero,
-                        child: RawMaterialButton(
-                          elevation: 0,
-                          fillColor: Colors.white,
-                          padding: const EdgeInsets.all(12.0),
-                          constraints: const BoxConstraints(
-                            minWidth: 44.0,
-                            minHeight: 36.0,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          onPressed: () {},
-                          child: AnimatedSize(
-                            duration: const Duration(milliseconds: 150),
-                            curve: Curves.easeInOutCubic,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                const Icon(
-                                  YTIcons.play_arrow,
-                                  color: Colors.black,
-                                ),
-                                ValueListenableBuilder<bool>(
-                                  valueListenable: _playSNotifier,
-                                  builder: (
-                                    BuildContext context,
-                                    bool show,
-                                    Widget? _,
-                                  ) {
-                                    return Visibility(
-                                      visible: show,
-                                      child: const Row(
-                                        children: <Widget>[
-                                          SizedBox(width: 8),
-                                          Text(
-                                            'Play something',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
+              // floatingActionButton: Visibility(
+              //   visible: state.isAuthenticated,
+              //   child: Consumer(
+              //     builder: (
+              //       BuildContext context,
+              //       WidgetRef ref,
+              //       Widget? childWidget,
+              //     ) {
+              //       final bool isPlayerActive =
+              //           ref.watch(playerOverlayStateProvider);
+              //
+              //       return Visibility(
+              //         child: Transform.translate(
+              //           offset: isPlayerActive
+              //               ? const Offset(0, -kMiniPlayerHeight)
+              //               : Offset.zero,
+              //           child: RawMaterialButton(
+              //             elevation: 0,
+              //             fillColor: Colors.white,
+              //             padding: const EdgeInsets.all(12.0),
+              //             constraints: const BoxConstraints(
+              //               minWidth: 44.0,
+              //               minHeight: 36.0,
+              //             ),
+              //             shape: RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(12),
+              //             ),
+              //             onPressed: () {},
+              //             child: AnimatedSize(
+              //               duration: const Duration(milliseconds: 150),
+              //               curve: Curves.easeInOutCubic,
+              //               child: Row(
+              //                 mainAxisSize: MainAxisSize.min,
+              //                 children: <Widget>[
+              //                   const Icon(
+              //                     YTIcons.play_arrow,
+              //                     color: Colors.black,
+              //                   ),
+              //                   ValueListenableBuilder<bool>(
+              //                     valueListenable: _playSNotifier,
+              //                     builder: (
+              //                       BuildContext context,
+              //                       bool show,
+              //                       Widget? _,
+              //                     ) {
+              //                       return Visibility(
+              //                         visible: show,
+              //                         child: const Row(
+              //                           children: <Widget>[
+              //                             SizedBox(width: 8),
+              //                             Text(
+              //                               'Play something',
+              //                               style: TextStyle(
+              //                                 color: Colors.black,
+              //                                 fontSize: 15,
+              //                                 fontWeight: FontWeight.w500,
+              //                               ),
+              //                             ),
+              //                           ],
+              //                         ),
+              //                       );
+              //                     },
+              //                   ),
+              //                 ],
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       );
+              //     },
+              //   ),
+              // ),
             );
           },
         );
