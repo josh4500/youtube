@@ -34,7 +34,7 @@ class AddSoundScreen extends StatelessWidget {
         ),
       ),
       body: DefaultTabController(
-        length: 2,
+        length: tabs.length,
         child: ScrollConfiguration(
           behavior: const OverScrollGlowBehavior(enabled: false),
           child: Column(
@@ -59,12 +59,14 @@ class AddSoundScreen extends StatelessWidget {
                             color: Colors.white,
                             fontWeight: FontWeight.w400,
                           ),
+                          contentPadding: EdgeInsets.only(bottom: 12),
                           border: InputBorder.none,
                           prefixIcon: Icon(
                             Icons.search,
                             color: Colors.white,
                           ),
                         ),
+                        cursorColor: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 12),
