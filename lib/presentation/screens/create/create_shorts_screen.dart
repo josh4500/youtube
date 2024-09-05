@@ -1989,23 +1989,25 @@ class RangeSliderPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     // Draws background
-    canvas.drawLine(
-      Offset(0, size.height / 2),
-      Offset(size.width, size.height / 2),
+    canvas.drawRRect(
+      RRect.fromLTRBR(0, 0, size.width, size.height, const Radius.circular(10)),
       backgroundPaint,
     );
 
-    final Offset startBeginOffset = Offset(0, size.height / 2);
-    final Offset startEndOffset = Offset(
+    final RRect startBeginRRect = RRect.fromLTRBR(
+      2.5,
+      2.5,
       size.width * value.start,
-      size.height / 2,
+      size.height - 2.5,
+      const Radius.circular(12),
     );
 
     // Draws start range
-    canvas.drawLine(startBeginOffset, startEndOffset, activePaint);
+    canvas.drawRRect(startBeginRRect, activePaint);
 
     if (value.start > 0) {
-      final double markerX1 = (size.width * value.start) + (strokeWidth / 2);
+      final double markerX1 =
+          (size.width * value.start) + (strokeWidth / 2) - 2.5;
 
       // Draws start maker
       canvas.drawLine(
@@ -2015,20 +2017,19 @@ class RangeSliderPainter extends CustomPainter {
       );
     }
 
-    final Offset endBeginOffset = Offset(
+    final RRect endBeginRRect = RRect.fromLTRBR(
       size.width * value.end,
-      size.height / 2,
-    );
-    final Offset beginEndOffset = Offset(
-      size.width,
-      size.height / 2,
+      2.5,
+      size.width - 2.5,
+      size.height - 2.5,
+      const Radius.circular(12),
     );
 
     // Draws end range
-    canvas.drawLine(endBeginOffset, beginEndOffset, activePaint);
+    canvas.drawRRect(endBeginRRect, activePaint);
 
     // Draws end marker
-    final double markerX2 = (size.width * value.end) - (strokeWidth / 2);
+    final double markerX2 = (size.width * value.end) - (strokeWidth / 2) - 2.5;
     canvas.drawLine(
       Offset(markerX2, -(paddleRadius + 2)),
       Offset(markerX2, size.height + paddleRadius + 2),
