@@ -74,6 +74,7 @@ class ViewableVideoContent extends StatelessWidget {
                     TappableArea(
                       onTap: () {},
                       containedInkWell: true,
+                      highlightColor: Colors.transparent,
                       padding: const EdgeInsets.all(4),
                       borderRadius: BorderRadius.circular(36),
                       releasedColor: Colors.transparent,
@@ -137,6 +138,9 @@ class ViewableVideoContent extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         borderRadius: BorderRadius.circular(32),
                         releasedColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        containedInkWell: true,
+                        splashFactory: InkSplash.splashFactory,
                         child: const Icon(
                           YTIcons.more_vert_outlined,
                           size: 18,
