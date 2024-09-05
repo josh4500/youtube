@@ -30,6 +30,7 @@ import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
@@ -190,7 +191,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
     hideAnimation = ReverseAnimation(
       CurvedAnimation(
         parent: hideController,
@@ -474,10 +474,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
 
-    controller = cameraController;
-
     try {
       await cameraController.initialize();
+      cameraController.lockCaptureOrientation(DeviceOrientation.portraitUp);
       Future.wait(
         <Future<Object?>>[
           cameraController
@@ -498,6 +497,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       _handleCameraException(e);
     }
 
+    controller = cameraController;
     hasInitCameraNotifier.value = cameraDescription;
   }
 
