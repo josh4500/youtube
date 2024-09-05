@@ -214,10 +214,10 @@ mixin InternetConnectivityMixin<T extends StatefulWidget>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed) {
-      InternetConnectivity._instance._resume();
-    } else {
+    if (state == AppLifecycleState.paused) {
       InternetConnectivity._instance._pause();
+    } else if (state == AppLifecycleState.resumed) {
+      InternetConnectivity._instance._resume();
     }
   }
 }
