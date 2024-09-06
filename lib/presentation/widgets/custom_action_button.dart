@@ -61,8 +61,15 @@ class CustomActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final buttonContent = Align(
+    final buttonContent = Container(
+      margin: margin,
       alignment: alignment,
+      padding: padding ?? const EdgeInsets.symmetric(horizontal: 11.5),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: borderRadius ?? BorderRadius.circular(32),
+        border: border,
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -84,28 +91,16 @@ class CustomActionButton extends StatelessWidget {
       ),
     );
 
-    return Container(
-      margin: margin,
-      padding: useTappable
-          ? null
-          : padding ?? const EdgeInsets.symmetric(horizontal: 11.5),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: borderRadius ?? BorderRadius.circular(32),
-        border: border,
-      ),
-      child: useTappable
-          ? TappableArea(
-              onTap: onTap,
-              padding: padding ?? const EdgeInsets.symmetric(horizontal: 11.5),
-              borderRadius: borderRadius ?? BorderRadius.circular(32),
-              child: buttonContent,
-            )
-          : InkWell(
-              onTap: onTap,
-              splashFactory: NoSplash.splashFactory,
-              child: buttonContent,
-            ),
-    );
+    return useTappable
+        ? TappableArea(
+            onTap: onTap,
+            borderRadius: borderRadius ?? BorderRadius.circular(32),
+            child: buttonContent,
+          )
+        : InkWell(
+            onTap: onTap,
+            splashFactory: NoSplash.splashFactory,
+            child: buttonContent,
+          );
   }
 }
