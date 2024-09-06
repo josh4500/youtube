@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import 'gestures/tappable_area.dart';
 
@@ -61,14 +62,16 @@ class CustomActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final CustomActionButtonStyle theme =
+        context.theme.appStyles.customActionButtonStyle;
     final buttonContent = Container(
       margin: margin,
       alignment: alignment,
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: 11.5),
+      padding: padding ?? theme.padding,
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: borderRadius ?? BorderRadius.circular(32),
         border: border,
+        color: backgroundColor ?? theme.backgroundColor,
+        borderRadius: borderRadius ?? theme.borderRadius,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -79,14 +82,7 @@ class CustomActionButton extends StatelessWidget {
             if (title != null) const SizedBox(width: 5),
           ],
           if (leadingWidth != null) SizedBox(width: leadingWidth),
-          if (title != null)
-            Text(
-              title!,
-              style: textStyle ??
-                  const TextStyle(
-                    fontSize: 12,
-                  ),
-            ),
+          if (title != null) Text(title!, style: textStyle ?? theme.textStyle),
         ],
       ),
     );
@@ -94,11 +90,12 @@ class CustomActionButton extends StatelessWidget {
     return useTappable
         ? TappableArea(
             onTap: onTap,
-            borderRadius: borderRadius ?? BorderRadius.circular(32),
+            borderRadius: borderRadius ?? theme.borderRadius,
             child: buttonContent,
           )
         : InkWell(
             onTap: onTap,
+            borderRadius: borderRadius ?? theme.borderRadius,
             splashFactory: NoSplash.splashFactory,
             child: buttonContent,
           );

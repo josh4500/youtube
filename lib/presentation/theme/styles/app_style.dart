@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 
 import 'brightness_pair.dart';
+import 'style.dart';
 
 abstract final class AppStyle {
   static const BrightnessPair<TextStyle> appBar = BrightnessPair<TextStyle>(
@@ -77,6 +78,54 @@ abstract final class AppStyle {
       ),
     ),
   );
+  static final BrightnessPair<CustomActionButtonStyle> customActionButtonStyle =
+      BrightnessPair<CustomActionButtonStyle>(
+    light: CustomActionButtonStyle(
+      backgroundColor: Colors.black12,
+      borderRadius: BorderRadius.circular(32),
+    ),
+    dark: CustomActionButtonStyle(
+      backgroundColor: Colors.white10,
+      borderRadius: BorderRadius.circular(32),
+    ),
+  );
+  static final BrightnessPair<CustomActionChipStyle> customActionChipStyle =
+      BrightnessPair<CustomActionChipStyle>(
+    light: CustomActionChipStyle(
+      backgroundColor: Colors.black12,
+      borderRadius: BorderRadius.circular(32),
+    ),
+    dark: CustomActionChipStyle(
+      backgroundColor: Colors.white10,
+      borderRadius: BorderRadius.circular(32),
+    ),
+  );
+  static final BrightnessPair<GroupedViewStyle> groupedViewStyle =
+      BrightnessPair<GroupedViewStyle>(
+    light: GroupedViewStyle(
+      subtitleStyle: const TextStyle(fontSize: 12, color: Colors.white12),
+      viewAllBorder: const Border.fromBorderSide(
+        BorderSide(color: Colors.black12),
+      ),
+    ),
+    dark: GroupedViewStyle(
+      subtitleStyle: const TextStyle(fontSize: 12, color: Colors.black12),
+      viewAllBorder: const Border.fromBorderSide(
+        BorderSide(color: Colors.white12),
+      ),
+    ),
+  );
+  static final BrightnessPair<PlayableContentStyle> playableContentStyle =
+      BrightnessPair<PlayableContentStyle>(
+    light: PlayableContentStyle(
+      subtitleStyle: const TextStyle(fontSize: 12, color: Colors.black54),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    dark: PlayableContentStyle(
+      subtitleStyle: const TextStyle(fontSize: 12, color: Colors.white54),
+      borderRadius: BorderRadius.circular(8),
+    ),
+  );
 }
 
 class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
@@ -84,17 +133,29 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
     required this.appBarTextStyle,
     required this.settingsTextButtonStyle,
     required this.settingsTextButtonTextStyle,
+    required this.customActionChipStyle,
+    required this.customActionButtonStyle,
+    required this.groupedViewStyle,
+    required this.playableContentStyle,
   });
 
   final TextStyle appBarTextStyle;
   final ButtonStyle settingsTextButtonStyle;
   final TextStyle settingsTextButtonTextStyle;
+  final CustomActionChipStyle customActionChipStyle;
+  final CustomActionButtonStyle customActionButtonStyle;
+  final GroupedViewStyle groupedViewStyle;
+  final PlayableContentStyle playableContentStyle;
 
   @override
   ThemeExtension<AppStylesExtension> copyWith({
     TextStyle? appBarTextStyle,
     ButtonStyle? settingsTextButtonStyle,
     TextStyle? settingsTextButtonTextStyle,
+    CustomActionChipStyle? customActionChipStyle,
+    CustomActionButtonStyle? customActionButtonStyle,
+    GroupedViewStyle? groupedViewStyle,
+    PlayableContentStyle? playableContentStyle,
   }) {
     return AppStylesExtension(
       appBarTextStyle: appBarTextStyle ?? this.appBarTextStyle,
@@ -102,6 +163,12 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
           settingsTextButtonStyle ?? this.settingsTextButtonStyle,
       settingsTextButtonTextStyle:
           settingsTextButtonTextStyle ?? this.settingsTextButtonTextStyle,
+      customActionChipStyle:
+          customActionChipStyle ?? this.customActionChipStyle,
+      customActionButtonStyle:
+          customActionButtonStyle ?? this.customActionButtonStyle,
+      groupedViewStyle: groupedViewStyle ?? this.groupedViewStyle,
+      playableContentStyle: playableContentStyle ?? this.playableContentStyle,
     );
   }
 
@@ -128,6 +195,26 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
       settingsTextButtonTextStyle: TextStyle.lerp(
         settingsTextButtonTextStyle,
         other.settingsTextButtonTextStyle,
+        t,
+      )!,
+      customActionButtonStyle: CustomActionButtonStyle.lerp(
+        customActionButtonStyle,
+        other.customActionButtonStyle,
+        t,
+      )!,
+      customActionChipStyle: CustomActionChipStyle.lerp(
+        customActionChipStyle,
+        other.customActionChipStyle,
+        t,
+      )!,
+      groupedViewStyle: GroupedViewStyle.lerp(
+        groupedViewStyle,
+        other.groupedViewStyle,
+        t,
+      )!,
+      playableContentStyle: PlayableContentStyle.lerp(
+        playableContentStyle,
+        other.playableContentStyle,
         t,
       )!,
     );

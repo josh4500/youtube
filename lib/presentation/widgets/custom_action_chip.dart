@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/gestures/tappable_area.dart';
 
 class CustomActionChip extends StatefulWidget {
@@ -54,7 +55,7 @@ class CustomActionChip extends StatefulWidget {
   final BorderRadius? borderRadius;
   final Color? backgroundColor;
   final TextStyle? textStyle;
-  final Border? border;
+  final BoxBorder? border;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final VoidCallback? onTapCancel;
@@ -87,6 +88,8 @@ class _CustomActionChipState extends State<CustomActionChip>
 
   @override
   Widget build(BuildContext context) {
+    final CustomActionChipStyle theme =
+        context.theme.appStyles.customActionChipStyle;
     return Listener(
       behavior: HitTestBehavior.opaque,
       onPointerHover: (_) {
@@ -98,20 +101,20 @@ class _CustomActionChipState extends State<CustomActionChip>
       child: TappableArea(
         onTap: widget.onTap,
         onLongPress: widget.onLongPress,
-        highlightColor: Colors.transparent,
-        releasedColor: Colors.transparent,
-        borderRadius: widget.borderRadius ?? BorderRadius.circular(32),
         onTapCancel: widget.onTapCancel,
+        releasedColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        borderRadius: widget.borderRadius ?? theme.borderRadius,
         child: ScaleTransition(
           scale: animation,
           child: Container(
-            alignment: widget.alignment,
             padding: widget.padding,
             margin: widget.margin,
+            alignment: widget.alignment,
             decoration: BoxDecoration(
-              color: widget.backgroundColor,
-              borderRadius: widget.borderRadius ?? BorderRadius.circular(32),
               border: widget.border,
+              color: widget.backgroundColor ?? theme.backgroundColor,
+              borderRadius: widget.borderRadius ?? theme.borderRadius,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -124,13 +127,9 @@ class _CustomActionChipState extends State<CustomActionChip>
                 if (widget.title != null) ...[
                   Text(
                     widget.title!,
-                    style: widget.textStyle ??
-                        const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
+                    style: widget.textStyle ?? theme.textStyle,
                   ),
-                  if (widget.padEnd) const SizedBox(width: 4),
+                  if (widget.icon != null) const SizedBox(width: 4),
                 ],
               ],
             ),

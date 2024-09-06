@@ -28,9 +28,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:youtube_clone/presentation/theme/app_style.dart';
+import 'package:youtube_clone/presentation/theme/styles/app_style.dart';
 
-import 'app_color.dart';
+import 'styles/app_color.dart';
 
 abstract final class AppTheme {
   //
@@ -46,6 +46,7 @@ abstract final class AppTheme {
     colorScheme: const ColorScheme.light(
       secondary: Color(0xFF065DD0),
     ),
+    highlightColor: Colors.black12,
     scrollbarTheme: const ScrollbarThemeData(
       interactive: true,
     ),
@@ -83,6 +84,10 @@ abstract final class AppTheme {
     appBarTextStyle: AppStyle.appBar.light,
     settingsTextButtonStyle: AppStyle.settingsTextButtonStyle.light,
     settingsTextButtonTextStyle: AppStyle.settingsTextButtonTextStyle.light,
+    customActionButtonStyle: AppStyle.customActionButtonStyle.light,
+    customActionChipStyle: AppStyle.customActionChipStyle.light,
+    groupedViewStyle: AppStyle.groupedViewStyle.light,
+    playableContentStyle: AppStyle.playableContentStyle.light,
   );
 
   //
@@ -99,6 +104,7 @@ abstract final class AppTheme {
       surface: Colors.black,
       secondary: Color(0xFF3DA3FA),
     ),
+    highlightColor: Colors.white10,
     scrollbarTheme: const ScrollbarThemeData(
       interactive: true,
     ),
@@ -138,6 +144,10 @@ abstract final class AppTheme {
     appBarTextStyle: AppStyle.appBar.dark,
     settingsTextButtonStyle: AppStyle.settingsTextButtonStyle.dark,
     settingsTextButtonTextStyle: AppStyle.settingsTextButtonTextStyle.dark,
+    customActionButtonStyle: AppStyle.customActionButtonStyle.dark,
+    customActionChipStyle: AppStyle.customActionChipStyle.dark,
+    groupedViewStyle: AppStyle.groupedViewStyle.dark,
+    playableContentStyle: AppStyle.playableContentStyle.dark,
   );
 }
 

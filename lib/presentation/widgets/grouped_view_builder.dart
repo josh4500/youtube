@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import 'custom_action_chip.dart';
 import 'gestures/tappable_area.dart';
@@ -62,14 +63,12 @@ class GroupedViewBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final GroupedViewStyle theme = context.theme.appStyles.groupedViewStyle;
     return Column(
       children: <Widget>[
         TappableArea(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 8,
-          ),
           onTap: onTap,
+          padding: theme.padding,
           child: Row(
             children: [
               Expanded(
@@ -82,35 +81,23 @@ class GroupedViewBuilder extends StatelessWidget {
                             title,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: theme.titleStyle,
                           ),
                         ),
                         const SizedBox(width: 80),
                       ],
                     ),
                     if (subtitle != null)
-                      Text(
-                        subtitle!,
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
+                      Text(subtitle!, style: theme.subtitleStyle),
                   ],
                 ),
               ),
               CustomActionChip(
-                title: 'View all',
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 12,
-                ),
-                border: const Border.fromBorderSide(
-                  BorderSide(color: Colors.white12),
-                ),
                 onTap: onTap,
+                title: 'View all',
+                border: theme.viewAllBorder,
+                padding: theme.viewAllPadding,
+                backgroundColor: theme.viewAllBackground,
               ),
             ],
           ),

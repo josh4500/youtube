@@ -34,7 +34,7 @@ import 'package:youtube_clone/presentation/theme/app_sizing.dart';
 import 'package:youtube_clone/presentation/theme/relative_size.dart';
 
 import '../utils/sizer_utils.dart';
-import 'enum.dart';
+import 'device_type.dart';
 
 typedef LandscapeBuilder = Widget Function(BuildContext context, Widget? child);
 typedef PortraitBuilder = Widget Function(BuildContext context, Widget? child);

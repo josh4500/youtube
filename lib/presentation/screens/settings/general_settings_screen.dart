@@ -36,7 +36,7 @@ import 'package:youtube_clone/presentation/screens/settings/view_models/pref_opt
 import 'package:youtube_clone/presentation/screens/settings/widgets/frequency_picker.dart';
 import 'package:youtube_clone/presentation/screens/settings/widgets/round_check_item.dart';
 import 'package:youtube_clone/presentation/screens/settings/widgets/settings_tile.dart';
-import 'package:youtube_clone/presentation/theme/app_style.dart';
+import 'package:youtube_clone/presentation/theme/styles/app_style.dart';
 
 import 'widgets/date_range_picker.dart';
 import 'widgets/settings_list_view.dart';

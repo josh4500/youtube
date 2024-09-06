@@ -75,14 +75,12 @@ class VideoActions extends StatelessWidget {
           ),
           const CustomActionChip(
             title: 'Share',
-            backgroundColor: Color(0xFF272727),
             padding: EdgeInsets.symmetric(horizontal: 12),
             margin: EdgeInsets.symmetric(horizontal: 4),
             icon: Icon(YTIcons.share_outlined, size: 18),
           ),
           CustomActionChip(
             title: 'Remix',
-            backgroundColor: const Color(0xFF272727),
             padding: const EdgeInsets.symmetric(horizontal: 12),
             margin: const EdgeInsets.symmetric(horizontal: 4),
             icon: const Icon(Icons.wifi_channel_outlined, size: 18),
@@ -90,14 +88,12 @@ class VideoActions extends StatelessWidget {
           ),
           const CustomActionChip(
             title: 'Thanks',
-            backgroundColor: Color(0xFF272727),
             padding: EdgeInsets.symmetric(horizontal: 12),
             margin: EdgeInsets.symmetric(horizontal: 4),
             icon: Icon(YTIcons.thanks_outlined, size: 18),
           ),
           CustomActionButton(
             title: 'Download',
-            backgroundColor: Colors.white10,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             margin: const EdgeInsets.symmetric(horizontal: 4),
             icon: const Icon(YTIcons.download_outlined, size: 18),
@@ -109,14 +105,12 @@ class VideoActions extends StatelessWidget {
           ),
           const CustomActionChip(
             title: 'Clip',
-            backgroundColor: Color(0xFF272727),
             padding: EdgeInsets.symmetric(horizontal: 12),
             margin: EdgeInsets.symmetric(horizontal: 4),
             icon: Icon(YTIcons.clip_outlined, size: 18),
           ),
           CustomActionChip(
             title: 'Save',
-            backgroundColor: const Color(0xFF272727),
             padding: const EdgeInsets.symmetric(horizontal: 12),
             margin: const EdgeInsets.symmetric(horizontal: 4),
             icon: const Icon(YTIcons.save_outlined, size: 18),
@@ -125,7 +119,6 @@ class VideoActions extends StatelessWidget {
           ),
           const CustomActionChip(
             title: 'Report',
-            backgroundColor: Color(0xFF272727),
             padding: EdgeInsets.symmetric(horizontal: 12),
             margin: EdgeInsets.symmetric(horizontal: 4),
             icon: Icon(YTIcons.report_outlined, size: 18),

@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/theme/brightness_pair.dart';
-
-abstract class Style<T> {
-  BrightnessPair<T> get brightness;
-}
+import 'package:youtube_clone/presentation/theme/styles/brightness_pair.dart';
 
 class SettingsStyle {
   SettingsStyle({
@@ -48,4 +44,166 @@ class SettingsStyle {
       ),
     ),
   );
+}
+
+class CustomActionButtonStyle {
+  CustomActionButtonStyle({
+    required this.backgroundColor,
+    required this.borderRadius,
+    this.textStyle = const TextStyle(fontSize: 12),
+    this.padding = const EdgeInsets.symmetric(horizontal: 11.5),
+  });
+
+  final Color backgroundColor;
+  final TextStyle textStyle;
+  final BorderRadius borderRadius;
+  final EdgeInsets padding;
+
+  static CustomActionButtonStyle? lerp(
+    CustomActionButtonStyle? a,
+    CustomActionButtonStyle? b,
+    double t,
+  ) {
+    if (a == null && b == null) {
+      return null;
+    }
+
+    return CustomActionButtonStyle(
+      backgroundColor: Color.lerp(a?.backgroundColor, b?.backgroundColor, t)!,
+      textStyle: TextStyle.lerp(a?.textStyle, b?.textStyle, t)!,
+      borderRadius: BorderRadius.lerp(a?.borderRadius, b?.borderRadius, t)!,
+      padding: EdgeInsets.lerp(a?.padding, b?.padding, t)!,
+    );
+  }
+}
+
+class CustomActionChipStyle {
+  CustomActionChipStyle({
+    required this.backgroundColor,
+    required this.borderRadius,
+    this.padding = const EdgeInsets.symmetric(horizontal: 11.5),
+    this.textStyle = const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+  });
+
+  final Color backgroundColor;
+  final TextStyle textStyle;
+  final BorderRadius borderRadius;
+  final EdgeInsets padding;
+
+  static CustomActionChipStyle? lerp(
+    CustomActionChipStyle? a,
+    CustomActionChipStyle? b,
+    double t,
+  ) {
+    if (a == null && b == null) {
+      return null;
+    }
+
+    return CustomActionChipStyle(
+      backgroundColor: Color.lerp(a?.backgroundColor, b?.backgroundColor, t)!,
+      textStyle: TextStyle.lerp(a?.textStyle, b?.textStyle, t)!,
+      borderRadius: BorderRadius.lerp(a?.borderRadius, b?.borderRadius, t)!,
+      padding: EdgeInsets.lerp(a?.padding, b?.padding, t)!,
+    );
+  }
+}
+
+class GroupedViewStyle {
+  GroupedViewStyle({
+    this.titleStyle = const TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w500,
+    ),
+    required this.subtitleStyle,
+    required this.viewAllBorder,
+    this.viewAllPadding = const EdgeInsets.symmetric(
+      vertical: 8,
+      horizontal: 12,
+    ),
+    this.viewAllBackground = Colors.transparent,
+    this.padding = const EdgeInsets.symmetric(
+      horizontal: 16,
+      vertical: 8,
+    ),
+  });
+
+  final TextStyle titleStyle;
+  final EdgeInsets padding;
+  final TextStyle subtitleStyle;
+  final BoxBorder viewAllBorder;
+  final EdgeInsets viewAllPadding;
+  final Color viewAllBackground;
+
+  static GroupedViewStyle? lerp(
+    GroupedViewStyle? style1,
+    GroupedViewStyle? style2,
+    double t,
+  ) {
+    if (style1 == null && style2 == null) {
+      return null;
+    }
+
+    return GroupedViewStyle(
+      titleStyle: TextStyle.lerp(
+        style1?.titleStyle,
+        style2?.titleStyle,
+        t,
+      )!,
+      subtitleStyle: TextStyle.lerp(
+        style1?.subtitleStyle,
+        style2?.subtitleStyle,
+        t,
+      )!,
+      viewAllBorder: BoxBorder.lerp(
+        style1?.viewAllBorder,
+        style2?.viewAllBorder,
+        t,
+      )!,
+      viewAllPadding: EdgeInsets.lerp(
+        style1?.viewAllPadding,
+        style2?.viewAllPadding,
+        t,
+      )!,
+    );
+  }
+}
+
+class PlayableContentStyle {
+  PlayableContentStyle({
+    this.titleStyle = const TextStyle(),
+    required this.subtitleStyle,
+    required this.borderRadius,
+  });
+
+  final TextStyle titleStyle;
+  final TextStyle subtitleStyle;
+  final BorderRadius borderRadius;
+
+  static PlayableContentStyle? lerp(
+    PlayableContentStyle? style1,
+    PlayableContentStyle? style2,
+    double t,
+  ) {
+    if (style1 == null && style2 == null) {
+      return null;
+    }
+
+    return PlayableContentStyle(
+      titleStyle: TextStyle.lerp(
+        style1?.titleStyle,
+        style2?.titleStyle,
+        t,
+      )!,
+      subtitleStyle: TextStyle.lerp(
+        style1?.subtitleStyle,
+        style2?.subtitleStyle,
+        t,
+      )!,
+      borderRadius: BorderRadius.lerp(
+        style1?.borderRadius,
+        style2?.borderRadius,
+        t,
+      )!,
+    );
+  }
 }

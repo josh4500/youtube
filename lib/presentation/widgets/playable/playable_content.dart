@@ -59,6 +59,8 @@ class PlayableContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final PlayableContentStyle theme =
+        context.theme.appStyles.playableContentStyle;
     return Container(
       margin: margin,
       child: Flex(
@@ -89,7 +91,7 @@ class PlayableContent extends StatelessWidget {
                     ),
                   Expanded(
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: theme.borderRadius,
                       child: Stack(
                         alignment: Alignment.bottomRight,
                         children: <Widget>[
@@ -168,12 +170,12 @@ class PlayableContent extends StatelessWidget {
                               : 'One Piece: Wano Country Arc Trailer',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
+                          style: theme.titleStyle,
                         ),
                         const SizedBox(height: 2),
                         Text(
                           isPlaylist ? 'Public . Playlist' : 'Zigalot',
-                          style:
-                              const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: theme.subtitleStyle,
                         ),
                       ],
                     ),

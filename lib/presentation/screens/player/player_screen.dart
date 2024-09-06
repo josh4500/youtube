@@ -1720,21 +1720,24 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     final Axis layoutDirection =
         orientation.isPortrait ? Axis.vertical : Axis.horizontal;
 
-    final interactivePlayerView = PlayerComponentsWrapper(
-      key: _interactivePlayerKey,
-      handleNotification: _handlePlayerControlNotification,
-      child: ListenableBuilder(
-        listenable: _transformationController,
-        builder: (BuildContext context, Widget? childWidget) {
-          return InteractiveViewer(
-            minScale: kMinPlayerScale,
-            maxScale: kMaxPlayerScale,
-            alignment: Alignment.center,
-            transformationController: _transformationController,
-            child: childWidget!,
-          );
-        },
-        child: const PlayerView(),
+    final interactivePlayerView = Theme(
+      data: AppTheme.dark,
+      child: PlayerComponentsWrapper(
+        key: _interactivePlayerKey,
+        handleNotification: _handlePlayerControlNotification,
+        child: ListenableBuilder(
+          listenable: _transformationController,
+          builder: (BuildContext context, Widget? childWidget) {
+            return InteractiveViewer(
+              minScale: kMinPlayerScale,
+              maxScale: kMaxPlayerScale,
+              alignment: Alignment.center,
+              transformationController: _transformationController,
+              child: childWidget!,
+            );
+          },
+          child: const PlayerView(),
+        ),
       ),
     );
 
