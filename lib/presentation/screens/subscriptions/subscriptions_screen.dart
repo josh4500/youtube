@@ -67,6 +67,8 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
               slivers: <Widget>[
                 SliverAppBar(
                   automaticallyImplyLeading: false,
+                  leadingWidth: 120,
+                  leading: const AppLogo(),
                   actions: <Widget>[
                     AppbarAction(
                       icon: YTIcons.cast_outlined,
@@ -197,8 +199,11 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                 ),
                 ValueListenableBuilder<int?>(
                   valueListenable: _selectedChannel,
-                  builder:
-                      (BuildContext context, int? value, Widget? childWidget) {
+                  builder: (
+                    BuildContext context,
+                    int? value,
+                    Widget? childWidget,
+                  ) {
                     if (value != null) {
                       return const SliverFillRemaining();
                     }
@@ -410,9 +415,7 @@ class SubscriptionsIncognitoScreen extends ConsumerWidget {
                       ),
                       child: const Text(
                         'Turn off Incognito',
-                        style: TextStyle(
-                          color: Color(0xFF3EA6FF),
-                        ),
+                        style: TextStyle(color: Color(0xFF3EA6FF)),
                       ),
                     ),
                   ],

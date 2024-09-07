@@ -128,12 +128,14 @@ class PlayableContent extends StatelessWidget {
                                         ? YTIcons.podcast_outlined
                                         : YTIcons.playlists_outlined,
                                     size: 16,
+                                    color: Colors.white,
                                   ),
                                   const SizedBox(width: 2),
                                   const Text(
                                     '2',
                                     style: TextStyle(
                                       fontSize: 13,
+                                      color: Colors.white,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),

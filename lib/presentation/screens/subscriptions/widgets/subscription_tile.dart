@@ -35,36 +35,22 @@ class SubscriptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.centerRight,
-      children: <Widget>[
-        TappableArea(
-          onTap: () {
-            context.goto(
-              AppRoutes.channel.withPrefixParent(
-                AppRoutes.subscriptions,
-              ),
-            );
-          },
-          child: const Row(
-            children: <Widget>[
-              AccountAvatar(name: 'John Jackson'),
-              SizedBox(width: 16),
-              Text(
-                'Life Uncontained',
-                style: TextStyle(
-                  fontSize: 15,
-                ),
-              ),
-              Spacer(),
-            ],
-          ),
-        ),
-        const Positioned(
-          right: 8,
-          child: SubscribedChannelButton(),
-        ),
-      ],
+    return TappableArea(
+      onTap: () {
+        context.goto(
+          AppRoutes.channel.withPrefixParent(AppRoutes.subscriptions),
+        );
+      },
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      child: const Row(
+        children: <Widget>[
+          AccountAvatar(name: 'John Jackson'),
+          SizedBox(width: 16),
+          Text('Life Uncontained', style: TextStyle(fontSize: 15)),
+          Spacer(),
+          SubscribedChannelButton(),
+        ],
+      ),
     );
   }
 }

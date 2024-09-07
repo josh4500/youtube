@@ -283,7 +283,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     if (currentTabIndex != CreateTab.shorts) return;
 
-    if (state == AppLifecycleState.paused) {
+    if (state == AppLifecycleState.inactive) {
       hasInitCameraNotifier.value = null;
       cameraController.dispose();
 
@@ -989,8 +989,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                               child: childWidget!,
                             );
                           },
-                          child:
-                              CaptureFocusIndicator(animation: focusController),
+                          child: CaptureFocusIndicator(
+                            animation: focusController,
+                          ),
                         ),
                         ValueListenableBuilder(
                           valueListenable: recordOuterButtonPosition,

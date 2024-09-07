@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../infrastructure.dart';
 import '../theme/icon/y_t_icons_icons.dart';
@@ -52,12 +53,13 @@ class _DynamicSheetState extends State<DynamicSheet>
 
   @override
   Widget build(BuildContext context) {
+    final DynamicSheetStyle theme = context.theme.appStyles.dynamicSheetStyle;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Material(
-          color: const Color(0xFF212121),
+          color: theme.backgroundColor,
           child: Listener(
             onPointerMove: (event) {
               final deltaY = event.delta.dy;
@@ -89,10 +91,10 @@ class _DynamicSheetState extends State<DynamicSheet>
                     shrinkWrap: true,
                     controller: scrollController,
                     children: [
-                      const Column(
+                      Column(
                         children: <Widget>[
-                          SizedBox(height: 8),
-                          SheetDragIndicator(),
+                          const SizedBox(height: 8),
+                          SheetDragIndicator(color: theme.dragIndicatorColor),
                         ],
                       ),
                       if (widget.title != null) widget.title!,

@@ -50,6 +50,7 @@ class PlaybackDuration extends StatelessWidget {
         '6:54',
         style: TextStyle(
           fontSize: 13,
+          color: Colors.white,
           fontWeight: FontWeight.w500,
         ),
       ),

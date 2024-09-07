@@ -128,7 +128,6 @@ class AnswerOption extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Spacer(),
                 Container(
                   alignment: Alignment.centerRight,
                   margin: const EdgeInsets.all(.5),

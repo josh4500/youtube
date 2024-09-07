@@ -2,32 +2,27 @@ import 'package:flutter/material.dart';
 
 const double kFocusSize = 56;
 
-class CaptureFocusIndicator extends StatefulWidget {
+class CaptureFocusIndicator extends StatelessWidget {
   const CaptureFocusIndicator({super.key, required this.animation});
 
   final AnimationController animation;
 
   @override
-  State<CaptureFocusIndicator> createState() => _CaptureFocusIndicatorState();
-}
-
-class _CaptureFocusIndicatorState extends State<CaptureFocusIndicator> {
-  @override
   Widget build(BuildContext context) {
     final sizeAnimation = CurvedAnimation(
-      parent: widget.animation,
+      parent: animation,
       curve: const Interval(0, .5, curve: Curves.easeInCubic),
     );
 
     final opacityAnimation = ReverseAnimation(
       CurvedAnimation(
-        parent: widget.animation,
+        parent: animation,
         curve: const Interval(.5, 1, curve: Curves.easeInCubic),
       ),
     );
 
     return AnimatedBuilder(
-      animation: widget.animation,
+      animation: animation,
       builder: (BuildContext context, Widget? _) {
         final sizeFactor = sizeAnimation.value;
         final opacity = opacityAnimation.value;

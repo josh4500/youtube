@@ -168,6 +168,35 @@ class GroupedViewStyle {
   }
 }
 
+class DynamicSheetStyle {
+  DynamicSheetStyle({
+    required this.dragIndicatorColor,
+    required this.backgroundColor,
+  });
+
+  final Color dragIndicatorColor;
+  final Color backgroundColor;
+
+  static DynamicSheetStyle? lerp(
+    DynamicSheetStyle? a,
+    DynamicSheetStyle? b,
+    double t,
+  ) {
+    if (a == null && b == null) {
+      return null;
+    }
+
+    return DynamicSheetStyle(
+      backgroundColor: Color.lerp(a?.backgroundColor, b?.backgroundColor, t)!,
+      dragIndicatorColor: Color.lerp(
+        a?.dragIndicatorColor,
+        b?.dragIndicatorColor,
+        t,
+      )!,
+    );
+  }
+}
+
 class PlayableContentStyle {
   PlayableContentStyle({
     this.titleStyle = const TextStyle(),
@@ -202,6 +231,39 @@ class PlayableContentStyle {
       borderRadius: BorderRadius.lerp(
         style1?.borderRadius,
         style2?.borderRadius,
+        t,
+      )!,
+    );
+  }
+}
+
+class ViewableVideoStyle {
+  ViewableVideoStyle({
+    required this.titleStyle,
+    required this.subtitleStyle,
+  });
+
+  final TextStyle titleStyle;
+  final TextStyle subtitleStyle;
+
+  static ViewableVideoStyle? lerp(
+    ViewableVideoStyle? style1,
+    ViewableVideoStyle? style2,
+    double t,
+  ) {
+    if (style1 == null && style2 == null) {
+      return null;
+    }
+
+    return ViewableVideoStyle(
+      titleStyle: TextStyle.lerp(
+        style1?.titleStyle,
+        style2?.titleStyle,
+        t,
+      )!,
+      subtitleStyle: TextStyle.lerp(
+        style1?.subtitleStyle,
+        style2?.subtitleStyle,
         t,
       )!,
     );

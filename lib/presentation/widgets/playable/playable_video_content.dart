@@ -99,6 +99,7 @@ class PlayableVideoContent extends StatelessWidget {
                     '6:54',
                     style: TextStyle(
                       fontSize: 12,
+                      color: Colors.white,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

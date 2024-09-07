@@ -44,6 +44,7 @@ abstract final class AppTheme {
     primaryColor: Colors.white,
     canvasColor: const Color(0xFFFFFFFF),
     colorScheme: const ColorScheme.light(
+      primary: AppPalette.blue,
       secondary: Color(0xFF065DD0),
     ),
     highlightColor: Colors.black12,
@@ -88,6 +89,8 @@ abstract final class AppTheme {
     customActionChipStyle: AppStyle.customActionChipStyle.light,
     groupedViewStyle: AppStyle.groupedViewStyle.light,
     playableContentStyle: AppStyle.playableContentStyle.light,
+    dynamicSheetStyle: AppStyle.dynamicSheetStyle.light,
+    viewableVideoStyle: AppStyle.viewableVideoStyle.light,
   );
 
   //
@@ -102,6 +105,7 @@ abstract final class AppTheme {
     canvasColor: const Color(0xFF0F0F0F),
     colorScheme: const ColorScheme.dark(
       surface: Colors.black,
+      primary: AppPalette.blue,
       secondary: Color(0xFF3DA3FA),
     ),
     highlightColor: Colors.white10,
@@ -148,6 +152,8 @@ abstract final class AppTheme {
     customActionChipStyle: AppStyle.customActionChipStyle.dark,
     groupedViewStyle: AppStyle.groupedViewStyle.dark,
     playableContentStyle: AppStyle.playableContentStyle.dark,
+    dynamicSheetStyle: AppStyle.dynamicSheetStyle.dark,
+    viewableVideoStyle: AppStyle.viewableVideoStyle.dark,
   );
 }
 

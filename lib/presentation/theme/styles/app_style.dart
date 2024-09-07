@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/theme/styles/app_color.dart';
 
 import 'brightness_pair.dart';
 import 'style.dart';
@@ -81,7 +82,7 @@ abstract final class AppStyle {
   static final BrightnessPair<CustomActionButtonStyle> customActionButtonStyle =
       BrightnessPair<CustomActionButtonStyle>(
     light: CustomActionButtonStyle(
-      backgroundColor: Colors.black12,
+      backgroundColor: Colors.black.withOpacity(0.05),
       borderRadius: BorderRadius.circular(32),
     ),
     dark: CustomActionButtonStyle(
@@ -92,7 +93,7 @@ abstract final class AppStyle {
   static final BrightnessPair<CustomActionChipStyle> customActionChipStyle =
       BrightnessPair<CustomActionChipStyle>(
     light: CustomActionChipStyle(
-      backgroundColor: Colors.black12,
+      backgroundColor: Colors.black.withOpacity(0.05),
       borderRadius: BorderRadius.circular(32),
     ),
     dark: CustomActionChipStyle(
@@ -126,6 +127,40 @@ abstract final class AppStyle {
       borderRadius: BorderRadius.circular(8),
     ),
   );
+  static final BrightnessPair<DynamicSheetStyle> dynamicSheetStyle =
+      BrightnessPair(
+    light: DynamicSheetStyle(
+      dragIndicatorColor: Colors.black12,
+      backgroundColor: Colors.white,
+    ),
+    dark: DynamicSheetStyle(
+      dragIndicatorColor: Colors.white24,
+      backgroundColor: const Color(0xFF212121),
+    ),
+  );
+  static final BrightnessPair<ViewableVideoStyle> viewableVideoStyle =
+      BrightnessPair(
+    light: ViewableVideoStyle(
+      titleStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+        color: Colors.black,
+      ),
+      subtitleStyle: const TextStyle(
+        color: Colors.black54,
+        fontSize: 11,
+      ),
+    ),
+    dark: ViewableVideoStyle(
+      titleStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+        color: Color(0xFFF1F1F1),
+      ),
+      subtitleStyle: const TextStyle(
+        color: Color(0xFFAAAAAA),
+        fontSize: 11,
+      ),
+    ),
+  );
 }
 
 class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
@@ -137,6 +172,8 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
     required this.customActionButtonStyle,
     required this.groupedViewStyle,
     required this.playableContentStyle,
+    required this.dynamicSheetStyle,
+    required this.viewableVideoStyle,
   });
 
   final TextStyle appBarTextStyle;
@@ -146,6 +183,8 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
   final CustomActionButtonStyle customActionButtonStyle;
   final GroupedViewStyle groupedViewStyle;
   final PlayableContentStyle playableContentStyle;
+  final DynamicSheetStyle dynamicSheetStyle;
+  final ViewableVideoStyle viewableVideoStyle;
 
   @override
   ThemeExtension<AppStylesExtension> copyWith({
@@ -156,6 +195,8 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
     CustomActionButtonStyle? customActionButtonStyle,
     GroupedViewStyle? groupedViewStyle,
     PlayableContentStyle? playableContentStyle,
+    DynamicSheetStyle? dynamicSheetStyle,
+    ViewableVideoStyle? viewableVideoStyle,
   }) {
     return AppStylesExtension(
       appBarTextStyle: appBarTextStyle ?? this.appBarTextStyle,
@@ -169,6 +210,8 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
           customActionButtonStyle ?? this.customActionButtonStyle,
       groupedViewStyle: groupedViewStyle ?? this.groupedViewStyle,
       playableContentStyle: playableContentStyle ?? this.playableContentStyle,
+      dynamicSheetStyle: dynamicSheetStyle ?? this.dynamicSheetStyle,
+      viewableVideoStyle: viewableVideoStyle ?? this.viewableVideoStyle,
     );
   }
 
@@ -215,6 +258,16 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
       playableContentStyle: PlayableContentStyle.lerp(
         playableContentStyle,
         other.playableContentStyle,
+        t,
+      )!,
+      dynamicSheetStyle: DynamicSheetStyle.lerp(
+        dynamicSheetStyle,
+        other.dynamicSheetStyle,
+        t,
+      )!,
+      viewableVideoStyle: ViewableVideoStyle.lerp(
+        viewableVideoStyle,
+        other.viewableVideoStyle,
         t,
       )!,
     );

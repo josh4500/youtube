@@ -138,6 +138,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final SettingsListView settingsList = SettingsListView(
       children: <Widget>[
         SettingsTile(
+          title: 'Family Center',
+          onTap: () {},
+        ),
+        SettingsTile(
           title: S.current.general,
           onTap: () => _showSettingsPrefScreen(SettingsTab.general),
           selected: _isSelected(1),

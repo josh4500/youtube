@@ -70,7 +70,11 @@ class ViewableShortsContent extends StatelessWidget {
               onTap: onMore,
               borderRadius: BorderRadius.circular(20),
               padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6),
-              child: const Icon(YTIcons.more_vert_outlined, size: 20),
+              child: const Icon(
+                YTIcons.more_vert_outlined,
+                size: 20,
+                color: Colors.white,
+              ),
             ),
           ),
           const Spacer(),
@@ -86,6 +90,7 @@ class ViewableShortsContent extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 15,
+                      color: Colors.white,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -95,6 +100,7 @@ class ViewableShortsContent extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
+                    color: Colors.white,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

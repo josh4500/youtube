@@ -89,6 +89,7 @@ class AccountsScreen extends StatelessWidget {
                       itemBuilder: (BuildContext context, int index) {
                         return TappableArea(
                           onTap: () {},
+                          onLongPress: () => onMoreVideo(context),
                           padding: const EdgeInsets.symmetric(
                             vertical: 4,
                             horizontal: 8,
@@ -97,49 +98,7 @@ class AccountsScreen extends StatelessWidget {
                             width: 145,
                             height: 88,
                             margin: const EdgeInsets.only(bottom: 16),
-                            onMore: () {
-                              showDynamicSheet(
-                                context,
-                                items: [
-                                  DynamicSheetOptionItem(
-                                    leading: const Icon(
-                                      YTIcons.playlist_play_outlined,
-                                    ),
-                                    title: 'Play next in queue',
-                                    trailing: ClipRRect(
-                                      borderRadius: BorderRadius.circular(2),
-                                      child: Image.asset(
-                                        AssetsPath.ytPAccessIcon48,
-                                        width: 18,
-                                        height: 18,
-                                      ),
-                                    ),
-                                  ),
-                                  const DynamicSheetOptionItem(
-                                    leading: Icon(
-                                      YTIcons.watch_later_outlined,
-                                    ),
-                                    title: 'Save to Watch later',
-                                  ),
-                                  const DynamicSheetOptionItem(
-                                    leading: Icon(YTIcons.save_outlined),
-                                    title: 'Save to playlist',
-                                  ),
-                                  const DynamicSheetOptionItem(
-                                    leading: Icon(YTIcons.download_outlined),
-                                    title: 'Download',
-                                  ),
-                                  const DynamicSheetOptionItem(
-                                    leading: Icon(YTIcons.share_outlined),
-                                    title: 'Share',
-                                  ),
-                                  const DynamicSheetOptionItem(
-                                    leading: Icon(YTIcons.delete_outlined),
-                                    title: 'Remove from watch history',
-                                  ),
-                                ],
-                              );
-                            },
+                            onMore: () => onMoreVideo(context),
                           ),
                         );
                       },
@@ -241,6 +200,50 @@ class AccountsScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  void onMoreVideo(BuildContext context) {
+    showDynamicSheet(
+      context,
+      items: [
+        DynamicSheetOptionItem(
+          leading: const Icon(
+            YTIcons.playlist_play_outlined,
+          ),
+          title: 'Play next in queue',
+          trailing: ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: Image.asset(
+              AssetsPath.ytPAccessIcon48,
+              width: 18,
+              height: 18,
+            ),
+          ),
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(
+            YTIcons.watch_later_outlined,
+          ),
+          title: 'Save to Watch later',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.save_outlined),
+          title: 'Save to playlist',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.download_outlined),
+          title: 'Download',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.share_outlined),
+          title: 'Share',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.delete_outlined),
+          title: 'Remove from watch history',
+        ),
+      ],
     );
   }
 }

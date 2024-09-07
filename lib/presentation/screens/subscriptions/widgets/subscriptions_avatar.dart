@@ -66,10 +66,7 @@ class SubscriptionAvatar extends StatelessWidget {
           'Owen Jones',
           textAlign: TextAlign.center,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
-          ),
+          style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
         const SizedBox(height: 8),
       ],

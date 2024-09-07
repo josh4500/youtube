@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/screens/create/provider/current_recording_state.dart';
-import 'package:youtube_clone/presentation/screens/create/provider/short_recording_state.dart';
-import 'package:youtube_clone/presentation/theme/styles/app_color.dart';
+import 'package:youtube_clone/presentation/themes.dart';
+
+import '../provider/current_recording_state.dart';
+import '../provider/short_recording_state.dart';
 
 class CreateProgress extends ConsumerWidget {
   const CreateProgress({super.key});

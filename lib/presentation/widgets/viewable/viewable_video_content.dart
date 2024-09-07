@@ -43,6 +43,7 @@ class ViewableVideoContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ViewableVideoStyle theme = context.theme.appStyles.viewableVideoStyle;
     return TappableArea(
       onTap: onTap,
       padding: const EdgeInsets.only(bottom: 12),
@@ -89,20 +90,17 @@ class ViewableVideoContent extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            const Text(
+                            Text(
                               'Future, Metro BoomIn - Like That (Official Audio)',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFFF1F1F1),
-                              ),
+                              style: theme.titleStyle,
                             ),
                             const SizedBox(height: 6),
                             Row(
                               children: <Widget>[
                                 RichText(
-                                  text: const TextSpan(
+                                  text: TextSpan(
                                     text: 'Future',
-                                    children: <InlineSpan>[
+                                    children: const <InlineSpan>[
                                       TextSpan(
                                         text: kDotSeparator,
                                         style: TextStyle(
@@ -118,10 +116,7 @@ class ViewableVideoContent extends StatelessWidget {
                                       ),
                                       TextSpan(text: '1 day ago'),
                                     ],
-                                    style: TextStyle(
-                                      color: Color(0xFFAAAAAA),
-                                      fontSize: 11,
-                                    ),
+                                    style: theme.subtitleStyle,
                                   ),
                                 ),
                               ],

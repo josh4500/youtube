@@ -125,10 +125,7 @@ class _OptionButtonState extends State<OptionButton>
               },
               child: const RotatedBox(
                 quarterTurns: 1,
-                child: Icon(
-                  YTIcons.chevron_right,
-                  size: 16,
-                ),
+                child: Icon(YTIcons.chevron_right, size: 16),
               ),
             ),
           ],

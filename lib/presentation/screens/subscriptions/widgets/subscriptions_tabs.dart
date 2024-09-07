@@ -98,6 +98,7 @@ class _SubscriptionsTabsState extends State<SubscriptionsTabs> {
                       }
                       widget.onChange(index);
                     },
+                    padding: const EdgeInsets.all(4),
                     child: const SubscriptionAvatar(),
                   ),
                 );
