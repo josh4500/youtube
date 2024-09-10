@@ -40,23 +40,31 @@ class MiniPlayer extends StatelessWidget {
     return Row(
       children: [
         const SizedBox(width: 8),
-        const Expanded(
+        Expanded(
           flex: 3,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Google Chromecast: Official Video',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12.5,
-                  color: Color(0xFFF1F1F1),
-                ),
+              Consumer(
+                builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                  final isMinimized = ref.watch(
+                    playerViewStateProvider.select(
+                      (state) => state.isMinimized,
+                    ),
+                  );
+                  return Marquee(
+                    text: 'Google Chromecast: Official Video',
+                    enabled: isMinimized,
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      color: Color(0xFFF1F1F1),
+                    ),
+                  );
+                },
               ),
-              SizedBox(height: 4),
-              Text(
+              const SizedBox(height: 4),
+              const Text(
                 'Harris Craycraft',
                 maxLines: 1,
                 style: TextStyle(

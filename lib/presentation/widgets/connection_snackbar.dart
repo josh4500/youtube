@@ -153,9 +153,7 @@ class _ConnectionSnackbarState extends State<ConnectionSnackbar>
                 : const Color(0xFF212121),
             child: Text(
               state.isConnected ? 'Back online' : 'No connection',
-              style: const TextStyle(
-                fontSize: 12,
-              ),
+              style: const TextStyle(fontSize: 12, color: Colors.white),
             ),
           );
         },

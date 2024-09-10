@@ -113,27 +113,29 @@ class SettingsPopupContainer<T> extends StatelessWidget {
           ),
           child: ListenableBuilder(
             listenable: effectiveController,
-            builder: (BuildContext context, _) {
+            builder: (BuildContext context, Widget? _) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   if (showTitle)
                     Padding(
-                      padding:
-                          const EdgeInsets.only(top: 16.0, right: 16, left: 16),
+                      padding: const EdgeInsets.only(
+                        top: 16.0,
+                        right: 16,
+                        left: 16,
+                      ),
                       child: Column(
                         crossAxisAlignment: density == VisualDensity.compact
                             ? CrossAxisAlignment.center
                             : CrossAxisAlignment.start,
                         children: <Widget>[
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: action == null
+                                ? MainAxisAlignment.start
+                                : MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Text(
-                                title,
-                                style: const TextStyle(fontSize: 18),
-                              ),
+                              Text(title, style: const TextStyle(fontSize: 18)),
                               if (action != null) action!,
                             ],
                           ),
@@ -151,10 +153,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
                         ],
                       ),
                     ),
-                  Align(
-                    alignment: alignment,
-                    child: child,
-                  ),
+                  Align(alignment: alignment, child: child),
                   if (showDismissButtons)
                     Container(
                       padding: const EdgeInsets.only(right: 16),

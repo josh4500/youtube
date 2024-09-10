@@ -26,23 +26,52 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
+const Gradient startGradient = LinearGradient(
+  stops: [.8, 1],
+  colors: <Color>[
+    Color(0xFFFFFFFF),
+    Color(0x00FFFFFF),
+  ],
+);
+
+const Gradient endGradient = LinearGradient(
+  stops: [0, .2, .8, 1],
+  colors: <Color>[
+    Color(0x00FFFFFF),
+    Color(0xFFFFFFFF),
+    Color(0xFFFFFFFF),
+    Color(0x00FFFFFF),
+  ],
+);
+
+enum MarqueeState {
+  animating,
+  notAnimating,
+}
 
 class Marquee extends StatefulWidget {
   const Marquee({
     super.key,
-    required this.child,
-    this.duration = const Duration(seconds: 5),
-    this.axisDirection = AxisDirection.left,
-    this.clipBehavior = Clip.hardEdge,
-    this.cacheExtent,
+    required this.text,
+    this.style,
+    this.spacing = 32,
+    this.enabled = true,
+    this.padding = EdgeInsets.zero,
+    this.duration = const Duration(seconds: 15),
+    this.intervalDelayDuration = const Duration(seconds: 5),
   });
 
-  final Widget child;
+  final String text;
+  final TextStyle? style;
+  final EdgeInsets padding;
+  final double spacing;
   final Duration duration;
-  final AxisDirection axisDirection;
-  final double? cacheExtent;
-  final Clip clipBehavior;
+  final Duration intervalDelayDuration;
+  final bool enabled;
 
   @override
   State<Marquee> createState() => _MarqueeState();
@@ -50,43 +79,185 @@ class Marquee extends StatefulWidget {
 
 class _MarqueeState extends State<Marquee> {
   final ScrollController _controller = ScrollController();
+  late Size textLayoutSize;
+  late bool _enabled = widget.enabled;
+  MarqueeState state = MarqueeState.notAnimating;
+  final ValueNotifier<Gradient> _gradient = ValueNotifier<Gradient>(
+    startGradient,
+  );
 
   @override
   void initState() {
     super.initState();
-  }
-
-  // Called when this object is removed from the tree.
-  @override
-  void deactivate() {
-    super.deactivate();
-  }
-
-  // Called when this object is reinserted into the tree after having been
-  // removed via deactivate.
-  @override
-  void activate() {
-    super.activate();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
-  void didUpdateWidget(covariant Marquee oldWidget) {
-    super.didUpdateWidget(oldWidget);
+    _controller.addListener(_gradientChangeCallback);
   }
 
   @override
   void dispose() {
+    state = MarqueeState.notAnimating;
+
+    _controller.removeListener(_gradientChangeCallback);
     _controller.dispose();
+    _gradient.dispose();
     super.dispose();
   }
 
   @override
+  void didChangeDependencies() {
+    _calculateTextSize();
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didUpdateWidget(Marquee oldWidget) {
+    _enabled = widget.enabled;
+    if (!oldWidget.enabled && state == MarqueeState.animating) {
+      state = MarqueeState.notAnimating;
+    }
+
+    if (oldWidget.text != widget.text || oldWidget.style != widget.style) {
+      _calculateTextSize();
+    }
+
+    super.didUpdateWidget(oldWidget);
+  }
+
+  void _gradientChangeCallback() {
+    if (_controller.offset == 0 || _controller.offset > textLayoutSize.width) {
+      _gradient.value = startGradient;
+    } else {
+      _gradient.value = endGradient;
+    }
+  }
+
+  void _calculateTextSize() {
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(text: widget.text, style: widget.style),
+      maxLines: 1,
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    );
+    textPainter.layout();
+    textLayoutSize = textPainter.size;
+  }
+
+  Future<void> _animate(double maxWidth) async {
+    final shouldAnimate = textLayoutSize.width > maxWidth;
+    if (!shouldAnimate || !_enabled) {
+      // TODO(josh4500): Cancel async _controller.animateTo before calling
+      // if (_controller.offset != 0) _controller.jumpTo(0);
+      state = MarqueeState.notAnimating;
+      return;
+    }
+
+    if (state == MarqueeState.animating || !_controller.hasClients) {
+      return;
+    }
+
+    state = MarqueeState.animating;
+    await Future.delayed(widget.intervalDelayDuration);
+    while (mounted && state == MarqueeState.animating && _enabled) {
+      if (_controller.hasClients) {
+        await _controller.animateTo(
+          textLayoutSize.width + widget.spacing,
+          duration: widget.duration,
+          curve: Curves.linear,
+        );
+        if (mounted && _controller.hasClients) {
+          _controller.jumpTo(0);
+          await Future.delayed(widget.intervalDelayDuration);
+        }
+      }
+    }
+    state = MarqueeState.notAnimating;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ListView();
+    final TextStyle style = widget.style ?? DefaultTextStyle.of(context).style;
+    final textSpan = TextSpan(
+      text: widget.text,
+      children: <InlineSpan>[
+        WidgetSpan(child: SizedBox(width: widget.spacing)),
+        TextSpan(text: widget.text),
+      ],
+      style: style,
+    );
+    final double height =
+        (style.fontSize ?? kDefaultFontSize) + widget.padding.vertical;
+    return SizedBox(
+      height: height,
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final child = _MarqueeBuilder(
+            text: textSpan,
+            animate: _animate,
+            controller: _controller,
+            constraints: constraints,
+            padding: widget.padding,
+          );
+          if (textLayoutSize.width > constraints.maxWidth) {
+            return ListenableBuilder(
+              listenable: _gradient,
+              builder: (BuildContext context, Widget? childWidget) {
+                return ShaderMask(
+                  shaderCallback: _gradient.value.createShader,
+                  child: childWidget,
+                );
+              },
+              child: child,
+            );
+          }
+
+          return child;
+        },
+      ),
+    );
+  }
+}
+
+class _MarqueeBuilder extends StatefulWidget {
+  const _MarqueeBuilder({
+    required this.controller,
+    required this.constraints,
+    required this.text,
+    required this.padding,
+    required this.animate,
+  });
+
+  final TextSpan text;
+  final ScrollController controller;
+  final BoxConstraints constraints;
+  final EdgeInsets padding;
+  final void Function(double maxWidth) animate;
+
+  @override
+  State<_MarqueeBuilder> createState() => _MarqueeBuilderState();
+}
+
+class _MarqueeBuilderState extends State<_MarqueeBuilder> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.animate(widget.constraints.maxWidth);
+    });
+  }
+
+  @override
+  void didUpdateWidget(_MarqueeBuilder oldWidget) {
+    widget.animate(widget.constraints.maxWidth);
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: widget.padding,
+      controller: widget.controller,
+      scrollDirection: Axis.horizontal,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [Text.rich(widget.text)],
+    );
   }
 }

@@ -265,10 +265,12 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   @override
   void didChangeDependencies() {
-    final playerRepo = ref.read(playerRepositoryProvider);
-    _playerSignalSubscription ??= playerRepo.playerSignalStream.listen(
-      _onPlayerSignalEvent,
-    );
+    Future.microtask(() {
+      final playerRepo = ref.read(playerRepositoryProvider);
+      _playerSignalSubscription ??= playerRepo.playerSignalStream.listen(
+        _onPlayerSignalEvent,
+      );
+    });
     super.didChangeDependencies();
   }
 

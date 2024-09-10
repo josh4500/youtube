@@ -71,7 +71,11 @@ class PlayableShortsContent extends StatelessWidget {
               alignment: Alignment.topRight,
               child: CustomInkWell(
                 onTap: onMore,
-                child: const Icon(YTIcons.more_vert_outlined, size: 14),
+                child: const Icon(
+                  YTIcons.more_vert_outlined,
+                  size: 14,
+                  color: Colors.white,
+                ),
               ),
             ),
             Container(
@@ -81,6 +85,7 @@ class PlayableShortsContent extends StatelessWidget {
                 maxLines: 2,
                 style: TextStyle(
                   fontSize: 15,
+                  color: Colors.white,
                   fontWeight: FontWeight.w500,
                 ),
                 overflow: TextOverflow.ellipsis,
