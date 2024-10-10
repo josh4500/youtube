@@ -60,6 +60,7 @@ export 'screens/feed/learning_screen.dart';
 export 'screens/feed/live_screen.dart';
 export 'screens/feed/music_screen.dart';
 export 'screens/feed/news_screen.dart';
+export 'screens/feed/podcasts_screen.dart';
 export 'screens/feed/sports_screen.dart';
 export 'screens/feed/trending_screen.dart';
 export 'screens/homepage.dart';

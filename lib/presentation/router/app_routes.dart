@@ -50,6 +50,10 @@ class AppRoutes {
     name: 'Gaming',
     path: 'feed/gaming',
   );
+  static final RouteInfo podcasts = RouteInfo(
+    name: 'Podcast',
+    path: 'feed/podcasts',
+  );
   static final RouteInfo learning = RouteInfo(
     name: 'Learning',
     path: 'feed/learning',

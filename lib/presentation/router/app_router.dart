@@ -116,6 +116,13 @@ class AppRouter {
                     },
                   ),
                   GoRoute(
+                    name: AppRoutes.podcasts.name,
+                    path: AppRoutes.podcasts.path,
+                    builder: (BuildContext context, GoRouterState state) {
+                      return const PodcastsScreen();
+                    },
+                  ),
+                  GoRoute(
                     name: AppRoutes.learning.name,
                     path: AppRoutes.learning.path,
                     builder: (BuildContext context, GoRouterState state) {

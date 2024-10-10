@@ -245,7 +245,6 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                           width: 125,
                           height: 196,
                           showDivider: false,
-                          itemMargin: const EdgeInsets.all(4),
                           onMore: () {
                             showDynamicSheet(
                               context,

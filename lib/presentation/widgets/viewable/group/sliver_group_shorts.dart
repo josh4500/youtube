@@ -50,7 +50,7 @@ class SliverGroupShorts extends StatelessWidget {
     this.layout = ShortsGroupLayout.list,
     this.view = ShortsGroupView.viewable,
     this.crossAxisCount = 2,
-    this.itemMargin,
+    this.itemMargin = const EdgeInsets.all(4),
     this.width,
     this.height,
     this.onMore,
@@ -59,7 +59,7 @@ class SliverGroupShorts extends StatelessWidget {
 
   final double? width, height;
   final bool showDivider;
-  final EdgeInsets? itemMargin;
+  final EdgeInsets itemMargin;
   final ShortsGroupLayout layout;
   final int crossAxisCount;
   final ShortsGroupView view;

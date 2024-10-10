@@ -186,6 +186,7 @@ class _ForYouFeedScreenState extends State<ForYouFeedScreen> {
                           layout: ShortsGroupLayout.grid,
                           crossAxisCount:
                               context.orientation.isLandscape ? 4 : 2,
+                          itemMargin: EdgeInsets.zero,
                           onMore: () {
                             showDynamicSheet(
                               context,

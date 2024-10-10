@@ -38,10 +38,7 @@ class VideoChannelContext extends StatelessWidget {
     // TODO(josh4500): This space should between videoChannelSection and VideoActions if no context
     // return const SizedBox(height: 8);
     return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: 6,
-        horizontal: 12,
-      ),
+      padding: const EdgeInsets.all(8),
       margin: const EdgeInsets.only(left: 12, right: 12, top: 6, bottom: 12),
       decoration: BoxDecoration(
         color: const Color(0xFF272727),
@@ -52,18 +49,21 @@ class VideoChannelContext extends StatelessWidget {
           const SizedBox(width: 4),
           Expanded(
             child: RichText(
-              text: const TextSpan(
+              text: TextSpan(
                 text: 'TRT is a Turkish public broadcast service. ',
                 children: [
                   TextSpan(
                     text: 'Wikipedia ',
-                    children: [
+                    children: const [
                       IconSpan(YTIcons.external_link_outlined),
                     ],
-                    style: TextStyle(fontSize: 12, color: Color(0xFF3EA6FF)),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: context.theme.colorScheme.primary,
+                    ),
                   ),
                 ],
-                style: TextStyle(fontSize: 12),
+                style: const TextStyle(fontSize: 12),
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 2,

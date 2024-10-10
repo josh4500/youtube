@@ -61,11 +61,12 @@ class HomeDrawer extends StatelessWidget {
                             icon: const Icon(YTIcons.sports_outlined),
                             onTap: () => context.goto(AppRoutes.sports),
                           ),
-                          HomeDrawerItem(
-                            title: 'Podcast',
-                            icon: const Icon(YTIcons.podcasts_outlined),
-                            onTap: () => context.goto(AppRoutes.learning),
-                          ),
+                          // Note: Does not seem to be in mobile app
+                          // HomeDrawerItem(
+                          //   title: 'Podcast',
+                          //   icon: const Icon(YTIcons.podcasts_outlined),
+                          //   onTap: () => context.goto(AppRoutes.podcasts),
+                          // ),
                           HomeDrawerItem(
                             title: 'Learning',
                             icon: const Icon(YTIcons.learning_outlined),
