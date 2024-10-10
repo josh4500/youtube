@@ -29,6 +29,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../controls/player_notifications.dart';
@@ -46,20 +47,23 @@ class PlayerComponentsWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NotificationListener<PlayerNotification>(
-      onNotification: (PlayerNotification playerNotification) {
-        if (handleNotification != null) {
-          handleNotification!.call(playerNotification);
-        }
-        // Return true to cancel the notification bubbling.
-        return true;
-      },
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          child,
-          const PlayerOverlayControls(),
-        ],
+    return Theme(
+      data: AppTheme.dark,
+      child: NotificationListener<PlayerNotification>(
+        onNotification: (PlayerNotification playerNotification) {
+          if (handleNotification != null) {
+            handleNotification!.call(playerNotification);
+          }
+          // Return true to cancel the notification bubbling.
+          return true;
+        },
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            child,
+            const PlayerOverlayControls(),
+          ],
+        ),
       ),
     );
   }
