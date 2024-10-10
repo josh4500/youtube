@@ -36,9 +36,9 @@ import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/providers.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_rotate.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
+
 
 import 'player_actions_control.dart';
 import 'player_autoplay_switch.dart';
@@ -53,6 +53,7 @@ import 'player_next.dart';
 import 'player_notifications.dart';
 import 'player_play_pause_restart.dart';
 import 'player_previous.dart';
+import 'player_rotate.dart';
 import 'player_seek_slide_frame.dart';
 import 'player_settings.dart';
 import 'player_unlock.dart';
@@ -1032,11 +1033,11 @@ class _OverlayProgress extends ConsumerWidget {
               if (isExpanded)
                 AnimatedVisibility(
                   animation: hideControlAnimation,
-                  child: const Row(
+                  child:  Row(
                     children: [
-                      SizedBox(width: 12),
-                      PlayerDurationControl(full: false, reversed: true),
-                      SizedBox(width: 12),
+                      SizedBox(width: 12.w),
+                      const PlayerDurationControl(full: false, reversed: true),
+                      SizedBox(width: 12.w),
                     ],
                   ),
                 ),
@@ -1148,9 +1149,9 @@ class _SlideFramePlayButton extends ConsumerWidget {
               ref.read(playerRepositoryProvider).playVideo();
             },
             child: Container(
-              constraints: const BoxConstraints.tightFor(
-                width: 54,
-                height: 54,
+              constraints:  BoxConstraints.tightFor(
+                width: 54.w,
+                height: 54.w,
               ),
               alignment: Alignment.center,
               padding: const EdgeInsets.all(8),
@@ -1194,11 +1195,11 @@ class _OverlayVideoSuggestions extends StatelessWidget {
             child: Row(
               children: [
                 if (isLandscape) ...[
-                  const Row(
+                   Row(
                     children: [
-                      PlayPauseRestartControl(useControlButton: false),
-                      SizedBox(width: 8),
-                      PlayerDurationControl(full: false, reversed: true),
+                     const PlayPauseRestartControl(useControlButton: false),
+                      SizedBox(width: 8.w),
+                      const PlayerDurationControl(full: false, reversed: true),
                     ],
                   ),
                   const Spacer(),
@@ -1250,7 +1251,7 @@ class _OverlayDurationOrientation extends StatelessWidget {
                   showOnExpanded: isExpanded,
                 ),
               ),
-              const SizedBox(width: 24),
+               SizedBox(width: 24.w),
               if (context.orientation.isLandscape)
                 const Expanded(
                   child: PlayerActionsControlV2(),

@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class LinkTvScreen extends StatefulWidget {
   const LinkTvScreen({super.key});
@@ -72,24 +73,24 @@ class _LinkTvScreenState extends State<LinkTvScreen> {
                   autocorrect: false,
                   autofocus: true,
                   cursorOpacityAnimates: true,
-                  cursorColor: Colors.blue,
+                  cursorColor: AppPalette.blue,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(
                       borderSide: BorderSide(
                         width: 1.5,
-                        color: Colors.blue,
+                        color: AppPalette.blue,
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: Colors.blue,
+                        color: AppPalette.blue,
                         width: 1.5,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                         width: 1.5,
-                        color: Colors.blue,
+                        color: AppPalette.blue,
                       ),
                     ),
                     errorBorder: OutlineInputBorder(
@@ -105,7 +106,7 @@ class _LinkTvScreenState extends State<LinkTvScreen> {
                       ),
                     ),
                     labelStyle: TextStyle(
-                      color: Colors.blue,
+                      color: AppPalette.blue,
                     ),
                     labelText: 'Enter TV code',
                   ),

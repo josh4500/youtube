@@ -29,6 +29,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/theme/app_theme.dart';
+import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class SettingsPopupContainer<T> extends StatelessWidget {
   const SettingsPopupContainer({
@@ -56,6 +58,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
     bool showAffirmButton = false,
     required Widget Function(BuildContext context, int index)? itemBuilder,
     required int? itemCount,
+    VisualDensity? density,
     bool capitalizeDismissButtons = false,
   }) {
     return SettingsPopupContainer(
@@ -63,16 +66,22 @@ class SettingsPopupContainer<T> extends StatelessWidget {
       title: title,
       subtitle: subtitle,
       showTitle: showTitle,
+      density: density,
       showDismissButtons: showDismissButtons,
       showAffirmButton: showAffirmButton,
       capitalizeDismissButtons: capitalizeDismissButtons,
-      child: Scrollbar(
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemBuilder: (BuildContext context, int index) {
-            return itemBuilder!(context, index);
-          },
-          itemCount: itemCount,
+      child: ScrollConfiguration(
+        behavior: const OverScrollGlowBehavior(
+          enabled: false,
+        ),
+        child: Scrollbar(
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) {
+              return itemBuilder!(context, index);
+            },
+            itemCount: itemCount,
+          ),
         ),
       ),
     );
@@ -97,20 +106,17 @@ class SettingsPopupContainer<T> extends StatelessWidget {
     final double width = density == null
         ? MediaQuery.sizeOf(context).width * 0.85
         : density == VisualDensity.compact
-            ? MediaQuery.sizeOf(context).width * 0.5
+            ? MediaQuery.sizeOf(context).width * 0.65
             : MediaQuery.sizeOf(context).width * 0.85;
-    return Material(
-      type: MaterialType.transparency,
-      child: Center(
-        child: Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.sizeOf(context).height * 0.8,
-          ),
-          width: width,
-          decoration: BoxDecoration(
-            color: context.theme.appColors.settingsPopupBackgroundColor,
+    return Center(
+      child: Container(
+        width: width,
+        padding: const EdgeInsets.all(16.0),
+        child: Material(
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(4),
           ),
+          color: context.theme.appColors.settingsPopupBackgroundColor,
           child: ListenableBuilder(
             listenable: effectiveController,
             builder: (BuildContext context, Widget? _) {
@@ -121,9 +127,9 @@ class SettingsPopupContainer<T> extends StatelessWidget {
                   if (showTitle)
                     Padding(
                       padding: const EdgeInsets.only(
-                        top: 16.0,
+                        top: 24.0,
                         right: 16,
-                        left: 16,
+                        left: 24,
                       ),
                       child: Column(
                         crossAxisAlignment: density == VisualDensity.compact
@@ -131,11 +137,18 @@ class SettingsPopupContainer<T> extends StatelessWidget {
                             : CrossAxisAlignment.start,
                         children: <Widget>[
                           Row(
+                            mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: action == null
                                 ? MainAxisAlignment.start
                                 : MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Text(title, style: const TextStyle(fontSize: 18)),
+                              Text(
+                                title,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                               if (action != null) action!,
                             ],
                           ),
@@ -159,6 +172,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 16),
                       alignment: Alignment.centerRight,
                       child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
                           TextButton(
@@ -194,6 +208,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
                         ],
                       ),
                     ),
+                  const SizedBox(height: 8),
                 ],
               );
             },

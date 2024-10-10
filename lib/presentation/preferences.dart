@@ -38,31 +38,16 @@ part 'preferences.g.dart';
 
 @riverpod
 class Preferences extends _$Preferences {
-  /// Dynamic Preference [HiveCacheProvider]
-  final HiveCacheProvider _prefBox = HiveCacheProvider('preferences');
+  /// Dynamic Preference [SharedPrefProvider]
+  static final SharedPrefProvider _prefBox = SharedPrefProvider('preferences');
 
-  late final ReadWriteValue<bool> _ambientMode = ReadWriteValue<bool>(
+  final ReadWriteValue<bool> _ambientMode = ReadWriteValue<bool>(
     'ambientMode',
     false,
     _prefBox,
   );
 
-  late final ReadWriteEnum<ThemeMode> _themeMode = ReadWriteEnum<ThemeMode>(
-    'themeMode',
-    ThemeMode.system,
-    _prefBox,
-    ThemeMode.values,
-  );
-
-  late final ReadWriteValue<Locale> _locale = ReadWriteValue<Locale>(
-    'locale',
-    const Locale('en'),
-    _prefBox,
-    encoder: (Locale locale) => locale.languageCode,
-    decoder: Locale.new,
-  );
-
-  late final ReadWriteValue<RemindForBreak> _remindForBreak =
+  final ReadWriteValue<RemindForBreak> _remindForBreak =
       ReadWriteValue<RemindForBreak>(
     'remindForBreak',
     RemindForBreak.defaultPref,
@@ -71,7 +56,7 @@ class Preferences extends _$Preferences {
     decoder: RemindForBreak.fromJson,
   );
 
-  late final ReadWriteValue<RemindForBedtime> _remindForBedtime =
+  final ReadWriteValue<RemindForBedtime> _remindForBedtime =
       ReadWriteValue<RemindForBedtime>(
     'remindForBedtime',
     RemindForBedtime.defaultPref,
@@ -80,7 +65,7 @@ class Preferences extends _$Preferences {
     decoder: RemindForBedtime.fromJson,
   );
 
-  late final ReadWriteEnum<PlaybackInFeeds> _playbackInFeeds =
+  final ReadWriteEnum<PlaybackInFeeds> _playbackInFeeds =
       ReadWriteEnum<PlaybackInFeeds>(
     'playbackInFeeds',
     PlaybackInFeeds.wifiOnly,
@@ -88,19 +73,19 @@ class Preferences extends _$Preferences {
     PlaybackInFeeds.values,
   );
 
-  late final ReadWriteValue<int> _doubleTapSeek = ReadWriteValue<int>(
+  final ReadWriteValue<int> _doubleTapSeek = ReadWriteValue<int>(
     'doubleTapToSeek',
     10,
     _prefBox,
   );
 
-  late final ReadWriteValue<bool> _zoomFillScreen = ReadWriteValue<bool>(
+  final ReadWriteValue<bool> _zoomFillScreen = ReadWriteValue<bool>(
     'zoomFillScreen',
     false,
     _prefBox,
   );
 
-  late final ReadWriteValue<Locale> _voiceSearchLocale = ReadWriteValue<Locale>(
+  final ReadWriteValue<Locale> _voiceSearchLocale = ReadWriteValue<Locale>(
     'voiceSearchLocale',
     const Locale('en'),
     _prefBox,
@@ -108,37 +93,37 @@ class Preferences extends _$Preferences {
     decoder: Locale.new,
   );
 
-  late final ReadWriteValue<bool> _restrictedMode = ReadWriteValue<bool>(
+  final ReadWriteValue<bool> _restrictedMode = ReadWriteValue<bool>(
     'restrictedMode',
     false,
     _prefBox,
   );
 
-  late final ReadWriteValue<bool> _autoPlay = ReadWriteValue<bool>(
+  final ReadWriteValue<bool> _autoPlay = ReadWriteValue<bool>(
     'autoPlay',
     false,
     _prefBox,
   );
 
-  late final ReadWriteValue<bool> _enableStatForNerds = ReadWriteValue<bool>(
+  final ReadWriteValue<bool> _enableStatForNerds = ReadWriteValue<bool>(
     'enableStatForNerds',
     false,
     _prefBox,
   );
 
-  late final ReadWriteValue<bool> _enableDataSaving = ReadWriteValue<bool>(
+  final ReadWriteValue<bool> _enableDataSaving = ReadWriteValue<bool>(
     'enableDataSaving',
     false,
     _prefBox,
   );
 
-  late final ReadWriteValue<Country?> _location = ReadWriteValue<Country?>(
+  final ReadWriteValue<Country?> _location = ReadWriteValue<Country?>(
     'location',
     null,
     _prefBox,
   );
 
-  late final ReadWriteEnum<UploadNetwork> _uploadNetwork =
+  final ReadWriteEnum<UploadNetwork> _uploadNetwork =
       ReadWriteEnum<UploadNetwork>(
     'uploadNetwork',
     UploadNetwork.onlyWifi,
@@ -146,7 +131,7 @@ class Preferences extends _$Preferences {
     UploadNetwork.values,
   );
 
-  late final ReadWriteValue<DataSavingPreferences> _dataSaving =
+  final ReadWriteValue<DataSavingPreferences> _dataSaving =
       ReadWriteValue<DataSavingPreferences>(
     'dataSaving',
     DataSavingPreferences.defaultPref,
@@ -155,7 +140,7 @@ class Preferences extends _$Preferences {
     decoder: DataSavingPreferences.fromJson,
   );
 
-  late final ReadWriteValue<VideoQualityPreferences> _videoQuality =
+  final ReadWriteValue<VideoQualityPreferences> _videoQuality =
       ReadWriteValue<VideoQualityPreferences>(
     'videoQuality',
     VideoQualityPreferences.defaultPref,
@@ -164,7 +149,7 @@ class Preferences extends _$Preferences {
     decoder: VideoQualityPreferences.fromJson,
   );
 
-  late final ReadWriteValue<DownloadPreferences> _downloads =
+  final ReadWriteValue<DownloadPreferences> _downloads =
       ReadWriteValue<DownloadPreferences>(
     'downloads',
     DownloadPreferences.defaultPref,
@@ -173,7 +158,7 @@ class Preferences extends _$Preferences {
     decoder: DownloadPreferences.fromJson,
   );
 
-  late final ReadWriteValue<AccessibilityPreferences> _accessibility =
+  final ReadWriteValue<AccessibilityPreferences> _accessibility =
       ReadWriteValue<AccessibilityPreferences>(
     'accessibility',
     AccessibilityPreferences.defaultPref,
@@ -219,12 +204,12 @@ class Preferences extends _$Preferences {
   }
 
   set themeMode(ThemeMode themeMode) {
-    _themeMode.value = themeMode;
+    LegacyCache.themeMode.value = themeMode;
     state = state.copyWith(themeMode: themeMode);
   }
 
   set locale(Locale locale) {
-    _locale.value = locale;
+    LegacyCache.locale.value = locale;
     state = state.copyWith(locale: locale);
   }
 
@@ -296,9 +281,9 @@ class Preferences extends _$Preferences {
   @override
   PreferenceState build() {
     return PreferenceState(
+      locale: LegacyCache.locale.value,
+      themeMode: LegacyCache.themeMode.value,
       ambientMode: _ambientMode.value,
-      themeMode: _themeMode.value,
-      locale: _locale.value,
       remindForBreak: _remindForBreak.value,
       remindForBedtime: _remindForBedtime.value,
       playbackInFeeds: _playbackInFeeds.value,
@@ -692,9 +677,4 @@ class AccessibilityPreferences {
       <String, Object>{'enabled': enabled, 'hideDuration': hideDuration},
     );
   }
-}
-
-extension IsDarkExtension on ThemeMode {
-  bool get isDark => this == ThemeMode.dark;
-  bool get isSystem => this == ThemeMode.system;
 }

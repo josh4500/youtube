@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../account_avatar.dart';
 import '../../network_image/custom_network_image.dart';
@@ -36,6 +37,7 @@ class ViewableVideoContext extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ViewableStyle theme = context.theme.appStyles.viewableVideoStyle;
     return ColoredBox(
       color: Colors.white12,
       child: Column(
@@ -67,29 +69,23 @@ class ViewableVideoContext extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const Text(
+                    Text(
                       'Future, Metro BoomIn - Like That (Official Audio)',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFFF1F1F1),
-                      ),
+                      style: theme.titleStyle,
                     ),
                     const SizedBox(height: 6),
                     Row(
                       children: <Widget>[
                         RichText(
-                          text: const TextSpan(
+                          text: TextSpan(
                             text: 'Future',
-                            children: <InlineSpan>[
+                            children: const <InlineSpan>[
                               TextSpan(text: ' · '),
                               TextSpan(text: '1.8M views'),
                               TextSpan(text: ' · '),
                               TextSpan(text: '1 day ago'),
                             ],
-                            style: TextStyle(
-                              color: Color(0xFFAAAAAA),
-                              fontSize: 12,
-                            ),
+                            style: theme.subtitleStyle,
                           ),
                         ),
                       ],

@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'subscriptions_avatar.dart';
@@ -74,9 +75,7 @@ class _SubscriptionsTabsState extends State<SubscriptionsTabs> {
                     final double opacity =
                         selected != null && selected != index ? 0.3 : 1.0;
                     return Container(
-                      color: selected == index
-                          ? Colors.blue.withOpacity(0.5)
-                          : Colors.transparent,
+                      color: selected == index ? Colors.white24 : null,
                       child: Opacity(
                         opacity: opacity,
                         child: childWidget,
@@ -98,26 +97,29 @@ class _SubscriptionsTabsState extends State<SubscriptionsTabs> {
                       }
                       widget.onChange(index);
                     },
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(8),
                     child: const SubscriptionAvatar(),
                   ),
                 );
               },
-              itemCount: 10,
+              itemCount: 2,
             ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TappableArea(
-            onTap: () {
-              context.goto(AppRoutes.allSubscriptions);
-            },
-            padding: const EdgeInsets.all(4.0),
+            onTap: () => context.goto(AppRoutes.allSubscriptions),
+            padding: const EdgeInsets.symmetric(
+              vertical: 4.0,
+              horizontal: 10,
+            ),
             child: const Text(
               'All',
               style: TextStyle(
-                color: Colors.blueAccent,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: AppPalette.blue2,
               ),
             ),
           ),

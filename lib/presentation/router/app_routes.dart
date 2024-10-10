@@ -40,39 +40,39 @@ class AppRoutes {
 
   static final RouteInfo home = RouteInfo(
     name: 'home',
-    path: '/home',
+    path: '/feed',
   );
   static final RouteInfo fashionAndBeauty = RouteInfo(
     name: 'Fashion and Beauty',
-    path: 'home/f_and_b',
+    path: 'feed/f_and_b',
   );
   static final RouteInfo gaming = RouteInfo(
     name: 'Gaming',
-    path: 'home/gaming',
+    path: 'feed/gaming',
   );
   static final RouteInfo learning = RouteInfo(
     name: 'Learning',
-    path: 'home/learning',
+    path: 'feed/learning',
   );
   static final RouteInfo live = RouteInfo(
     name: 'Live',
-    path: 'home/live',
+    path: 'feed/live',
   );
   static final RouteInfo music = RouteInfo(
     name: 'Music',
-    path: 'home/music',
+    path: 'feed/music',
   );
   static final RouteInfo news = RouteInfo(
     name: 'News',
-    path: 'home/news',
+    path: 'feed/news',
   );
   static final RouteInfo sports = RouteInfo(
     name: 'Sports',
-    path: 'home/sports',
+    path: 'feed/sports',
   );
   static final RouteInfo trending = RouteInfo(
     name: 'Trending',
-    path: 'home/trending',
+    path: 'feed/trending',
   );
 
   static final RouteInfo shorts = RouteInfo(

@@ -26,6 +26,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:ui';
+
 /// A generic class representing a pair of values for different brightness modes.
 ///
 /// This class is designed to hold two values, one for light mode and one for dark mode.
@@ -62,4 +64,8 @@ class BrightnessPair<T> {
 
   /// Value for dark mode.
   final T dark;
+
+  T fromValue(Brightness brightness) {
+    return brightness == Brightness.light ? light : dark;
+  }
 }

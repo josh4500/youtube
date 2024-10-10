@@ -5,6 +5,7 @@ class CustomInkWell extends StatelessWidget {
   const CustomInkWell({
     super.key,
     required this.child,
+    this.canRequestFocus = true,
     this.onTap,
     this.borderRadius,
     this.padding,
@@ -12,6 +13,7 @@ class CustomInkWell extends StatelessWidget {
     this.splashFactory = CustomInkSplash.splashFactory,
   });
 
+  final bool canRequestFocus;
   final Color? highlightColor;
   final VoidCallback? onTap;
   final BorderRadius? borderRadius;
@@ -23,6 +25,7 @@ class CustomInkWell extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
+      canRequestFocus: canRequestFocus,
       borderRadius: borderRadius,
       splashColor: Colors.white10,
       highlightColor: highlightColor ?? Colors.white10,

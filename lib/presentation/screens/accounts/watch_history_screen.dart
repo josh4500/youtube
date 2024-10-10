@@ -30,13 +30,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'widgets/history_search_text_field.dart';
 import 'widgets/popup/show_history_menu.dart';
-import 'widgets/shorts_history.dart';
 
 class WatchHistoryScreen extends StatefulWidget {
   const WatchHistoryScreen({super.key});
@@ -50,8 +50,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
   final ScrollController controller = ScrollController();
   final FocusNode focusNode = FocusNode();
   final TextEditingController textEditingController = TextEditingController();
-  final SharedSlidableState<int?> sharedSlidableState =
-      SharedSlidableState<int?>(null);
+  final SharedSlidableState sharedSlidableState = SharedSlidableState(null);
 
   late final AnimationController opacityController;
   late final Animation animation;
@@ -236,7 +235,45 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                       item: historyItem.items.first.time,
                       separatorBuilder: (date) => SeparatorWidget(date: date),
                       itemHeadGetter: (DateTime item) => item.asHeader.index,
-                      child: const ShortsHistory(),
+                      sliver: ModelBinding(
+                        model: <ShortsViewModel>[
+                          ShortsViewModel(),
+                          ShortsViewModel(),
+                          ShortsViewModel(),
+                        ],
+                        child: SliverGroupShorts(
+                          width: 125,
+                          height: 196,
+                          showDivider: false,
+                          itemMargin: const EdgeInsets.all(4),
+                          onMore: () {
+                            showDynamicSheet(
+                              context,
+                              items: [
+                                const DynamicSheetOptionItem(
+                                  leading: Icon(YTIcons.delete_outlined),
+                                  title: 'Remove from watch history',
+                                ),
+                                const DynamicSheetOptionItem(
+                                  leading: Icon(
+                                    YTIcons.watch_later_outlined,
+                                  ),
+                                  title: 'Save to Watch later',
+                                ),
+                                const DynamicSheetOptionItem(
+                                  leading: Icon(YTIcons.save_outlined),
+                                  title: 'Save to playlist',
+                                ),
+                                const DynamicSheetOptionItem(
+                                  leading: Icon(YTIcons.share_outlined),
+                                  title: 'Share',
+                                ),
+                              ],
+                            );
+                          },
+                          view: ShortsGroupView.playable,
+                        ),
+                      ),
                     )
                   else
                     SliverGroupList<DateTime>(
@@ -274,7 +311,7 @@ class HistoryVideo extends StatelessWidget {
     required this.onMore,
   });
   final int index;
-  final SharedSlidableState<dynamic>? sharedSlidableState;
+  final SharedSlidableState? sharedSlidableState;
   final VoidCallback onMore;
   @override
   Widget build(BuildContext context) {
@@ -282,19 +319,23 @@ class HistoryVideo extends StatelessWidget {
       key: ValueKey(index),
       maxOffset: 0.3,
       sharedSlidableState: sharedSlidableState,
-      items: const <SlidableItem>[
+      items: <SlidableItem>[
         SlidableItem(
-          icon: Icon(
-            Icons.delete,
-            color: Colors.black,
-          ),
+          icon: const Icon(Icons.delete),
+          onTap: sharedSlidableState?.close,
         ),
       ],
       child: Material(
-        child: CustomInkWell(
+        child: TappableArea(
           onTap: () {},
+          releasedColor: Colors.transparent,
+          highlightColor: context.theme.brightness.isDark
+              ? Colors.white10
+              : const Color(0xFFC9C9C9),
+          splashColor: Colors.black12,
+          // splashFactory: InkSparkle.splashFactory,
           child: PlayableVideoContent(
-            width: 145,
+            width: 160,
             height: 88,
             margin: const EdgeInsets.symmetric(
               vertical: 12,
@@ -331,7 +372,7 @@ class SeparatorWidget extends StatelessWidget {
       padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
       child: Text(
         date.header,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
       ),
     );
   }

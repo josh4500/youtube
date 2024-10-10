@@ -104,12 +104,13 @@ class _CustomActionChipState extends State<CustomActionChip>
         onTapCancel: widget.onTapCancel,
         releasedColor: Colors.transparent,
         highlightColor: Colors.transparent,
+        enableFeedback: false,
         borderRadius: widget.borderRadius ?? theme.borderRadius,
         child: ScaleTransition(
           scale: animation,
           child: Container(
-            padding: widget.padding,
             margin: widget.margin,
+            padding: widget.padding ?? theme.padding,
             alignment: widget.alignment,
             decoration: BoxDecoration(
               border: widget.border,

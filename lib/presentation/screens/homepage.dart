@@ -31,13 +31,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../providers.dart';
 import '../screens.dart' show PlayerScreen;
 import '../widgets/home/home_drawer.dart';
 import '../widgets/home/home_navigation_bar.dart';
-// import 'player/old_player_screen.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key, required this.child});
@@ -128,10 +128,19 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
   void didUpdateWidget(covariant HomeOverlayWrapper oldWidget) {
     super.didUpdateWidget(oldWidget);
     final int index = widget.child.currentIndex;
-    if (index == 1) {
-      _overlayPlayerController.reverse();
-    } else {
-      _overlayPlayerController.forward();
+
+    if (oldWidget.child.currentIndex != widget.child.currentIndex) {
+      if (index == 1) {
+        _overlayPlayerController.reverse();
+
+        AppTheme.setSystemOverlayStyle();
+      } else {
+        _overlayPlayerController.forward();
+
+        if (oldWidget.child.currentIndex == 1) {
+          AppTheme.setSystemOverlayStyle(context.theme.brightness);
+        }
+      }
     }
 
     Future<void>(() {
@@ -250,8 +259,8 @@ class ExploreDownloadsOverlay extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(AssetsPath.download130, width: 36, height: 36),
-          const SizedBox(width: 12),
+          Image.asset(AssetsPath.download130, width: 36.w, height: 36.w),
+          SizedBox(width: 12.w),
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -289,7 +298,7 @@ class ExploreDownloadsOverlay extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12.w),
                     CustomActionChip(
                       title: 'Go to Downloads',
                       onTap: onGotoDownloads,

@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -48,18 +49,20 @@ class VideoActions extends StatelessWidget {
           Container(
             margin: const EdgeInsets.only(right: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFF272727),
+              color: Colors.white10,
               borderRadius: BorderRadius.circular(32),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 CustomActionButton(
+                  onTap: () {},
                   title: '336',
                   leadingWidth: 4,
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  icon: Icon(YTIcons.like_outlined, size: 18),
+                  backgroundColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  icon: const Icon(YTIcons.like_outlined, size: 18),
                 ),
-                Padding(
+                const Padding(
                   padding: EdgeInsets.symmetric(vertical: 6.0),
                   child: RotatedBox(
                     quarterTurns: 1,
@@ -67,8 +70,11 @@ class VideoActions extends StatelessWidget {
                   ),
                 ),
                 CustomActionButton(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  icon: Icon(YTIcons.dislike_outlined, size: 18),
+                  onTap: () {},
+                  enableFeedback: false,
+                  backgroundColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  icon: const Icon(YTIcons.dislike_outlined, size: 18),
                 ),
               ],
             ),
@@ -94,6 +100,7 @@ class VideoActions extends StatelessWidget {
           ),
           CustomActionButton(
             title: 'Download',
+            enableFeedback: false,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             margin: const EdgeInsets.symmetric(horizontal: 4),
             icon: const Icon(YTIcons.download_outlined, size: 18),
@@ -175,7 +182,7 @@ class VideoActions extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
               children: [
-                const SizedBox(width: 16),
+                SizedBox(width: 16.w),
                 const Text(
                   'Save video to...',
                   style: TextStyle(fontSize: 16),
@@ -255,8 +262,8 @@ class VideoActions extends StatelessWidget {
               children: [
                 Expanded(
                   child: CustomActionChip(
-                    onTap: () {},
                     title: 'Cancel',
+                    onTap: context.pop,
                     alignment: Alignment.center,
                     backgroundColor: Colors.transparent,
                     border: Border.all(color: Colors.white12),

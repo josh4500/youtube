@@ -62,7 +62,7 @@ class SearchVoiceRequestScreen extends StatelessWidget {
                         onPressed: () {},
                         style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.resolveWith(
-                            (states) => Colors.blue,
+                            (states) => AppPalette.blue,
                           ),
                           padding: WidgetStateProperty.all(
                             const EdgeInsets.all(16),

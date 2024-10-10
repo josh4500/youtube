@@ -1658,7 +1658,8 @@ class CaptureTimerSelector extends StatelessWidget {
                   '${countdowns[index]}s',
                   style: const TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: AppFont.youTubeSans,
                   ),
                 );
               },
@@ -1765,7 +1766,7 @@ class DraftDecision extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     TextButton(
                       onPressed: () => context.pop(false),
                       child: const Text(

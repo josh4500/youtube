@@ -28,12 +28,11 @@
 
 import 'dart:ui' as ui;
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:youtube_clone/presentation/theme/app_sizing.dart';
 import 'package:youtube_clone/presentation/theme/relative_size.dart';
 
-import '../utils/sizer_utils.dart';
 import 'device_type.dart';
 
 typedef LandscapeBuilder = Widget Function(BuildContext context, Widget? child);
@@ -90,6 +89,30 @@ class DeviceThemeData {
 
   @override
   int get hashCode => deviceType.hashCode ^ screenSize.hashCode;
+}
+
+class SizerUtils {
+  static const ui.Size designSize = ui.Size(448, 973.3);
+  static late ui.Size deviceSize;
+  static late double _dpr;
+  static double get dpr => _dpr * 1;
+  static set dpr(double v) => _dpr = v;
+}
+
+extension DensityPixelsExtension on num {
+  double get dp => this / SizerUtils.dpr;
+  double get pt => this / SizerUtils.dpr;
+
+  double get h {
+    final screenHeight = SizerUtils.deviceSize.height;
+    return (this / SizerUtils.designSize.height) * screenHeight;
+  }
+
+  double get w {
+    final screenWidth = SizerUtils.deviceSize.width;
+
+    return (this / SizerUtils.designSize.width) * screenWidth;
+  }
 }
 
 class DeviceTheme extends InheritedModel<_DeviceThemeAspects> {
@@ -271,6 +294,7 @@ class _DeviceThemeFromViewState extends State<_DeviceThemeFromView>
   Widget build(BuildContext context) {
     final DeviceThemeData effectiveData = _data!;
     SizerUtils.dpr = widget.view.devicePixelRatio;
+    SizerUtils.deviceSize = widget.view.physicalSize / SizerUtils.dpr;
 
     return DeviceTheme(
       data: effectiveData,
@@ -288,4 +312,14 @@ extension DeviceThemeGetter on BuildContext {
 extension OrientationExtension on Orientation {
   bool get isLandscape => this == Orientation.landscape;
   bool get isPortrait => this == Orientation.portrait;
+}
+
+extension IsDarkExtension on ui.Brightness {
+  bool get isDark => this == ui.Brightness.dark;
+  bool get isLight => this == ui.Brightness.light;
+}
+
+extension IsThemeDarkExtension on ThemeMode {
+  bool get isDark => this == ThemeMode.dark;
+  bool get isSystem => this == ThemeMode.system;
 }

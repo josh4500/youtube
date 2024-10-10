@@ -67,107 +67,66 @@ class VideoDescriptionSheet extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           children: [
             const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '\'Israel will lose to South Africa\' says international law expert | LBC',
+                  'Google Pixel 9 Pro Fold Is so Good! But...',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 SizedBox(height: 16),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Column(
-                      children: [
-                        Text(
-                          '5,126',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Likes',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
+                    Expanded(
+                      child: VideoCounterInfo(
+                        title: '5,126',
+                        subtitle: 'Likes',
+                      ),
                     ),
-                    Column(
-                      children: [
-                        Text(
-                          '500,126',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Views',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
+                    Expanded(
+                      flex: 2,
+                      child: VideoCounterInfo(
+                        title: '500,126',
+                        subtitle: 'Views',
+                      ),
                     ),
-                    Column(
-                      children: [
-                        Text(
-                          '12h',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Ago',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
+                    Expanded(
+                      child: VideoCounterInfo(
+                        title: '12h',
+                        subtitle: 'Ago',
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            SizedBox(
+            const SizedBox(
               height: 24,
               child: Row(
                 children: [
                   CustomActionChip(
                     title: '#SangitaMyaska',
-                    margin: const EdgeInsets.only(right: 8),
-                    backgroundColor: Colors.grey.shade900,
-                    textStyle: const TextStyle(
+                    margin: EdgeInsets.only(right: 8),
+                    textStyle: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   CustomActionChip(
                     title: '#Israel',
-                    margin: const EdgeInsets.only(right: 8),
-                    backgroundColor: Colors.grey.shade900,
-                    textStyle: const TextStyle(
+                    margin: EdgeInsets.only(right: 8),
+                    textStyle: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   CustomActionChip(
                     title: '#SouthAfrica',
-                    margin: const EdgeInsets.only(right: 8),
-                    backgroundColor: Colors.grey.shade900,
-                    textStyle: const TextStyle(
+                    margin: EdgeInsets.only(right: 8),
+                    textStyle: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
@@ -182,12 +141,12 @@ class VideoDescriptionSheet extends StatelessWidget {
                 horizontal: 12,
               ),
               decoration: BoxDecoration(
-                color: Colors.grey.shade900,
+                color: Colors.white10,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Text(
-                '''One Piece Episode 1090 with English subbed has been released at chia anime, make sure to watch other episodes of ONE PIECE anime series. If you enjoyed this episode, help us make this episode popular, share this link now!, note if the video is broken please contact us on facebook and we will do our best to reply from you and fixed the problem. if you like Chia-Anime show us your love by sharing this episode, Thank you.
-                            \nPlease be patient with popup ads with us, that supports us to maintain our fully service to you.''',
+                '''Pixel 9 Pro Fold is my favorite foldable I've ever used and you should totally get one, except ... \n\n'''
+                '''Be the first to get the MKBHD x Ridge Biflex wallet at https://ridge.com/mkbhd''',
               ),
             ),
             const SizedBox(height: 32),
@@ -214,7 +173,7 @@ class VideoDescriptionSheet extends StatelessWidget {
                   title: 'Show transcript',
                   alignment: Alignment.center,
                   padding: const EdgeInsets.all(12),
-                  border: Border.all(color: Colors.grey, width: 0.7),
+                  border: Border.all(color: Colors.white12),
                   onTap: transcriptController.open,
                   textStyle: const TextStyle(
                     fontSize: 14,
@@ -262,7 +221,7 @@ class VideoDescriptionSheet extends StatelessWidget {
                         horizontal: 12,
                         vertical: 6,
                       ),
-                      border: Border.all(color: Colors.grey, width: 0.7),
+                      border: Border.all(color: Colors.white12),
                       textStyle: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -279,7 +238,7 @@ class VideoDescriptionSheet extends StatelessWidget {
                         horizontal: 12,
                         vertical: 6,
                       ),
-                      border: Border.all(color: Colors.grey, width: 0.7),
+                      border: Border.all(color: Colors.white12),
                       textStyle: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -313,6 +272,40 @@ class VideoDescriptionSheet extends StatelessWidget {
   }
 }
 
+class VideoCounterInfo extends StatelessWidget {
+  const VideoCounterInfo({
+    super.key,
+    required this.title,
+    required this.subtitle,
+  });
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
+            fontFamily: AppFont.youTubeSans,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          subtitle,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class TranscriptTile extends StatelessWidget {
   const TranscriptTile({super.key});
 
@@ -326,13 +319,13 @@ class TranscriptTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.2),
+              color: AppPalette.blue.withOpacity(0.2),
               borderRadius: BorderRadius.circular(4),
             ),
             child: const Text(
               '0:00',
               style: TextStyle(
-                color: Colors.blue,
+                color: AppPalette.blue,
                 fontWeight: FontWeight.w800,
               ),
             ),

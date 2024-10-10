@@ -71,18 +71,21 @@ class _SearchResultCompoundState extends State<SearchResultCompound>
                   children: [
                     const SizedBox(width: 4),
                     Expanded(
-                      child: ValueListenableBuilder<bool>(
-                        valueListenable: _showContent,
-                        builder: (
-                          BuildContext context,
-                          bool show,
-                          Widget? childWidget,
-                        ) {
-                          if (show) {
-                            return widget.secondTitle;
-                          }
-                          return widget.firstTitle;
-                        },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ValueListenableBuilder<bool>(
+                          valueListenable: _showContent,
+                          builder: (
+                            BuildContext context,
+                            bool show,
+                            Widget? childWidget,
+                          ) {
+                            if (show) {
+                              return widget.secondTitle;
+                            }
+                            return widget.firstTitle;
+                          },
+                        ),
                       ),
                     ),
                     Row(

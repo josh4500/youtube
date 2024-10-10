@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class CreatePermissionReason extends StatelessWidget {
   const CreatePermissionReason({
@@ -19,7 +20,7 @@ class CreatePermissionReason extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 18),
-          const SizedBox(width: 16),
+           SizedBox(width: 16.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

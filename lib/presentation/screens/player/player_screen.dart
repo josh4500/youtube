@@ -787,7 +787,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
   }
 
-  /// Callback to show or hide home screen navigation bar
+  /// Callback to show or hide feed screen navigation bar
   void _showHideNavigationBar(double value) {
     ref.read(homeRepositoryProvider).updateNavBarPosition(
           value.normalize(minPlayerHeightRatio, 1).invertByOne,
@@ -1867,7 +1867,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
 
     final mainPlayer = createPlayerView(interactivePlayerView);
-    final placeholderPlayer = createPlayerView(const SizedBox());
+    // final placeholderPlayer = createPlayerView(const SizedBox());
 
     final infoScrollview = PlayerVideoInfo(
       physics: _infoScrollPhysics,

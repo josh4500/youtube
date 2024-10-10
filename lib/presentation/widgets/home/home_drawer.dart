@@ -10,14 +10,14 @@ import '../gestures/tappable_area.dart';
 import '../over_scroll_glow_behavior.dart';
 
 class HomeDrawer extends StatelessWidget {
-  const HomeDrawer({
-    super.key,
-  });
+  const HomeDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.theme.appStyles.homeDrawerStyle;
     return Drawer(
-      backgroundColor: const Color(0xFF212121),
+      backgroundColor: theme.backgroundColor,
+      width: 280,
       child: Column(
         children: [
           Expanded(
@@ -119,19 +119,19 @@ class HomeDrawer extends StatelessWidget {
               ],
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(4.0),
+          Padding(
+            padding: const EdgeInsets.all(4.0),
             child: Text(
               'Privacy Policy · Terms of Service',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: Colors.white60),
+              style: theme.footerStyle,
             ),
           ),
-          // const Padding(
-          //   padding: EdgeInsets.all(4.0),
+          //  Padding(
+          //   padding: const EdgeInsets.all(4.0),
           //   child: Text(
           //     'YouTube, a Google company',
-          //     style: TextStyle(fontSize: 12, color: Colors.white60),
+          //     style: theme.footerStyle,
           //   ),
           // ),
         ],

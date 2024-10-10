@@ -31,23 +31,28 @@ import 'package:flutter/services.dart';
 import 'package:youtube_clone/presentation/theme/styles/app_style.dart';
 
 import 'styles/app_color.dart';
+import 'styles/app_font.dart';
+import 'styles/brightness_pair.dart';
 
 abstract final class AppTheme {
   //
   // Light theme
   //
 
-  static final ThemeData light = ThemeData.light(
+  static final ThemeData light = ThemeData(
     useMaterial3: false,
-  ).copyWith(
+    fontFamily: AppFont.roboto,
+    // fontFamilyFallback: AppFont.all,
     scaffoldBackgroundColor: Colors.white,
     primaryColor: Colors.white,
     canvasColor: const Color(0xFFFFFFFF),
     colorScheme: const ColorScheme.light(
-      primary: AppPalette.blue,
+      primary: AppPalette.blue2,
       secondary: Color(0xFF065DD0),
+      outlineVariant: Colors.white,
     ),
     highlightColor: Colors.black12,
+    focusColor: Colors.black26,
     scrollbarTheme: const ScrollbarThemeData(
       interactive: true,
     ),
@@ -64,6 +69,22 @@ abstract final class AppTheme {
         systemNavigationBarDividerColor: Colors.white,
       ),
     ),
+    tabBarTheme: const TabBarTheme(
+      indicatorColor: Colors.black,
+      dividerColor: Colors.black12,
+    ),
+    radioTheme: RadioThemeData(
+      fillColor: WidgetStateProperty.resolveWith(
+        (states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppPalette.blue2;
+          } else {
+            return const Color(0xFF666666);
+          }
+        },
+      ),
+    ),
+    //dividerColor: const Color(0xFF3F3F3F),
     listTileTheme: const ListTileThemeData(
       horizontalTitleGap: 0,
       minVerticalPadding: 0,
@@ -88,9 +109,12 @@ abstract final class AppTheme {
     customActionButtonStyle: AppStyle.customActionButtonStyle.light,
     customActionChipStyle: AppStyle.customActionChipStyle.light,
     groupedViewStyle: AppStyle.groupedViewStyle.light,
-    playableContentStyle: AppStyle.playableContentStyle.light,
+    playableStyle: AppStyle.playableStyle.light,
     dynamicSheetStyle: AppStyle.dynamicSheetStyle.light,
-    viewableVideoStyle: AppStyle.viewableVideoStyle.light,
+    viewableVideoStyle: AppStyle.viewableStyle.light,
+    slidableStyle: AppStyle.slidableStyle.light,
+    dynamicTabStyle: AppStyle.dynamicTabStyle.light,
+    homeDrawerStyle: AppStyle.homeDrawerStyle.light,
   );
 
   //
@@ -99,16 +123,19 @@ abstract final class AppTheme {
 
   static final ThemeData dark = ThemeData(
     useMaterial3: false,
-    fontFamily: 'Roboto',
+    fontFamily: AppFont.roboto,
+    // fontFamilyFallback: AppFont.all,
     scaffoldBackgroundColor: const Color(0xFF0F0F0F),
     primaryColor: Colors.black,
     canvasColor: const Color(0xFF0F0F0F),
     colorScheme: const ColorScheme.dark(
       surface: Colors.black,
-      primary: AppPalette.blue,
+      primary: AppPalette.white,
       secondary: Color(0xFF3DA3FA),
+      outlineVariant: Colors.white,
     ),
     highlightColor: Colors.white10,
+    focusColor: Colors.white24,
     scrollbarTheme: const ScrollbarThemeData(
       interactive: true,
     ),
@@ -123,6 +150,21 @@ abstract final class AppTheme {
         systemNavigationBarColor: Color(0xFF0F0F0F),
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarDividerColor: Color(0xFF0F0F0F),
+      ),
+    ),
+    tabBarTheme: const TabBarTheme(
+      indicatorColor: Colors.white,
+      dividerColor: Colors.white10,
+    ),
+    radioTheme: RadioThemeData(
+      fillColor: WidgetStateProperty.resolveWith(
+        (states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppPalette.blue;
+          } else {
+            return const Color(0xFFBDBDBD);
+          }
+        },
       ),
     ),
     listTileTheme: const ListTileThemeData(
@@ -151,10 +193,43 @@ abstract final class AppTheme {
     customActionButtonStyle: AppStyle.customActionButtonStyle.dark,
     customActionChipStyle: AppStyle.customActionChipStyle.dark,
     groupedViewStyle: AppStyle.groupedViewStyle.dark,
-    playableContentStyle: AppStyle.playableContentStyle.dark,
+    playableStyle: AppStyle.playableStyle.dark,
     dynamicSheetStyle: AppStyle.dynamicSheetStyle.dark,
-    viewableVideoStyle: AppStyle.viewableVideoStyle.dark,
+    viewableVideoStyle: AppStyle.viewableStyle.dark,
+    slidableStyle: AppStyle.slidableStyle.dark,
+    dynamicTabStyle: AppStyle.dynamicTabStyle.dark,
+    homeDrawerStyle: AppStyle.homeDrawerStyle.dark,
   );
+
+  static const BrightnessPair<SystemUiOverlayStyle> _systemUiOverlayStyle =
+      BrightnessPair(
+    light: SystemUiOverlayStyle(
+      statusBarColor: Colors.white,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.white,
+      systemNavigationBarDividerColor: Colors.white,
+      statusBarBrightness: Brightness.dark,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+    dark: SystemUiOverlayStyle(
+      statusBarColor: Color(0xFF0F0F0F),
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: Color(0xFF0F0F0F),
+      systemNavigationBarDividerColor: Color(0xFF0F0F0F),
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarIconBrightness: Brightness.light,
+    ),
+  );
+
+  /// Set default to [Brightness.dark]
+  static void setSystemOverlayStyle([
+    Brightness brightness = Brightness.dark,
+    SystemUiOverlayStyle? style,
+  ]) {
+    SystemChrome.setSystemUIOverlayStyle(
+      style ?? _systemUiOverlayStyle.fromValue(brightness),
+    );
+  }
 }
 
 extension AppThemeExtension on ThemeData {

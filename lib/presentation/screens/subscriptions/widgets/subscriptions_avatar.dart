@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class SubscriptionAvatar extends StatelessWidget {
@@ -34,42 +35,43 @@ class SubscriptionAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        const SizedBox(height: 16),
-        Expanded(
-          child: Stack(
-            children: <Widget>[
-              LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints c) {
-                  return AccountAvatar(size: c.maxHeight);
-                },
-              ),
-              Positioned(
-                right: 3.5,
-                bottom: 3.5,
-                child: Container(
-                  width: 12.5,
-                  height: 12.5,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                    border: Border.all(width: 1.7),
+    return SizedBox(
+      width: 65,
+      child: Column(
+        children: <Widget>[
+          const SizedBox(height: 4),
+          Expanded(
+            child: Stack(
+              children: <Widget>[
+                const AccountAvatar(
+                  size: double.infinity,
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 10,
+                  child: Container(
+                    width: 12.5,
+                    height: 12.5,
+                    decoration: BoxDecoration(
+                      color: AppPalette.blue,
+                      shape: BoxShape.circle,
+                      border: Border.all(width: 1.7),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Owen Jones',
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontSize: 12, color: Colors.grey),
-        ),
-        const SizedBox(height: 8),
-      ],
+          const SizedBox(height: 4),
+          const Text(
+            'Marques Brownlee',
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 12),
+          ),
+          const SizedBox(height: 2),
+        ],
+      ),
     );
   }
 }

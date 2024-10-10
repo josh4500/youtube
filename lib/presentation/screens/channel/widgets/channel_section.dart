@@ -67,18 +67,22 @@ class ChannelSection extends StatelessWidget {
                           Text(
                             'Marques Brownlee',
                             style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(YTIcons.verified_filled, size: 16),
+                          // Icon(YTIcons.music_outlined, size: 20),
+                          Icon(YTIcons.verified_filled, size: 20),
                         ],
                       ),
                       const SizedBox(height: 4),
                       const Text(
                         '@mkbhd',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       RichText(
@@ -166,7 +170,6 @@ class ChannelSection extends StatelessWidget {
                     child: CustomActionChip(
                       title: 'Join',
                       alignment: Alignment.center,
-                      backgroundColor: Colors.white12,
                       padding: const EdgeInsets.symmetric(
                         vertical: 12,
                         horizontal: 12,
@@ -184,7 +187,6 @@ class ChannelSection extends StatelessWidget {
               CustomActionChip(
                 title: 'Visit store',
                 alignment: Alignment.center,
-                backgroundColor: Colors.white12,
                 padding: const EdgeInsets.symmetric(
                   vertical: 12,
                   horizontal: 12,

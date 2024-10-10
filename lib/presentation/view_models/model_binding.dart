@@ -77,3 +77,9 @@ class _ModelBindingState<T> extends State<ModelBinding<T>> {
     return _ModelBindingScope<T>(bindingState: this, child: widget.child);
   }
 }
+
+extension ModelBindingExtension on BuildContext {
+  T provide<T>() {
+    return ModelBinding.of<T>(this);
+  }
+}

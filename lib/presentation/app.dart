@@ -49,13 +49,21 @@ class _AppState extends State<App>
     with WidgetsBindingObserver, InternetConnectivityMixin<App> {
   @override
   Widget build(BuildContext context) {
-    return ProviderScope(
-      child: Consumer(
-        builder: (BuildContext context, WidgetRef ref, _) {
-          final PreferenceState preferences = ref.watch(preferencesProvider);
-          return DeviceTheme.fromView(
-            view: View.of(context),
-            child: MaterialApp.router(
+    return DeviceTheme.fromView(
+      view: View.of(context),
+      child: ProviderScope(
+        child: Consumer(
+          builder: (BuildContext context, WidgetRef ref, _) {
+            // Watch only 2 properties to ensure it only rebuilds entire app only when
+            // `ThemeMode` and `Locale` changes
+            final (ThemeMode, Locale) preferences = ref.watch(
+              preferencesProvider.select(
+                (PreferenceState state) => (state.themeMode, state.locale),
+              ),
+            );
+            final (themeMode, locale) = preferences;
+
+            return MaterialApp.router(
               title: 'Youtube',
               restorationScopeId: 'app',
               themeAnimationStyle: AnimationStyle(
@@ -70,11 +78,11 @@ class _AppState extends State<App>
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
-              locale: preferences.locale,
+              locale: locale,
               supportedLocales: S.delegate.supportedLocales,
               theme: AppTheme.light,
               darkTheme: AppTheme.dark,
-              themeMode: preferences.themeMode,
+              themeMode: themeMode,
               themeAnimationCurve: Curves.easeIn,
               builder: (BuildContext context, Widget? child) {
                 return ErrorOverlay(
@@ -82,9 +90,9 @@ class _AppState extends State<App>
                 );
               },
               routerConfig: AppRouter.routerConfig,
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

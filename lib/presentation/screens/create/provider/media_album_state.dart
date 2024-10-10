@@ -6,7 +6,8 @@ part 'media_album_state.g.dart';
 
 class MediaAlbumSelector {
   MediaAlbumSelector({required this.albums, required this.selected});
-
+  factory MediaAlbumSelector.empty() =>
+      MediaAlbumSelector(albums: [], selected: null);
   final List<MediaAlbum> albums;
   final MediaAlbum? selected;
 
@@ -24,12 +25,17 @@ class MediaAlbumSelector {
 
 @riverpod
 class MediaAlbumState extends _$MediaAlbumState {
-  final _cacheProvider = HiveCacheProvider<MediaAlbum>('media_album_state');
+  final _cache = SharedPrefProvider<MediaAlbum>('media_album_state');
+  late final _selectedMediaAlbum = ReadWriteValue<MediaAlbum?>(
+    'selected',
+    null,
+    _cache,
+  );
 
   @override
   Future<MediaAlbumSelector> build() async {
     state = const AsyncLoading<MediaAlbumSelector>();
-    final selected = _cacheProvider.read('selected');
+    final selected = _selectedMediaAlbum.value;
 
     MediaDiscovery.getAlbums([MediaType.video, MediaType.images]).then(
       (List<MediaAlbum> albums) {
@@ -50,13 +56,13 @@ class MediaAlbumState extends _$MediaAlbumState {
       },
     );
 
-    final albums = _cacheProvider.values.toList();
-    if (albums.isNotEmpty) {
-      return MediaAlbumSelector(
-        albums: albums,
-        selected: selected ?? albums.first,
-      );
-    }
+    // final albums = _selectedMediaAlbum.value.toList();
+    // if (albums.isNotEmpty) {
+    //   return MediaAlbumSelector(
+    //     albums: albums,
+    //     selected: selected ?? albums.first,
+    //   );
+    // }
 
     return MediaAlbumSelector(albums: [], selected: null);
   }

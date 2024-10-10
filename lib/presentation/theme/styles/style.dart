@@ -197,27 +197,29 @@ class DynamicSheetStyle {
   }
 }
 
-class PlayableContentStyle {
-  PlayableContentStyle({
+class PlayableStyle {
+  PlayableStyle({
     this.titleStyle = const TextStyle(),
     required this.subtitleStyle,
     required this.borderRadius,
+    required this.backgroundColor,
   });
 
   final TextStyle titleStyle;
   final TextStyle subtitleStyle;
   final BorderRadius borderRadius;
+  final Color backgroundColor;
 
-  static PlayableContentStyle? lerp(
-    PlayableContentStyle? style1,
-    PlayableContentStyle? style2,
+  static PlayableStyle? lerp(
+    PlayableStyle? style1,
+    PlayableStyle? style2,
     double t,
   ) {
     if (style1 == null && style2 == null) {
       return null;
     }
 
-    return PlayableContentStyle(
+    return PlayableStyle(
       titleStyle: TextStyle.lerp(
         style1?.titleStyle,
         style2?.titleStyle,
@@ -233,12 +235,17 @@ class PlayableContentStyle {
         style2?.borderRadius,
         t,
       )!,
+      backgroundColor: Color.lerp(
+        style1?.backgroundColor,
+        style2?.backgroundColor,
+        t,
+      )!,
     );
   }
 }
 
-class ViewableVideoStyle {
-  ViewableVideoStyle({
+class ViewableStyle {
+  ViewableStyle({
     required this.titleStyle,
     required this.subtitleStyle,
   });
@@ -246,16 +253,16 @@ class ViewableVideoStyle {
   final TextStyle titleStyle;
   final TextStyle subtitleStyle;
 
-  static ViewableVideoStyle? lerp(
-    ViewableVideoStyle? style1,
-    ViewableVideoStyle? style2,
+  static ViewableStyle? lerp(
+    ViewableStyle? style1,
+    ViewableStyle? style2,
     double t,
   ) {
     if (style1 == null && style2 == null) {
       return null;
     }
 
-    return ViewableVideoStyle(
+    return ViewableStyle(
       titleStyle: TextStyle.lerp(
         style1?.titleStyle,
         style2?.titleStyle,
@@ -264,6 +271,126 @@ class ViewableVideoStyle {
       subtitleStyle: TextStyle.lerp(
         style1?.subtitleStyle,
         style2?.subtitleStyle,
+        t,
+      )!,
+    );
+  }
+}
+
+class SlidableStyle {
+  SlidableStyle({
+    required this.backgroundColor,
+    required this.itemBackgroundColor,
+    required this.iconTheme,
+  });
+
+  final Color backgroundColor;
+  final Color itemBackgroundColor;
+  final IconThemeData iconTheme;
+
+  static SlidableStyle? lerp(
+    SlidableStyle? a,
+    SlidableStyle? b,
+    double t,
+  ) {
+    if (a == null && b == null) {
+      return null;
+    }
+
+    return SlidableStyle(
+      backgroundColor: Color.lerp(
+        a?.backgroundColor,
+        b?.backgroundColor,
+        t,
+      )!,
+      itemBackgroundColor: Color.lerp(
+        a?.itemBackgroundColor,
+        b?.itemBackgroundColor,
+        t,
+      )!,
+      iconTheme: IconThemeData.lerp(
+        a?.iconTheme,
+        b?.iconTheme,
+        t,
+      ),
+    );
+  }
+}
+
+class DynamicTabStyle {
+  DynamicTabStyle({
+    required this.selectedColor,
+    required this.selectedTextStyle,
+    required this.unselectedColor,
+    required this.unselectedTextStyle,
+  });
+
+  final Color selectedColor;
+  final TextStyle selectedTextStyle;
+  final Color unselectedColor;
+  final TextStyle unselectedTextStyle;
+
+  static DynamicTabStyle? lerp(
+    DynamicTabStyle? style1,
+    DynamicTabStyle? style2,
+    double t,
+  ) {
+    if (style1 == null && style2 == null) {
+      return null;
+    }
+
+    return DynamicTabStyle(
+      selectedColor: Color.lerp(
+        style1?.selectedColor,
+        style2?.selectedColor,
+        t,
+      )!,
+      selectedTextStyle: TextStyle.lerp(
+        style1?.selectedTextStyle,
+        style2?.selectedTextStyle,
+        t,
+      )!,
+      unselectedColor: Color.lerp(
+        style1?.unselectedColor,
+        style2?.unselectedColor,
+        t,
+      )!,
+      unselectedTextStyle: TextStyle.lerp(
+        style1?.unselectedTextStyle,
+        style2?.unselectedTextStyle,
+        t,
+      )!,
+    );
+  }
+}
+
+class HomeDrawerStyle {
+  HomeDrawerStyle({
+    required this.backgroundColor,
+    required this.footerStyle,
+  });
+
+  final Color backgroundColor;
+  final TextStyle footerStyle;
+
+  static HomeDrawerStyle? lerp(
+    HomeDrawerStyle? style1,
+    HomeDrawerStyle? style2,
+    double t,
+  ) {
+    if (style1 == null && style2 == null) {
+      return null;
+    }
+
+    return HomeDrawerStyle(
+      backgroundColor: Color.lerp(
+        style1?.backgroundColor,
+        style2?.backgroundColor,
+        t,
+      )!,
+      footerStyle: TextStyle.lerp(
+        style1?.footerStyle,
+        style2?.footerStyle,
         t,
       )!,
     );

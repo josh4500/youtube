@@ -141,9 +141,9 @@ class _YourClipsScreenState extends State<YourClipsScreen>
                       vertical: 8.0,
                       horizontal: 12,
                     ),
-                    child: const PlayableClipContent(
-                      width: 180,
-                      height: 104,
+                    child: PlayableClipContent(
+                      width: 160.w,
+                      height: 90.h,
                     ),
                   );
                 },

@@ -50,14 +50,14 @@ class VideoContext extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Expanded(
                 child: Row(
                   children: [
-                    Icon(Icons.content_paste, size: 18),
-                    SizedBox(width: 18),
-                    Text(
+                    const Icon(Icons.content_paste, size: 18),
+                    SizedBox(width: 18.w),
+                    const Text(
                       'Context',
                       style: TextStyle(
                         fontSize: 16,
@@ -67,8 +67,8 @@ class VideoContext extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 24),
-              Icon(YTIcons.more_vert_outlined, size: 18),
+              SizedBox(width: 24.w),
+              const Icon(YTIcons.more_vert_outlined, size: 18),
             ],
           ),
           const Divider(height: 24, thickness: 1),
@@ -106,10 +106,10 @@ class VideoContext extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12.w),
               Container(
-                width: 72,
-                height: 72,
+                width: 72.w,
+                height: 72.w,
                 decoration: BoxDecoration(
                   color: Colors.white30,
                   borderRadius: BorderRadius.circular(8),

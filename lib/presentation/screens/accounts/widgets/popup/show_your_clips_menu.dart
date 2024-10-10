@@ -36,6 +36,8 @@ Future<T?> showYourClipsMenu<T>(
 ) async {
   return showMenu<T>(
     context: context,
+    menuPadding: EdgeInsets.zero,
+    color: const Color(0xFF303030),
     position: position,
     items: <PopupMenuEntry<T>>[
       PopupMenuItem(

@@ -34,12 +34,12 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
-      title: 'Comment',
-      subtitle: '16k',
-      scrollTag: 'short_comment',
+      title: 'Comments',
+      subtitle: '7.1k',
+      scrollTag: 'short_comments',
       borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(12),
-        topRight: Radius.circular(12),
+        topLeft: Radius.circular(8),
+        topRight: Radius.circular(8),
       ),
       controller: widget.controller,
       onClose: widget.closeComment,
@@ -51,8 +51,8 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet> {
           child: IconButton(
             onPressed: () {},
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(maxHeight: 24),
-            icon: const Icon(YTIcons.tune_outlined, size: 24),
+            constraints: const BoxConstraints(maxHeight: 28),
+            icon: const Icon(YTIcons.tune_outlined),
           ),
         ),
       ],

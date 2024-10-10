@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
 import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
@@ -209,7 +210,23 @@ class _NavCreateButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () => context.goto(AppRoutes.create),
+      onPressed: () async {
+        AppTheme.setSystemOverlayStyle(
+          Brightness.dark,
+          const SystemUiOverlayStyle(
+            statusBarColor: Colors.black,
+            statusBarBrightness: Brightness.light,
+            statusBarIconBrightness: Brightness.light,
+            systemNavigationBarColor: Colors.black,
+            systemNavigationBarDividerColor: Colors.black,
+            systemNavigationBarIconBrightness: Brightness.light,
+          ),
+        );
+        await context.goto(AppRoutes.create);
+        if (context.mounted) {
+          AppTheme.setSystemOverlayStyle(context.theme.brightness);
+        }
+      },
       padding: EdgeInsets.zero,
       visualDensity: VisualDensity.standard,
       icon: const Icon(YTIcons.create_outlined, size: 36),
@@ -270,7 +287,12 @@ class _NavLibraryButton extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 isLibrary ? 'Library' : 'You',
-                style: const TextStyle(fontSize: 10),
+                style: const TextStyle(
+                  fontSize: 10,
+                  letterSpacing: .2,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: AppFont.roboto,
+                ),
               ),
             ],
           ),
@@ -307,7 +329,16 @@ class _NavButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Icon(isSelected ? selectedIcon : notSelectedIcon),
-          Text(title, maxLines: 1, style: const TextStyle(fontSize: 10)),
+          Text(
+            title,
+            maxLines: 1,
+            style: const TextStyle(
+              fontSize: 10,
+              letterSpacing: .2,
+              fontWeight: FontWeight.w400,
+              fontFamily: AppFont.roboto,
+            ),
+          ),
         ],
       ),
     );

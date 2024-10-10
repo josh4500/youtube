@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class OneWayRangeSlider extends StatefulWidget {
   const OneWayRangeSlider({
@@ -7,7 +8,7 @@ class OneWayRangeSlider extends StatefulWidget {
     this.trackHeight = 16,
     this.activeColor = Colors.white24,
     this.trackColor = Colors.black87,
-    this.markerColor = Colors.blue,
+    this.markerColor = AppPalette.blue,
     this.onChanged,
   });
   final RangeValue value;

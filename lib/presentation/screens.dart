@@ -53,15 +53,15 @@ export 'screens/create/create_shorts_screen.dart';
 export 'screens/create/create_video_screen.dart';
 
 // Home
-export 'screens/home/fashion_and_beauty_screen.dart';
-export 'screens/home/gaming_screen.dart';
-export 'screens/home/home_feed_screen.dart';
-export 'screens/home/learning_screen.dart';
-export 'screens/home/live_screen.dart';
-export 'screens/home/music_screen.dart';
-export 'screens/home/news_screen.dart';
-export 'screens/home/sports_screen.dart';
-export 'screens/home/trending_screen.dart';
+export 'screens/feed/fashion_and_beauty_screen.dart';
+export 'screens/feed/for_you_feed_screen.dart';
+export 'screens/feed/gaming_screen.dart';
+export 'screens/feed/learning_screen.dart';
+export 'screens/feed/live_screen.dart';
+export 'screens/feed/music_screen.dart';
+export 'screens/feed/news_screen.dart';
+export 'screens/feed/sports_screen.dart';
+export 'screens/feed/trending_screen.dart';
 export 'screens/homepage.dart';
 
 // Notifications

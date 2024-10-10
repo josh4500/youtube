@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:ui';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
@@ -69,6 +70,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
   late final AnimationController _dynamicTabHideController;
   late final Animation<double> _dynamicTabHideAnimation;
 
+  VelocityTracker? _velocityTracker;
+
   @override
   void initState() {
     super.initState();
@@ -136,7 +139,13 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     super.dispose();
   }
 
+  void _onPointerDownOnSheet(PointerDownEvent event) {
+    _velocityTracker = VelocityTracker.withKind(event.kind);
+  }
+
   void _onPointerMoveOnSheetContent(PointerMoveEvent event) {
+    _velocityTracker?.addPosition(event.timeStamp, event.localPosition);
+
     if (widget.draggableController != null) {
       if (_innerListController.offset == 0 && !_overlayAnyChildIsOpened) {
         _changeDraggableSize(_innerListPhysics, event);
@@ -187,6 +196,26 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
         );
       }
     }
+
+    // Calculate the velocity
+    final velocity = _velocityTracker?.getVelocity();
+    if (velocity != null && velocity.pixelsPerSecond.dy > 300) {
+      if (event.delta.dy > 1) {
+        widget.draggableController!.animateTo(
+          1,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeIn,
+        );
+      } else {
+        widget.draggableController!.animateTo(
+          0,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeIn,
+        );
+      }
+    }
+
+    _velocityTracker = null;
   }
 
   void _closeSheet() {
@@ -222,8 +251,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                     pinned: true,
                     floating: true,
                     delegate: PersistentHeaderDelegate(
-                      minHeight: 66,
-                      maxHeight: (v * (111 - 66)) + 66,
+                      minHeight: 66.5,
+                      maxHeight: (v * (111 - 66.5)) + 66.5,
                       child: childWidget!,
                     ),
                   );
@@ -238,60 +267,68 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                           child: SheetDragIndicator(),
                         )
                       else
-                        const SizedBox(height: 16),
-                      const SizedBox(height: 4),
+                        const SizedBox(height: 12),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12.0,
                         ),
                         child: Stack(
+                          clipBehavior: Clip.none,
                           children: <Widget>[
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Text(
-                                  widget.title,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.fade,
-                                  softWrap: false,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                if (widget.subtitle != null)
-                                  Text(
-                                    widget.subtitle!,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.bold,
+                            Column(
+                              children: [
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Text(
+                                      widget.title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.fade,
+                                      softWrap: false,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                const Spacer(),
-                                const SizedBox(width: 12),
-                                ...widget.actions,
-                                const SizedBox(width: 12),
-                                CustomInkWell(
-                                  borderRadius: BorderRadius.circular(32),
-                                  onTap: _closeSheet,
-                                  child: const Icon(
-                                    YTIcons.close_outlined,
-                                    size: 20,
-                                  ),
+                                    const SizedBox(width: 12),
+                                    if (widget.subtitle != null)
+                                      Text(
+                                        widget.subtitle!,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    const Spacer(),
+                                    const SizedBox(width: 12),
+                                    ...widget.actions,
+                                    const SizedBox(width: 12),
+                                    IconButton(
+                                      onPressed: _closeSheet,
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(
+                                        maxHeight: 28,
+                                      ),
+                                      splashColor: Colors.transparent,
+                                      icon: const Icon(YTIcons.close_outlined),
+                                    ),
+                                  ],
                                 ),
+                                const SizedBox(height: 18),
                               ],
                             ),
                             for (final PageDraggableOverlayChild overlayChild
                                 in widget.overlayChildren)
-                              _OverlayChildTitle(
-                                controller: overlayChild.controller,
+                              Positioned(
+                                top: -4,
+                                child: _OverlayChildTitle(
+                                  controller: overlayChild.controller,
+                                ),
                               ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 18),
                       if (widget.dynamicTab != null)
                         SizeTransition(
                           sizeFactor: _dynamicTabHideAnimation,
@@ -305,13 +342,14 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                             ],
                           ),
                         ),
-                      const Divider(thickness: 1, height: 0),
+                      const Divider(thickness: .8, height: 0),
                     ],
                   ),
                 ),
               ),
               SliverFillRemaining(
                 child: Listener(
+                  onPointerDown: _onPointerDownOnSheet,
                   onPointerMove: _onPointerMoveOnSheetContent,
                   onPointerUp: _onPointerLeaveOnSheetContent,
                   child: Stack(
@@ -495,10 +533,11 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
             children: <Widget>[
               CustomInkWell(
                 borderRadius: BorderRadius.circular(32),
+                padding: const EdgeInsets.all(8),
                 onTap: widget.controller.close,
                 child: const Icon(YTIcons.arrow_back_outlined),
               ),
-              const SizedBox(width: 20),
+              const SizedBox(width: 12),
               Text(
                 widget.controller.title,
                 style: const TextStyle(

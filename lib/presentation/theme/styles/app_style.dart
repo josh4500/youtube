@@ -27,7 +27,6 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/theme/styles/app_color.dart';
 
 import 'brightness_pair.dart';
 import 'style.dart';
@@ -60,6 +59,7 @@ abstract final class AppStyle {
       BrightnessPair<ButtonStyle>(
     light: ButtonStyle(
       enableFeedback: true,
+      splashFactory: InkSparkle.constantTurbulenceSeedSplashFactory,
       overlayColor: WidgetStateProperty.all(const Color(0xFF505065)),
       textStyle: WidgetStateProperty.all(
         const TextStyle(
@@ -70,6 +70,7 @@ abstract final class AppStyle {
     ),
     dark: ButtonStyle(
       enableFeedback: true,
+      splashFactory: InkSparkle.constantTurbulenceSeedSplashFactory,
       overlayColor: WidgetStateProperty.all(const Color(0xFF505065)),
       textStyle: WidgetStateProperty.all(
         const TextStyle(
@@ -116,15 +117,17 @@ abstract final class AppStyle {
       ),
     ),
   );
-  static final BrightnessPair<PlayableContentStyle> playableContentStyle =
-      BrightnessPair<PlayableContentStyle>(
-    light: PlayableContentStyle(
+  static final BrightnessPair<PlayableStyle> playableStyle =
+      BrightnessPair<PlayableStyle>(
+    light: PlayableStyle(
       subtitleStyle: const TextStyle(fontSize: 12, color: Colors.black54),
       borderRadius: BorderRadius.circular(8),
+      backgroundColor: Colors.black12,
     ),
-    dark: PlayableContentStyle(
+    dark: PlayableStyle(
       subtitleStyle: const TextStyle(fontSize: 12, color: Colors.white54),
       borderRadius: BorderRadius.circular(8),
+      backgroundColor: Colors.white12,
     ),
   );
   static final BrightnessPair<DynamicSheetStyle> dynamicSheetStyle =
@@ -138,9 +141,8 @@ abstract final class AppStyle {
       backgroundColor: const Color(0xFF212121),
     ),
   );
-  static final BrightnessPair<ViewableVideoStyle> viewableVideoStyle =
-      BrightnessPair(
-    light: ViewableVideoStyle(
+  static final BrightnessPair<ViewableStyle> viewableStyle = BrightnessPair(
+    light: ViewableStyle(
       titleStyle: const TextStyle(
         fontWeight: FontWeight.w500,
         color: Colors.black,
@@ -150,7 +152,7 @@ abstract final class AppStyle {
         fontSize: 11,
       ),
     ),
-    dark: ViewableVideoStyle(
+    dark: ViewableStyle(
       titleStyle: const TextStyle(
         fontWeight: FontWeight.w500,
         color: Color(0xFFF1F1F1),
@@ -158,6 +160,62 @@ abstract final class AppStyle {
       subtitleStyle: const TextStyle(
         color: Color(0xFFAAAAAA),
         fontSize: 11,
+      ),
+    ),
+  );
+  static final BrightnessPair<SlidableStyle> slidableStyle = BrightnessPair(
+    light: SlidableStyle(
+      backgroundColor: const Color(0x0D000000),
+      itemBackgroundColor: const Color(0xFF0F0F0F),
+      iconTheme: const IconThemeData.fallback().copyWith(color: Colors.white),
+    ),
+    dark: SlidableStyle(
+      backgroundColor: Colors.white12,
+      itemBackgroundColor: Colors.white,
+      iconTheme: const IconThemeData.fallback().copyWith(color: Colors.black),
+    ),
+  );
+
+  static final BrightnessPair<DynamicTabStyle> dynamicTabStyle = BrightnessPair(
+    light: DynamicTabStyle(
+      selectedColor: Colors.black87,
+      selectedTextStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+        color: Colors.white,
+      ),
+      unselectedColor: const Color(0xFFF2F2F2),
+      unselectedTextStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+        color: Colors.black,
+      ),
+    ),
+    dark: DynamicTabStyle(
+      selectedColor: const Color(0xFFF1F1F1),
+      selectedTextStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+        color: Color(0xFF272727),
+      ),
+      unselectedColor: const Color(0xFF272727),
+      unselectedTextStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+        color: Color(0xFFF1F1F1),
+      ),
+    ),
+  );
+
+  static final BrightnessPair<HomeDrawerStyle> homeDrawerStyle = BrightnessPair(
+    light: HomeDrawerStyle(
+      backgroundColor: Colors.white,
+      footerStyle: const TextStyle(
+        fontSize: 12,
+        color: Colors.black54,
+      ),
+    ),
+    dark: HomeDrawerStyle(
+      backgroundColor: const Color(0xFF212121),
+      footerStyle: const TextStyle(
+        fontSize: 12,
+        color: Colors.white54,
       ),
     ),
   );
@@ -171,9 +229,12 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
     required this.customActionChipStyle,
     required this.customActionButtonStyle,
     required this.groupedViewStyle,
-    required this.playableContentStyle,
+    required this.playableStyle,
     required this.dynamicSheetStyle,
     required this.viewableVideoStyle,
+    required this.slidableStyle,
+    required this.dynamicTabStyle,
+    required this.homeDrawerStyle,
   });
 
   final TextStyle appBarTextStyle;
@@ -182,9 +243,12 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
   final CustomActionChipStyle customActionChipStyle;
   final CustomActionButtonStyle customActionButtonStyle;
   final GroupedViewStyle groupedViewStyle;
-  final PlayableContentStyle playableContentStyle;
+  final PlayableStyle playableStyle;
   final DynamicSheetStyle dynamicSheetStyle;
-  final ViewableVideoStyle viewableVideoStyle;
+  final ViewableStyle viewableVideoStyle;
+  final SlidableStyle slidableStyle;
+  final DynamicTabStyle dynamicTabStyle;
+  final HomeDrawerStyle homeDrawerStyle;
 
   @override
   ThemeExtension<AppStylesExtension> copyWith({
@@ -194,9 +258,12 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
     CustomActionChipStyle? customActionChipStyle,
     CustomActionButtonStyle? customActionButtonStyle,
     GroupedViewStyle? groupedViewStyle,
-    PlayableContentStyle? playableContentStyle,
+    PlayableStyle? playableStyle,
     DynamicSheetStyle? dynamicSheetStyle,
-    ViewableVideoStyle? viewableVideoStyle,
+    ViewableStyle? viewableVideoStyle,
+    SlidableStyle? slidableStyle,
+    DynamicTabStyle? dynamicTabStyle,
+    HomeDrawerStyle? homeDrawerStyle,
   }) {
     return AppStylesExtension(
       appBarTextStyle: appBarTextStyle ?? this.appBarTextStyle,
@@ -209,9 +276,12 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
       customActionButtonStyle:
           customActionButtonStyle ?? this.customActionButtonStyle,
       groupedViewStyle: groupedViewStyle ?? this.groupedViewStyle,
-      playableContentStyle: playableContentStyle ?? this.playableContentStyle,
+      playableStyle: playableStyle ?? this.playableStyle,
       dynamicSheetStyle: dynamicSheetStyle ?? this.dynamicSheetStyle,
       viewableVideoStyle: viewableVideoStyle ?? this.viewableVideoStyle,
+      slidableStyle: slidableStyle ?? this.slidableStyle,
+      dynamicTabStyle: dynamicTabStyle ?? this.dynamicTabStyle,
+      homeDrawerStyle: homeDrawerStyle ?? this.homeDrawerStyle,
     );
   }
 
@@ -255,9 +325,9 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
         other.groupedViewStyle,
         t,
       )!,
-      playableContentStyle: PlayableContentStyle.lerp(
-        playableContentStyle,
-        other.playableContentStyle,
+      playableStyle: PlayableStyle.lerp(
+        playableStyle,
+        other.playableStyle,
         t,
       )!,
       dynamicSheetStyle: DynamicSheetStyle.lerp(
@@ -265,9 +335,24 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
         other.dynamicSheetStyle,
         t,
       )!,
-      viewableVideoStyle: ViewableVideoStyle.lerp(
+      viewableVideoStyle: ViewableStyle.lerp(
         viewableVideoStyle,
         other.viewableVideoStyle,
+        t,
+      )!,
+      slidableStyle: SlidableStyle.lerp(
+        slidableStyle,
+        other.slidableStyle,
+        t,
+      )!,
+      dynamicTabStyle: DynamicTabStyle.lerp(
+        dynamicTabStyle,
+        other.dynamicTabStyle,
+        t,
+      )!,
+      homeDrawerStyle: HomeDrawerStyle.lerp(
+        homeDrawerStyle,
+        other.homeDrawerStyle,
         t,
       )!,
     );

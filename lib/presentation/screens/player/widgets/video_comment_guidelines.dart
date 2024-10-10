@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class VideoCommentGuidelines extends StatelessWidget {
   const VideoCommentGuidelines({super.key});
@@ -42,7 +43,7 @@ class VideoCommentGuidelines extends StatelessWidget {
           children: [
             TextSpan(
               text: 'Community Guidelines',
-              style: TextStyle(color: Colors.blue, fontSize: 12),
+              style: TextStyle(color: AppPalette.blue, fontSize: 12),
             ),
           ],
           style: TextStyle(fontSize: 12),

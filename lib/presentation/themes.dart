@@ -3,5 +3,6 @@ export 'theme/app_theme.dart';
 export 'theme/device_theme.dart';
 export 'theme/icon/y_t_icons_icons.dart';
 export 'theme/styles/app_color.dart';
+export 'theme/styles/app_font.dart';
 export 'theme/styles/app_style.dart';
 export 'theme/styles/style.dart';

@@ -29,7 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
-import '../gestures/custom_ink_well.dart';
+import '../gestures/tappable_area.dart';
 import '../network_image/custom_network_image.dart';
 
 class PlayableShortsContent extends StatelessWidget {
@@ -37,56 +37,79 @@ class PlayableShortsContent extends StatelessWidget {
     super.key,
     this.width,
     this.height,
+    this.margin,
     this.onTap,
     this.onMore,
   });
-  final double? width;
-  final double? height;
+
+  final double? width, height;
+  final EdgeInsets? margin;
   final VoidCallback? onTap;
   final VoidCallback? onMore;
 
   @override
   Widget build(BuildContext context) {
+    final PlayableStyle theme = context.theme.appStyles.playableStyle;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: width,
-        margin: const EdgeInsets.all(4),
         padding: const EdgeInsets.symmetric(
           vertical: 8,
           horizontal: 4,
         ),
+        margin: margin,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: theme.borderRadius,
           image: const DecorationImage(
             image: CustomNetworkImage('https://picsum.photos/250/300'),
             fit: BoxFit.cover,
           ),
-          color: Colors.white12,
+          color: theme.backgroundColor,
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Align(
               alignment: Alignment.topRight,
-              child: CustomInkWell(
-                onTap: onMore,
-                child: const Icon(
-                  YTIcons.more_vert_outlined,
-                  size: 14,
-                  color: Colors.white,
+              child: Transform.translate(
+                offset: const Offset(8, -8),
+                child: TappableArea(
+                  onTap: onMore,
+                  canRequestFocus: false,
+                  focusColor: Colors.transparent,
+                  padding: const EdgeInsets.all(8),
+                  releasedColor: Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                  child: const Icon(
+                    YTIcons.more_vert_outlined,
+                    size: 18,
+                    color: Colors.white,
+                    shadows: [
+                      BoxShadow(
+                        color: Colors.black54,
+                        offset: Offset(2, 2),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
+              margin: const EdgeInsets.all(4),
               child: const Text(
                 'mappa animators making',
                 maxLines: 2,
                 style: TextStyle(
                   fontSize: 15,
                   color: Colors.white,
-                  fontWeight: FontWeight.w500,
+                  shadows: [
+                    BoxShadow(
+                      color: Colors.black54,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
                 ),
                 overflow: TextOverflow.ellipsis,
               ),

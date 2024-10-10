@@ -28,6 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class HistorySearchTextField extends StatefulWidget {
   const HistorySearchTextField({super.key, this.controller, this.focusNode});
@@ -83,7 +84,9 @@ class _HistorySearchTextFieldState extends State<HistorySearchTextField>
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(left: 16),
-      color: const Color(0xff2c2c2c),
+      color: context.theme.brightness.isDark
+          ? Colors.white10
+          : const Color(0x0D000000),
       child: Row(
         children: <Widget>[
           const Padding(
@@ -99,6 +102,7 @@ class _HistorySearchTextFieldState extends State<HistorySearchTextField>
                 border: InputBorder.none,
                 hintText: 'Search watch history',
               ),
+              cursorWidth: 2.5,
             ),
           ),
           ListenableBuilder(
@@ -123,16 +127,20 @@ class _HistorySearchTextFieldState extends State<HistorySearchTextField>
             sizeFactor: _animation,
             axis: Axis.horizontal,
             child: ColoredBox(
-              color: Colors.white12,
-              child: TextButton(
-                onPressed: () {
+              color: context.theme.brightness.isDark
+                  ? Colors.white10
+                  : const Color(0x0D000000),
+              child: CustomInkWell(
+                onTap: () {
                   _effectiveFocusNode.unfocus();
                   _effectiveController.clear();
                 },
+                padding: const EdgeInsets.all(16),
                 child: const Text(
                   'Cancel',
                   style: TextStyle(
-                    color: Colors.white,
+                    fontSize: 12,
+                    color: Colors.black54,
                   ),
                 ),
               ),

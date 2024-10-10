@@ -27,14 +27,36 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'dart:async';
-
-import 'package:hive/hive.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 import 'cache_provider.dart';
+
+// Note these are just fake impl
+class Box<E> {
+  get keys => null;
+
+  containsKey(String key) {}
+
+  watchKey(String key) {}
+
+  getAll(keys) {}
+
+  void delete(String key) {}
+  operator [](String keys) {}
+  operator []=(String keys, dynamic object) {}
+}
+
+class Hive {
+  static Box<E> box<E>({required String name}) => Box<E>();
+}
 
 class HiveCacheProvider<E> extends CacheProvider<E> {
   HiveCacheProvider(this.name) {
     _store = Hive.box(name: name);
+    throw Exception(
+      'Cannot create HiveCacheProvider, use SharedPreference instead',
+    );
   }
   late final Box<E> _store;
   final String name;
@@ -53,7 +75,7 @@ class HiveCacheProvider<E> extends CacheProvider<E> {
     return _store
         .getAll(_store.keys)
         .where((E? element) => element != null)
-        .cast();
+        .cast<E>();
   }
 
   @override
@@ -67,4 +89,12 @@ class HiveCacheProvider<E> extends CacheProvider<E> {
 
   @override
   void delete(String key) => _store.delete(key);
+}
+
+Future<void> hiveInit() async {
+  final Directory dir = await getApplicationDocumentsDirectory();
+  final String appPath = dir.path;
+
+// Set Hive default directory
+// Hive.defaultDirectory = appPath;
 }

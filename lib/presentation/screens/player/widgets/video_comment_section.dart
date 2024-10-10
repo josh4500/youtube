@@ -32,6 +32,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'video_highlighted_comment.dart';
@@ -93,7 +94,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
                 },
               ),
               if (!isRestrictedMode) ...[
-                const SizedBox(width: 4),
+                 SizedBox(width: 4.w),
                 ListenableBuilder(
                   listenable: _pageController,
                   builder: (context, _) {

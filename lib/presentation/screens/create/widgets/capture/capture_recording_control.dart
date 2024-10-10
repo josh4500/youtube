@@ -23,8 +23,8 @@ class CaptureRecordingControl extends StatelessWidget {
                 return const Icon(Icons.photo_outlined, size: 40);
               }
               return Container(
-                width: 40,
-                height: 40,
+                width: 40.w,
+                height: 40.w,
                 decoration: BoxDecoration(
                   color: Colors.white12,
                   borderRadius: BorderRadius.circular(8),
@@ -41,7 +41,7 @@ class CaptureRecordingControl extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(width: 36),
+           SizedBox(width: 36.w),
           Expanded(
             child: Consumer(
               builder: (BuildContext context, WidgetRef ref, Widget? _) {
@@ -67,7 +67,7 @@ class CaptureRecordingControl extends StatelessWidget {
                         ),
                       )
                     else
-                      const SizedBox(width: 38),
+                       SizedBox(width: 38.w),
                     const Spacer(),
                     if (timelineState.hasUndidRecording)
                       GestureDetector(
@@ -88,8 +88,8 @@ class CaptureRecordingControl extends StatelessWidget {
                         ),
                       )
                     else
-                      const SizedBox(width: 38),
-                    const SizedBox(width: 36),
+                       SizedBox(width: 38.w),
+                     SizedBox(width: 36.w),
                     if (timelineState.hasRecordings)
                       Container(
                         padding: const EdgeInsets.all(4),
@@ -106,7 +106,7 @@ class CaptureRecordingControl extends StatelessWidget {
                         ),
                       )
                     else
-                      const SizedBox(width: 38),
+                       SizedBox(width: 38.w),
                   ],
                 );
               },

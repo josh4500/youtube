@@ -5,4 +5,8 @@ export 'core/enums/auth_state.dart';
 export 'core/enums/date_group_head.dart';
 export 'core/enums/settings_enums.dart';
 export 'core/environment.dart';
+export 'core/error_handling/error_boundary.dart';
+export 'core/error_handling/error_reporter.dart';
+export 'core/error_handling/reporter/console_reporter.dart';
+export 'core/error_handling/reporter/local_reporter.dart';
 export 'core/extensions.dart';

@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class DownloadStorageUsage extends StatelessWidget {
   const DownloadStorageUsage({super.key});
@@ -40,7 +41,7 @@ class DownloadStorageUsage extends StatelessWidget {
           const LinearProgressIndicator(
             backgroundColor: Colors.grey,
             value: 0,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+            valueColor: AlwaysStoppedAnimation<Color>(AppPalette.blue),
             minHeight: 12,
           ),
           const SizedBox(height: 2),
@@ -53,7 +54,7 @@ class DownloadStorageUsage extends StatelessWidget {
                   Container(
                     height: 12,
                     width: 12,
-                    color: Colors.blue,
+                    color: AppPalette.blue,
                   ),
                   const SizedBox(width: 4),
                   const Text(

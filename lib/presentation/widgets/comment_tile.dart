@@ -60,7 +60,6 @@ class CommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double avatarSpace = 52;
     final showTranslationOption = Random().nextBool();
     return ColoredBox(
       color: backgroundColor ?? Colors.transparent,
@@ -77,11 +76,12 @@ class CommentTile extends StatelessWidget {
                   releasedColor: Colors.transparent,
                   padding: const EdgeInsets.all(8),
                   borderRadius: BorderRadius.circular(24),
-                  child: const AccountAvatar(size: 32),
+                  child: const AccountAvatar(size: 24),
                 ),
+                const SizedBox(width: 2),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -136,7 +136,7 @@ class CommentTile extends StatelessWidget {
                                               size: 12,
                                               color: byCreator
                                                   ? Colors.white
-                                                  : Colors.grey,
+                                                  : const Color(0xFFAAAAAA),
                                             ),
                                           ],
                                         ),
@@ -144,8 +144,9 @@ class CommentTile extends StatelessWidget {
                                   ],
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color:
-                                        byCreator ? Colors.white : Colors.grey,
+                                    color: byCreator
+                                        ? Colors.white
+                                        : const Color(0xFFAAAAAA),
                                   ),
                                 ),
                               ),
@@ -168,74 +169,91 @@ class CommentTile extends StatelessWidget {
                         const Text(
                           'Cutting funding on precautions is going to cost more in the long run',
                           maxLines: 5,
+                          style: TextStyle(
+                            color: Color(0xFFF1F1F1),
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
                         if (showTranslationOption)
                           const CommentTranslationButton(),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            TappableArea(
-                              onTap: () {},
-                              releasedColor: Colors.transparent,
-                              padding: const EdgeInsets.all(8),
-                              borderRadius: BorderRadius.circular(24),
-                              child: const Icon(
-                                YTIcons.like_outlined,
-                                size: 18,
-                              ),
-                            ),
-                            const Text(
-                              '69',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            const SizedBox(width: 16),
-                            TappableArea(
-                              onTap: () {},
-                              releasedColor: Colors.transparent,
-                              padding: const EdgeInsets.all(8),
-                              borderRadius: BorderRadius.circular(24),
-                              child: const Icon(
-                                YTIcons.dislike_outlined,
-                                size: 18,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            TappableArea(
-                              onTap: () {},
-                              releasedColor: Colors.transparent,
-                              padding: const EdgeInsets.all(8),
-                              borderRadius: BorderRadius.circular(24),
-                              child: const Icon(
-                                YTIcons.reply_outlined,
-                                size: 18,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            if (creatorLikes)
+                        Transform.translate(
+                          offset: const Offset(-8, 0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
                               TappableArea(
                                 onTap: () {},
                                 releasedColor: Colors.transparent,
                                 padding: const EdgeInsets.all(8),
                                 borderRadius: BorderRadius.circular(24),
-                                child: const Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    AccountAvatar(size: 18),
-                                    Positioned(
-                                      top: 9,
-                                      left: 9,
-                                      child: Icon(
-                                        YTIcons.heart_filled,
-                                        size: 14,
-                                        color: Color(0xFFFF0000),
-                                      ),
-                                    ),
-                                  ],
+                                child: const Icon(
+                                  YTIcons.like_outlined,
+                                  size: 18,
+                                  color: Color(0xFFF1F1F1),
                                 ),
                               ),
-                          ],
+                              Transform.translate(
+                                offset: const Offset(-4, 0),
+                                child: const SizedBox(
+                                  width: 24,
+                                  child: Text(
+                                    '69k',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFFF1F1F1),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              TappableArea(
+                                onTap: () {},
+                                releasedColor: Colors.transparent,
+                                padding: const EdgeInsets.all(8),
+                                borderRadius: BorderRadius.circular(24),
+                                child: const Icon(
+                                  YTIcons.dislike_outlined,
+                                  size: 18,
+                                  color: Color(0xFFF1F1F1),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              TappableArea(
+                                onTap: () {},
+                                releasedColor: Colors.transparent,
+                                padding: const EdgeInsets.all(8),
+                                borderRadius: BorderRadius.circular(24),
+                                child: const Icon(
+                                  YTIcons.reply_outlined,
+                                  size: 18,
+                                  color: Color(0xFFF1F1F1),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              if (creatorLikes)
+                                TappableArea(
+                                  onTap: () {},
+                                  releasedColor: Colors.transparent,
+                                  padding: const EdgeInsets.all(8),
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: const Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      AccountAvatar(size: 18),
+                                      Positioned(
+                                        top: 9,
+                                        left: 9,
+                                        child: Icon(
+                                          YTIcons.heart_filled,
+                                          size: 14,
+                                          color: Color(0xFFFF0000),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -249,21 +267,24 @@ class CommentTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(32),
                   splashFactory: InkSplash.splashFactory,
                   containedInkWell: true,
-                  child: const Icon(YTIcons.more_vert_outlined, size: 16),
+                  child: const Icon(
+                    YTIcons.more_vert_outlined,
+                    size: 16,
+                    color: Color(0xFFF1F1F1),
+                  ),
                 ),
               ],
             ),
           ),
           if (showReplies) ...<Widget>[
-            const SizedBox(height: 8),
             Row(
               children: <Widget>[
-                const SizedBox(width: avatarSpace),
+                const SizedBox(width: 32),
                 TappableArea(
                   onTap: openReply,
                   padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 8,
+                    vertical: 14,
+                    horizontal: 16,
                   ),
                   child: Row(
                     children: [
@@ -278,8 +299,11 @@ class CommentTile extends StatelessWidget {
                         ),
                       ],
                       const Text(
-                        '107 Replies',
-                        style: TextStyle(color: Color(0xFF3EA6FF)),
+                        '107 replies',
+                        style: TextStyle(
+                          color: Color(0xFF3EA6FF),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),

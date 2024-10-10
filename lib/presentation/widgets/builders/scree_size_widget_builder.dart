@@ -13,13 +13,15 @@ class ScreenSizeWidgetBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final maxWidth = MediaQuery.sizeOf(context).shortestSide;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
+        // final size = MediaQuery.sizeOf(context).shortestSide;
         return builder(
           context,
-          constraints.maxWidth > 800,
-          constraints.maxWidth > 500 && constraints.maxWidth <= 800,
-          constraints.maxWidth > 300 && constraints.maxWidth <= 500,
+          maxWidth > 800,
+          maxWidth > 500 && maxWidth <= 800,
+          maxWidth > 300 && maxWidth <= 500,
         );
       },
     );

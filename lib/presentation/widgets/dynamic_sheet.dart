@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/core.dart';
-import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../infrastructure.dart';
-import '../theme/icon/y_t_icons_icons.dart';
 import 'custom_scroll_physics.dart';
 import 'gestures/custom_ink_well.dart';
 import 'gestures/tappable_area.dart';
@@ -78,16 +76,20 @@ class _DynamicSheetState extends State<DynamicSheet>
               listenable: heightNotifier,
               builder: (BuildContext context, Widget? childWidget) {
                 return ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: heightNotifier.value),
+                  constraints: BoxConstraints(
+                    maxHeight: heightNotifier.value,
+                  ),
                   child: childWidget,
                 );
               },
               child: ScrollConfiguration(
-                behavior: const OverScrollGlowBehavior(enabled: false),
+                behavior: const OverScrollGlowBehavior(
+                  enabled: false,
+                ),
                 child: Scrollbar(
                   controller: scrollController,
                   child: ListView(
-                    physics: customScrollPhysics,
+                    physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     controller: scrollController,
                     children: [
@@ -117,6 +119,7 @@ enum DynamicSheetItemDependent {
   channel,
   network,
   orientation,
+  premium,
 }
 
 class DynamicSheetOptionItem<T> extends DynamicSheetItem {
@@ -160,7 +163,7 @@ class DynamicSheetOptionItem<T> extends DynamicSheetItem {
       child: Row(
         children: [
           leading,
-          const SizedBox(width: 12),
+          SizedBox(width: 12.w),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

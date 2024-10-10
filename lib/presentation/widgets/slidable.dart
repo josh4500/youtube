@@ -29,6 +29,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/core/extensions.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'custom_action_chip.dart';
 
 /// A widget that allows a child to slide horizontally or vertically with a draggable area.
@@ -258,10 +260,11 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final SlidableStyle theme = context.theme.appStyles.slidableStyle;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return ColoredBox(
-          color: widget.backgroundColor,
+          color: theme.backgroundColor,
           child: Stack(
             children: <Widget>[
               Positioned.fill(
@@ -277,13 +280,17 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
                         (index) {
                           final item = widget.items[index];
                           return Expanded(
-                            child: CustomActionChip(
-                              icon: item.icon,
-                              onTap: item.onTap,
-                              alignment: item.alignment,
-                              backgroundColor: item.backgroundColor,
-                              onTapCancel: _slideController.reverse,
-                              borderRadius: BorderRadius.zero,
+                            child: IconTheme(
+                              data: theme.iconTheme,
+                              child: CustomActionChip(
+                                icon: item.icon,
+                                onTap: item.onTap,
+                                alignment: item.alignment,
+                                backgroundColor: item.backgroundColor ??
+                                    theme.itemBackgroundColor,
+                                onTapCancel: _slideController.reverse,
+                                borderRadius: BorderRadius.zero,
+                              ),
                             ),
                           );
                         },
@@ -328,57 +335,23 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
   }
 }
 
-/// Extension methods for the AxisDirection enum to provide convenient
-/// ways to check its direction and alignment properties.
-extension on AxisDirection {
-  /// Returns true if this direction is [AxisDirection.left].
-  bool get isLeft => this == AxisDirection.left;
-
-  /// Returns true if this direction is [AxisDirection.right].
-  bool get isRight => this == AxisDirection.right;
-
-  /// Returns true if this direction is [AxisDirection.up].
-  bool get isUp => this == AxisDirection.up;
-
-  /// Returns true if this direction is [AxisDirection.down].
-  bool get isDown => this == AxisDirection.down;
-
-  /// Returns true if this direction is horizontal (left or right).
-  bool get isHorizontal =>
-      this == AxisDirection.left || this == AxisDirection.right;
-
-  /// Returns true if this direction is vertical (up or down).
-  bool get isVertical => this == AxisDirection.up || this == AxisDirection.down;
-}
-
-/// Returns the corresponding [Alignment] for the given [direction]
-/// that positions a child widget at the center of the sliding area.
-Alignment axisDirectionToCenterAlignment(AxisDirection direction) {
-  switch (direction) {
-    case AxisDirection.left:
-      return Alignment.centerLeft;
-    case AxisDirection.up:
-      return Alignment.topCenter;
-    case AxisDirection.right:
-      return Alignment.centerRight;
-    case AxisDirection.down:
-      return Alignment.bottomCenter;
-  }
-}
-
-class SharedSlidableState<T> extends ValueNotifier<T> {
+class SharedSlidableState extends ValueNotifier {
   SharedSlidableState(super.value);
+
+  void close() {
+    value = null;
+  }
 }
 
 class SlidableItem {
   const SlidableItem({
-    this.backgroundColor = Colors.white,
+    this.backgroundColor,
     this.alignment = Alignment.center,
     this.onTap,
     this.icon,
   });
 
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final Alignment alignment;
   final VoidCallback? onTap;
   final Widget? icon;

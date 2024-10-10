@@ -61,7 +61,7 @@ class ViewablePostContent extends StatelessWidget {
             children: <Widget>[
               const Padding(
                 padding: EdgeInsets.all(6.0),
-                child: AccountAvatar(size: 42),
+                child: AccountAvatar(size: 36),
               ),
               const Expanded(
                 child: Padding(
@@ -73,15 +73,18 @@ class ViewablePostContent extends StatelessWidget {
                         'ByteByteGo',
                         style: TextStyle(
                           fontSize: 15,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       SizedBox(height: 4),
-                      Text(
-                        '42 minutes ago',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey,
+                      Text.rich(
+                        TextSpan(
+                          text: '42 minutes ago',
+                          children: [TextSpan(text: ' (edited)')],
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                     ],
@@ -110,6 +113,7 @@ class ViewablePostContent extends StatelessWidget {
                         ],
                       );
                     },
+                canRequestFocus: false,
                 padding: const EdgeInsets.all(8.0),
                 borderRadius: BorderRadius.circular(32),
                 child: const Icon(YTIcons.more_vert_outlined),

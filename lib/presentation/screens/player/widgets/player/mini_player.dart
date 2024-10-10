@@ -39,7 +39,7 @@ class MiniPlayer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const SizedBox(width: 8),
+         SizedBox(width: 8.w),
         Expanded(
           flex: 3,
           child: Column(

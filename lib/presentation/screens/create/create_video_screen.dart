@@ -57,13 +57,13 @@ class SelectMediaView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
           child: Row(
             children: [
-              Expanded(child: AlbumSelectorButton()),
-              SizedBox(width: 24),
-              CreateCloseButton(),
+              const Expanded(child: AlbumSelectorButton()),
+              SizedBox(width: 24.w),
+              const CreateCloseButton(),
             ],
           ),
         ),
@@ -322,7 +322,7 @@ class AlbumSelectorButton extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           const RotatedBox(
             quarterTurns: 1,
             child: Icon(Icons.chevron_right_rounded),

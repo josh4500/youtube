@@ -11,10 +11,8 @@
 ///      fonts:
 ///       - asset: fonts/YTIcons.ttf
 ///
+/// 
 ///
-///
-// ignore_for_file: avoid_redundant_argument_values, constant_identifier_names
-
 import 'package:flutter/widgets.dart';
 
 class YTIcons {
@@ -23,330 +21,168 @@ class YTIcons {
   static const _kFontFam = 'YTIcons';
   static const String? _kFontPkg = null;
 
-  static const IconData clip_outlined =
-      IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData like_outlined =
-      IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData watch_later_outlined =
-      IconData(0xe802, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData your_videos_outlined =
-      IconData(0xe803, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData history_outlined =
-      IconData(0xe804, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData playlists_outlined =
-      IconData(0xe805, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData library_filled =
-      IconData(0xe806, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData library_outlined =
-      IconData(0xe807, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData subscriptions_filled =
-      IconData(0xe808, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shorts_filled =
-      IconData(0xe809, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData home_filled =
-      IconData(0xe80a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData arrow_back_outlined =
-      IconData(0xe80b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData mic_outlined =
-      IconData(0xe80c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData your_channel_outlined =
-      IconData(0xe80d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData more_vert_outlined =
-      IconData(0xe80e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData podcasts_outlined =
-      IconData(0xe80f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData movies_outlined =
-      IconData(0xe810, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData feedbck_outlined =
-      IconData(0xe811, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData help_outlined =
-      IconData(0xe812, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData report_outlined =
-      IconData(0xe813, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData thanks_outlined =
-      IconData(0xe814, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData save_outlined =
-      IconData(0xe815, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData redo_arrow =
-      IconData(0xe816, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData chevron_up =
-      IconData(0xe817, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData do_not_recommend_outlined =
-      IconData(0xe818, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData exclusive_outlined =
-      IconData(0xe819, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData save_to_playlist_outlined =
-      IconData(0xe81a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData playlist_play_outlined =
-      IconData(0xe81b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shuffle_outlined =
-      IconData(0xe81c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData not_interested_outlined =
-      IconData(0xe81d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData youtube_music_outlined =
-      IconData(0xe81e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData podcast_outlined =
-      IconData(0xe81f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shopping_bag_outlined =
-      IconData(0xe820, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData heart_filled =
-      IconData(0xe821, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData pinned_outlined =
-      IconData(0xe822, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData undo_arrow =
-      IconData(0xe823, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData timeline =
-      IconData(0xe824, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData settings_filled =
-      IconData(0xe825, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData live_outlined =
-      IconData(0xe826, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData cast_outlined =
-      IconData(0xe827, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData close_outlined =
-      IconData(0xe828, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData fashion_outlined =
-      IconData(0xe829, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData menu_outlined =
-      IconData(0xe82a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData learning_outlined =
-      IconData(0xe82b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData music_filled =
-      IconData(0xe82c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData add_playlist_outlined =
-      IconData(0xe82d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData pinned_filled =
-      IconData(0xe82e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData sort_outlined =
-      IconData(0xe82f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData add_circle_outline =
-      IconData(0xe830, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData clip_filled =
-      IconData(0xe831, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData dislike_outlined =
-      IconData(0xe832, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData download_outlined =
-      IconData(0xe833, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData loop_one_outlined =
-      IconData(0xe834, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData add_outlined =
-      IconData(0xe835, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData unmuted =
-      IconData(0xe839, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData chevron_down =
-      IconData(0xe83a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData chevron_up_1 =
-      IconData(0xe83b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData close_circle_outlined =
-      IconData(0xe83c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData fast_forward =
-      IconData(0xe83d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData info_filled =
-      IconData(0xe83e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData more_horiz_outlined =
-      IconData(0xe83f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData pause =
-      IconData(0xe840, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData restart_outlined =
-      IconData(0xe841, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shared_filled =
-      IconData(0xe842, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shorts_search =
-      IconData(0xe844, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData tag_fiiled =
-      IconData(0xe845, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData watch_later_filled =
-      IconData(0xe846, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData chevron_left =
-      IconData(0xe847, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData chevron_right =
-      IconData(0xe848, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shorts_dislike_filled =
-      IconData(0xe84a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shorts_like_filled =
-      IconData(0xe84b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shorts_share_filled =
-      IconData(0xe84c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData reply_outlined =
-      IconData(0xe84d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData description_outlined =
-      IconData(0xe850, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData notification_outlined =
-      IconData(0xe851, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData sound_off =
-      IconData(0xe852, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData sound_on =
-      IconData(0xe853, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData verified_filled =
-      IconData(0xe854, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData closed_caption =
-      IconData(0xe855, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData desktop_expand =
-      IconData(0xe856, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData desktop_minimize =
-      IconData(0xe857, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData fullscreen =
-      IconData(0xe858, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData info_filled_1 =
-      IconData(0xe859, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData minimize =
-      IconData(0xe85a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData paid_promotion_outlined =
-      IconData(0xe85c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData place_outlined =
-      IconData(0xe85d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData dislike_filled =
-      IconData(0xe85e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData google =
-      IconData(0xe85f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData purchases_membership =
-      IconData(0xe860, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData switch_accounts =
-      IconData(0xe861, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData youtube_outlined =
-      IconData(0xe863, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData cancel_outlined =
-      IconData(0xe864, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData check_outlined =
-      IconData(0xe865, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData external_link_outlined =
-      IconData(0xe866, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData info_outlined =
-      IconData(0xe867, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData network_outlined =
-      IconData(0xe868, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData phone_outlined =
-      IconData(0xe869, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData subscribers_outlined =
-      IconData(0xe86a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData trending_up_outlined =
-      IconData(0xe86b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData share_outlined =
-      IconData(0xe86d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData ambient_mode_outlined =
-      IconData(0xe86e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData annotation_outlined =
-      IconData(0xe86f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData audio_track_outlined =
-      IconData(0xe870, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData playback_speed_outlined =
-      IconData(0xe871, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData tune_outlined =
-      IconData(0xe872, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData exit_fullscreen_outlined =
-      IconData(0xe874, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData play_arrow =
-      IconData(0xe875, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData play_next =
-      IconData(0xe876, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData play_prev =
-      IconData(0xe877, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData delete_outlined =
-      IconData(0xe878, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData reload_outlined =
-      IconData(0xe879, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData youtube_studio_outlined =
-      IconData(0xe87a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData private_circle_outlined =
-      IconData(0xe87b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData private_dot_outlined =
-      IconData(0xe87c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData edit_outlined =
-      IconData(0xe87d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData loop_outlined =
-      IconData(0xe87e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData move_outlined =
-      IconData(0xe87f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData notifications_off_outlined =
-      IconData(0xe880, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData hide_outlined =
-      IconData(0xe881, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData heart_circle_outlied =
-      IconData(0xe882, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData mix_outlined =
-      IconData(0xe883, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData mix_solid_outlined =
-      IconData(0xe884, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData external_link_rounded_outlined =
-      IconData(0xe885, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData notification_all_filled =
-      IconData(0xe886, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData unsubscribe_outlined =
-      IconData(0xe887, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shorts_comment_filled =
-      IconData(0xe888, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData analytics_outlined =
-      IconData(0xe88a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData comments_outlined =
-      IconData(0xe88b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData like_filled =
-      IconData(0xe88c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData copyright_outlined =
-      IconData(0xe88d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData retouch =
-      IconData(0xe88e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData star =
-      IconData(0xe88f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData filter_outlined =
-      IconData(0xe890, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData exit_outlined =
-      IconData(0xe891, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData caption_filled =
-      IconData(0xe892, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shorts_outline_outlined =
-      IconData(0xe893, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shorts_filled_1 =
-      IconData(0xe894, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData flip_camera =
-      IconData(0xe895, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData sparkle =
-      IconData(0xe896, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData speed =
-      IconData(0xe897, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData music =
-      IconData(0xe898, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData trim =
-      IconData(0xe899, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData flash_off =
-      IconData(0xe89a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData create_outlined =
-      IconData(0xe89b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData adjust =
-      IconData(0xe89c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData filter_photo =
-      IconData(0xe89d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData green_screen =
-      IconData(0xe89e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData align =
-      IconData(0xe89f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData channel_memberships =
-      IconData(0xe8a0, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData message_bubble_overlap =
-      IconData(0xe8a1, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData lighting =
-      IconData(0xe8a2, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData search_outlined =
-      IconData(0xe8a3, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData discover_outlined =
-      IconData(0xe900, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData subscriptions_outlined =
-      IconData(0xe901, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData shorts_outlined =
-      IconData(0xe902, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData home_outlined =
-      IconData(0xe903, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData settings_outlined =
-      IconData(0xe904, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData games_outlined =
-      IconData(0xe905, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData sports_outlined =
-      IconData(0xe906, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData news_outlined =
-      IconData(0xe907, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData trending_outlined =
-      IconData(0xe908, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData music_outlined =
-      IconData(0xe909, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData location_outlined =
-      IconData(0xe90a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData clip_outlined = IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData like_outlined = IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData watch_later_outlined = IconData(0xe802, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData your_videos_outlined = IconData(0xe803, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData history_outlined = IconData(0xe804, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData playlists_outlined = IconData(0xe805, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData library_filled = IconData(0xe806, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData library_outlined = IconData(0xe807, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData subscriptions_filled = IconData(0xe808, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shorts_filled = IconData(0xe809, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData home_filled = IconData(0xe80a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData arrow_back_outlined = IconData(0xe80b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData mic_outlined = IconData(0xe80c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData your_channel_outlined = IconData(0xe80d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData more_vert_outlined = IconData(0xe80e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData podcasts_outlined = IconData(0xe80f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData movies_outlined = IconData(0xe810, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData feedbck_outlined = IconData(0xe811, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData help_outlined = IconData(0xe812, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData report_outlined = IconData(0xe813, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData thanks_outlined = IconData(0xe814, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData save_outlined = IconData(0xe815, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData redo_arrow = IconData(0xe816, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chevron_up = IconData(0xe817, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData do_not_recommend_outlined = IconData(0xe818, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData exclusive_outlined = IconData(0xe819, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData save_to_playlist_outlined = IconData(0xe81a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData playlist_play_outlined = IconData(0xe81b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shuffle_outlined = IconData(0xe81c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData not_interested_outlined = IconData(0xe81d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData youtube_music_outlined = IconData(0xe81e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData podcast_outlined = IconData(0xe81f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shopping_bag_outlined = IconData(0xe820, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData heart_filled = IconData(0xe821, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData pinned_outlined = IconData(0xe822, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData undo_arrow = IconData(0xe823, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData timeline = IconData(0xe824, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData settings_filled = IconData(0xe825, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData live_outlined = IconData(0xe826, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData cast_outlined = IconData(0xe827, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData close_outlined = IconData(0xe828, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData fashion_outlined = IconData(0xe829, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData menu_outlined = IconData(0xe82a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData learning_outlined = IconData(0xe82b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData music_filled = IconData(0xe82c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData add_playlist_outlined = IconData(0xe82d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData pinned_filled = IconData(0xe82e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData sort_outlined = IconData(0xe82f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData add_circle_outline = IconData(0xe830, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData clip_filled = IconData(0xe831, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData dislike_outlined = IconData(0xe832, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData download_outlined = IconData(0xe833, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData loop_one_outlined = IconData(0xe834, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData add_outlined = IconData(0xe835, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData share_filled = IconData(0xe836, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData unmuted = IconData(0xe839, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chevron_down = IconData(0xe83a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chevron_up_1 = IconData(0xe83b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData close_circle_outlined = IconData(0xe83c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData fast_forward = IconData(0xe83d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData info_filled = IconData(0xe83e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData more_horiz_outlined = IconData(0xe83f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData pause = IconData(0xe840, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData restart_outlined = IconData(0xe841, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shared_filled = IconData(0xe842, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shorts_search = IconData(0xe844, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData tag_fiiled = IconData(0xe845, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData watch_later_filled = IconData(0xe846, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chevron_left = IconData(0xe847, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chevron_right = IconData(0xe848, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shorts_dislike_filled = IconData(0xe84a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shorts_like_filled = IconData(0xe84b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shorts_share_filled = IconData(0xe84c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData reply_outlined = IconData(0xe84d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData description_outlined = IconData(0xe850, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData notification_outlined = IconData(0xe851, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData sound_off = IconData(0xe852, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData sound_on = IconData(0xe853, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData verified_filled = IconData(0xe854, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData closed_caption = IconData(0xe855, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData desktop_expand = IconData(0xe856, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData desktop_minimize = IconData(0xe857, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData fullscreen = IconData(0xe858, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData info_filled_1 = IconData(0xe859, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData minimize = IconData(0xe85a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData paid_promotion_outlined = IconData(0xe85c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData place_outlined = IconData(0xe85d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData dislike_filled = IconData(0xe85e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData google = IconData(0xe85f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData purchases_membership = IconData(0xe860, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData switch_accounts = IconData(0xe861, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData youtube_outlined = IconData(0xe863, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData cancel_outlined = IconData(0xe864, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData check_outlined = IconData(0xe865, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData external_link_outlined = IconData(0xe866, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData info_outlined = IconData(0xe867, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData network_outlined = IconData(0xe868, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData phone_outlined = IconData(0xe869, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData subscribers_outlined = IconData(0xe86a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData trending_up_outlined = IconData(0xe86b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData share_outlined = IconData(0xe86d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData ambient_mode_outlined = IconData(0xe86e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData annotation_outlined = IconData(0xe86f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData audio_track_outlined = IconData(0xe870, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData playback_speed_outlined = IconData(0xe871, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData tune_outlined = IconData(0xe872, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData exit_fullscreen_outlined = IconData(0xe874, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData play_arrow = IconData(0xe875, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData play_next = IconData(0xe876, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData play_prev = IconData(0xe877, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData delete_outlined = IconData(0xe878, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData reload_outlined = IconData(0xe879, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData youtube_studio_outlined = IconData(0xe87a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData private_circle_outlined = IconData(0xe87b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData private_dot_outlined = IconData(0xe87c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData edit_outlined = IconData(0xe87d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData loop_outlined = IconData(0xe87e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData move_outlined = IconData(0xe87f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData notifications_off_outlined = IconData(0xe880, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData hide_outlined = IconData(0xe881, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData heart_circle_outlied = IconData(0xe882, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData mix_outlined = IconData(0xe883, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData mix_solid_outlined = IconData(0xe884, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData external_link_rounded_outlined = IconData(0xe885, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData notification_all_filled = IconData(0xe886, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData unsubscribe_outlined = IconData(0xe887, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shorts_comment_filled = IconData(0xe888, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData analytics_outlined = IconData(0xe88a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData comments_outlined = IconData(0xe88b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData like_filled = IconData(0xe88c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData copyright_outlined = IconData(0xe88d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData retouch = IconData(0xe88e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData star = IconData(0xe88f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData filter_outlined = IconData(0xe890, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData exit_outlined = IconData(0xe891, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData caption_filled = IconData(0xe892, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shorts_outline_outlined = IconData(0xe893, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shorts_filled_1 = IconData(0xe894, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData flip_camera = IconData(0xe895, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData sparkle = IconData(0xe896, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData speed = IconData(0xe897, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData music = IconData(0xe898, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData trim = IconData(0xe899, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData flash_off = IconData(0xe89a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData create_outlined = IconData(0xe89b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData adjust = IconData(0xe89c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData filter_photo = IconData(0xe89d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData green_screen = IconData(0xe89e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData align = IconData(0xe89f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData channel_memberships = IconData(0xe8a0, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData message_bubble_overlap = IconData(0xe8a1, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData lighting = IconData(0xe8a2, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData search_outlined = IconData(0xe8a4, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData discover_outlined = IconData(0xe900, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData subscriptions_outlined = IconData(0xe901, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData shorts_outlined = IconData(0xe902, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData home_outlined = IconData(0xe903, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData settings_outlined = IconData(0xe904, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData games_outlined = IconData(0xe905, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData sports_outlined = IconData(0xe906, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData news_outlined = IconData(0xe907, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData trending_outlined = IconData(0xe908, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData music_outlined = IconData(0xe909, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData location_outlined = IconData(0xe90a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

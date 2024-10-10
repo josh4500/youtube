@@ -1,10 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:media_kit/media_kit.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import 'core.dart';
 import 'data.dart';
@@ -15,30 +15,72 @@ import 'presentation/app.dart';
 
 Future<void> main() async {
   await setup();
-  runApp(const App());
+  final errorReporter = ErrorReporter(
+    clients: [
+      ConsoleReporterClient(),
+      // Uncommented till when Firebase setup is complete
+      // FirebaseReporterClient(),
+      LocalFileReporterClient(LegacyCache.errorFile.value),
+    ],
+  );
+  AppLogger.init(
+    shouldLog: () => true,
+    shouldLogException: (Object error) {
+      const List<Type> ignoreTypes = <Type>[
+        SocketException,
+        HandshakeException,
+        TimeoutException,
+      ];
+      return !ignoreTypes.contains(error.runtimeType);
+    },
+    onException: errorReporter.reportError,
+    onLog: (Object? message) => debugPrint(message?.toString()),
+  );
+
+  runApp(
+    ErrorBoundary(
+      // TODO(josh4500): Create a screen for error
+      errorViewBuilder: (_) => const SizedBox(),
+      onCrash: errorReporter.reportCrash,
+      onException: (_, __) {},
+      child: const App(),
+    ),
+  );
 }
 
 Future<void> setup() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   PhotoManager.clearFileCache();
-  final Directory dir = await getApplicationDocumentsDirectory();
-  final String appPath = dir.path;
+  await SharedPref.init();
 
-  // Set Hive default directory
-  Hive.defaultDirectory = appPath;
+  await Future.wait([
+    setupSystemUITheme(),
+    setupSystemLocale(),
+    InternetConnectivity.instance.initialize(),
+  ]);
 
+  setupRepositories();
+}
+
+Future<void> setupSystemUITheme() async {
+  AppTheme.setSystemOverlayStyle(
+    LegacyCache.themeMode.value.isDark ? Brightness.dark : Brightness.light,
+  );
+}
+
+Future<void> setupSystemLocale() async {
   // Load default locale
   final Locale locale = S.delegate.supportedLocales.firstWhere(
     (Locale locale) {
-      return locale.languageCode.split('_').first == Platform.localeName ||
-          locale.languageCode == Platform.localeName;
+      final userCacheValue = LegacyCache.locale.value;
+      return locale.languageCode.split('_').first ==
+              userCacheValue.languageCode ||
+          locale.languageCode == userCacheValue.languageCode;
     },
     orElse: () => kDefaultLocale,
   );
   await S.load(locale);
-  await InternetConnectivity.instance.initialize();
-  setupRepositories();
 }
 
 // TODO(Josh): Inject repositories

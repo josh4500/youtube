@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import '../gestures/tappable_area.dart';
 import '../network_image/custom_network_image.dart';
 
 class PlayableLiveContent extends StatelessWidget {
@@ -40,6 +41,7 @@ class PlayableLiveContent extends StatelessWidget {
     this.direction = Axis.horizontal,
     this.margin,
     this.completed = false,
+    this.onMore,
   });
   final Axis direction;
   final EdgeInsets? margin;
@@ -48,11 +50,13 @@ class PlayableLiveContent extends StatelessWidget {
   // TODO(Josh): rename width and height
   final double? width;
   final double? height;
+  final VoidCallback? onMore;
 
   @override
   Widget build(BuildContext context) {
     // TODO(josh4500): Add bool to hide live/duration indicator
     // TODO(josh4500): Can be completed or upcoming or currently live
+    final PlayableStyle theme = context.theme.appStyles.playableStyle;
     return Container(
       margin: margin,
       child: Flex(
@@ -68,7 +72,7 @@ class PlayableLiveContent extends StatelessWidget {
                   width: width,
                   height: height,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.backgroundColor,
                     borderRadius: BorderRadius.circular(8),
                     image: const DecorationImage(
                       image: CustomNetworkImage(
@@ -88,7 +92,7 @@ class PlayableLiveContent extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: completed ? Colors.black54 : const Color(0xFFFF0000),
+                    color: completed ? Colors.black54 : AppPalette.red,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: completed
@@ -96,16 +100,24 @@ class PlayableLiveContent extends StatelessWidget {
                           '2:06:14',
                           style: TextStyle(
                             fontSize: 12,
+                            color: Colors.white,
                             fontWeight: FontWeight.w500,
                           ),
                         )
                       : const Row(
                           children: [
-                            Icon(YTIcons.live_outlined, size: 14),
+                            Icon(
+                              YTIcons.live_outlined,
+                              size: 14,
+                              color: Colors.white,
+                            ),
                             SizedBox(width: 4),
                             Text(
                               'LIVE',
-                              style: TextStyle(fontSize: 12),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.white,
+                              ),
                             ),
                           ],
                         ),
@@ -114,9 +126,9 @@ class PlayableLiveContent extends StatelessWidget {
             ),
           ),
           if (direction == Axis.vertical)
-            const SizedBox(height: 8)
+            SizedBox(height: 8.h)
           else
-            const SizedBox(width: 12),
+            SizedBox(width: 16.w),
           Flexible(
             flex: direction == Axis.vertical ? 0 : 1,
             child: SizedBox(
@@ -167,7 +179,17 @@ class PlayableLiveContent extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(YTIcons.more_vert_outlined, size: 14),
+                  Transform.translate(
+                    offset: const Offset(8, -8),
+                    child: TappableArea(
+                      onTap: onMore,
+                      canRequestFocus: false,
+                      focusColor: Colors.transparent,
+                      padding: const EdgeInsets.all(8),
+                      borderRadius: BorderRadius.circular(16),
+                      child: const Icon(YTIcons.more_vert_outlined, size: 16),
+                    ),
+                  ),
                 ],
               ),
             ),

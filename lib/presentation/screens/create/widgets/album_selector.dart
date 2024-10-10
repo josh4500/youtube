@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 import 'package:youtube_clone/infrastructure.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../provider/media_album_state.dart';
@@ -69,11 +70,11 @@ class AlbumSelector extends ConsumerWidget {
                               AssetEntityImage(
                                 album.thumbAsset,
                                 fit: BoxFit.cover,
-                                height: 100,
-                                width: 100,
+                                height: 100.w,
+                                width: 100.w,
                                 isOriginal: false,
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12.w),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +99,7 @@ class AlbumSelector extends ConsumerWidget {
                                   ],
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12.w),
                             ],
                           ),
                         ),

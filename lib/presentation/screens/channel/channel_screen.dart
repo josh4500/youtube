@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/screens/channel/widgets/menu/show_channel_menu.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/view_models/content/shorts_view_model.dart';
 import 'package:youtube_clone/presentation/view_models/content/video_view_model.dart';
@@ -54,10 +55,10 @@ class _ChannelScreenState extends State<ChannelScreen> {
       'Home',
       'Videos',
       'Shorts',
-      'Releases', // TODO(Josh): DO impl
+      'Releases',
       'Live',
       'Podcasts',
-      'Playlists', // TODO(Josh): DO impl
+      'Playlists',
       'Community',
       'Products', // TODO(Josh): Do impl
     ];
@@ -73,12 +74,18 @@ class _ChannelScreenState extends State<ChannelScreen> {
               onTap: () {},
             ),
             AppbarAction(
-              icon: YTIcons.notification_outlined,
-              onTap: () => context.goto(AppRoutes.notifications),
-            ),
-            AppbarAction(
               icon: YTIcons.search_outlined,
               onTap: () => context.goto(AppRoutes.search),
+            ),
+            AppbarAction(
+              icon: YTIcons.more_vert_outlined,
+              onTapDown: (TapDownDetails details) {
+                final Offset position = details.globalPosition;
+                showChannelMenu(
+                  context,
+                  RelativeRect.fromLTRB(position.dx, 0, 0, 0),
+                );
+              },
             ),
           ],
         ),
@@ -102,8 +109,6 @@ class _ChannelScreenState extends State<ChannelScreen> {
                     bottom: TabBar(
                       isScrollable: true,
                       tabAlignment: TabAlignment.start,
-                      dividerColor: Colors.white,
-                      indicatorColor: Colors.white,
                       tabs: tabs.map((String name) => Tab(text: name)).toList(),
                     ),
                   ),
@@ -115,6 +120,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                 return Builder(
                   builder: (BuildContext context) {
                     return CustomScrollView(
+                      physics: const ClampingScrollPhysics(),
                       slivers: <Widget>[
                         SliverOverlapInjector(
                           handle:
@@ -126,6 +132,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                         if (tabName == 'Videos') ..._buildVideos(),
                         if (tabName == 'Shorts') ..._buildShorts(),
                         if (tabName == 'Live') ..._buildLives(),
+                        if (tabName == 'Releases') ..._buildReleases(),
                         if (tabName == 'Podcasts') ..._buildPodcasts(),
                         if (tabName == 'Playlists') ..._buildPlaylists(),
                         if (tabName == 'Community') ..._buildCommunity(),
@@ -271,14 +278,16 @@ class _ChannelScreenState extends State<ChannelScreen> {
         SliverList(
           delegate: SliverChildBuilderDelegate(
             (BuildContext context, int index) {
-              return const TappableArea(
-                padding: EdgeInsets.symmetric(
+              return TappableArea(
+                padding: const EdgeInsets.symmetric(
                   vertical: 8.0,
                   horizontal: 12,
                 ),
+                onLongPress: onMoreVideo,
                 child: PlayableVideoContent(
-                  height: 112,
-                  width: 180,
+                  width: 160,
+                  height: 88,
+                  onMore: onMoreVideo,
                 ),
               );
             },
@@ -321,14 +330,17 @@ class _ChannelScreenState extends State<ChannelScreen> {
       SliverList(
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
-            return const TappableArea(
-              padding: EdgeInsets.symmetric(
+            return TappableArea(
+              padding: const EdgeInsets.symmetric(
                 vertical: 8.0,
                 horizontal: 12,
               ),
+              onTap: () {},
+              onLongPress: onMoreVideo,
               child: PlayableVideoContent(
-                height: 112,
-                width: 180,
+                width: 160,
+                height: 88,
+                onMore: onMoreVideo,
               ),
             );
           },
@@ -409,10 +421,65 @@ class _ChannelScreenState extends State<ChannelScreen> {
                 vertical: 8.0,
                 horizontal: 12,
               ),
+              onLongPress: onMoreVideo,
               child: PlayableLiveContent(
-                height: 112,
-                width: 180,
+                width: 160,
+                height: 88,
                 completed: index != 0,
+                onMore: onMoreVideo,
+              ),
+            );
+          },
+          childCount: 10,
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> _buildReleases() {
+    return [
+      const SliverToBoxAdapter(child: SizedBox(height: 8)),
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (BuildContext context, int index) {
+            return TappableArea(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 12,
+              ),
+              onTap: () {},
+              child: PlayableContent(
+                width: 160,
+                height: 88,
+                direction: Axis.horizontal,
+                isPlaylist: true,
+                onMore: () {
+                  showDynamicSheet(
+                    context,
+                    items: [
+                      DynamicSheetOptionItem(
+                        leading: const Icon(YTIcons.playlist_play_outlined),
+                        title: 'Play next in queue',
+                        trailing: ClipRRect(
+                          borderRadius: BorderRadius.circular(2),
+                          child: Image.asset(
+                            AssetsPath.ytPAccessIcon48,
+                            width: 18,
+                            height: 18,
+                          ),
+                        ),
+                      ),
+                      const DynamicSheetOptionItem(
+                        leading: Icon(YTIcons.save_outlined),
+                        title: 'Save to library',
+                      ),
+                      const DynamicSheetOptionItem(
+                        leading: Icon(YTIcons.share_outlined),
+                        title: 'Share',
+                      ),
+                    ],
+                  );
+                },
               ),
             );
           },
@@ -433,9 +500,10 @@ class _ChannelScreenState extends State<ChannelScreen> {
                 vertical: 8.0,
                 horizontal: 12,
               ),
+              onTap: () {},
               child: PlayableContent(
-                width: 180,
-                height: 112,
+                width: 160,
+                height: 170,
                 direction: Axis.horizontal,
                 isPlaylist: true,
                 isPodcasts: true,
@@ -517,8 +585,8 @@ class _ChannelScreenState extends State<ChannelScreen> {
                 horizontal: 12,
               ),
               child: PlayableContent(
-                width: 180,
-                height: 112,
+                width: 160,
+                height: 88,
                 direction: Axis.horizontal,
                 isPlaylist: true,
                 onMore: () {
@@ -560,7 +628,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
   List<Widget> _buildCommunity() {
     return <Widget>[
       const SliverToBoxAdapter(
-        child: SizedBox(height: 8),
+        child: SizedBox(height: 4),
       ),
       SliverList(
         delegate: SliverChildBuilderDelegate(
@@ -583,5 +651,45 @@ class _ChannelScreenState extends State<ChannelScreen> {
         ),
       ),
     ];
+  }
+
+  void onMoreVideo() {
+    showDynamicSheet(
+      context,
+      items: [
+        DynamicSheetOptionItem(
+          leading: const Icon(YTIcons.watch_later_outlined),
+          title: 'Play next in queue',
+          trailing: ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: Image.asset(
+              AssetsPath.ytPAccessIcon48,
+              width: 24,
+              height: 24,
+            ),
+          ),
+          dependents: const [DynamicSheetItemDependent.premium],
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.watch_later_outlined),
+          title: 'Save to Watch later',
+          dependents: [DynamicSheetItemDependent.auth],
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.add_playlist_outlined),
+          title: 'Save to playlist',
+          dependents: [DynamicSheetItemDependent.auth],
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.download_outlined),
+          title: 'Download video',
+          dependents: [DynamicSheetItemDependent.auth],
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.share_outlined),
+          title: 'Share',
+        ),
+      ],
+    );
   }
 }

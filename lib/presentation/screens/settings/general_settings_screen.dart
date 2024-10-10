@@ -32,15 +32,15 @@ import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core/enums/settings_enums.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/preferences.dart';
-import 'package:youtube_clone/presentation/screens/settings/view_models/pref_option.dart';
-import 'package:youtube_clone/presentation/screens/settings/widgets/frequency_picker.dart';
-import 'package:youtube_clone/presentation/screens/settings/widgets/round_check_item.dart';
-import 'package:youtube_clone/presentation/screens/settings/widgets/settings_tile.dart';
-import 'package:youtube_clone/presentation/theme/styles/app_style.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
+import 'view_models/pref_option.dart';
 import 'widgets/date_range_picker.dart';
+import 'widgets/frequency_picker.dart';
+import 'widgets/round_check_item.dart';
 import 'widgets/settings_list_view.dart';
 import 'widgets/settings_popup_container.dart';
+import 'widgets/settings_tile.dart';
 
 class GeneralSettingsScreen extends ConsumerStatefulWidget {
   const GeneralSettingsScreen({super.key});
@@ -358,13 +358,13 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
   }
 
   Future<void> _onChangeAppearance() async {
-    final ThemeMode? result = await showDialog<ThemeMode>(
+    final ThemeMode? result = await showAdaptiveDialog<ThemeMode>(
       context: context,
-      builder: (_) {
+      builder: (BuildContext context) {
         return SettingsPopupContainer<ThemeMode>.builder(
           title: 'Appearance',
           capitalizeDismissButtons: true,
-          itemBuilder: (_, int index) {
+          itemBuilder: (BuildContext _, int index) {
             final ThemeMode themeMode = ThemeMode.values[index];
             final String title = themeMode.isDark
                 ? 'Dark theme'
@@ -374,8 +374,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
 
             return Consumer(
               builder: (BuildContext context, WidgetRef ref, _) {
-                final PreferenceState preferences =
-                    ref.watch(preferencesProvider);
+                final preferences = ref.watch(preferencesProvider);
                 return RoundCheckItem<ThemeMode>(
                   title: title,
                   value: themeMode,

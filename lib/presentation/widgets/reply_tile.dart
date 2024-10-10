@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import 'account_avatar.dart';
@@ -52,10 +53,10 @@ class ReplyTile extends StatelessWidget {
             onTap: () => showCommenterProfile(context),
             releasedColor: Colors.transparent,
             padding: const EdgeInsets.all(8),
-            borderRadius: BorderRadius.circular(32),
-            child: const AccountAvatar(size: 32),
+            borderRadius: BorderRadius.circular(24),
+            child: const AccountAvatar(size: 24),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 2),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -66,71 +67,68 @@ class ReplyTile extends StatelessWidget {
                     text: const TextSpan(
                       text: '@BussyBoyBonanza',
                       children: <InlineSpan>[
-                        TextSpan(text: ' · '),
+                        TextSpan(text: kDotSeparator),
                         TextSpan(text: '7mo ago'),
                       ],
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'OMG This is so fun 😂',
-                  ),
+                  const Text('OMG This is so fun 😂'),
                   const SizedBox(height: 16),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      TappableArea(
-                        onTap: () {},
-                        releasedColor: Colors.transparent,
-                        padding: const EdgeInsets.all(8),
-                        borderRadius: BorderRadius.circular(24),
-                        child: const Icon(
-                          YTIcons.like_outlined,
-                          size: 18,
-                        ),
-                      ),
-                      const Text('7', style: TextStyle(fontSize: 12)),
-                      const SizedBox(width: 16),
-                      TappableArea(
-                        onTap: () {},
-                        releasedColor: Colors.transparent,
-                        padding: const EdgeInsets.all(8),
-                        borderRadius: BorderRadius.circular(24),
-                        child: const Icon(
-                          YTIcons.dislike_outlined,
-                          size: 18,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      if (creatorLikes)
+                  Transform.translate(
+                    offset: const Offset(-8, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
                         TappableArea(
                           onTap: () {},
                           releasedColor: Colors.transparent,
                           padding: const EdgeInsets.all(8),
                           borderRadius: BorderRadius.circular(24),
-                          child: const Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              AccountAvatar(size: 18),
-                              Positioned(
-                                top: 9,
-                                left: 9,
-                                child: Icon(
-                                  YTIcons.heart_filled,
-                                  size: 14,
-                                  color: Color(0xFFFF0000),
-                                ),
-                              ),
-                            ],
+                          child: const Icon(YTIcons.like_outlined, size: 18),
+                        ),
+                        const SizedBox(
+                          width: 24,
+                          child: Text(
+                            '7',
+                            style: TextStyle(fontSize: 12),
                           ),
                         ),
-                    ],
+                        TappableArea(
+                          onTap: () {},
+                          releasedColor: Colors.transparent,
+                          padding: const EdgeInsets.all(8),
+                          borderRadius: BorderRadius.circular(24),
+                          child: const Icon(YTIcons.dislike_outlined, size: 18),
+                        ),
+                        const SizedBox(width: 16),
+                        if (creatorLikes)
+                          TappableArea(
+                            onTap: () {},
+                            releasedColor: Colors.transparent,
+                            padding: const EdgeInsets.all(8),
+                            borderRadius: BorderRadius.circular(24),
+                            child: const Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                AccountAvatar(size: 18),
+                                Positioned(
+                                  top: 9,
+                                  left: 9,
+                                  child: Icon(
+                                    YTIcons.heart_filled,
+                                    size: 14,
+                                    color: Color(0xFFFF0000),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ],
               ),

@@ -29,8 +29,8 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
+import 'custom_action_button.dart';
 import 'dynamic_sheet.dart';
-import 'gestures/tappable_area.dart';
 
 class SubscribedChannelButton extends StatelessWidget {
   const SubscribedChannelButton({
@@ -52,37 +52,18 @@ class SubscribedChannelButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TappableArea(
+    return CustomActionButton(
+      title: title,
+      alignment: Alignment.center,
+      padding: padding ??
+          const EdgeInsets.symmetric(
+            vertical: 4,
+            horizontal: 8,
+          ),
       onTap: () => onButtonClicked(context),
-      padding: EdgeInsets.zero,
-      borderRadius: borderRadius ?? BorderRadius.circular(16),
-      child: Container(
-        alignment: alignment,
-        padding: padding ??
-            const EdgeInsets.symmetric(
-              vertical: 4,
-              horizontal: 8,
-            ),
-        decoration: BoxDecoration(
-          color: Colors.white12,
-          borderRadius: borderRadius ?? BorderRadius.circular(16),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(SubscriptionNotificationType.all.icon),
-            if (title != null) ...<Widget>[
-              const SizedBox(width: 4),
-              Text(title!, style: textStyle),
-            ],
-            const SizedBox(width: 4),
-            const RotatedBox(
-              quarterTurns: 1,
-              child: Icon(YTIcons.chevron_right),
-            ),
-          ],
-        ),
-      ),
+      textStyle: textStyle,
+      icon: Icon(SubscriptionNotificationType.personalized.icon),
+      trailingIcon: const Icon(YTIcons.chevron_down),
     );
   }
 
@@ -97,7 +78,11 @@ class SubscribedChannelButton extends StatelessWidget {
         ),
       ),
       items: [
-        for (final type in SubscriptionNotificationType.values)
+        for (final type in SubscriptionNotificationType.values) ...[
+          if (type == SubscriptionNotificationType.unsubscribe)
+            const DynamicSheetSection(
+              child: Divider(height: 0, thickness: 1),
+            ),
           DynamicSheetOptionItem<SubscriptionNotificationType>(
             value: type,
             title: type.text,
@@ -108,6 +93,7 @@ class SubscribedChannelButton extends StatelessWidget {
               size: 18,
             ),
           ),
+        ],
       ],
     );
   }

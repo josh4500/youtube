@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import 'gestures/tappable_area.dart';
 import 'over_scroll_glow_behavior.dart';
@@ -90,11 +91,12 @@ class _DynamicTabState extends State<DynamicTab> {
   @override
   void didUpdateWidget(covariant DynamicTab oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _selectedIndexNotifier.value = widget.initialIndex;
+    //_selectedIndexNotifier.value = widget.initialIndex;
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.theme.appStyles.dynamicTabStyle;
     return ScrollConfiguration(
       behavior: const OverScrollGlowBehavior(enabled: false),
       child: ListView.builder(
@@ -131,22 +133,19 @@ class _DynamicTabState extends State<DynamicTab> {
                   color: widget.useTappable
                       ? null
                       : index == selectedIndex
-                          ? const Color(0xFFF1F1F1)
-                          : const Color(0xFF272727),
+                          ? theme.selectedColor
+                          : theme.unselectedColor,
                 ),
                 child: Text(
                   widget.options[index],
-                  style: widget.textStyle?.copyWith(
-                        color: index == selectedIndex
-                            ? const Color(0xFF0F0F0F)
-                            : const Color(0xFFF1F1F1),
+                  style: widget.textStyle?.merge(
+                        index == selectedIndex
+                            ? theme.selectedTextStyle
+                            : theme.unselectedTextStyle,
                       ) ??
-                      TextStyle(
-                        color: index == selectedIndex
-                            ? const Color(0xFF0F0F0F)
-                            : const Color(0xFFF1F1F1),
-                        fontWeight: FontWeight.w500,
-                      ),
+                      (index == selectedIndex
+                          ? theme.selectedTextStyle
+                          : theme.unselectedTextStyle),
                 ),
               );
             },
@@ -166,8 +165,8 @@ class _DynamicTabState extends State<DynamicTab> {
                     borderRadius: BorderRadius.circular(8),
                     child: ColoredBox(
                       color: index == selectedIndex
-                          ? const Color(0xFFF1F1F1)
-                          : const Color(0xFF272727),
+                          ? theme.selectedColor
+                          : theme.unselectedColor,
                       child: childWidget,
                     ),
                   );

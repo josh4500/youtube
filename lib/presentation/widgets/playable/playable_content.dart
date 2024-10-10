@@ -59,8 +59,7 @@ class PlayableContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PlayableContentStyle theme =
-        context.theme.appStyles.playableContentStyle;
+    final PlayableStyle theme = context.theme.appStyles.playableStyle;
     return Container(
       margin: margin,
       child: Flex(
@@ -83,9 +82,10 @@ class PlayableContent extends StatelessWidget {
                       ),
                       child: ClipPath(
                         clipper: ClipEdgeClipper(),
-                        child: const ColoredBox(
+                        child: ColoredBox(
                           color: Colors.white60,
-                          child: SizedBox(width: double.infinity, height: 4.2),
+                          child:
+                              SizedBox(width: double.infinity, height: 4.2.h),
                         ),
                       ),
                     ),
@@ -96,9 +96,9 @@ class PlayableContent extends StatelessWidget {
                         alignment: Alignment.bottomRight,
                         children: <Widget>[
                           Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.white10,
-                              image: DecorationImage(
+                            decoration: BoxDecoration(
+                              color: theme.backgroundColor,
+                              image: const DecorationImage(
                                 image: CustomNetworkImage(
                                   'https://picsum.photos/300/300',
                                 ),
@@ -130,7 +130,7 @@ class PlayableContent extends StatelessWidget {
                                     size: 16,
                                     color: Colors.white,
                                   ),
-                                  const SizedBox(width: 2),
+                                  SizedBox(width: 2.w),
                                   const Text(
                                     '2',
                                     style: TextStyle(
@@ -151,15 +151,22 @@ class PlayableContent extends StatelessWidget {
             ),
           ),
           if (direction == Axis.vertical)
-            const SizedBox(height: 8)
+            SizedBox(height: 8.h)
           else
-            const SizedBox(width: 16),
+            SizedBox(width: 16.w),
           Flexible(
             flex: direction == Axis.vertical ? 0 : 1,
-            child: SizedBox(
-              width: width,
+            child: Container(
+              margin: direction == Axis.vertical
+                  ? margin?.subtract(
+                      EdgeInsets.only(top: margin?.top ?? 0),
+                    )
+                  : margin?.subtract(
+                      EdgeInsets.only(left: margin?.left ?? 0),
+                    ),
+              width: direction == Axis.vertical ? width : null,
               child: Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Expanded(
@@ -182,16 +189,14 @@ class PlayableContent extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (direction == Axis.vertical)
-                    const SizedBox(height: 8)
-                  else
-                    const SizedBox(width: 8),
                   // TODO(josh4500): Fix left space layout caused by outer paddings
                   Transform.translate(
-                    offset: const Offset(4, -4),
+                    offset: const Offset(8, -6),
                     child: TappableArea(
                       onTap: onMore,
-                      padding: const EdgeInsets.all(4),
+                      canRequestFocus: false,
+                      focusColor: Colors.transparent,
+                      padding: const EdgeInsets.all(6),
                       releasedColor: Colors.transparent,
                       borderRadius: BorderRadius.circular(16),
                       child: const Icon(YTIcons.more_vert_outlined, size: 14),

@@ -27,11 +27,13 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'widgets/channel_desc_link.dart';
+import 'widgets/menu/show_channel_menu.dart';
 
 class ChannelDescriptionScreen extends StatelessWidget {
   const ChannelDescriptionScreen({super.key});
@@ -41,18 +43,27 @@ class ChannelDescriptionScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Marques Brownlee'),
+        leading: CustomBackButton(
+          onPressed: context.pop,
+        ),
         actions: <Widget>[
           AppbarAction(
             icon: YTIcons.cast_outlined,
             onTap: () {},
           ),
           AppbarAction(
-            icon: YTIcons.notification_outlined,
-            onTap: () => context.goto(AppRoutes.notifications),
-          ),
-          AppbarAction(
             icon: YTIcons.search_outlined,
             onTap: () => context.goto(AppRoutes.search),
+          ),
+          AppbarAction(
+            icon: YTIcons.more_vert_outlined,
+            onTapDown: (TapDownDetails details) {
+              final Offset position = details.globalPosition;
+              showChannelMenu(
+                context,
+                RelativeRect.fromLTRB(position.dx, 0, 0, 0),
+              );
+            },
           ),
         ],
       ),
@@ -127,7 +138,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
                           SizedBox(width: 8),
                           Text(
                             'http://www.youtube.com/MKBHD',
-                            style: TextStyle(color: Colors.blue),
+                            style: TextStyle(color: AppPalette.blue),
                           ),
                         ],
                       ),

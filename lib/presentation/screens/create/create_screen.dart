@@ -12,7 +12,8 @@ import 'provider/index_notifier.dart';
 import 'widgets/notifications/create_notification.dart';
 
 class CreateScreen extends StatefulWidget {
-  const CreateScreen({super.key});
+  const CreateScreen({super.key, this.showOnlyShorts = false});
+  final bool showOnlyShorts;
 
   @override
   State<CreateScreen> createState() => _CreateScreenState();
@@ -61,11 +62,10 @@ class _CreateScreenState extends State<CreateScreen>
 
   @override
   Widget build(BuildContext context) {
-    final tabs = ['Video', 'Short', 'Live', 'Post'];
     return Theme(
       data: AppTheme.dark,
-      child: Scaffold(
-        body: SafeArea(
+      child: Material(
+        child: SafeArea(
           child: Column(
             children: [
               Expanded(
@@ -123,8 +123,9 @@ class _CreateScreenState extends State<CreateScreen>
                               child: ListenableBuilder(
                                 listenable: indexNotifier,
                                 builder: (BuildContext context, Widget? _) {
+                                  final index = indexNotifier.currentIndex;
                                   return Text(
-                                    tabs[indexNotifier.currentIndex],
+                                    CreateTab.values[index].name,
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
@@ -137,7 +138,7 @@ class _CreateScreenState extends State<CreateScreen>
                           PageView.builder(
                             controller: controller,
                             onPageChanged: onPageChangeCallback,
-                            itemCount: tabs.length,
+                            itemCount: CreateTab.values.length,
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
                                 onTap: () => controller.animateToPage(
@@ -159,7 +160,7 @@ class _CreateScreenState extends State<CreateScreen>
                                       ) {
                                         return FittedBox(
                                           child: Text(
-                                            tabs[index],
+                                            CreateTab.values[index].name,
                                             style: TextStyle(
                                               fontSize: 14,
                                               color: index ==

@@ -30,6 +30,8 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../clip_thumb_clipper.dart';
+import '../gestures/tappable_area.dart';
+import '../network_image/custom_network_image.dart';
 
 class PlayableClipContent extends StatelessWidget {
   const PlayableClipContent({
@@ -54,7 +56,15 @@ class PlayableClipContent extends StatelessWidget {
               child: Container(
                 width: width,
                 height: height,
-                color: Colors.white,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  image: DecorationImage(
+                    image: CustomNetworkImage(
+                      'https://picsum.photos/300/300',
+                    ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
             ),
             Container(
@@ -91,11 +101,11 @@ class PlayableClipContent extends StatelessWidget {
           ],
         ),
         const SizedBox(width: 16),
-        const Flexible(
+        Flexible(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Expanded(
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -117,8 +127,18 @@ class PlayableClipContent extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 8),
-              Icon(YTIcons.more_vert_outlined),
+              const SizedBox(width: 8),
+              Transform.translate(
+                offset: const Offset(8, -8),
+                child: TappableArea(
+                  onTap: () {},
+                  canRequestFocus: false,
+                  focusColor: Colors.transparent,
+                  padding: const EdgeInsets.all(8.0),
+                  borderRadius: BorderRadius.circular(18),
+                  child: const Icon(YTIcons.more_vert_outlined, size: 18),
+                ),
+              ),
             ],
           ),
         ),

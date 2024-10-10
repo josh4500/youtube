@@ -48,13 +48,24 @@ class RoundCheckItem<T> extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: RadioListTile<T>(
-        title: Text(title),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 16),
+        ),
         enableFeedback: true,
         subtitle: subtitle,
         splashRadius: 0,
+        dense: false,
+        visualDensity: VisualDensity.compact,
+        materialTapTargetSize: MaterialTapTargetSize.padded,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+        ),
+        hoverColor: Colors.transparent,
         overlayColor: WidgetStateProperty.resolveWith(
           (states) => Colors.transparent,
         ),
+        toggleable: true,
         value: value,
         groupValue: groupValue,
         onChanged: onChange,

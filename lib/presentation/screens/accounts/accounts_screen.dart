@@ -84,7 +84,7 @@ class AccountsScreen extends StatelessWidget {
                   <Widget>[
                     GroupedViewBuilder(
                       title: 'History',
-                      height: 160,
+                      height: 176,
                       onTap: () => context.goto(AppRoutes.watchHistory),
                       itemBuilder: (BuildContext context, int index) {
                         return TappableArea(
@@ -95,7 +95,7 @@ class AccountsScreen extends StatelessWidget {
                             horizontal: 8,
                           ),
                           child: PlayableContent(
-                            width: 145,
+                            width: 142,
                             height: 88,
                             margin: const EdgeInsets.only(bottom: 16),
                             onMore: () => onMoreVideo(context),
@@ -118,7 +118,7 @@ class AccountsScreen extends StatelessWidget {
                           child: index == 7
                               ? const AddNewPlaylist()
                               : PlayableContent(
-                                  width: 145,
+                                  width: 142,
                                   height: 88,
                                   isPlaylist: true,
                                   margin: const EdgeInsets.only(bottom: 16),

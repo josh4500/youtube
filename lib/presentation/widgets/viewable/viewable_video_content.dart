@@ -43,14 +43,16 @@ class ViewableVideoContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ViewableVideoStyle theme = context.theme.appStyles.viewableVideoStyle;
+    final ViewableStyle theme = context.theme.appStyles.viewableVideoStyle;
     return TappableArea(
       onTap: onTap,
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         children: <Widget>[
           ConstrainedBox(
-            constraints: const BoxConstraints.expand(height: 200),
+            constraints: BoxConstraints.expand(
+              height: 252.h,
+            ),
             child: PlaybackView(
               placeholder: Container(
                 decoration: const BoxDecoration(
@@ -127,18 +129,20 @@ class ViewableVideoContent extends StatelessWidget {
                       ),
                     ),
                     Transform.translate(
-                      offset: const Offset(8, -4),
+                      offset: const Offset(0, -6),
                       child: TappableArea(
                         onTap: onMore,
                         padding: const EdgeInsets.all(8.0),
                         borderRadius: BorderRadius.circular(32),
+                        canRequestFocus: false,
+                        focusColor: Colors.transparent,
                         releasedColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         containedInkWell: true,
                         splashFactory: InkSplash.splashFactory,
                         child: const Icon(
                           YTIcons.more_vert_outlined,
-                          size: 18,
+                          size: 24,
                         ),
                       ),
                     ),
@@ -155,8 +159,8 @@ class ViewableVideoContent extends StatelessWidget {
   static Widget shimmer() {
     return Column(
       children: <Widget>[
-        const Shimmer(
-          height: 200,
+        Shimmer(
+          height: 252.h,
           width: double.infinity,
         ),
         Padding(
@@ -164,8 +168,8 @@ class ViewableVideoContent extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const Shimmer(width: 36, height: 36, shape: BoxShape.circle),
-              const SizedBox(width: 12),
+              Shimmer(width: 36.w, height: 36.w, shape: BoxShape.circle),
+              SizedBox(width: 12.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,8 +187,8 @@ class ViewableVideoContent extends StatelessWidget {
                     ),
                     const SizedBox(height: 15),
                     Shimmer(
-                      width: 120,
-                      height: 16,
+                      width: 120.w,
+                      height: 16.h,
                       borderRadius: BorderRadius.circular(1.5),
                     ),
                     const SizedBox(height: 12),

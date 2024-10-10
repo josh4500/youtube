@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../../constants.dart';
@@ -69,7 +70,7 @@ class ChapterTile extends StatelessWidget {
           children: [
             Container(
               width: 160,
-              height: 100,
+              height: 88,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 image: const DecorationImage(
@@ -113,13 +114,13 @@ class ChapterTile extends StatelessWidget {
                           horizontal: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.2),
+                          color: AppPalette.blue.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Text(
                           '1:04',
                           style: TextStyle(
-                            color: Colors.blue,
+                            color: AppPalette.blue,
                             fontWeight: FontWeight.w800,
                           ),
                         ),

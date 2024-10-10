@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'video/video_channel_button.dart';
@@ -14,16 +15,16 @@ class VideoChannelSection extends StatelessWidget {
         vertical: 4,
         horizontal: 12,
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Expanded(child: VideoChannelButton()),
-          SizedBox(width: 12),
+          const Expanded(child: VideoChannelButton()),
+          SizedBox(width: 12.w),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              VideoChannelMembershipButton(),
-              SizedBox(width: 12),
-              VideoChannelSubscriptionButton(),
+              const VideoChannelMembershipButton(),
+              SizedBox(width: 12.w),
+              const VideoChannelSubscriptionButton(),
             ],
           ),
         ],
@@ -57,9 +58,9 @@ class VideoChannelMembershipButton extends StatelessWidget {
       title: 'Join',
       onTap: () {},
       backgroundColor: Colors.white,
-      borderRadius: BorderRadius.circular(15),
+      borderRadius: BorderRadius.circular(24),
       padding: const EdgeInsets.symmetric(
-        vertical: 8,
+        vertical: 10,
         horizontal: 14,
       ),
       textStyle: const TextStyle(
@@ -71,25 +72,83 @@ class VideoChannelMembershipButton extends StatelessWidget {
   }
 }
 
-class VideoChannelSubscriptionButton extends StatelessWidget {
+class VideoChannelSubscriptionButton extends StatefulWidget {
   const VideoChannelSubscriptionButton({super.key});
 
   @override
+  State<VideoChannelSubscriptionButton> createState() =>
+      _VideoChannelSubscriptionButtonState();
+}
+
+class _VideoChannelSubscriptionButtonState
+    extends State<VideoChannelSubscriptionButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 3))
+          ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return CustomActionButton(
-      title: 'Subscribe',
-      onTap: () {},
-      backgroundColor: Colors.white,
-      borderRadius: BorderRadius.circular(15),
-      padding: const EdgeInsets.symmetric(
-        vertical: 8,
-        horizontal: 14,
-      ),
-      textStyle: const TextStyle(
-        fontSize: 12,
-        color: Colors.black,
-        fontWeight: FontWeight.w500,
-      ),
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        return Container(
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(width: 5, color: Colors.transparent),
+          ),
+          child: ShaderMask(
+            // blendMode: BlendMode.colorBurn,
+            shaderCallback: (bounds) {
+              return LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: const [
+                  AppPalette.blue,
+                  Colors.purple,
+                  AppPalette.red,
+                  Colors.orange,
+                ],
+                stops: [
+                  (_controller.value - 0.2).clamp(0.0, 1.0),
+                  _controller.value,
+                  (_controller.value + 0.2).clamp(0.0, 1.0),
+                  (_controller.value + 0.4).clamp(0.0, 1.0),
+                ],
+                // tileMode: TileMode.repeated,
+              ).createShader(bounds);
+            },
+            child: CustomActionButton(
+              title: 'Subscribe',
+              onTap: () {},
+              backgroundColor: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              padding: const EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 14,
+              ),
+              textStyle: const TextStyle(
+                fontSize: 12,
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

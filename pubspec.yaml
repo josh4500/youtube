@@ -10,6 +10,7 @@ environment:
 dependencies:
   # app_settings: ^5.1.1
   camera: ^0.11.0+2
+  clock: ^1.1.1
   connectivity_plus: ^6.0.5
   country_selector:
     git: https://github.com/josh4500/country_selector
@@ -20,10 +21,8 @@ dependencies:
     sdk: flutter
   flutter_riverpod: ^2.5.1
   go_router: ^14.2.3
-  hive: ^4.0.0-dev.2
   intl: ^0.19.0
   intl_utils: ^2.8.3
-  isar_flutter_libs: ^4.0.0-dev.13
   logging: ^1.2.0
   media_kit: ^1.1.10+1
   media_kit_libs_video: ^1.0.4
@@ -36,6 +35,7 @@ dependencies:
   riverpod_annotation: ^2.3.5
   rxdart: ^0.28.0
   segment_group_list: ^0.0.1
+  shared_preferences: ^2.3.2
 
 dependency_overrides:
   win32: ^5.5.3
@@ -101,48 +101,48 @@ flutter:
           style: italic
     - family: YouTubeSans
       fonts:
-        - asset: assets/fonts/YouTubeSansRegular.otf
-          weight: 400
-          style: normal
-        - asset: assets/fonts/YouTubeSansMedium.otf
-          weight: 500
-          style: normal
-        - asset: assets/fonts/YouTubeSansLight.otf
+        - asset: assets/fonts/youTubeSans/YouTubeSansLight.ttf
           weight: 300
           style: normal
-        - asset: assets/fonts/YouTubeSansBlack.otf
-          weight: 900
-          style: normal
-        - asset: assets/fonts/YouTubeSansBold.otf
-          weight: 700
-          style: normal
-        - asset: assets/fonts/YouTubeSansDarkBlack.otf
-          weight: 900
-          style: normal
-        - asset: assets/fonts/YouTubeSansDarkBold.otf
-          weight: 700
-          style: normal
-        - asset: assets/fonts/YouTubeSansDarkExtraBold.otf
-          weight: 800
-          style: normal
-        - asset: assets/fonts/YouTubeSansDarkLight.otf
-          weight: 300
-          style: normal
-        - asset: assets/fonts/YouTubeSansDarkMedium.otf
-          weight: 500
-          style: normal
-        - asset: assets/fonts/YouTubeSansDarkRegular.otf
+        - asset: assets/fonts/youTubeSans/YouTubeSansRegular.ttf
           weight: 400
           style: normal
-        - asset: assets/fonts/YouTubeSansDarkSemibold.otf
+        - asset: assets/fonts/youTubeSans/YouTubeSansMedium.ttf
+          weight: 500
+          style: normal
+        - asset: assets/fonts/youTubeSans/YouTubeSansSemibold.ttf
           weight: 600
           style: normal
-        - asset: assets/fonts/YouTubeSansExtraBold.otf
+        - asset: assets/fonts/youTubeSans/YouTubeSansBold.ttf
+          weight: 700
+          style: normal
+        - asset: assets/fonts/youTubeSans/YouTubeSansBlack.ttf
           weight: 800
           style: normal
-        - asset: assets/fonts/YouTubeSansSemibold.otf
-          weight: 600
+        - asset: assets/fonts/youTubeSans/YouTubeSansDarkBlack.ttf
+          weight: 900
           style: normal
+#        - asset: assets/fonts/youTubeSans/YouTubeSansDarkBold.ttf
+#          weight: 700
+#          style: normal
+#        - asset: assets/fonts/youTubeSans/YouTubeSansDarkExtraBold.ttf
+#          weight: 800
+#          style: normal
+#        - asset: assets/fonts/youTubeSans/YouTubeSansDarkLight.ttf
+#          weight: 300
+#          style: normal
+#        - asset: assets/fonts/youTubeSans/YouTubeSansDarkMedium.ttf
+#          weight: 500
+#          style: normal
+#        - asset: assets/fonts/youTubeSans/YouTubeSansDarkRegular.ttf
+#          weight: 400
+#          style: normal
+#        - asset: assets/fonts/youTubeSans/YouTubeSansDarkSemibold.ttf
+#          weight: 600
+#          style: normal
+#        - asset: assets/fonts/youTubeSans/YouTubeSansExtraBold.ttf
+#          weight: 800
+#          style: normal
 
 
 

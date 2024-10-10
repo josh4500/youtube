@@ -232,7 +232,7 @@ class SliverSingleGroup<E> extends StatelessWidget {
   const SliverSingleGroup({
     super.key,
     this.separatorAlignment = Alignment.centerLeft,
-    required this.child,
+    required this.sliver,
     required this.separatorBuilder,
     required this.item,
     required this.itemHeadGetter,
@@ -242,7 +242,7 @@ class SliverSingleGroup<E> extends StatelessWidget {
   final E item;
   final ItemHeadGetter<E> itemHeadGetter;
   final SeparatorWidgetBuilder<E> separatorBuilder;
-  final Widget child;
+  final Widget sliver;
 
   @override
   Widget build(BuildContext context) {
@@ -257,8 +257,11 @@ class SliverSingleGroup<E> extends StatelessWidget {
       ),
     );
 
-    return SliverToBoxAdapter(
-      child: Column(children: [separatorWidget, child]),
+    return SliverMainAxisGroup(
+      slivers: [
+        SliverToBoxAdapter(child: separatorWidget),
+        sliver,
+      ],
     );
   }
 }

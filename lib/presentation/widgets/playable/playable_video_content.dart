@@ -29,7 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
-import '../gestures/custom_ink_well.dart';
+import '../gestures/tappable_area.dart';
 import '../network_image/custom_network_image.dart';
 
 class PlayableVideoContent extends StatelessWidget {
@@ -51,6 +51,8 @@ class PlayableVideoContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final PlayableStyle theme = context.theme.appStyles.playableStyle;
+
     return Flex(
       direction: direction,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,8 +74,8 @@ class PlayableVideoContent extends StatelessWidget {
                   width: width,
                   height: height,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
+                    color: theme.backgroundColor,
+                    borderRadius: theme.borderRadius,
                     image: const DecorationImage(
                       image: CustomNetworkImage(
                         'https://picsum.photos/300/300',
@@ -109,77 +111,60 @@ class PlayableVideoContent extends StatelessWidget {
           ),
         ),
         if (direction == Axis.vertical)
-          const SizedBox(height: 8)
+          SizedBox(height: 8.h)
         else
-          const SizedBox(width: 8),
+          SizedBox(width: 16.w),
         Flexible(
           flex: direction == Axis.vertical ? 0 : 1,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                margin: direction == Axis.vertical
-                    ? margin?.subtract(
-                        EdgeInsets.only(top: margin?.top ?? 0),
-                      )
-                    : margin?.subtract(
-                        EdgeInsets.only(left: margin?.left ?? 0),
-                      ),
-                child: SizedBox(
-                  width: direction == Axis.vertical ? width : null,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+          child: Container(
+            width: direction == Axis.vertical ? width : null,
+            margin: direction == Axis.vertical
+                ? margin?.subtract(
+                    EdgeInsets.only(top: margin?.top ?? 0),
+                  )
+                : margin?.subtract(
+                    EdgeInsets.only(left: margin?.left ?? 0),
+                  ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              'I found the BEST One Piece cast 2 clips from their socials',
-                              maxLines: direction == Axis.horizontal ? 3 : 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 2),
-                            const Text(
-                              'Mobile Academy',
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.grey),
-                            ),
-                            const SizedBox(height: 2),
-                            const Text(
-                              '11k Views',
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.grey),
-                            ),
-                          ],
-                        ),
+                      Text(
+                        'I found the BEST One Piece cast 2 clips from their socials',
+                        maxLines: direction == Axis.horizontal ? 3 : 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: 22),
+                      const SizedBox(height: 2),
+                      const Text(
+                        'Mobile Academy',
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        '11k Views',
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
                     ],
                   ),
                 ),
-              ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Padding(
-                  padding: direction == Axis.vertical
-                      ? const EdgeInsets.symmetric(horizontal: 4.0)
-                      : const EdgeInsets.symmetric(
-                          vertical: 4,
-                          horizontal: 2.0,
-                        ),
-                  child: CustomInkWell(
-                    onTap: () {},
+                Transform.translate(
+                  offset: const Offset(14, -8),
+                  child: TappableArea(
+                    onTap: onMore,
                     padding: const EdgeInsets.all(8),
+                    canRequestFocus: false,
+                    focusColor: Colors.transparent,
                     borderRadius: BorderRadius.circular(24),
                     splashFactory: NoSplash.splashFactory,
-                    child: const Icon(YTIcons.more_vert_outlined, size: 16),
+                    child: const Icon(YTIcons.more_vert_outlined, size: 18),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

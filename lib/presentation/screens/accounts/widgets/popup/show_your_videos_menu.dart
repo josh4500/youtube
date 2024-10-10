@@ -36,6 +36,7 @@ Future<T?> showYourVideosMenu<T>(
 ) async {
   return showMenu<T>(
     context: context,
+    menuPadding: EdgeInsets.zero,
     position: position,
     items: <PopupMenuEntry<T>>[
       PopupMenuItem(

@@ -42,30 +42,30 @@ class CustomActionButton extends StatelessWidget {
     this.backgroundColor,
     this.border,
     this.icon,
+    this.trailingIcon,
     this.textStyle,
     this.onTap,
     this.title,
     this.useTappable = true,
+    this.enableFeedback = true,
   });
   final String? title;
-  final Widget? icon;
+  final Widget? icon, trailingIcon;
   final double? leadingWidth;
   final Alignment alignment;
-  final EdgeInsets? padding;
-  final EdgeInsets? margin;
+  final EdgeInsets? padding, margin;
   final BorderRadius? borderRadius;
   final Color? backgroundColor;
   final TextStyle? textStyle;
   final Border? border;
   final VoidCallback? onTap;
-  final bool useTappable;
+  final bool useTappable, enableFeedback;
 
   @override
   Widget build(BuildContext context) {
     final CustomActionButtonStyle theme =
         context.theme.appStyles.customActionButtonStyle;
     final buttonContent = Container(
-      margin: margin,
       alignment: alignment,
       padding: padding ?? theme.padding,
       decoration: BoxDecoration(
@@ -83,21 +83,30 @@ class CustomActionButton extends StatelessWidget {
           ],
           if (leadingWidth != null) SizedBox(width: leadingWidth),
           if (title != null) Text(title!, style: textStyle ?? theme.textStyle),
+          if (trailingIcon != null) ...[
+            const SizedBox(width: 5),
+            trailingIcon!
+          ],
         ],
       ),
     );
 
-    return useTappable
-        ? TappableArea(
-            onTap: onTap,
-            borderRadius: borderRadius ?? theme.borderRadius,
-            child: buttonContent,
-          )
-        : InkWell(
-            onTap: onTap,
-            borderRadius: borderRadius ?? theme.borderRadius,
-            splashFactory: NoSplash.splashFactory,
-            child: buttonContent,
-          );
+    return Container(
+      margin: margin,
+      child: useTappable
+          ? TappableArea(
+              onTap: onTap,
+              enableFeedback: enableFeedback,
+              borderRadius: borderRadius ?? theme.borderRadius,
+              child: buttonContent,
+            )
+          : InkWell(
+              onTap: onTap,
+              enableFeedback: enableFeedback,
+              borderRadius: borderRadius ?? theme.borderRadius,
+              splashFactory: NoSplash.splashFactory,
+              child: buttonContent,
+            ),
+    );
   }
 }

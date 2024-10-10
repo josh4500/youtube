@@ -42,7 +42,7 @@ class PlaylistScreen extends StatefulWidget {
 }
 
 class _PlaylistScreenState extends State<PlaylistScreen> {
-  final _slidableState = SharedSlidableState<int?>(null);
+  final _slidableState = SharedSlidableState(null);
   @override
   void dispose() {
     _slidableState.dispose();
@@ -219,35 +219,32 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Slidable(
-                      key: ValueKey(index),
-                      maxOffset: 0.3,
-                      sharedSlidableState: _slidableState,
-                      items: const <SlidableItem>[
-                        SlidableItem(
-                          icon: Icon(Icons.delete, color: Colors.black),
-                        ),
-                      ],
-                      child: CustomInkWell(
+                  return Slidable(
+                    key: ValueKey(index),
+                    maxOffset: 0.3,
+                    sharedSlidableState: _slidableState,
+                    items: const <SlidableItem>[
+                      SlidableItem(icon: Icon(Icons.delete)),
+                    ],
+                    child: Material(
+                      child: TappableArea(
                         onTap: () {},
-                        child: const Material(
-                          child: Row(
-                            children: <Widget>[
-                              Icon(YTIcons.move_outlined),
-                              Expanded(
-                                child: PlayableVideoContent(
-                                  width: 145,
-                                  height: 88,
-                                  margin: EdgeInsets.symmetric(
-                                    vertical: 4,
-                                    horizontal: 8,
-                                  ),
+                        child: const Row(
+                          children: <Widget>[
+                            SizedBox(width: 8),
+                            Icon(YTIcons.move_outlined),
+                            Expanded(
+                              child: PlayableVideoContent(
+                                width: 142,
+                                height: 88,
+                                margin: EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 8.0,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(width: 8),
+                          ],
                         ),
                       ),
                     ),

@@ -79,7 +79,10 @@ class _ViewableSlidesContextState extends State<ViewableSlidesContext> {
                       ),
                       child: Text(
                         '${slideIndex + 1}/$slideCount',
-                        style: const TextStyle(fontSize: 12),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

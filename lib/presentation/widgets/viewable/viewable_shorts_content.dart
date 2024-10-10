@@ -68,12 +68,19 @@ class ViewableShortsContent extends StatelessWidget {
             alignment: Alignment.topRight,
             child: CustomInkWell(
               onTap: onMore,
+              canRequestFocus: false,
               borderRadius: BorderRadius.circular(20),
               padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6),
               child: const Icon(
                 YTIcons.more_vert_outlined,
                 size: 20,
                 color: Colors.white,
+                shadows: [
+                  BoxShadow(
+                    offset: Offset(2, 2),
+                    color: Colors.black12,
+                  ),
+                ],
               ),
             ),
           ),
@@ -92,6 +99,12 @@ class ViewableShortsContent extends StatelessWidget {
                       fontSize: 15,
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
+                      shadows: [
+                        BoxShadow(
+                          offset: Offset(2, 2),
+                          color: Colors.black12,
+                        ),
+                      ],
                     ),
                   ),
                 const SizedBox(height: 8),
@@ -101,7 +114,14 @@ class ViewableShortsContent extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: Colors.white,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w300,
+                    shadows: [
+                      BoxShadow(
+                        offset: Offset(2, 2),
+                        color: Colors.black12,
+                      ),
+                    ],
                   ),
                 ),
               ],

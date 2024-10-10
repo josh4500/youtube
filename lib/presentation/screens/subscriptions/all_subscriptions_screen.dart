@@ -74,43 +74,47 @@ class AllSubscriptionsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: ScrollConfiguration(
-        behavior: const OverScrollGlowBehavior(
-          enabled: false,
-        ),
-        child: CustomScrollView(
-          slivers: <Widget>[
-            const SliverToBoxAdapter(
-              child: Row(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: TappableArea(
-                      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-                      child: Row(
-                        children: <Widget>[
-                          Text('Most relevant'),
-                          SizedBox(width: 4),
-                          RotatedBox(
-                            quarterTurns: 1,
-                            child: Icon(YTIcons.chevron_right),
-                          ),
-                        ],
+      body: RefreshIndicator(
+        onRefresh: () async {},
+        child: ScrollConfiguration(
+          behavior: const OverScrollGlowBehavior(
+            enabled: false,
+          ),
+          child: CustomScrollView(
+            slivers: <Widget>[
+              const SliverToBoxAdapter(
+                child: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: TappableArea(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                        child: Row(
+                          children: <Widget>[
+                            Text('Most relevant'),
+                            SizedBox(width: 4),
+                            RotatedBox(
+                              quarterTurns: 1,
+                              child: Icon(YTIcons.chevron_right),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  return const SubscriptionTile();
-                },
-                childCount: 20,
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    return const SubscriptionTile();
+                  },
+                  childCount: 2,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

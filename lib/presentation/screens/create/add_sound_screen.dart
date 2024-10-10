@@ -245,14 +245,14 @@ class _SoundTileState extends State<SoundTile>
         child: Row(
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: 56.w,
+              height: 56.h,
               decoration: BoxDecoration(
                 color: Colors.grey,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -282,7 +282,7 @@ class _SoundTileState extends State<SoundTile>
               ],
             ),
             const Spacer(),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             // TODO(josh4500): Get filled save icon
             const Icon(YTIcons.save_outlined),
             SizeTransition(
@@ -291,7 +291,7 @@ class _SoundTileState extends State<SoundTile>
               sizeFactor: controller,
               child: Row(
                 children: [
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12.w),
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: const BoxDecoration(

@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class ChannelDescLink extends StatelessWidget {
@@ -57,7 +58,7 @@ class ChannelDescLink extends StatelessWidget {
               Text(
                 'twitter.com/MKBHD',
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: AppPalette.blue,
                 ),
               ),
             ],

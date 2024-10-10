@@ -26,6 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 
 import 'enums/date_group_head.dart';
@@ -184,4 +185,42 @@ extension AgoExtension on DateTime {
 extension IfNullExtension<T> on T? {
   bool get isNull => this == null;
   bool get isNotNull => this != null;
+}
+
+/// Extension methods for the AxisDirection enum to provide convenient
+/// ways to check its direction and alignment properties.
+extension DirectionExtension on AxisDirection {
+  /// Returns true if this direction is [AxisDirection.left].
+  bool get isLeft => this == AxisDirection.left;
+
+  /// Returns true if this direction is [AxisDirection.right].
+  bool get isRight => this == AxisDirection.right;
+
+  /// Returns true if this direction is [AxisDirection.up].
+  bool get isUp => this == AxisDirection.up;
+
+  /// Returns true if this direction is [AxisDirection.down].
+  bool get isDown => this == AxisDirection.down;
+
+  /// Returns true if this direction is horizontal (left or right).
+  bool get isHorizontal =>
+      this == AxisDirection.left || this == AxisDirection.right;
+
+  /// Returns true if this direction is vertical (up or down).
+  bool get isVertical => this == AxisDirection.up || this == AxisDirection.down;
+}
+
+/// Returns the corresponding [Alignment] for the given [direction]
+/// that positions a child widget at the center of the sliding area.
+Alignment axisDirectionToCenterAlignment(AxisDirection direction) {
+  switch (direction) {
+    case AxisDirection.left:
+      return Alignment.centerLeft;
+    case AxisDirection.up:
+      return Alignment.topCenter;
+    case AxisDirection.right:
+      return Alignment.centerRight;
+    case AxisDirection.down:
+      return Alignment.bottomCenter;
+  }
 }
