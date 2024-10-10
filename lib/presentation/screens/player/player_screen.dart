@@ -28,6 +28,7 @@
 
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -797,8 +798,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// Callback to change Draggable heights when the Player height changes
   /// (via [_screenHeightNotifier])
   void _recomputeDraggableOpacityAndHeight(double value) {
-    // TODO(josh4500): Consider _isResizableExpandedMode
-    // TODO(josh4500): Check if calculation can be simplified
     final double newSizeValue = ui.clampDouble(
       1 -
           (((playerHeight + additionalHeight) + ((1 - value) * screenHeight)) /
