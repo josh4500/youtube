@@ -1,0 +1,17 @@
+flutter_native_splash:
+  color: "#ffffff"
+  background_image: assets/icon/yt_icon_rgb.png
+  color_dark: "#0f0f0f"
+  background_image_dark: assets/icon/yt_icon_rgb.png
+
+#  android_12:
+#    image: assets/icon/yt_icon_rgb.png
+#    color: "#ffffff"
+#    icon_background_color: "#ffffff"
+#    image_dark: assets/icon/yt_icon_rgb.png
+#    color_dark: "#0f0f0f"
+#    icon_background_color_dark: "#0f0f0f"
+
+  branding: assets/icon/yt_icon_rgb.png
+  branding_mode: bottom
+  branding_dark: assets/icon/yt_icon_rgb.png

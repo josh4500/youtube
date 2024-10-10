@@ -358,3 +358,5 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
     );
   }
 }
+
+class CommentStyle{}
