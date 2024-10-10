@@ -198,7 +198,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   ///
   /// NOTE: Depends on [_playerHeightNotifier], make to wrap with [ListenableBuilder]
   /// to see changes.
-  double? get playerHeight {
+  double get playerHeight {
     return _playerHeightNotifier.value.normalizeRange(
       playerMinHeight,
       playerMaxHeight,
@@ -798,8 +798,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
   /// (via [_screenHeightNotifier])
   void _recomputeDraggableOpacityAndHeight(double value) {
     // TODO(josh4500): Consider _isResizableExpandedMode
+    // TODO(josh4500): Check if calculation can be simplified
     final double newSizeValue = ui.clampDouble(
-      (value - minPlayerHeightRatio) - (value * 0.135),
+      1 -
+          (((playerHeight + additionalHeight) + ((1 - value) * screenHeight)) /
+              screenHeight),
       0,
       1 - playerHeightToScreenRatio,
     );
@@ -1042,7 +1045,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       // If comments are opened, animate to the appropriate position
       if (_commentIsOpened) {
         _commentDraggableController.animateTo(
-          ((playerHeight ?? 0) + additionalHeight) / screenHeight,
+          (playerHeight + additionalHeight) / screenHeight,
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeIn,
         );
@@ -1051,7 +1054,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       // If description is opened, animate to the appropriate position
       if (_descIsOpened) {
         _descDraggableController.animateTo(
-          ((playerHeight ?? 0) + additionalHeight) / screenHeight,
+          (playerHeight + additionalHeight) / screenHeight,
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeIn,
         );
@@ -1059,7 +1062,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
       if (_chaptersIsOpened) {
         _chaptersDraggableController.animateTo(
-          ((playerHeight ?? 0) + additionalHeight) / screenHeight,
+          (playerHeight + additionalHeight) / screenHeight,
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeIn,
         );
