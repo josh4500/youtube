@@ -197,21 +197,23 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
       }
     }
 
-    // Calculate the velocity
-    final velocity = _velocityTracker?.getVelocity();
-    if (velocity != null && velocity.pixelsPerSecond.dy > 300) {
-      if (event.delta.dy > 1) {
-        widget.draggableController!.animateTo(
-          1,
-          duration: const Duration(milliseconds: 150),
-          curve: Curves.easeIn,
-        );
-      } else {
-        widget.draggableController!.animateTo(
-          0,
-          duration: const Duration(milliseconds: 150),
-          curve: Curves.easeIn,
-        );
+    if (_innerListController.hasClients && _innerListController.offset == 0) {
+      // Calculate the velocity
+      final velocity = _velocityTracker?.getVelocity();
+      if (velocity != null && velocity.pixelsPerSecond.dy > 300) {
+        if (event.delta.dy > 1) {
+          widget.draggableController!.animateTo(
+            1,
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeIn,
+          );
+        } else {
+          widget.draggableController!.animateTo(
+            0,
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeIn,
+          );
+        }
       }
     }
 
