@@ -809,7 +809,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
 
     //**************************** Opacity Changes ***************************//
     final double opacityValue =
-        1 - (_screenHeightNotifier.value - 0.45) / (1 - 0.45);
+        1 - newSizeValue.normalize(0, 1 - playerHeightToScreenRatio);
     if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
       // Changes info opacity when neither of the draggable sheet are opened
       _infoOpacityController.value = (opacityValue - .225).clamp(0, 1);
