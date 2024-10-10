@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/models.dart';
 
-class CallOut extends StatefulWidget {
+class CallOut extends StatelessWidget {
   const CallOut({
     super.key,
+    this.alignment = Alignment.topCenter,
     required this.text,
     required this.child,
     required this.controller,
   });
+
+  final Alignment alignment;
   final String text;
   final OverlayPortalController controller;
   final Widget child;
 
   @override
-  State<CallOut> createState() => _CallOutState();
-}
-
-class _CallOutState extends State<CallOut> {
-  @override
   Widget build(BuildContext context) {
     final CallOutLink callOutLink = ModelBinding.of<CallOutLink>(context);
     return OverlayPortal(
-      controller: widget.controller,
+      controller: controller,
       overlayChildBuilder: (BuildContext context) {
         return CompositedTransformFollower(
           link: callOutLink.link,
@@ -32,11 +30,11 @@ class _CallOutState extends State<CallOut> {
             alignment: AlignmentDirectional.topCenter,
             child: CustomPaint(
               painter: TrianglePainter(
-                alignment: Alignment.topCenter,
+                alignment: alignment,
                 color: Colors.white,
               ),
               child: GestureDetector(
-                onTap: widget.controller.hide,
+                onTap: controller.hide,
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -44,7 +42,7 @@ class _CallOutState extends State<CallOut> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    widget.text,
+                    text,
                     style: const TextStyle(
                       color: Colors.black,
                     ),
@@ -55,7 +53,7 @@ class _CallOutState extends State<CallOut> {
           ),
         );
       },
-      child: widget.child,
+      child: child,
     );
   }
 }
@@ -72,20 +70,48 @@ class TrianglePainter extends CustomPainter {
     required this.alignment,
     required this.color,
   });
+
   final Alignment alignment;
   final Color color;
 
-  // TODO(josh4500): Paint triangle for possible alignment position
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
       ..color = color
       ..style = PaintingStyle.fill;
+
+    const double triangleHeight = 12;
+    const double triangleHalfWidth = 12;
+
+    // Calculate the x-position based on the alignment
+    double xOffset = (alignment.x + 1) * 0.5 * size.width;
+
+    // Clamp xOffset to ensure the triangle stays within the bounds
+    xOffset = xOffset.clamp(triangleHalfWidth, size.width - triangleHalfWidth);
+
+    // Calculate the yOffset based on the alignment
+    final bool isUpsideDown = alignment.y > 0;
+    final double yOffset =
+        isUpsideDown ? size.height - triangleHeight : triangleHeight;
+
     final Path path = Path();
-    path.moveTo((size.width / 2) - 12, 0);
-    path.lineTo(size.width / 2, -12);
-    path.lineTo((size.width / 2) + 12, 0);
+
+    if (isUpsideDown) {
+      // Draw the triangle pointing upwards (upside down)
+      path.moveTo(
+          xOffset - triangleHalfWidth, size.height); // Bottom left point
+      path.lineTo(xOffset, size.height + triangleHeight); // Top point
+      path.lineTo(
+          xOffset + triangleHalfWidth, size.height); // Bottom right point
+    } else {
+      // Draw the triangle pointing downwards (normal)
+      path.moveTo(xOffset - triangleHalfWidth, 0); // Top left point
+      path.lineTo(xOffset, -triangleHeight); // Bottom point
+      path.lineTo(xOffset + triangleHalfWidth, 0); // Top right point
+    }
+
     path.close();
+
     canvas.drawPath(path, paint);
   }
 
