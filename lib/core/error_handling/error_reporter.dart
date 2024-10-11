@@ -2,7 +2,7 @@ import 'package:clock/clock.dart' show Clock;
 import 'package:flutter/foundation.dart';
 
 import '../utils/platform_info.dart';
-import 'reporter/reporter_client.dart';
+import 'reporter_client.dart';
 
 class ErrorReporter {
   ErrorReporter({
