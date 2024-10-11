@@ -53,8 +53,8 @@ import 'widgets/video_chapters_sheet.dart';
 import 'widgets/video_comment_sheet.dart';
 import 'widgets/video_description_sheet.dart';
 
-class PlayerScreen extends ConsumerStatefulWidget {
-  const PlayerScreen({
+class VideoScreen extends ConsumerStatefulWidget {
+  const VideoScreen({
     super.key,
     required this.width,
     required this.height,
@@ -63,11 +63,11 @@ class PlayerScreen extends ConsumerStatefulWidget {
   final double width;
 
   @override
-  ConsumerState<PlayerScreen> createState() => _PlayerScreenState();
+  ConsumerState<VideoScreen> createState() => _VideoScreenState();
 }
 
-class _PlayerScreenState extends ConsumerState<PlayerScreen>
-    with TickerProviderStateMixin, WidgetsBindingObserver, RouteAware {
+class _VideoScreenState extends ConsumerState<VideoScreen>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   final GlobalKey _interactivePlayerKey = GlobalKey();
   final GlobalKey _commentSheetKey = GlobalKey();
   final GlobalKey _descSheetKey = GlobalKey();
@@ -417,7 +417,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     });
 
     // Added a callback to animate info opacity when additional heights changes
-    // (i.e when player going in or out of expanded mode)
+    // (i.e when screen going in or out of expanded mode)
     // Opacity of info does not need to be updated when either bottom sheets are open
     // (i.e Comment or Description Sheet)
     _playerAddedHeightNotifier.addListener(() {
@@ -913,7 +913,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     SystemChrome.restoreSystemUIOverlays();
   }
 
-  /// Opens the player in fullscreen mode by sending a player signal to the
+  /// Opens the video in fullscreen mode by sending a video signal to the
   /// repository.
   Future<void> _enterFullscreenMode() async {
     _orientationTimer?.cancel(); // Cancel existing timer
@@ -936,7 +936,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     if (_isForcedFullscreen == false) {
       _hideControls();
       // If we change the Orientations to portraitUp this will make it permanent
-      // and player will not react when flipped to landscape
+      // and video will not react when flipped to landscape
       await SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp],
       );
@@ -1024,7 +1024,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       return;
     }
 
-    // If the player screen is full toggle controls
+    // If the player screen is maximized toggle controls
     if (_screenHeightNotifier.value == 1) {
       _toggleControls();
     }
@@ -1342,7 +1342,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
       await _onDragEndNotExpandedPlayer(details);
     }
 
-    // For fullscreen player
+    // For fullscreen video
     _onDragFullscreenPlayerEnd(details);
 
     // Reversing zoom due to swiping up
@@ -1353,7 +1353,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen>
     }
 
     // Shows controls if it was temporary hidden and avoids showing controls
-    // when player is minimized
+    // when screen is minimized
     _showControls();
   }
 

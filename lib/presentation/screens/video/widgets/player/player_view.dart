@@ -38,7 +38,7 @@ class PlayerView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = ref.watch(playerRepositoryProvider);
     return Hero(
-      tag: 'player',
+      tag: 'video',
       child: ColoredBox(
         color: Colors.black,
         child: Video(

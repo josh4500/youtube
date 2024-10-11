@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
-import 'package:youtube_clone/presentation/screens/player/widgets/controls/player_notifications.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
+
+import 'player_notifications.dart';
 
 class PlayerChapterControl extends ConsumerWidget {
   const PlayerChapterControl({

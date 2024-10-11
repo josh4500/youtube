@@ -35,7 +35,7 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../providers.dart';
-import '../screens.dart' show PlayerScreen;
+import '../screens.dart' show VideoScreen;
 import '../widgets/home/home_drawer.dart';
 import '../widgets/home/home_navigation_bar.dart';
 
@@ -212,7 +212,7 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
                     final showPlayer = ref.watch(playerOverlayStateProvider);
                     return Visibility(
                       visible: showPlayer,
-                      child: PlayerScreen(
+                      child: VideoScreen(
                         width: constraints.maxWidth,
                         height: constraints.maxHeight,
                       ),

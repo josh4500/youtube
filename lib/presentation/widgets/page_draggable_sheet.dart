@@ -283,7 +283,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                           const SizedBox(height: 12),
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0,
+                            horizontal: 8.0,
                           ),
                           child: Stack(
                             clipBehavior: Clip.none,
@@ -348,6 +348,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                             sizeFactor: _dynamicTabHideAnimation,
                             child: Column(
                               children: <Widget>[
+                                const SizedBox(height: 8),
                                 SizedBox(
                                   height: 40,
                                   child: widget.dynamicTab,

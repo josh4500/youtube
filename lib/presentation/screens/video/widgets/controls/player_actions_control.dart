@@ -55,7 +55,7 @@ class PlayerActionsControl extends ConsumerWidget {
       }
       return childWidget;
     } else {
-      // Shows Action controls when player is expanded
+      // Shows Action controls when video is expanded
       if (playerViewState.isExpanded) {
         return childWidget;
       }

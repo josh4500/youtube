@@ -39,7 +39,6 @@ import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-
 import 'player_actions_control.dart';
 import 'player_autoplay_switch.dart';
 import 'player_cast_caption_control.dart';
@@ -579,7 +578,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     final seekRate = ref.read(preferencesProvider).doubleTapSeek;
     _seekRate.value += seekRate;
 
-    // Seek player by seek rate
+    // Seek video by seek rate
     ref.read(playerRepositoryProvider).seek(Duration(seconds: seekRate));
 
     // Show seek rate widget
@@ -601,7 +600,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     final seekRate = ref.read(preferencesProvider).doubleTapSeek;
     _seekRate.value += seekRate;
 
-    // Seek player by seek rate
+    // Seek video by seek rate
     ref
         .read(playerRepositoryProvider)
         .seek(Duration(seconds: seekRate), reverse: true);
@@ -613,18 +612,18 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _resetSeekRate();
   }
 
-  // Method to show the 2x speed indicator and update player speed
+  // Method to show the 2x speed indicator and update video speed
   void _show2xSpeed() {
     _seekIndicatorNotifier.value = SeekNotificationType.speedUp2X;
     _seekIndicatorController.forward();
     _controlsVisibilityController.reverse(from: 0);
-    ref.read(playerRepositoryProvider).setSpeed(); // Update player speed
+    ref.read(playerRepositoryProvider).setSpeed(); // Update video speed
   }
 
-  /// Hide the 2x speed indicator and reset player speed to normal (1x)
+  /// Hide the 2x speed indicator and reset video speed to normal (1x)
   void _hide2xSpeed() {
     _seekIndicatorController.reverse();
-    // Reset player speed to normal (1x)
+    // Reset video speed to normal (1x)
     ref.read(playerRepositoryProvider).setSpeed(PlayerSpeed.normal);
   }
 
@@ -641,7 +640,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _seekIndicatorController.reverse();
 
     // If a sliding seek duration is set, perform seek operation to that duration
-    // Release updating from player
+    // Release updating from video
     ref.read(playerRepositoryProvider).updatePosition(
           _slideSeekDuration,
           lockProgress: false,
@@ -784,7 +783,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
         _seekDurationIndicatorController.forward();
 
-        // Updates and locks progress from player
+        // Updates and locks progress from video
         ref.read(playerRepositoryProvider).updatePosition(_slideSeekDuration);
       }
 
@@ -864,7 +863,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
     SlideSeekStartPlayerNotification().dispatch(context);
     _showSlideSeek();
-    // Updates and locks progress from player
+    // Updates and locks progress from video
     ref.read(playerRepositoryProvider).updatePosition(position);
   }
 
@@ -874,10 +873,10 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     ref.read(playerRepositoryProvider).seekTo(_slideSeekDuration);
     if (_showingSlideFrame == false && _slideFrameController.value < 0.7) {
       // Updates the progress for the last time and unlocks getting progress from
-      // player
+      // video
       ref.read(playerRepositoryProvider).updatePosition(
             _slideSeekDuration,
-            lockProgress: false, // Releases lock on player progress
+            lockProgress: false, // Releases lock on video progress
           );
 
       _seekIndicatorController.reverse();
@@ -934,7 +933,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _checkOutOfBound(lastPosition, position);
 
     _slideSeekDuration = position;
-    // Updates and locks progress from player
+    // Updates and locks progress from video
     ref.read(playerRepositoryProvider).updatePosition(position);
   }
 }
@@ -1033,7 +1032,7 @@ class _OverlayProgress extends ConsumerWidget {
               if (isExpanded)
                 AnimatedVisibility(
                   animation: hideControlAnimation,
-                  child:  Row(
+                  child: Row(
                     children: [
                       SizedBox(width: 12.w),
                       const PlayerDurationControl(full: false, reversed: true),
@@ -1149,7 +1148,7 @@ class _SlideFramePlayButton extends ConsumerWidget {
               ref.read(playerRepositoryProvider).playVideo();
             },
             child: Container(
-              constraints:  BoxConstraints.tightFor(
+              constraints: BoxConstraints.tightFor(
                 width: 54.w,
                 height: 54.w,
               ),
@@ -1195,9 +1194,9 @@ class _OverlayVideoSuggestions extends StatelessWidget {
             child: Row(
               children: [
                 if (isLandscape) ...[
-                   Row(
+                  Row(
                     children: [
-                     const PlayPauseRestartControl(useControlButton: false),
+                      const PlayPauseRestartControl(useControlButton: false),
                       SizedBox(width: 8.w),
                       const PlayerDurationControl(full: false, reversed: true),
                     ],
@@ -1251,7 +1250,7 @@ class _OverlayDurationOrientation extends StatelessWidget {
                   showOnExpanded: isExpanded,
                 ),
               ),
-               SizedBox(width: 24.w),
+              SizedBox(width: 24.w),
               if (context.orientation.isLandscape)
                 const Expanded(
                   child: PlayerActionsControlV2(),

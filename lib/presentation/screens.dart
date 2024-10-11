@@ -68,9 +68,6 @@ export 'screens/homepage.dart';
 // Notifications
 export 'screens/notifications/notifications_screen.dart';
 
-// Player
-export 'screens/player/player_screen.dart';
-
 // Playlist
 export 'screens/playlist/edit_playlist_screen.dart';
 export 'screens/playlist/playlist_screen.dart';
@@ -100,6 +97,9 @@ export 'screens/shorts/shorts_screen.dart';
 // Subscriptions
 export 'screens/subscriptions/all_subscriptions_screen.dart';
 export 'screens/subscriptions/subscriptions_screen.dart';
+
+// Video
+export 'screens/video/video_screen.dart';
 
 // Watch on TV
 export 'screens/watch_on_tv/link_tv_screen.dart';
