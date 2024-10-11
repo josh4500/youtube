@@ -2,34 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-class ShortsCommentsBottomSheet extends StatefulWidget {
+class ShortsCommentsBottomSheet extends StatelessWidget {
   const ShortsCommentsBottomSheet({
     super.key,
     required this.controller,
-    required this.replyNotifier,
     required this.closeComment,
+    required this.replyController,
     required this.draggableController,
   });
   final ScrollController controller;
-  final ValueNotifier<bool> replyNotifier;
   final VoidCallback closeComment;
+  final PageDraggableOverlayChildController replyController;
   final DraggableScrollableController draggableController;
-
-  @override
-  State<ShortsCommentsBottomSheet> createState() =>
-      _ShortsCommentsBottomSheetState();
-}
-
-class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet> {
-  final _replyController = PageDraggableOverlayChildController(
-    title: 'Replies',
-  );
-
-  @override
-  void dispose() {
-    _replyController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +25,10 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet> {
         topLeft: Radius.circular(8),
         topRight: Radius.circular(8),
       ),
-      controller: widget.controller,
-      onClose: widget.closeComment,
+      controller: controller,
+      onClose: closeComment,
       showDragIndicator: true,
-      draggableController: widget.draggableController,
+      draggableController: draggableController,
       actions: <Widget>[
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -61,52 +45,54 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet> {
         ScrollController scrollController,
         CustomScrollableScrollPhysics scrollPhysics,
       ) {
-        return Column(
-          children: <Widget>[
-            Expanded(
-              child: ListView.builder(
-                physics: scrollPhysics,
-                controller: scrollController,
-                itemBuilder: (BuildContext context, int index) {
-                  return CommentTile(
-                    pinned: index == 0,
-                    creatorLikes: index == 0,
-                    openReply: () {},
-                  );
-                },
-                itemCount: 20,
-              ),
-            ),
-            // TODO(Josh): Fix CommentTextFieldPlaceholder overflow issues
-            // ValueListenableBuilder(
-            //   valueListenable: replyNotifier,
-            //   builder: (context, value, _) {
-            //     return Visibility(
-            //       visible: !value,
-            //       child: const CommentTextFieldPlaceholder(),
-            //     );
-            //   },
-            // ),
-          ],
+        return ListView.builder(
+          physics: scrollPhysics,
+          controller: scrollController,
+          itemBuilder: (BuildContext context, int index) {
+            return CommentTile(
+              pinned: index == 0,
+              creatorLikes: index == 0,
+              openReply: replyController.open,
+            );
+          },
+          itemCount: 20,
         );
       },
+      bottom: ListenableBuilder(
+        listenable: replyController,
+        builder: (context, _) {
+          return Visibility(
+            visible: !replyController.isOpened,
+            child: const CommentTextFieldPlaceholder(),
+          );
+        },
+      ),
       overlayChildren: [
         PageDraggableOverlayChild(
-          controller: _replyController,
+          controller: replyController,
           builder: (context, controller, physics) {
-            return ListView.builder(
-              controller: controller,
-              physics: physics,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return const CommentTile(
-                    showReplies: false,
-                    backgroundColor: Color(0xFF272727),
-                  );
+            return FutureBuilder<bool>(
+              initialData: false,
+              future: Future.delayed(const Duration(seconds: 2), () => true),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.data == false) {
+                  return const Center(child: CircularProgressIndicator());
                 }
-                return const ReplyTile();
+                return ListView.builder(
+                  controller: controller,
+                  physics: physics,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return const CommentTile(
+                        showReplies: false,
+                        backgroundColor: Color(0xFF272727),
+                      );
+                    }
+                    return const ReplyTile();
+                  },
+                  itemCount: 20,
+                );
               },
-              itemCount: 20,
             );
           },
         ),

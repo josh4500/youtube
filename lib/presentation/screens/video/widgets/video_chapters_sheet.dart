@@ -4,7 +4,7 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../../constants.dart';
 
-class VideoChaptersSheet extends StatefulWidget {
+class VideoChaptersSheet extends StatelessWidget {
   const VideoChaptersSheet({
     super.key,
     required this.controller,
@@ -16,19 +16,14 @@ class VideoChaptersSheet extends StatefulWidget {
   final DraggableScrollableController draggableController;
 
   @override
-  State<VideoChaptersSheet> createState() => _VideoChaptersSheetState();
-}
-
-class _VideoChaptersSheetState extends State<VideoChaptersSheet> {
-  @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Chapters',
       scrollTag: 'player_chapters',
-      controller: widget.controller,
-      onClose: widget.closeChapter,
+      controller: controller,
+      onClose: closeChapter,
       showDragIndicator: true,
-      draggableController: widget.draggableController,
+      draggableController: draggableController,
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(12),
         topRight: Radius.circular(12),

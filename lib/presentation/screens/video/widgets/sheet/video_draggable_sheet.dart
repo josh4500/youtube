@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
-class PlayerDraggableSheet extends StatelessWidget {
-  const PlayerDraggableSheet({
+typedef PageDraggableBuilder = Widget Function(
+  BuildContext context,
+  ScrollController scrollController,
+);
+
+class VideoDraggableSheet extends StatelessWidget {
+  const VideoDraggableSheet({
     super.key,
     required this.controller,
     required this.opacity,
@@ -14,10 +19,7 @@ class PlayerDraggableSheet extends StatelessWidget {
   final Animation<double> opacity;
   final ValueNotifier<bool> visibleListenable;
   final List<double> snapSizes;
-  final Widget Function(
-    BuildContext context,
-    ScrollController scrollController,
-  ) builder;
+  final PageDraggableBuilder builder;
 
   @override
   Widget build(BuildContext context) {

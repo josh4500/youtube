@@ -44,7 +44,7 @@ abstract final class AppTheme {
     fontFamily: AppFont.roboto,
     // fontFamilyFallback: AppFont.all,
     scaffoldBackgroundColor: Colors.white,
-    primaryColor: Colors.white,
+    primaryColor: AppPalette.blue2,
     canvasColor: const Color(0xFFFFFFFF),
     colorScheme: const ColorScheme.light(
       primary: AppPalette.blue2,
@@ -126,11 +126,11 @@ abstract final class AppTheme {
     fontFamily: AppFont.roboto,
     // fontFamilyFallback: AppFont.all,
     scaffoldBackgroundColor: const Color(0xFF0F0F0F),
-    primaryColor: Colors.black,
+    primaryColor: AppPalette.blue,
     canvasColor: const Color(0xFF0F0F0F),
     colorScheme: const ColorScheme.dark(
       surface: Colors.black,
-      primary: AppPalette.white,
+      primary: AppPalette.blue,
       secondary: Color(0xFF3DA3FA),
       outlineVariant: Colors.white,
     ),

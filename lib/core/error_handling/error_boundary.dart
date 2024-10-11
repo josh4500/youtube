@@ -62,14 +62,14 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
   /// This function is called to catch build-time errors in the subtree.
   void _catchException(Object error, StackTrace stackTrace) {
     widget.onException(error, stackTrace);
-    setState(() {
-      _hasError = true;
-      _errorDetails = FlutterErrorDetails(
-        exception: error,
-        stack: stackTrace,
-        context: ErrorDescription('While building a widget subtree.'),
-      );
-    });
+    // setState(() {
+    //   _hasError = true;
+    //   _errorDetails = FlutterErrorDetails(
+    //     exception: error,
+    //     stack: stackTrace,
+    //     context: ErrorDescription('While building a widget subtree.'),
+    //   );
+    // });
   }
 
   @override

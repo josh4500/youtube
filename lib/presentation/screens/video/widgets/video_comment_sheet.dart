@@ -67,40 +67,34 @@ class VideoCommentsSheet extends StatelessWidget {
         options: ['Top', 'Timed', 'Newest'],
       ),
       contentBuilder: (context, controller, physics) {
-        return Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                physics: physics,
-                controller: controller,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return const VideoCommentGuidelines();
-                  }
-                  return CommentTile(
-                    openReply: replyController.open,
-                    pinned: index == 1,
-                    byCreator: index == 1,
-                    creatorLikes: index == 1,
-                    creatorReply: index == 1,
-                    showReplies: index == 1,
-                  );
-                },
-                itemCount: 20,
-              ),
-            ),
-            // ValueListenableBuilder(
-            //   valueListenable: widget.replyNotifier,
-            //   builder: (context, value, _) {
-            //     return Visibility(
-            //       visible: !value,
-            //       child: const CommentTextFieldPlaceholder(),
-            //     );
-            //   },
-            // ),
-          ],
+        return ListView.builder(
+          physics: physics,
+          controller: controller,
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return const VideoCommentGuidelines();
+            }
+            return CommentTile(
+              openReply: replyController.open,
+              pinned: index == 1,
+              byCreator: index == 1,
+              creatorLikes: index == 1,
+              creatorReply: index == 1,
+              showReplies: index == 1,
+            );
+          },
+          itemCount: 20,
         );
       },
+      bottom: ListenableBuilder(
+        listenable: replyController,
+        builder: (context, _) {
+          return Visibility(
+            visible: !replyController.isOpened,
+            child: const CommentTextFieldPlaceholder(),
+          );
+        },
+      ),
       baseHeight: 1 - kAvgVideoViewPortHeight,
       overlayChildren: [
         PageDraggableOverlayChild(

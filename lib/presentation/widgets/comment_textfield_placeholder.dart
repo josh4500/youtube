@@ -27,6 +27,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class CommentTextFieldPlaceholder extends StatelessWidget {
   const CommentTextFieldPlaceholder({super.key, this.isReply = false});
@@ -34,47 +36,56 @@ class CommentTextFieldPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        const Divider(thickness: 1, height: 0),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 4,
-            horizontal: 8.0,
-          ),
-          child: Row(
-            children: <Widget>[
-              const Padding(
-                padding: EdgeInsets.all(4.0),
-                child: CircleAvatar(
-                  backgroundColor: Colors.grey,
-                  maxRadius: 12,
+    return Material(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const Divider(thickness: 1, height: 0),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 4,
+              horizontal: 8.0,
+            ),
+            child: Row(
+              children: <Widget>[
+                const Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: AccountAvatar(size: 24),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white12,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    'Add a ${isReply ? 'reply' : 'comment'}...',
-                    style: const TextStyle(
-                      color: Colors.grey,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white12,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'Add a ${isReply ? 'reply' : 'comment'}...',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 4),
-            ],
+                const SizedBox(width: 4),
+                if (isReply)
+                  const Icon(Icons.camera)
+                else
+                  TappableArea(
+                    onTap: () {},
+                    padding: const EdgeInsets.all(4),
+                    borderRadius: BorderRadius.circular(24),
+                    child: const Icon(YTIcons.thanks_outlined, size: 24),
+                  ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

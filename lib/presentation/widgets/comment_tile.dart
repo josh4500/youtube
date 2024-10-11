@@ -26,8 +26,6 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -60,14 +58,17 @@ class CommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showTranslationOption = Random().nextBool();
+    const showTranslationOption = true;
     return ColoredBox(
       color: backgroundColor ?? Colors.transparent,
       child: Column(
         children: <Widget>[
           TappableArea(
             onTap: openReply,
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.symmetric(
+              vertical: 8,
+              horizontal: 6,
+            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -80,183 +81,181 @@ class CommentTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 2),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        if (pinned) ...[
-                          const Row(
-                            children: [
-                              Icon(
-                                YTIcons.pinned_outlined,
-                                size: 14,
-                                color: Colors.grey,
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                'Pinned by BussyBoyBonanza',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                        ],
-                        Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const SizedBox(height: 8),
+                      if (pinned) ...[
+                        const Row(
                           children: [
-                            Container(
-                              padding: byCreator
-                                  ? const EdgeInsets.symmetric(
-                                      vertical: 4,
-                                      horizontal: 8,
-                                    )
-                                  : null,
-                              decoration: byCreator
-                                  ? BoxDecoration(
-                                      color: Colors.white24,
-                                      borderRadius: BorderRadius.circular(
-                                        16,
-                                      ),
-                                    )
-                                  : null,
-                              child: RichText(
-                                text: TextSpan(
-                                  text: '@BussyBoyBonanza',
-                                  children: <InlineSpan>[
-                                    if (byCreator)
-                                      WidgetSpan(
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(width: 4),
-                                            Icon(
-                                              YTIcons.verified_filled,
-                                              size: 12,
-                                              color: byCreator
-                                                  ? Colors.white
-                                                  : const Color(0xFFAAAAAA),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                  ],
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: byCreator
-                                        ? Colors.white
-                                        : const Color(0xFFAAAAAA),
-                                  ),
-                                ),
-                              ),
+                            Icon(
+                              YTIcons.pinned_outlined,
+                              size: 14,
+                              color: Colors.grey,
                             ),
-                            const Text.rich(
-                              TextSpan(
-                                text: kDotSeparator,
-                                children: <InlineSpan>[
-                                  TextSpan(text: '7mo ago'),
-                                ],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
+                            SizedBox(width: 4),
+                            Text(
+                              'Pinned by BussyBoyBonanza',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 4),
-                        const Text(
-                          'Cutting funding on precautions is going to cost more in the long run',
-                          maxLines: 5,
-                          style: TextStyle(
-                            color: Color(0xFFF1F1F1),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 8),
-                        if (showTranslationOption)
-                          const CommentTranslationButton(),
-                        Transform.translate(
-                          offset: const Offset(-8, 0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              TappableArea(
-                                onTap: () {},
-                                releasedColor: Colors.transparent,
-                                padding: const EdgeInsets.all(8),
-                                borderRadius: BorderRadius.circular(24),
-                                child: const Icon(
-                                  YTIcons.like_outlined,
-                                  size: 18,
-                                  color: Color(0xFFF1F1F1),
-                                ),
-                              ),
-                              Transform.translate(
-                                offset: const Offset(-4, 0),
-                                child: const SizedBox(
-                                  width: 24,
-                                  child: Text(
-                                    '69k',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Color(0xFFF1F1F1),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              TappableArea(
-                                onTap: () {},
-                                releasedColor: Colors.transparent,
-                                padding: const EdgeInsets.all(8),
-                                borderRadius: BorderRadius.circular(24),
-                                child: const Icon(
-                                  YTIcons.dislike_outlined,
-                                  size: 18,
-                                  color: Color(0xFFF1F1F1),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              TappableArea(
-                                onTap: () {},
-                                releasedColor: Colors.transparent,
-                                padding: const EdgeInsets.all(8),
-                                borderRadius: BorderRadius.circular(24),
-                                child: const Icon(
-                                  YTIcons.reply_outlined,
-                                  size: 18,
-                                  color: Color(0xFFF1F1F1),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              if (creatorLikes)
-                                TappableArea(
-                                  onTap: () {},
-                                  releasedColor: Colors.transparent,
-                                  padding: const EdgeInsets.all(8),
-                                  borderRadius: BorderRadius.circular(24),
-                                  child: const Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      AccountAvatar(size: 18),
-                                      Positioned(
-                                        top: 9,
-                                        left: 9,
-                                        child: Icon(
-                                          YTIcons.heart_filled,
-                                          size: 14,
-                                          color: Color(0xFFFF0000),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
                       ],
-                    ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: byCreator
+                                ? const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                    horizontal: 8,
+                                  )
+                                : null,
+                            decoration: byCreator
+                                ? BoxDecoration(
+                                    color: Colors.white24,
+                                    borderRadius: BorderRadius.circular(
+                                      16,
+                                    ),
+                                  )
+                                : null,
+                            child: RichText(
+                              text: TextSpan(
+                                text: '@BussyBoyBonanza',
+                                children: <InlineSpan>[
+                                  if (byCreator)
+                                    WidgetSpan(
+                                      child: Row(
+                                        children: [
+                                          const SizedBox(width: 4),
+                                          Icon(
+                                            YTIcons.verified_filled,
+                                            size: 12,
+                                            color: byCreator
+                                                ? Colors.white
+                                                : const Color(0xFFAAAAAA),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                ],
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: byCreator
+                                      ? Colors.white
+                                      : const Color(0xFFAAAAAA),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const Text.rich(
+                            TextSpan(
+                              text: kDotSeparator,
+                              children: <InlineSpan>[
+                                TextSpan(text: '7mo ago'),
+                              ],
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Cutting funding on precautions is going to cost more in the long run',
+                        maxLines: 5,
+                        style: TextStyle(
+                          color: Color(0xFFF1F1F1),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      if (showTranslationOption)
+                        const CommentTranslationButton(),
+                      Transform.translate(
+                        offset: const Offset(-8, 0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            TappableArea(
+                              onTap: () {},
+                              releasedColor: Colors.transparent,
+                              padding: const EdgeInsets.all(8),
+                              borderRadius: BorderRadius.circular(24),
+                              child: const Icon(
+                                YTIcons.like_outlined,
+                                size: 18,
+                                color: Color(0xFFF1F1F1),
+                              ),
+                            ),
+                            Transform.translate(
+                              offset: const Offset(-4, 0),
+                              child: const SizedBox(
+                                width: 24,
+                                child: Text(
+                                  '69k',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFFF1F1F1),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TappableArea(
+                              onTap: () {},
+                              releasedColor: Colors.transparent,
+                              padding: const EdgeInsets.all(8),
+                              borderRadius: BorderRadius.circular(24),
+                              child: const Icon(
+                                YTIcons.dislike_outlined,
+                                size: 18,
+                                color: Color(0xFFF1F1F1),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            TappableArea(
+                              onTap: () {},
+                              releasedColor: Colors.transparent,
+                              padding: const EdgeInsets.all(8),
+                              borderRadius: BorderRadius.circular(24),
+                              child: const Icon(
+                                YTIcons.reply_outlined,
+                                size: 18,
+                                color: Color(0xFFF1F1F1),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            if (creatorLikes)
+                              TappableArea(
+                                onTap: () {},
+                                releasedColor: Colors.transparent,
+                                padding: const EdgeInsets.all(8),
+                                borderRadius: BorderRadius.circular(24),
+                                child: const Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    AccountAvatar(size: 18),
+                                    Positioned(
+                                      top: 9,
+                                      left: 9,
+                                      child: Icon(
+                                        YTIcons.heart_filled,
+                                        size: 14,
+                                        color: Color(0xFFFF0000),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 TappableArea(
@@ -671,14 +670,17 @@ class _CommentTranslationButtonState extends State<CommentTranslationButton> {
   bool translated = false;
   @override
   Widget build(BuildContext context) {
-    return TappableArea(
-      onTap: () => setState(() => translated = !translated),
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Text(
-        translated
-            ? 'See original (Translated by Google)'
-            : 'Translate to English',
-        style: const TextStyle(color: Colors.grey),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: TappableArea(
+        onTap: () => setState(() => translated = !translated),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Text(
+          translated
+              ? 'See original (Translated by Google)'
+              : 'Translate to English',
+          style: const TextStyle(color: Colors.grey),
+        ),
       ),
     );
   }

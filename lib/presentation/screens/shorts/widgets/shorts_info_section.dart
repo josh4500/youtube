@@ -60,31 +60,11 @@ class ShortsInfoSection extends StatelessWidget {
                         const SizedBox(height: 12),
                       ],
                       ...<Widget>[
-                        CustomInkWell(
-                          onTap: () {},
-                          borderRadius: BorderRadius.circular(32),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 6,
-                              horizontal: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(32),
-                              color: Colors.black45,
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Icon(YTIcons.place_outlined, size: 18),
-                                SizedBox(width: 4),
-                                Text('New york'),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
+                        const ShortsShopButton(),
+                        const SizedBox(height: 12),
+                        const ShortsLocationButton(),
                       ],
+                      const SizedBox(height: 16),
                       Row(
                         children: <Widget>[
                           const AccountAvatar(size: 32, name: 'John Jackson'),
@@ -199,6 +179,95 @@ class ShortsInfoSection extends StatelessWidget {
         const SizedBox(height: 4),
         const ShortsContextInfo(),
       ],
+    );
+  }
+}
+
+class ShortsShopButton extends StatelessWidget {
+  const ShortsShopButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.black45,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(2.5),
+            decoration: BoxDecoration(
+              color: Colors.white30,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: const Icon(
+              YTIcons.shopping_bag_outlined,
+            ),
+          ),
+          const SizedBox(width: 8),
+          const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Shop',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontVariations: [
+                    FontVariation('wdth', 3),
+                  ],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: 1.25),
+              Text(
+                'Marques Brownlee store',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  color: Colors.white60,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ShortsLocationButton extends StatelessWidget {
+  const ShortsLocationButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomInkWell(
+      onTap: () {},
+      borderRadius: BorderRadius.circular(32),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: 6,
+          horizontal: 12,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(32),
+          color: Colors.black45,
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(YTIcons.place_outlined, size: 18),
+            SizedBox(width: 4),
+            Text('New york'),
+          ],
+        ),
+      ),
     );
   }
 }

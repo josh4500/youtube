@@ -58,80 +58,78 @@ class ReplyTile extends StatelessWidget {
           ),
           const SizedBox(width: 2),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  RichText(
-                    text: const TextSpan(
-                      text: '@BussyBoyBonanza',
-                      children: <InlineSpan>[
-                        TextSpan(text: kDotSeparator),
-                        TextSpan(text: '7mo ago'),
-                      ],
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox(height: 8),
+                RichText(
+                  text: const TextSpan(
+                    text: '@BussyBoyBonanza',
+                    children: <InlineSpan>[
+                      TextSpan(text: kDotSeparator),
+                      TextSpan(text: '7mo ago'),
+                    ],
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
-                  const SizedBox(height: 4),
-                  const Text('OMG This is so fun 😂'),
-                  const SizedBox(height: 16),
-                  Transform.translate(
-                    offset: const Offset(-8, 0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                const Text('OMG This is so fun 😂'),
+                const SizedBox(height: 8),
+                Transform.translate(
+                  offset: const Offset(-8, 0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      TappableArea(
+                        onTap: () {},
+                        releasedColor: Colors.transparent,
+                        padding: const EdgeInsets.all(8),
+                        borderRadius: BorderRadius.circular(24),
+                        child: const Icon(YTIcons.like_outlined, size: 18),
+                      ),
+                      const SizedBox(
+                        width: 24,
+                        child: Text(
+                          '7',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      TappableArea(
+                        onTap: () {},
+                        releasedColor: Colors.transparent,
+                        padding: const EdgeInsets.all(8),
+                        borderRadius: BorderRadius.circular(24),
+                        child: const Icon(YTIcons.dislike_outlined, size: 18),
+                      ),
+                      const SizedBox(width: 16),
+                      if (creatorLikes)
                         TappableArea(
                           onTap: () {},
                           releasedColor: Colors.transparent,
                           padding: const EdgeInsets.all(8),
                           borderRadius: BorderRadius.circular(24),
-                          child: const Icon(YTIcons.like_outlined, size: 18),
-                        ),
-                        const SizedBox(
-                          width: 24,
-                          child: Text(
-                            '7',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ),
-                        TappableArea(
-                          onTap: () {},
-                          releasedColor: Colors.transparent,
-                          padding: const EdgeInsets.all(8),
-                          borderRadius: BorderRadius.circular(24),
-                          child: const Icon(YTIcons.dislike_outlined, size: 18),
-                        ),
-                        const SizedBox(width: 16),
-                        if (creatorLikes)
-                          TappableArea(
-                            onTap: () {},
-                            releasedColor: Colors.transparent,
-                            padding: const EdgeInsets.all(8),
-                            borderRadius: BorderRadius.circular(24),
-                            child: const Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                AccountAvatar(size: 18),
-                                Positioned(
-                                  top: 9,
-                                  left: 9,
-                                  child: Icon(
-                                    YTIcons.heart_filled,
-                                    size: 14,
-                                    color: Color(0xFFFF0000),
-                                  ),
+                          child: const Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              AccountAvatar(size: 18),
+                              Positioned(
+                                top: 9,
+                                left: 9,
+                                child: Icon(
+                                  YTIcons.heart_filled,
+                                  size: 14,
+                                  color: Color(0xFFFF0000),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                      ],
-                    ),
+                        ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           TappableArea(

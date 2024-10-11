@@ -17,7 +17,7 @@ class ShortsActionButton extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       child: CustomInkWell(
-        onTap: () {},
+        onTap: onTap,
         borderRadius: BorderRadius.circular(64),
         padding: const EdgeInsets.symmetric(
           vertical: 6.0,

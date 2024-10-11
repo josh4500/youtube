@@ -104,47 +104,40 @@ class _VideoChannelSubscriptionButtonState
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
-        return Container(
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(width: 5, color: Colors.transparent),
-          ),
-          child: ShaderMask(
-            // blendMode: BlendMode.colorBurn,
-            shaderCallback: (bounds) {
-              return LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: const [
-                  AppPalette.blue,
-                  Colors.purple,
-                  AppPalette.red,
-                  Colors.orange,
-                ],
-                stops: [
-                  (_controller.value - 0.2).clamp(0.0, 1.0),
-                  _controller.value,
-                  (_controller.value + 0.2).clamp(0.0, 1.0),
-                  (_controller.value + 0.4).clamp(0.0, 1.0),
-                ],
-                // tileMode: TileMode.repeated,
-              ).createShader(bounds);
-            },
-            child: CustomActionButton(
-              title: 'Subscribe',
-              onTap: () {},
-              backgroundColor: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              padding: const EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 14,
-              ),
-              textStyle: const TextStyle(
-                fontSize: 12,
-                color: Colors.black,
-                fontWeight: FontWeight.w500,
-              ),
+        return ShaderMask(
+          // blendMode: BlendMode.colorBurn,
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: const [
+                AppPalette.blue,
+                Colors.purple,
+                AppPalette.red,
+                Colors.orange,
+              ],
+              stops: [
+                (_controller.value - 0.2).clamp(0.0, 1.0),
+                _controller.value,
+                (_controller.value + 0.2).clamp(0.0, 1.0),
+                (_controller.value + 0.4).clamp(0.0, 1.0),
+              ],
+              // tileMode: TileMode.repeated,
+            ).createShader(bounds);
+          },
+          child: CustomActionButton(
+            title: 'Subscribe',
+            onTap: () {},
+            backgroundColor: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            padding: const EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: 14,
+            ),
+            textStyle: const TextStyle(
+              fontSize: 12,
+              color: Colors.black,
+              fontWeight: FontWeight.w500,
             ),
           ),
         );

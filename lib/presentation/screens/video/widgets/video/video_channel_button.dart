@@ -10,7 +10,7 @@ class VideoChannelButton extends StatelessWidget {
     return const Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        AccountAvatar(size: 36, name: 'John Jackson'),
+        AccountAvatar(size: 28, name: 'John Jackson'),
         SizedBox(width: 8),
         Flexible(
           child: Text(

@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
@@ -31,6 +30,7 @@ class PageDraggableSheet extends StatefulWidget {
     this.actions = const <Widget>[],
     this.overlayChildren = const <PageDraggableOverlayChild>[],
     this.onOpenOverlayChild,
+    this.bottom,
   });
 
   final String scrollTag;
@@ -48,6 +48,7 @@ class PageDraggableSheet extends StatefulWidget {
   ) contentBuilder;
   final DraggableScrollableController? draggableController;
   final List<Widget> actions;
+  final Widget? bottom;
   final List<PageDraggableOverlayChild> overlayChildren;
   final ValueChanged<int>? onOpenOverlayChild;
   final DynamicTab? dynamicTab;
@@ -60,10 +61,9 @@ class PageDraggableSheet extends StatefulWidget {
 
 class _PageDraggableSheetState extends State<PageDraggableSheet>
     with SingleTickerProviderStateMixin {
-  final Queue<int> _overlayChildQueue = Queue<int>();
-  int? _overlayChildIndex;
-  int _overlayChildOpenCount = 0;
-  bool _overlayAnyChildIsOpened = false;
+  final List<int> _overlayChildIndexList = <int>[];
+  int? _overlayLastChildIndex;
+  bool get _overlayAnyChildIsOpened => _overlayChildIndexList.isNotEmpty;
 
   late final ScrollController _innerListController;
   late final CustomScrollableScrollPhysics _innerListPhysics;
@@ -100,26 +100,27 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
 
   Future<void> _onOpenOverlayChild(int index) async {
     final bool opened = widget.overlayChildren[index].controller.isOpened;
-    if (widget.dynamicTab != null) {
-      if (opened) {
-        _overlayChildOpenCount += 1;
+
+    if (opened) {
+      _overlayLastChildIndex = index;
+      _overlayChildIndexList.add(index);
+
+      if (hasDynamicTab) {
         _dynamicTabHideController.reverse();
-        _overlayAnyChildIsOpened = true;
-        _overlayChildIndex = index;
-        _overlayChildQueue.add(index);
+      }
+    } else {
+      // Resets the topmost to null
+      if (!_overlayAnyChildIsOpened) {
+        _overlayLastChildIndex = null;
       } else {
-        _overlayChildOpenCount -= 1;
-        _overlayAnyChildIsOpened = _overlayChildOpenCount >= 1;
+        _overlayLastChildIndex = _overlayChildIndexList.last;
+      }
+      _overlayChildIndexList.remove(index);
 
-        // Resets the topmost to null
-        if (!_overlayAnyChildIsOpened) {
-          _overlayChildIndex = null;
-        } else {}
-
-        _overlayChildQueue.removeWhere((int val) => val == index);
-        if (_innerListController.offset < 100) {
-          _dynamicTabHideController.forward();
-        }
+      if (_innerListController.hasClients &&
+          _innerListController.offset < 100 &&
+          hasDynamicTab) {
+        _dynamicTabHideController.forward();
       }
     }
   }
@@ -163,9 +164,9 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     if (widget.draggableController != null) {
       if (_innerListController.offset == 0 && !_overlayAnyChildIsOpened) {
         _changeDraggableSize(_innerListPhysics, event);
-      } else if (_overlayAnyChildIsOpened && _overlayChildIndex != null) {
+      } else if (_overlayAnyChildIsOpened && _overlayLastChildIndex != null) {
         final PageDraggableOverlayChildController controller =
-            widget.overlayChildren[_overlayChildIndex!].controller;
+            widget.overlayChildren[_overlayLastChildIndex!].controller;
         if (controller._scrollController.offset == 0 && controller.isOpened) {
           _changeDraggableSize(controller._scrollPhysics, event);
         }
@@ -196,8 +197,9 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     if (widget.draggableController != null) {
       _innerListPhysics.canScroll(true);
       if (_overlayAnyChildIsOpened) {
-        if (_overlayChildIndex != null) {
-          widget.overlayChildren[_overlayChildIndex!].controller._scrollPhysics
+        if (_overlayLastChildIndex != null) {
+          widget.overlayChildren[_overlayLastChildIndex!].controller
+              ._scrollPhysics
               .canScroll(true);
         }
       }
@@ -395,6 +397,13 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                           _innerListPhysics,
                         ),
                       ),
+                      if (widget.bottom != null)
+                        SingleChildScrollView(
+                          reverse: true,
+                          child: IntrinsicHeight(
+                            child: widget.bottom,
+                          ),
+                        ),
                       for (final PageDraggableOverlayChild overlayChild
                           in widget.overlayChildren)
                         overlayChild,
@@ -456,7 +465,7 @@ class _PageDraggableOverlayChildState extends State<PageDraggableOverlayChild>
 
   @override
   void dispose() {
-    controller.dispose();
+    // controller.dispose();
     super.dispose();
   }
 
@@ -559,7 +568,7 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
                 onTap: widget.controller.close,
                 child: const Icon(YTIcons.arrow_back_outlined),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 24),
               Text(
                 widget.controller.title,
                 style: const TextStyle(
