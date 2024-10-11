@@ -30,8 +30,6 @@ import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-import 'package:youtube_clone/presentation/widgets/playable/group/playable_group_contents.dart';
-import 'package:youtube_clone/presentation/widgets/playable/group/playable_group_videos.dart';
 
 class PodcastsScreen extends StatefulWidget {
   const PodcastsScreen({super.key});

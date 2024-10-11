@@ -99,10 +99,14 @@ class TrianglePainter extends CustomPainter {
     if (isUpsideDown) {
       // Draw the triangle pointing upwards (upside down)
       path.moveTo(
-          xOffset - triangleHalfWidth, size.height); // Bottom left point
+        xOffset - triangleHalfWidth,
+        size.height,
+      ); // Bottom left point
       path.lineTo(xOffset, size.height + triangleHeight); // Top point
       path.lineTo(
-          xOffset + triangleHalfWidth, size.height); // Bottom right point
+        xOffset + triangleHalfWidth,
+        size.height,
+      ); // Bottom right point
     } else {
       // Draw the triangle pointing downwards (normal)
       path.moveTo(xOffset - triangleHalfWidth, 0); // Top left point

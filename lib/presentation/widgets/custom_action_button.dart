@@ -85,7 +85,7 @@ class CustomActionButton extends StatelessWidget {
           if (title != null) Text(title!, style: textStyle ?? theme.textStyle),
           if (trailingIcon != null) ...[
             const SizedBox(width: 5),
-            trailingIcon!
+            trailingIcon!,
           ],
         ],
       ),

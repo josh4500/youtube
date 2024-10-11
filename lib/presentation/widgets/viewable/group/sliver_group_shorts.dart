@@ -140,7 +140,7 @@ class SliverGroupShorts extends StatelessWidget {
                     return ViewableShortsContent(
                       width: width ?? 196.h,
                       onMore: onMore,
-                      margin: itemMargin ?? const EdgeInsets.all(4),
+                      margin: itemMargin,
                       borderRadius: BorderRadius.circular(8),
                     );
                   }
