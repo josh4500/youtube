@@ -72,6 +72,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
 
   VelocityTracker? _velocityTracker;
 
+  bool get hasDynamicTab => widget.dynamicTab != null;
+
   @override
   void initState() {
     super.initState();
@@ -86,6 +88,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
 
     _dynamicTabHideController = AnimationController(
       vsync: this,
+      value: hasDynamicTab ? 1 : 0,
       duration: const Duration(milliseconds: 250),
     );
 
@@ -121,10 +124,13 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     }
   }
 
-  Future<void> _onHideDynamicTabsCallback(double offset) async {
-    if (offset >= 100) {
+  Future<void> _onHideDynamicTabsCallback(
+    double changePixels,
+    double extentBefore,
+  ) async {
+    if (changePixels >= 100) {
       _dynamicTabHideController.reverse();
-    } else if (offset <= -100) {
+    } else if (changePixels <= -100 || extentBefore < 100) {
       _dynamicTabHideController.forward();
     }
   }
@@ -253,16 +259,14 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
               AnimatedBuilder(
                 animation: _dynamicTabHideAnimation,
                 builder: (context, childWidget) {
-                  final v = widget.dynamicTab == null
-                      ? 0
-                      : _dynamicTabHideAnimation.value;
+                  final v = _dynamicTabHideAnimation.value;
 
                   return SliverPersistentHeader(
                     pinned: true,
                     floating: true,
                     delegate: PersistentHeaderDelegate(
-                      minHeight: 66.05,
-                      maxHeight: (v * (111 - 66.05)) + 66.05,
+                      minHeight: 66,
+                      maxHeight: (v * 44) + 66,
                       child: childWidget!,
                     ),
                   );
@@ -324,8 +328,9 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                                           maxHeight: 28,
                                         ),
                                         splashColor: Colors.transparent,
-                                        icon:
-                                            const Icon(YTIcons.close_outlined),
+                                        icon: const Icon(
+                                          YTIcons.close_outlined,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -348,7 +353,6 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                             sizeFactor: _dynamicTabHideAnimation,
                             child: Column(
                               children: <Widget>[
-                                const SizedBox(height: 8),
                                 SizedBox(
                                   height: 40,
                                   child: widget.dynamicTab,
@@ -357,7 +361,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                               ],
                             ),
                           ),
-                        const Divider(thickness: .8, height: 0),
+                        const Divider(thickness: 1, height: 0),
                       ],
                     ),
                   ),
@@ -373,13 +377,15 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                     children: <Widget>[
                       NotificationListener<ScrollNotification>(
                         onNotification: (ScrollNotification notification) {
-                          if (notification is ScrollStartNotification) {
-                            _beginPixels = notification.metrics.pixels;
-                          }
-                          if (notification is ScrollEndNotification) {
-                            _onHideDynamicTabsCallback(
-                              notification.metrics.pixels - _beginPixels,
-                            );
+                          if (hasDynamicTab) {
+                            if (notification is ScrollStartNotification) {
+                              _beginPixels = notification.metrics.pixels;
+                            } else if (notification is ScrollEndNotification) {
+                              _onHideDynamicTabsCallback(
+                                notification.metrics.pixels - _beginPixels,
+                                notification.metrics.extentBefore,
+                              );
+                            }
                           }
                           return false;
                         },

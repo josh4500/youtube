@@ -48,7 +48,7 @@ class ReplyTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const SizedBox(width: 52),
+          const SizedBox(width: 44),
           TappableArea(
             onTap: () => showCommenterProfile(context),
             releasedColor: Colors.transparent,
