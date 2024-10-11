@@ -37,7 +37,6 @@ Future<T?> showPlaylistMenu<T>(
   return showMenu<T>(
     context: context,
     menuPadding: EdgeInsets.zero,
-    color: const Color(0xFF303030),
     position: position,
     items: <PopupMenuEntry<T>>[
       const PopupMenuItem(

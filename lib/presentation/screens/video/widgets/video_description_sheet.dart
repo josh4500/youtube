@@ -41,6 +41,7 @@ class VideoDescriptionSheet extends StatelessWidget {
     required this.closeDescription,
     this.draggableController,
   });
+
   final ScrollController? controller;
   final bool showDragIndicator;
   final PageDraggableOverlayChildController transcriptController;

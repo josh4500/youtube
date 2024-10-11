@@ -46,6 +46,7 @@ abstract final class AppTheme {
     scaffoldBackgroundColor: Colors.white,
     primaryColor: AppPalette.blue2,
     canvasColor: const Color(0xFFFFFFFF),
+    hintColor: Colors.black45,
     colorScheme: const ColorScheme.light(
       primary: AppPalette.blue2,
       secondary: Color(0xFF065DD0),
@@ -84,7 +85,13 @@ abstract final class AppTheme {
         },
       ),
     ),
-    //dividerColor: const Color(0xFF3F3F3F),
+    popupMenuTheme: const PopupMenuThemeData(
+      color: Colors.white,
+      shadowColor: Colors.black26,
+      elevation: 4,
+      menuPadding: EdgeInsets.zero,
+    ),
+    // dividerColor: const Color(0xFF3F3F3F),
     listTileTheme: const ListTileThemeData(
       horizontalTitleGap: 0,
       minVerticalPadding: 0,
@@ -115,6 +122,7 @@ abstract final class AppTheme {
     slidableStyle: AppStyle.slidableStyle.light,
     dynamicTabStyle: AppStyle.dynamicTabStyle.light,
     homeDrawerStyle: AppStyle.homeDrawerStyle.light,
+    commentStyle: AppStyle.commentStyle.light,
   );
 
   //
@@ -128,6 +136,7 @@ abstract final class AppTheme {
     scaffoldBackgroundColor: const Color(0xFF0F0F0F),
     primaryColor: AppPalette.blue,
     canvasColor: const Color(0xFF0F0F0F),
+    hintColor: Colors.white38,
     colorScheme: const ColorScheme.dark(
       surface: Colors.black,
       primary: AppPalette.blue,
@@ -171,6 +180,12 @@ abstract final class AppTheme {
       horizontalTitleGap: 0,
       minVerticalPadding: 0,
     ),
+    popupMenuTheme: const PopupMenuThemeData(
+      color: Color(0xFF303030),
+      shadowColor: Colors.transparent,
+      elevation: 4,
+      menuPadding: EdgeInsets.zero,
+    ),
     dividerColor: const Color(0xFF3F3F3F),
   ).copyWith(
     extensions: <ThemeExtension>[
@@ -199,6 +214,7 @@ abstract final class AppTheme {
     slidableStyle: AppStyle.slidableStyle.dark,
     dynamicTabStyle: AppStyle.dynamicTabStyle.dark,
     homeDrawerStyle: AppStyle.homeDrawerStyle.dark,
+    commentStyle: AppStyle.commentStyle.dark,
   );
 
   static const BrightnessPair<SystemUiOverlayStyle> _systemUiOverlayStyle =

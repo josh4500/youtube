@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-class ShortsCommentsBottomSheet extends StatelessWidget {
+class ShortsCommentsBottomSheet extends StatefulWidget {
   const ShortsCommentsBottomSheet({
     super.key,
     required this.controller,
@@ -16,6 +18,14 @@ class ShortsCommentsBottomSheet extends StatelessWidget {
   final DraggableScrollableController draggableController;
 
   @override
+  State<ShortsCommentsBottomSheet> createState() =>
+      _ShortsCommentsBottomSheetState();
+}
+
+class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet> {
+  Completer<bool> replyCompleter = Completer();
+
+  @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Comments',
@@ -25,19 +35,43 @@ class ShortsCommentsBottomSheet extends StatelessWidget {
         topLeft: Radius.circular(8),
         topRight: Radius.circular(8),
       ),
-      controller: controller,
-      onClose: closeComment,
+      controller: widget.controller,
+      onClose: widget.closeComment,
       showDragIndicator: true,
-      draggableController: draggableController,
+      draggableController: widget.draggableController,
       actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-          child: IconButton(
-            onPressed: () {},
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(maxHeight: 28),
-            icon: const Icon(YTIcons.tune_outlined),
-          ),
+        TappableArea(
+          onTapDown: (TapDownDetails details) {
+            showMenu(
+              context: context,
+              menuPadding: EdgeInsets.zero,
+              position: RelativeRect.fromLTRB(
+                details.globalPosition.dx,
+                // Size of icon plus top and half padding
+                details.globalPosition.dy - (46),
+                52, // Size of icon plus horizontal padding
+                0,
+              ),
+              initialValue: 'Top comments',
+              items: <PopupMenuEntry>[
+                const PopupMenuItem(
+                  value: 'Top comments',
+                  padding: EdgeInsets.only(left: 12, right: 64),
+                  child: Text('Top comments'),
+                ),
+                const PopupMenuItem(
+                  value: 'Newest first',
+                  padding: EdgeInsets.only(left: 12, right: 64),
+                  child: Text('Newest first'),
+                ),
+              ],
+            );
+          },
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          releasedColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          splashFactory: InkSplash.splashFactory,
+          child: const Icon(YTIcons.tune_outlined),
         ),
       ],
       contentBuilder: (
@@ -52,45 +86,62 @@ class ShortsCommentsBottomSheet extends StatelessWidget {
             return CommentTile(
               pinned: index == 0,
               creatorLikes: index == 0,
-              openReply: replyController.open,
+              openReply: widget.replyController.open,
             );
           },
           itemCount: 20,
         );
       },
       bottom: ListenableBuilder(
-        listenable: replyController,
+        listenable: widget.replyController,
         builder: (context, _) {
           return Visibility(
-            visible: !replyController.isOpened,
+            visible: !widget.replyController.isOpened,
             child: const CommentTextFieldPlaceholder(),
           );
         },
       ),
+      onOpenOverlayChild: (int index) {
+        replyCompleter = Completer();
+        replyCompleter.complete(
+          Future.delayed(const Duration(seconds: 5), () => true),
+        );
+      },
       overlayChildren: [
         PageDraggableOverlayChild(
-          controller: replyController,
+          controller: widget.replyController,
           builder: (context, controller, physics) {
             return FutureBuilder<bool>(
-              initialData: false,
-              future: Future.delayed(const Duration(seconds: 2), () => true),
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
+              future: replyCompleter.future,
+              builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
                 if (snapshot.data == false) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                return ListView.builder(
-                  controller: controller,
-                  physics: physics,
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return const CommentTile(
-                        showReplies: false,
-                        backgroundColor: Color(0xFF272727),
-                      );
-                    }
-                    return const ReplyTile();
-                  },
-                  itemCount: 20,
+                return Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        controller: controller,
+                        physics: physics,
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            return CommentTile(
+                              showReplies: false,
+                              backgroundColor: context.theme.highlightColor,
+                            );
+                          }
+                          return const ReplyTile();
+                        },
+                        itemCount: 20,
+                      ),
+                    ),
+                    // const SingleChildScrollView(
+                    //   reverse: true,
+                    //   child: IntrinsicHeight(
+                    //     child: CommentTextFieldPlaceholder(isReply: true),
+                    //   ),
+                    // ),
+                  ],
                 );
               },
             );

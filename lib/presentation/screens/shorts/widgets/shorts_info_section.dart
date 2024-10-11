@@ -69,7 +69,10 @@ class ShortsInfoSection extends StatelessWidget {
                         children: <Widget>[
                           const AccountAvatar(size: 32, name: 'John Jackson'),
                           const SizedBox(width: 8),
-                          const Text('@maxymilliano'),
+                          const Text(
+                            '@maxymilliano',
+                            style: TextStyle(color: Colors.white),
+                          ),
                           const SizedBox(width: 12),
                           CustomInkWell(
                             onTap: () {},
@@ -97,12 +100,13 @@ class ShortsInfoSection extends StatelessWidget {
                       const SizedBox(height: 8),
                       const Row(
                         children: <Widget>[
-                          Icon(Icons.arrow_right_sharp),
+                          Icon(Icons.arrow_right_sharp, color: Colors.white),
                           SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               'Posted content will be found here if clicked',
                               overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: Colors.white),
                             ),
                           ),
                         ],
@@ -112,13 +116,17 @@ class ShortsInfoSection extends StatelessWidget {
                         'These 2 controversial ads use the same psychological trick 🤯 #shorts',
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.white),
                       ),
                       const SizedBox(height: 16),
                       const Row(
                         children: <Widget>[
-                          Icon(YTIcons.music_outlined),
+                          Icon(YTIcons.music_outlined, color: Colors.white),
                           SizedBox(width: 8),
-                          Text('Original Sound'),
+                          Text(
+                            'Original Sound',
+                            style: TextStyle(color: Colors.white),
+                          ),
                           SizedBox(width: 8),
                         ],
                       ),
@@ -134,6 +142,7 @@ class ShortsInfoSection extends StatelessWidget {
                     title: const Icon(
                       YTIcons.shorts_like_filled,
                       size: 30,
+                      color: Colors.white,
                     ),
                     summary: '196k',
                     onTap: () {},
@@ -142,6 +151,7 @@ class ShortsInfoSection extends StatelessWidget {
                     title: const Icon(
                       YTIcons.shorts_dislike_filled,
                       size: 30,
+                      color: Colors.white,
                     ),
                     summary: 'Dislike',
                     onTap: () {},
@@ -150,6 +160,7 @@ class ShortsInfoSection extends StatelessWidget {
                     title: const Icon(
                       YTIcons.shorts_comment_filled,
                       size: 24,
+                      color: Colors.white,
                     ),
                     summary: '1.2k',
                     onTap: onTapComment,
@@ -158,6 +169,7 @@ class ShortsInfoSection extends StatelessWidget {
                     title: const Icon(
                       YTIcons.shorts_share_filled,
                       size: 30,
+                      color: Colors.white,
                     ),
                     summary: 'Share',
                     onTap: () {},
@@ -166,6 +178,7 @@ class ShortsInfoSection extends StatelessWidget {
                     title: const Icon(
                       Icons.recycling,
                       size: 30,
+                      color: Colors.white,
                     ),
                     summary: 'Remix',
                     onTap: () {},
@@ -207,6 +220,7 @@ class ShortsShopButton extends StatelessWidget {
             ),
             child: const Icon(
               YTIcons.shopping_bag_outlined,
+              color: Colors.white,
             ),
           ),
           const SizedBox(width: 8),
@@ -220,6 +234,7 @@ class ShortsShopButton extends StatelessWidget {
                   fontVariations: [
                     FontVariation('wdth', 3),
                   ],
+                  color: Colors.white,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -233,6 +248,7 @@ class ShortsShopButton extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(width: 8),
         ],
       ),
     );
@@ -262,9 +278,9 @@ class ShortsLocationButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Icon(YTIcons.place_outlined, size: 18),
+            Icon(YTIcons.place_outlined, size: 18, color: Colors.white),
             SizedBox(width: 4),
-            Text('New york'),
+            Text('New york', style: TextStyle(color: Colors.white)),
           ],
         ),
       ),

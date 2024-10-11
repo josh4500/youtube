@@ -219,6 +219,30 @@ abstract final class AppStyle {
       ),
     ),
   );
+
+  static final BrightnessPair<CommentStyle> commentStyle = BrightnessPair(
+    light: CommentStyle(
+      iconColor: Colors.black87,
+      textStyle: const TextStyle(
+        fontSize: 12,
+        color: Colors.black87,
+      ),
+      subtitleTextStyle: const TextStyle(
+        fontSize: 12,
+        color: Colors.black54,
+      ),
+    ),
+    dark: CommentStyle(
+      iconColor: const Color(0xFFF1F1F1),
+      textStyle: const TextStyle(
+        color: Color(0xFFF1F1F1),
+      ),
+      subtitleTextStyle: const TextStyle(
+        fontSize: 12,
+        color: Colors.white54,
+      ),
+    ),
+  );
 }
 
 class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
@@ -235,6 +259,7 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
     required this.slidableStyle,
     required this.dynamicTabStyle,
     required this.homeDrawerStyle,
+    required this.commentStyle,
   });
 
   final TextStyle appBarTextStyle;
@@ -249,6 +274,7 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
   final SlidableStyle slidableStyle;
   final DynamicTabStyle dynamicTabStyle;
   final HomeDrawerStyle homeDrawerStyle;
+  final CommentStyle commentStyle;
 
   @override
   ThemeExtension<AppStylesExtension> copyWith({
@@ -264,6 +290,7 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
     SlidableStyle? slidableStyle,
     DynamicTabStyle? dynamicTabStyle,
     HomeDrawerStyle? homeDrawerStyle,
+    CommentStyle? commentStyle,
   }) {
     return AppStylesExtension(
       appBarTextStyle: appBarTextStyle ?? this.appBarTextStyle,
@@ -282,6 +309,7 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
       slidableStyle: slidableStyle ?? this.slidableStyle,
       dynamicTabStyle: dynamicTabStyle ?? this.dynamicTabStyle,
       homeDrawerStyle: homeDrawerStyle ?? this.homeDrawerStyle,
+      commentStyle: commentStyle ?? this.commentStyle,
     );
   }
 
@@ -355,8 +383,11 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
         other.homeDrawerStyle,
         t,
       )!,
+      commentStyle: CommentStyle.lerp(
+        commentStyle,
+        other.commentStyle,
+        t,
+      )!,
     );
   }
 }
-
-class CommentStyle{}

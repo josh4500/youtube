@@ -49,14 +49,13 @@ class ShortsContextInfo extends StatelessWidget {
             Icon(
               YTIcons.info_outlined,
               size: 16,
+              color: Colors.white,
             ),
             SizedBox(width: 8),
             Expanded(
               child: Text(
                 'Covid 19 . Get the latest information from the NCDC about COVID-19',
-                style: TextStyle(
-                  fontSize: 12,
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.white),
               ),
             ),
             SizedBox(width: 8),

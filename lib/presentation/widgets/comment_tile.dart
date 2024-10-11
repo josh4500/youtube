@@ -59,7 +59,9 @@ class CommentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const showTranslationOption = true;
-    return ColoredBox(
+    final theme = context.theme.appStyles.commentStyle;
+    return Material(
+      // type: MaterialType.transparency,
       color: backgroundColor ?? Colors.transparent,
       child: Column(
         children: <Widget>[
@@ -86,20 +88,17 @@ class CommentTile extends StatelessWidget {
                     children: <Widget>[
                       const SizedBox(height: 8),
                       if (pinned) ...[
-                        const Row(
+                        Row(
                           children: [
                             Icon(
                               YTIcons.pinned_outlined,
                               size: 14,
-                              color: Colors.grey,
+                              color: theme.iconColor,
                             ),
-                            SizedBox(width: 4),
+                            const SizedBox(width: 4),
                             Text(
                               'Pinned by BussyBoyBonanza',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
+                              style: theme.subtitleTextStyle,
                             ),
                           ],
                         ),
@@ -142,36 +141,26 @@ class CommentTile extends StatelessWidget {
                                       ),
                                     ),
                                 ],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: byCreator
-                                      ? Colors.white
-                                      : const Color(0xFFAAAAAA),
-                                ),
+                                style: theme.subtitleTextStyle,
                               ),
                             ),
                           ),
-                          const Text.rich(
+                          Text.rich(
                             TextSpan(
                               text: kDotSeparator,
-                              children: <InlineSpan>[
+                              children: const <InlineSpan>[
                                 TextSpan(text: '7mo ago'),
                               ],
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
+                              style: theme.subtitleTextStyle,
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 4),
-                      const Text(
+                      Text(
                         'Cutting funding on precautions is going to cost more in the long run',
                         maxLines: 5,
-                        style: TextStyle(
-                          color: Color(0xFFF1F1F1),
-                        ),
+                        style: theme.textStyle,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 8),
@@ -187,21 +176,21 @@ class CommentTile extends StatelessWidget {
                               releasedColor: Colors.transparent,
                               padding: const EdgeInsets.all(8),
                               borderRadius: BorderRadius.circular(24),
-                              child: const Icon(
+                              child: Icon(
                                 YTIcons.like_outlined,
                                 size: 18,
-                                color: Color(0xFFF1F1F1),
+                                color: theme.iconColor,
                               ),
                             ),
                             Transform.translate(
                               offset: const Offset(-4, 0),
-                              child: const SizedBox(
-                                width: 24,
+                              child: SizedBox(
+                                width: 32,
                                 child: Text(
                                   '69k',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: Color(0xFFF1F1F1),
+                                    color: theme.iconColor,
                                   ),
                                 ),
                               ),
@@ -211,10 +200,10 @@ class CommentTile extends StatelessWidget {
                               releasedColor: Colors.transparent,
                               padding: const EdgeInsets.all(8),
                               borderRadius: BorderRadius.circular(24),
-                              child: const Icon(
+                              child: Icon(
                                 YTIcons.dislike_outlined,
                                 size: 18,
-                                color: Color(0xFFF1F1F1),
+                                color: theme.iconColor,
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -223,10 +212,10 @@ class CommentTile extends StatelessWidget {
                               releasedColor: Colors.transparent,
                               padding: const EdgeInsets.all(8),
                               borderRadius: BorderRadius.circular(24),
-                              child: const Icon(
+                              child: Icon(
                                 YTIcons.reply_outlined,
                                 size: 18,
-                                color: Color(0xFFF1F1F1),
+                                color: theme.iconColor,
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -266,10 +255,10 @@ class CommentTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(32),
                   splashFactory: InkSplash.splashFactory,
                   containedInkWell: true,
-                  child: const Icon(
+                  child: Icon(
                     YTIcons.more_vert_outlined,
-                    size: 16,
-                    color: Color(0xFFF1F1F1),
+                    size: 18,
+                    color: theme.iconColor,
                   ),
                 ),
               ],
@@ -289,18 +278,18 @@ class CommentTile extends StatelessWidget {
                     children: [
                       if (creatorReply) ...[
                         const AccountAvatar(size: 18),
-                        const Text(
+                        Text(
                           kDotSeparator,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF3EA6FF),
+                            color: context.theme.primaryColor,
                           ),
                         ),
                       ],
-                      const Text(
+                      Text(
                         '107 replies',
                         style: TextStyle(
-                          color: Color(0xFF3EA6FF),
+                          color: context.theme.primaryColor,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

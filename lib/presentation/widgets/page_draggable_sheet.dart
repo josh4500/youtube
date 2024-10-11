@@ -104,7 +104,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     if (opened) {
       _overlayLastChildIndex = index;
       _overlayChildIndexList.add(index);
-
+      widget.onOpenOverlayChild?.call(index);
       if (hasDynamicTab) {
         _dynamicTabHideController.reverse();
       }
@@ -339,8 +339,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                                   const SizedBox(height: 18),
                                 ],
                               ),
-                              for (final PageDraggableOverlayChild overlayChild
-                                  in widget.overlayChildren)
+                              for (final overlayChild in widget.overlayChildren)
                                 Positioned(
                                   top: -4,
                                   child: _OverlayChildTitle(
@@ -404,8 +403,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                             child: widget.bottom,
                           ),
                         ),
-                      for (final PageDraggableOverlayChild overlayChild
-                          in widget.overlayChildren)
+                      for (final overlayChild in widget.overlayChildren)
                         overlayChild,
                     ],
                   ),

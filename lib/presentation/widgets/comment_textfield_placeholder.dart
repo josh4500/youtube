@@ -60,13 +60,13 @@ class CommentTextFieldPlaceholder extends StatelessWidget {
                       horizontal: 16,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white12,
+                      color: context.theme.highlightColor,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       'Add a ${isReply ? 'reply' : 'comment'}...',
-                      style: const TextStyle(
-                        color: Colors.grey,
+                      style: TextStyle(
+                        color: context.theme.hintColor,
                       ),
                     ),
                   ),

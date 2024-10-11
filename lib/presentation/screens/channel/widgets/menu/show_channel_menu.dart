@@ -8,7 +8,6 @@ Future<void> showChannelMenu(
   return showMenu(
     context: context,
     menuPadding: EdgeInsets.zero,
-    color: const Color(0xFF303030),
     position: position,
     items: <PopupMenuEntry>[
       const PopupMenuItem(

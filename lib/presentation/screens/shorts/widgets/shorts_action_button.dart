@@ -27,7 +27,10 @@ class ShortsActionButton extends StatelessWidget {
           children: <Widget>[
             title,
             const SizedBox(height: 8),
-            Text(summary, style: const TextStyle(fontSize: 12)),
+            Text(
+              summary,
+              style: const TextStyle(fontSize: 12, color: Colors.white),
+            ),
           ],
         ),
       ),

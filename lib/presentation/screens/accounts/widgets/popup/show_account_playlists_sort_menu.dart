@@ -35,7 +35,6 @@ Future<T?> showAccountPlaylistsSortMenu<T>(
   return showMenu<T>(
     context: context,
     menuPadding: EdgeInsets.zero,
-    color: const Color(0xFF303030),
     position: RelativeRect.fill,
     items: <PopupMenuEntry<T>>[
       PopupMenuItem(

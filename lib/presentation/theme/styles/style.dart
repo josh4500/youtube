@@ -396,3 +396,43 @@ class HomeDrawerStyle {
     );
   }
 }
+
+class CommentStyle {
+  CommentStyle({
+    required this.textStyle,
+    required this.iconColor,
+    required this.subtitleTextStyle,
+  });
+
+  final TextStyle textStyle;
+  final Color iconColor;
+  final TextStyle subtitleTextStyle;
+
+  static CommentStyle? lerp(
+    CommentStyle? style1,
+    CommentStyle? style2,
+    double t,
+  ) {
+    if (style1 == null && style2 == null) {
+      return null;
+    }
+
+    return CommentStyle(
+      iconColor: Color.lerp(
+        style1?.iconColor,
+        style2?.iconColor,
+        t,
+      )!,
+      textStyle: TextStyle.lerp(
+        style1?.textStyle,
+        style2?.textStyle,
+        t,
+      )!,
+      subtitleTextStyle: TextStyle.lerp(
+        style1?.subtitleTextStyle,
+        style2?.subtitleTextStyle,
+        t,
+      )!,
+    );
+  }
+}
