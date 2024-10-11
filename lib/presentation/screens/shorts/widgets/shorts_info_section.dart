@@ -151,27 +151,42 @@ class ShortsInfoSection extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   ShortsActionButton(
-                    title: const Icon(YTIcons.shorts_like_filled, size: 32),
+                    title: const Icon(
+                      YTIcons.shorts_like_filled,
+                      size: 30,
+                    ),
                     summary: '196k',
                     onTap: () {},
                   ),
                   ShortsActionButton(
-                    title: const Icon(YTIcons.shorts_dislike_filled, size: 32),
+                    title: const Icon(
+                      YTIcons.shorts_dislike_filled,
+                      size: 30,
+                    ),
                     summary: 'Dislike',
                     onTap: () {},
                   ),
                   ShortsActionButton(
-                    title: const Icon(YTIcons.shorts_comment_filled, size: 32),
+                    title: const Icon(
+                      YTIcons.shorts_comment_filled,
+                      size: 24,
+                    ),
                     summary: '1.2k',
                     onTap: onTapComment,
                   ),
                   ShortsActionButton(
-                    title: const Icon(YTIcons.shorts_share_filled, size: 32),
+                    title: const Icon(
+                      YTIcons.shorts_share_filled,
+                      size: 30,
+                    ),
                     summary: 'Share',
                     onTap: () {},
                   ),
                   ShortsActionButton(
-                    title: const Icon(Icons.recycling, size: 32),
+                    title: const Icon(
+                      Icons.recycling,
+                      size: 30,
+                    ),
                     summary: 'Remix',
                     onTap: () {},
                   ),

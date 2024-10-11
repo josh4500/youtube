@@ -52,12 +52,26 @@ class ShortsCategoryActions extends StatelessWidget {
                   vertical: 6,
                   horizontal: 16,
                 ),
-                icon: const Icon(YTIcons.subscriptions_outlined),
+                icon: const Icon(
+                  YTIcons.subscriptions_outlined,
+                  shadows: [
+                    BoxShadow(
+                      offset: Offset(2, 2),
+                      color: Colors.black12,
+                    ),
+                  ],
+                ),
                 backgroundColor: Colors.white10,
                 title: 'Subscriptions',
                 textStyle: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
+                  shadows: [
+                    BoxShadow(
+                      offset: Offset(2, 2),
+                      color: Colors.black12,
+                    ),
+                  ],
                 ),
                 margin: const EdgeInsets.symmetric(horizontal: 4),
               ),
@@ -67,12 +81,26 @@ class ShortsCategoryActions extends StatelessWidget {
                   vertical: 6,
                   horizontal: 16,
                 ),
-                icon: const Icon(YTIcons.live_outlined),
+                icon: const Icon(
+                  YTIcons.live_outlined,
+                  shadows: [
+                    BoxShadow(
+                      offset: Offset(2, 2),
+                      color: Colors.black12,
+                    ),
+                  ],
+                ),
                 backgroundColor: Colors.white10,
                 title: 'Live',
                 textStyle: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
+                  shadows: [
+                    BoxShadow(
+                      offset: Offset(2, 2),
+                      color: Colors.black12,
+                    ),
+                  ],
                 ),
                 margin: const EdgeInsets.symmetric(horizontal: 4),
               ),
@@ -82,12 +110,26 @@ class ShortsCategoryActions extends StatelessWidget {
                   vertical: 6,
                   horizontal: 16,
                 ),
-                icon: const Icon(YTIcons.shopping_bag_outlined),
+                icon: const Icon(
+                  YTIcons.shopping_bag_outlined,
+                  shadows: [
+                    BoxShadow(
+                      offset: Offset(2, 2),
+                      color: Colors.black12,
+                    ),
+                  ],
+                ),
                 backgroundColor: Colors.white10,
                 title: 'Shopping',
                 textStyle: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
+                  shadows: [
+                    BoxShadow(
+                      offset: Offset(2, 2),
+                      color: Colors.black12,
+                    ),
+                  ],
                 ),
                 margin: const EdgeInsets.symmetric(horizontal: 4),
               ),

@@ -14,24 +14,21 @@ class ShortsActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(64),
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        child: CustomInkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(64),
-          padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16),
-          child: Column(
-            children: <Widget>[
-              title,
-              const SizedBox(height: 8),
-              Text(
-                summary,
-                style: const TextStyle(fontSize: 12),
-              ),
-            ],
-          ),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: CustomInkWell(
+        onTap: () {},
+        borderRadius: BorderRadius.circular(64),
+        padding: const EdgeInsets.symmetric(
+          vertical: 6.0,
+          horizontal: 14,
+        ),
+        child: Column(
+          children: <Widget>[
+            title,
+            const SizedBox(height: 8),
+            Text(summary, style: const TextStyle(fontSize: 12)),
+          ],
         ),
       ),
     );
