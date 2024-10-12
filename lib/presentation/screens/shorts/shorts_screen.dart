@@ -28,6 +28,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -63,8 +64,6 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
   bool get _isSubscriptionScreen => widget.isSubscription;
   bool get _isLiveScreen => widget.isLive;
   bool get _showCategoryActions => _isPaused.value && _isMainScreen;
-
-  final ValueNotifier<bool> _replyIsOpenedNotifier = ValueNotifier<bool>(false);
 
   bool _commentOpened = false;
   final DraggableScrollableController _draggableController =
@@ -182,6 +181,55 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
     }
     return false;
   }
+  void _showMoreOptions(){
+    showDynamicSheet(
+      context,
+      items: [
+        const DynamicSheetOptionItem(
+          leading:
+          Icon(YTIcons.description_outlined),
+          title: 'Description',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.save_outlined),
+          title: 'Save to playlist',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.closed_caption),
+          title:
+          'Captions $kDotSeparator Unavailable',
+          enabled: false,
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.settings_outlined),
+          title: 'Quality',
+        ),
+        const DynamicSheetOptionItem(
+          leading:
+          Icon(YTIcons.not_interested_outlined),
+          title: 'Not interested',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(
+              YTIcons.do_not_recommend_outlined),
+          title: 'Don\'nt recommend this channel',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.report_outlined),
+          title: 'Report',
+        ),
+        const DynamicSheetOptionItem(
+          leading: Icon(YTIcons.feedbck_outlined),
+          title: 'Send feedback',
+        ),
+        const DynamicSheetOptionItem(
+          leading:
+          Icon(YTIcons.description_outlined),
+          title: 'Stats for nerds',
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -243,8 +291,9 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
                       ) {
                         return Visibility(
                           visible: showViewerDiscretion == false,
-                          child: const AppbarAction(
+                          child: AppbarAction(
                             icon: YTIcons.more_vert_outlined,
+                            onTap: _showMoreOptions,
                           ),
                         );
                       },
@@ -343,6 +392,7 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
                                       Expanded(
                                         child: GestureDetector(
                                           onTap: _pausePlay,
+                                          onLongPress: _showMoreOptions,
                                           child: shortsPlayerView,
                                         ),
                                       ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -21,14 +20,7 @@ class HomeViewableVideoContent extends ConsumerWidget {
             DynamicSheetOptionItem(
               leading: const Icon(YTIcons.playlist_play_outlined),
               title: 'Play next in queue',
-              trailing: ClipRRect(
-                borderRadius: BorderRadius.circular(2),
-                child: Image.asset(
-                  AssetsPath.ytPAccessIcon48,
-                  width: 18.w,
-                  height: 18.w,
-                ),
-              ),
+              trailing: ImageFromAsset.ytPAccessIcon,
             ),
             const DynamicSheetOptionItem(
               leading: Icon(YTIcons.watch_later_outlined),

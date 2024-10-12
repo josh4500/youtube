@@ -133,12 +133,12 @@ class _ForYouFeedScreenState extends State<ForYouFeedScreen> {
                                       child: TappableArea(
                                         onTap: () {},
                                         padding: const EdgeInsets.all(4.0),
-                                        child: const Text(
+                                        child: Text(
                                           'Send feedback',
                                           style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w500,
-                                            color: AppPalette.blue2,
+                                            color: context.theme.primaryColor,
                                           ),
                                         ),
                                       ),

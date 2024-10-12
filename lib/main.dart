@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
@@ -64,9 +65,9 @@ Future<void> setup() async {
 }
 
 Future<void> setupSystemUITheme() async {
-  AppTheme.setSystemOverlayStyle(
-    LegacyCache.themeMode.value.isDark ? Brightness.dark : Brightness.light,
-  );
+  final themeMode = LegacyCache.themeMode.value;
+  final brightness = themeMode.isSystem? ui.PlatformDispatcher.instance.platformBrightness : themeMode.isDark ? Brightness.dark : Brightness.light;
+  AppTheme.setSystemOverlayStyle(brightness);
 }
 
 Future<void> setupSystemLocale() async {

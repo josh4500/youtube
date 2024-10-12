@@ -38,15 +38,18 @@ class VideoCommentGuidelines extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       color: Colors.white10,
       child: RichText(
-        text: const TextSpan(
+        text: TextSpan(
           text: 'Remember to keep comments respectful and to follow our ',
           children: [
             TextSpan(
               text: 'Community Guidelines',
-              style: TextStyle(color: AppPalette.blue, fontSize: 12),
+              style: TextStyle(
+                color: context.theme.primaryColor,
+                fontSize: 12,
+              ),
             ),
           ],
-          style: TextStyle(fontSize: 12),
+          style: const TextStyle(fontSize: 12),
         ),
       ),
     );

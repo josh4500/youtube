@@ -49,7 +49,7 @@ class VideoActions extends StatelessWidget {
           Container(
             margin: const EdgeInsets.only(right: 4),
             decoration: BoxDecoration(
-              color: Colors.white10,
+              color: context.theme.highlightColor,
               borderRadius: BorderRadius.circular(32),
             ),
             child: Row(

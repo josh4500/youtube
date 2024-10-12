@@ -75,11 +75,9 @@ class AccountIncognitoScreen extends ConsumerWidget {
                   vertical: 6.0,
                   horizontal: 12,
                 ),
-                child: const Text(
+                child: Text(
                   'Turn off Incognito',
-                  style: TextStyle(
-                    color: AppPalette.blue,
-                  ),
+                  style: TextStyle(color: context.theme.primaryColor),
                 ),
               ),
             ],
@@ -89,9 +87,7 @@ class AccountIncognitoScreen extends ConsumerWidget {
           child: Column(
             children: <Widget>[
               Center(
-                child: CircularProgressIndicator(
-                  color: AppPalette.blue,
-                ),
+                child: CircularProgressIndicator(),
               ),
             ],
           ),

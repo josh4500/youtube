@@ -28,7 +28,6 @@
 
 import 'dart:async';
 import 'dart:ui' as ui;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,8 +45,8 @@ import 'widgets/player/player_annotations_wrapper.dart';
 import 'widgets/player/player_components_wrapper.dart';
 import 'widgets/player/player_view.dart';
 import 'widgets/player_video_info.dart';
-import 'widgets/sheet/video_draggable_sheet.dart';
 import 'widgets/sheet/player_settings_sheet.dart';
+import 'widgets/sheet/video_draggable_sheet.dart';
 import 'widgets/sheet/video_side_sheet.dart';
 import 'widgets/video_chapters_sheet.dart';
 import 'widgets/video_comment_sheet.dart';

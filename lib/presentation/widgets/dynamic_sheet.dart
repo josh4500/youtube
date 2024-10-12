@@ -155,6 +155,7 @@ class DynamicSheetOptionItem<T> extends DynamicSheetItem {
 
   @override
   Widget build(BuildContext context) {
+    final DynamicSheetStyle theme = context.theme.appStyles.dynamicSheetStyle;
     Widget child = Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 12.0,
@@ -162,7 +163,12 @@ class DynamicSheetOptionItem<T> extends DynamicSheetItem {
       ),
       child: Row(
         children: [
-          leading,
+          IconTheme(
+            data: IconTheme.of(context).copyWith(
+              color: enabled ? theme.iconColor : theme.disabledIconColor,
+            ),
+            child: leading,
+          ),
           SizedBox(width: 12.w),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,22 +177,28 @@ class DynamicSheetOptionItem<T> extends DynamicSheetItem {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.clip,
-                style: const TextStyle(fontSize: 15),
+                style:
+                    enabled ? theme.itemTextStyle : theme.disabledItemTextStyle,
               ),
               if (subtitle != null) ...[
                 const SizedBox(height: 4),
                 Text(
                   subtitle!,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.white30,
-                  ),
+                  style: enabled
+                      ? theme.itemSubtitleStyle
+                      : theme.disabledItemSubtitleStyle,
                 ),
               ],
             ],
           ),
           const Spacer(),
-          if (trailing != null) trailing!,
+          if (trailing != null)
+            IconTheme(
+              data: IconTheme.of(context).copyWith(
+                color: enabled ? theme.iconColor : theme.disabledIconColor,
+              ),
+              child: trailing!,
+            ),
         ],
       ),
     );

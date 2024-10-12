@@ -137,16 +137,17 @@ class PlayableVideoContent extends StatelessWidget {
                         'I found the BEST One Piece cast 2 clips from their socials',
                         maxLines: direction == Axis.horizontal ? 3 : 2,
                         overflow: TextOverflow.ellipsis,
+                        style: theme.titleStyle,
                       ),
                       const SizedBox(height: 2),
-                      const Text(
+                      Text(
                         'Mobile Academy',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        style: theme.subtitleStyle,
                       ),
                       const SizedBox(height: 2),
-                      const Text(
+                      Text(
                         '11k Views',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        style: theme.subtitleStyle,
                       ),
                     ],
                   ),

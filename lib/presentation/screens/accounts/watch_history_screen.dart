@@ -29,7 +29,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core.dart';
-import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -95,14 +94,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
             YTIcons.playlist_play_outlined,
           ),
           title: 'Play next in queue',
-          trailing: ClipRRect(
-            borderRadius: BorderRadius.circular(2),
-            child: Image.asset(
-              AssetsPath.ytPAccessIcon48,
-              width: 18,
-              height: 18,
-            ),
-          ),
+          trailing: ImageFromAsset.ytPAccessIcon,
         ),
         const DynamicSheetOptionItem(
           leading: Icon(

@@ -53,7 +53,7 @@ class SubscriptionAvatar extends StatelessWidget {
                     width: 12.5,
                     height: 12.5,
                     decoration: BoxDecoration(
-                      color: AppPalette.blue,
+                      color:context.theme.primaryColor,
                       shape: BoxShape.circle,
                       border: Border.all(width: 1.7),
                     ),

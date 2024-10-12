@@ -135,10 +135,46 @@ abstract final class AppStyle {
     light: DynamicSheetStyle(
       dragIndicatorColor: Colors.black12,
       backgroundColor: Colors.white,
+      disabledItemTextStyle: const TextStyle(
+        fontSize: 15,
+        color: Colors.black38,
+      ),
+      disabledItemSubtitleStyle: const TextStyle(
+        fontSize: 12,
+        color: Colors.black38,
+      ),
+      itemTextStyle: const TextStyle(
+        fontSize: 15,
+        color: Colors.black,
+      ),
+      itemSubtitleStyle: const TextStyle(
+        fontSize: 13,
+        color: Colors.black,
+      ),
+      iconColor: Colors.black,
+      disabledIconColor: Colors.black38,
     ),
     dark: DynamicSheetStyle(
       dragIndicatorColor: Colors.white24,
       backgroundColor: const Color(0xFF212121),
+      disabledItemTextStyle: const TextStyle(
+        fontSize: 15,
+        color: Colors.white38,
+      ),
+      disabledItemSubtitleStyle: const TextStyle(
+        fontSize: 12,
+        color: Colors.white38,
+      ),
+      itemTextStyle: const TextStyle(
+        fontSize: 15,
+        color: Colors.white,
+      ),
+      itemSubtitleStyle: const TextStyle(
+        fontSize: 13,
+        color: Colors.white,
+      ),
+      iconColor: Colors.white,
+      disabledIconColor: Colors.white38,
     ),
   );
   static final BrightnessPair<ViewableStyle> viewableStyle = BrightnessPair(

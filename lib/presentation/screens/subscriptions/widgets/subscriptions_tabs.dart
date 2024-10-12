@@ -114,12 +114,12 @@ class _SubscriptionsTabsState extends State<SubscriptionsTabs> {
               vertical: 4.0,
               horizontal: 10,
             ),
-            child: const Text(
+            child: Text(
               'All',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: AppPalette.blue2,
+                color: context.theme.primaryColor,
               ),
             ),
           ),

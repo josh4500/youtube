@@ -46,12 +46,12 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
       } else {
         oldFlutterErrorHandler?.call(details);
       }
-      if (mounted) {
-        setState(() {
-          _hasError = true;
-          _errorDetails = details;
-        });
-      }
+      // if (mounted) {
+      //   setState(() {
+      //     _hasError = true;
+      //     _errorDetails = details;
+      //   });
+      // }
     };
     PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
       widget.onException(error, stack);

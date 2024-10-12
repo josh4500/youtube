@@ -73,40 +73,40 @@ class _LinkTvScreenState extends State<LinkTvScreen> {
                   autocorrect: false,
                   autofocus: true,
                   cursorOpacityAnimates: true,
-                  cursorColor: AppPalette.blue,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(
+                  cursorColor: context.theme.primaryColor,
+                  decoration: InputDecoration(
+                    border:  OutlineInputBorder(
                       borderSide: BorderSide(
                         width: 1.5,
-                        color: AppPalette.blue,
+                        color: context.theme.primaryColor,
                       ),
                     ),
-                    enabledBorder: OutlineInputBorder(
+                    enabledBorder:  OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: AppPalette.blue,
+                        color: context.theme.primaryColor,
                         width: 1.5,
                       ),
                     ),
-                    focusedBorder: OutlineInputBorder(
+                    focusedBorder:  OutlineInputBorder(
                       borderSide: BorderSide(
                         width: 1.5,
-                        color: AppPalette.blue,
+                        color: context.theme.primaryColor,
                       ),
                     ),
-                    errorBorder: OutlineInputBorder(
+                    errorBorder: const OutlineInputBorder(
                       borderSide: BorderSide(
                         width: 1.5,
                         color: Colors.white,
                       ),
                     ),
-                    focusedErrorBorder: OutlineInputBorder(
+                    focusedErrorBorder: const OutlineInputBorder(
                       borderSide: BorderSide(
                         width: 1.5,
                         color: Colors.white,
                       ),
                     ),
                     labelStyle: TextStyle(
-                      color: AppPalette.blue,
+                      color: context.theme.primaryColor,
                     ),
                     labelText: 'Enter TV code',
                   ),

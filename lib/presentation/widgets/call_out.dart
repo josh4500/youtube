@@ -91,8 +91,6 @@ class TrianglePainter extends CustomPainter {
 
     // Calculate the yOffset based on the alignment
     final bool isUpsideDown = alignment.y > 0;
-    final double yOffset =
-        isUpsideDown ? size.height - triangleHeight : triangleHeight;
 
     final Path path = Path();
 

@@ -147,28 +147,20 @@ class _NewsScreenState extends State<NewsScreen>
                       maxHeight: 50,
                       minHeight: 50,
                       child: Material(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TabBar(
-                              isScrollable: true,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              indicatorPadding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
-                              tabAlignment: TabAlignment.start,
-                              dividerColor: Colors.white,
-                              indicatorColor: Colors.white,
-                              enableFeedback: true,
-                              indicatorWeight: 2.5,
-                              tabs: tabs
-                                  .map((String name) => Tab(text: name))
-                                  .toList(),
-                            ),
-                            const Divider(height: .75, thickness: 1),
-                          ],
+                        child: TabBar(
+                          isScrollable: true,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                          ),
+                          indicatorPadding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                          ),
+                          tabAlignment: TabAlignment.start,
+                          enableFeedback: true,
+                          indicatorWeight: 2.5,
+                          tabs: tabs
+                              .map((String name) => Tab(text: name))
+                              .toList(),
                         ),
                       ),
                     ),

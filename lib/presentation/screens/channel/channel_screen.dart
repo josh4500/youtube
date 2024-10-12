@@ -460,14 +460,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                       DynamicSheetOptionItem(
                         leading: const Icon(YTIcons.playlist_play_outlined),
                         title: 'Play next in queue',
-                        trailing: ClipRRect(
-                          borderRadius: BorderRadius.circular(2),
-                          child: Image.asset(
-                            AssetsPath.ytPAccessIcon48,
-                            width: 18,
-                            height: 18,
-                          ),
-                        ),
+                        trailing: ImageFromAsset.ytPAccessIcon,
                       ),
                       const DynamicSheetOptionItem(
                         leading: Icon(YTIcons.save_outlined),
@@ -514,14 +507,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                       DynamicSheetOptionItem(
                         leading: const Icon(YTIcons.playlist_play_outlined),
                         title: 'Play next in queue',
-                        trailing: ClipRRect(
-                          borderRadius: BorderRadius.circular(2),
-                          child: Image.asset(
-                            AssetsPath.ytPAccessIcon48,
-                            width: 18,
-                            height: 18,
-                          ),
-                        ),
+                        trailing: ImageFromAsset.ytPAccessIcon,
                       ),
                       const DynamicSheetOptionItem(
                         leading: Icon(YTIcons.save_outlined),
@@ -596,14 +582,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
                       DynamicSheetOptionItem(
                         leading: const Icon(YTIcons.playlist_play_outlined),
                         title: 'Play next in queue',
-                        trailing: ClipRRect(
-                          borderRadius: BorderRadius.circular(2),
-                          child: Image.asset(
-                            AssetsPath.ytPAccessIcon48,
-                            width: 18,
-                            height: 18,
-                          ),
-                        ),
+                        trailing: ImageFromAsset.ytPAccessIcon,
                       ),
                       const DynamicSheetOptionItem(
                         leading: Icon(YTIcons.save_outlined),
@@ -660,14 +639,7 @@ class _ChannelScreenState extends State<ChannelScreen> {
         DynamicSheetOptionItem(
           leading: const Icon(YTIcons.watch_later_outlined),
           title: 'Play next in queue',
-          trailing: ClipRRect(
-            borderRadius: BorderRadius.circular(2),
-            child: Image.asset(
-              AssetsPath.ytPAccessIcon48,
-              width: 24,
-              height: 24,
-            ),
-          ),
+          trailing: ImageFromAsset.ytPAccessIcon,
           dependents: const [DynamicSheetItemDependent.premium],
         ),
         const DynamicSheetOptionItem(

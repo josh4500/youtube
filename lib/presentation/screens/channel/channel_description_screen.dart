@@ -67,11 +67,11 @@ class ChannelDescriptionScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: const ScrollConfiguration(
-        behavior: OverScrollGlowBehavior(enabled: false),
+      body: ScrollConfiguration(
+        behavior: const OverScrollGlowBehavior(enabled: false),
         child: CustomScrollView(
           slivers: <Widget>[
-            SliverToBoxAdapter(
+            const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(12.0),
                 child: Column(
@@ -93,7 +93,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SliverToBoxAdapter(
+            const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 8),
                 child: Column(
@@ -118,32 +118,36 @@ class ChannelDescriptionScreen extends StatelessWidget {
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 8),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
+                    const Text(
                       'More info',
                       style: TextStyle(
                         fontSize: 21,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     TappableArea(
-                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 8,
+                      ),
                       child: Row(
                         children: <Widget>[
-                          Icon(YTIcons.network_outlined),
-                          SizedBox(width: 8),
+                          const Icon(YTIcons.network_outlined),
+                          const SizedBox(width: 8),
                           Text(
                             'http://www.youtube.com/MKBHD',
-                            style: TextStyle(color: AppPalette.blue),
+                            style: TextStyle(color: context.theme.primaryColor),
                           ),
                         ],
                       ),
                     ),
-                    Padding(
+                    const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Row(
                         children: <Widget>[
@@ -153,7 +157,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Padding(
+                    const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Row(
                         children: <Widget>[
@@ -165,7 +169,7 @@ class ChannelDescriptionScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Padding(
+                    const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Row(
                         children: <Widget>[

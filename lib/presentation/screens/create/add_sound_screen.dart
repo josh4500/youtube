@@ -77,8 +77,6 @@ class AddSoundScreen extends StatelessWidget {
                         horizontal: 8,
                       ),
                       tabAlignment: TabAlignment.start,
-                      dividerColor: Colors.white,
-                      indicatorColor: Colors.white,
                       tabs: tabs.map((String name) => Tab(text: name)).toList(),
                     ),
                   ],
@@ -88,8 +86,8 @@ class AddSoundScreen extends StatelessWidget {
               const Expanded(
                 child: TabBarView(
                   children: [
-                    BrowsePage(),
-                    SavedPage(),
+                    AddSoundBrowsePage(),
+                    AddSoundSavedPage(),
                   ],
                 ),
               ),
@@ -101,11 +99,27 @@ class AddSoundScreen extends StatelessWidget {
   }
 }
 
-class SavedPage extends StatelessWidget {
-  const SavedPage({super.key});
+class AddSoundSavedPage extends StatelessWidget {
+  const AddSoundSavedPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final hasSound = [].isNotEmpty;
+    if (hasSound) {
+      return CustomScrollView(
+        slivers: [
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                return const SoundTile();
+              },
+              childCount: 3,
+            ),
+          ),
+        ],
+      );
+    }
+
     return const Padding(
       padding: EdgeInsets.all(12.0),
       child: Column(
@@ -127,23 +141,11 @@ class SavedPage extends StatelessWidget {
         ],
       ),
     );
-    return CustomScrollView(
-      slivers: [
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              return const SoundTile();
-            },
-            childCount: 3,
-          ),
-        ),
-      ],
-    );
   }
 }
 
-class BrowsePage extends StatelessWidget {
-  const BrowsePage({super.key});
+class AddSoundBrowsePage extends StatelessWidget {
+  const AddSoundBrowsePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -294,8 +296,8 @@ class _SoundTileState extends State<SoundTile>
                   SizedBox(width: 12.w),
                   Container(
                     padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: AppPalette.blue,
+                    decoration: BoxDecoration(
+                      color: context.theme.primaryColor,
                       shape: BoxShape.circle,
                     ),
                     child: const RotatedBox(

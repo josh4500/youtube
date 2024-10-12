@@ -1542,10 +1542,10 @@ class CaptureFilterSelector extends StatelessWidget {
                   const Spacer(),
                   GestureDetector(
                     onTap: context.pop,
-                    child: const Text(
+                    child:  Text(
                       'DONE',
                       style: TextStyle(
-                        color: AppPalette.blue,
+                        color: context.theme.primaryColor,
                       ),
                     ),
                   ),
@@ -1683,7 +1683,7 @@ class CaptureTimerSelector extends StatelessWidget {
                 },
                 style: ButtonStyle(
                   backgroundColor: WidgetStateColor.resolveWith(
-                    (_) => AppPalette.blue,
+                    (_) => context.theme.primaryColor,
                   ),
                   overlayColor: WidgetStateColor.resolveWith(
                     (_) => Colors.white12,
@@ -1759,20 +1759,20 @@ class DraftDecision extends StatelessWidget {
                   children: [
                     TextButton(
                       onPressed: () => context.pop(true),
-                      child: const Text(
+                      child:  Text(
                         'Start over',
                         style: TextStyle(
-                          color: AppPalette.blue,
+                          color: context.theme.primaryColor,
                         ),
                       ),
                     ),
                     SizedBox(width: 8.w),
                     TextButton(
                       onPressed: () => context.pop(false),
-                      child: const Text(
+                      child:  Text(
                         'Continue',
                         style: TextStyle(
-                          color: AppPalette.blue,
+                          color: context.theme.primaryColor,
                         ),
                       ),
                     ),

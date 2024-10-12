@@ -274,97 +274,108 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                   );
                 },
                 child: Material(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: _onTapScrollHeader,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        if (widget.showDragIndicator)
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 8.0),
-                            child: SheetDragIndicator(),
-                          )
-                        else
-                          const SizedBox(height: 12),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                          ),
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: <Widget>[
-                              Column(
-                                children: [
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Text(
-                                        widget.title,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.fade,
-                                        softWrap: false,
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (widget.showDragIndicator)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: SheetDragIndicator(),
+                        )
+                      else
+                        const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                        ),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 4),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: _onTapScrollHeader,
+                                        child: Row(
+                                          children: [
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              widget.title,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.fade,
+                                              softWrap: false,
+                                              style: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            if (widget.subtitle != null)
+                                              Text(
+                                                widget.subtitle!,
+                                                style: const TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            const Spacer(),
+                                            const SizedBox(width: 12),
+                                            ...widget.actions,
+                                          ],
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
-                                      if (widget.subtitle != null)
-                                        Text(
-                                          widget.subtitle!,
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            color: Colors.grey,
+                                      for (final overlayChild
+                                          in widget.overlayChildren)
+                                        Positioned.fill(
+                                          top: -4,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                              right: 8.0,
+                                            ),
+                                            child: _OverlayChildTitle(
+                                              controller:
+                                                  overlayChild.controller,
+                                            ),
                                           ),
                                         ),
-                                      const Spacer(),
-                                      const SizedBox(width: 12),
-                                      ...widget.actions,
-                                      const SizedBox(width: 12),
-                                      IconButton(
-                                        onPressed: _closeSheet,
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(
-                                          maxHeight: 28,
-                                        ),
-                                        splashColor: Colors.transparent,
-                                        icon: const Icon(
-                                          YTIcons.close_outlined,
-                                        ),
-                                      ),
                                     ],
                                   ),
-                                  const SizedBox(height: 18),
-                                ],
-                              ),
-                              for (final overlayChild in widget.overlayChildren)
-                                Positioned(
-                                  top: -4,
-                                  child: _OverlayChildTitle(
-                                    controller: overlayChild.controller,
-                                  ),
                                 ),
+                                const SizedBox(width: 16),
+                                IconButton(
+                                  onPressed: _closeSheet,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(
+                                    maxHeight: 28,
+                                  ),
+                                  splashColor: Colors.transparent,
+                                  icon: const Icon(YTIcons.close_outlined),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 18),
+                          ],
+                        ),
+                      ),
+                      if (widget.dynamicTab != null)
+                        SizeTransition(
+                          sizeFactor: _dynamicTabHideAnimation,
+                          child: Column(
+                            children: <Widget>[
+                              SizedBox(
+                                height: 40,
+                                child: widget.dynamicTab,
+                              ),
+                              const SizedBox(height: 4),
                             ],
                           ),
                         ),
-                        if (widget.dynamicTab != null)
-                          SizeTransition(
-                            sizeFactor: _dynamicTabHideAnimation,
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(
-                                  height: 40,
-                                  child: widget.dynamicTab,
-                                ),
-                                const SizedBox(height: 4),
-                              ],
-                            ),
-                          ),
-                        const Divider(thickness: 1, height: 0),
-                      ],
-                    ),
+                      const Divider(thickness: 1, height: 0),
+                    ],
                   ),
                 ),
               ),
@@ -558,7 +569,6 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
         opacity: opacityAnimation,
         child: Material(
           child: Row(
-            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               CustomInkWell(
                 borderRadius: BorderRadius.circular(32),
@@ -567,11 +577,14 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
                 child: const Icon(YTIcons.arrow_back_outlined),
               ),
               const SizedBox(width: 24),
-              Text(
-                widget.controller.title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Transform.translate(
+                offset: const Offset(0, 4),
+                child: Text(
+                  widget.controller.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(width: 20),

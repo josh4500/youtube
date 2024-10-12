@@ -172,10 +172,22 @@ class DynamicSheetStyle {
   DynamicSheetStyle({
     required this.dragIndicatorColor,
     required this.backgroundColor,
+    required this.itemTextStyle,
+    required this.itemSubtitleStyle,
+    required this.disabledItemTextStyle,
+    required this.disabledItemSubtitleStyle,
+    required this.iconColor,
+    required this.disabledIconColor,
   });
 
   final Color dragIndicatorColor;
   final Color backgroundColor;
+  final TextStyle itemTextStyle;
+  final TextStyle itemSubtitleStyle;
+  final TextStyle disabledItemTextStyle;
+  final TextStyle disabledItemSubtitleStyle;
+  final Color iconColor;
+  final Color disabledIconColor;
 
   static DynamicSheetStyle? lerp(
     DynamicSheetStyle? a,
@@ -191,6 +203,36 @@ class DynamicSheetStyle {
       dragIndicatorColor: Color.lerp(
         a?.dragIndicatorColor,
         b?.dragIndicatorColor,
+        t,
+      )!,
+      disabledIconColor: Color.lerp(
+        a?.disabledIconColor,
+        b?.disabledIconColor,
+        t,
+      )!,
+      disabledItemSubtitleStyle: TextStyle.lerp(
+        a?.disabledItemSubtitleStyle,
+        b?.disabledItemSubtitleStyle,
+        t,
+      )!,
+      disabledItemTextStyle: TextStyle.lerp(
+        a?.disabledItemTextStyle,
+        b?.disabledItemTextStyle,
+        t,
+      )!,
+      iconColor: Color.lerp(
+        a?.iconColor,
+        b?.iconColor,
+        t,
+      )!,
+      itemSubtitleStyle: TextStyle.lerp(
+        a?.itemSubtitleStyle,
+        b?.itemSubtitleStyle,
+        t,
+      )!,
+      itemTextStyle: TextStyle.lerp(
+        a?.itemTextStyle,
+        b?.itemTextStyle,
         t,
       )!,
     );

@@ -94,7 +94,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
                 },
               ),
               if (!isRestrictedMode) ...[
-                 SizedBox(width: 4.w),
+                SizedBox(width: 4.w),
                 ListenableBuilder(
                   listenable: _pageController,
                   builder: (context, _) {
@@ -157,7 +157,7 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
           horizontal: 12,
         ),
         decoration: BoxDecoration(
-          color: const Color(0xFF272727),
+          color: context.theme.highlightColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: LayoutBuilder(

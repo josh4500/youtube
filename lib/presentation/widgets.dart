@@ -57,6 +57,7 @@ export 'widgets/gestures/custom_ink_well.dart';
 export 'widgets/gestures/tappable_area.dart';
 
 export 'widgets/grouped_view_builder.dart';
+export 'widgets/image_from_asset.dart';
 export 'widgets/info_buttons.dart';
 export 'widgets/lazy_indexed_stack.dart';
 export 'widgets/marquee.dart';

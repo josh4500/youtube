@@ -38,10 +38,11 @@ class DownloadStorageUsage extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: <Widget>[
-          const LinearProgressIndicator(
+          LinearProgressIndicator(
             backgroundColor: Colors.grey,
             value: 0,
-            valueColor: AlwaysStoppedAnimation<Color>(AppPalette.blue),
+            valueColor:
+                AlwaysStoppedAnimation<Color>(context.theme.primaryColor),
             minHeight: 12,
           ),
           const SizedBox(height: 2),
@@ -54,7 +55,7 @@ class DownloadStorageUsage extends StatelessWidget {
                   Container(
                     height: 12,
                     width: 12,
-                    color: AppPalette.blue,
+                    color: context.theme.primaryColor,
                   ),
                   const SizedBox(width: 4),
                   const Text(

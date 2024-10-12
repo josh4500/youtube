@@ -44,15 +44,16 @@ abstract final class AppTheme {
     fontFamily: AppFont.roboto,
     // fontFamilyFallback: AppFont.all,
     scaffoldBackgroundColor: Colors.white,
-    primaryColor: AppPalette.blue2,
+    primaryColor: AppPalette.darkBlue,
     canvasColor: const Color(0xFFFFFFFF),
     hintColor: Colors.black45,
     colorScheme: const ColorScheme.light(
-      primary: AppPalette.blue2,
+      primary: AppPalette.darkBlue,
+      surface: Colors.black,
       secondary: Color(0xFF065DD0),
       outlineVariant: Colors.white,
     ),
-    highlightColor: Colors.black12,
+    highlightColor: Colors.black.withOpacity(.05),
     focusColor: Colors.black26,
     scrollbarTheme: const ScrollbarThemeData(
       interactive: true,
@@ -78,7 +79,7 @@ abstract final class AppTheme {
       fillColor: WidgetStateProperty.resolveWith(
         (states) {
           if (states.contains(WidgetState.selected)) {
-            return AppPalette.blue2;
+            return AppPalette.darkBlue;
           } else {
             return const Color(0xFF666666);
           }
@@ -138,7 +139,7 @@ abstract final class AppTheme {
     canvasColor: const Color(0xFF0F0F0F),
     hintColor: Colors.white38,
     colorScheme: const ColorScheme.dark(
-      surface: Colors.black,
+      surface: Colors.white,
       primary: AppPalette.blue,
       secondary: Color(0xFF3DA3FA),
       outlineVariant: Colors.white,

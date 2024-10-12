@@ -149,12 +149,12 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                                 child: TappableArea(
                                   onTap: () {},
                                   padding: const EdgeInsets.all(4.0),
-                                  child: const Text(
+                                  child:  Text(
                                     'Settings',
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
-                                      color: AppPalette.blue2,
+                                      color: context.theme.primaryColor,
                                     ),
                                   ),
                                 ),
@@ -237,14 +237,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                                     YTIcons.playlist_play_outlined,
                                   ),
                                   title: 'Play next in queue',
-                                  trailing: ClipRRect(
-                                    borderRadius: BorderRadius.circular(2),
-                                    child: Image.asset(
-                                      AssetsPath.ytPAccessIcon48,
-                                      width: 18.w,
-                                      height: 18.w,
-                                    ),
-                                  ),
+                                  trailing: ImageFromAsset.ytPAccessIcon,
                                 ),
                                 const DynamicSheetOptionItem(
                                   leading: Icon(YTIcons.watch_later_outlined),

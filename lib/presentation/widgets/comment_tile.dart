@@ -572,9 +572,9 @@ class CommenterProfileCard extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(24),
                 splashFactory: NoSplash.splashFactory,
-                child: const Text(
+                child: Text(
                   'View Channel',
-                  style: TextStyle(color: AppPalette.blue),
+                  style: TextStyle(color: context.theme.primaryColor),
                 ),
               ),
             ),
@@ -600,35 +600,35 @@ class SubCommentTile extends StatelessWidget {
             Expanded(
               child: TappableArea(
                 onTap: () {},
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text.rich(
                       TextSpan(
                         text: 'Commented on ',
                         children: [
-                          TextSpan(text: '"'),
+                          const TextSpan(text: '"'),
                           TextSpan(
                             text: 'I was so confused lol',
                             style: TextStyle(
-                              color: AppPalette.blue,
+                              color: context.theme.primaryColor,
                             ),
                           ),
-                          TextSpan(text: '"'),
+                          const TextSpan(text: '"'),
                         ],
                       ),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12.5,
                         color: Colors.grey,
                       ),
                     ),
-                    SizedBox(height: 8),
-                    Text(
+                    const SizedBox(height: 8),
+                    const Text(
                       'Realized this the second time I watched but he sounds mean',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),

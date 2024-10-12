@@ -28,7 +28,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
-import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/screens/accounts/account_incognito_screen.dart';
@@ -131,15 +130,8 @@ class AccountsScreen extends StatelessWidget {
                                             YTIcons.playlist_play_outlined,
                                           ),
                                           title: 'Play next in queue',
-                                          trailing: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(2),
-                                            child: Image.asset(
-                                              AssetsPath.ytPAccessIcon48,
-                                              width: 18,
-                                              height: 18,
-                                            ),
-                                          ),
+                                          trailing:
+                                              ImageFromAsset.ytPAccessIcon,
                                         ),
                                       ],
                                     );
@@ -212,14 +204,7 @@ class AccountsScreen extends StatelessWidget {
             YTIcons.playlist_play_outlined,
           ),
           title: 'Play next in queue',
-          trailing: ClipRRect(
-            borderRadius: BorderRadius.circular(2),
-            child: Image.asset(
-              AssetsPath.ytPAccessIcon48,
-              width: 18,
-              height: 18,
-            ),
-          ),
+          trailing: ImageFromAsset.ytPAccessIcon,
         ),
         const DynamicSheetOptionItem(
           leading: Icon(

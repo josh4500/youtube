@@ -93,8 +93,6 @@ class _AccountChannelScreenState extends State<AccountChannelScreen> {
                       child: TabBar(
                         isScrollable: true,
                         tabAlignment: TabAlignment.start,
-                        dividerColor: Colors.white,
-                        indicatorColor: Colors.white,
                         tabs: <Widget>[
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 8.0),

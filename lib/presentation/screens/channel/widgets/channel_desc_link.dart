@@ -35,30 +35,33 @@ class ChannelDescLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const TappableArea(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+    return TappableArea(
+      padding: const EdgeInsets.symmetric(
+        vertical: 8,
+        horizontal: 4,
+      ),
       child: Row(
         children: <Widget>[
-          Icon(
+          const Icon(
             Icons.camera,
             size: 28,
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
+              const Text(
                 'Twitter',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 'twitter.com/MKBHD',
                 style: TextStyle(
-                  color: AppPalette.blue,
+                  color: context.theme.primaryColor,
                 ),
               ),
             ],

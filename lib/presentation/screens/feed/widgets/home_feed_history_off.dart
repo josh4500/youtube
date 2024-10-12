@@ -126,7 +126,7 @@ class HomeFeedHistoryOff extends StatelessWidget {
                     ),
                     const SizedBox(height: 18),
                     RichText(
-                      text: const TextSpan(
+                      text: TextSpan(
                         text:
                             'You can change setting at any time to get the latest videos tailored to you. ',
                         children: [
@@ -134,11 +134,11 @@ class HomeFeedHistoryOff extends StatelessWidget {
                             text: 'Learn more',
                             style: TextStyle(
                               fontSize: 14,
-                              color: AppPalette.blue,
+                              color: context.theme.primaryColor,
                             ),
                           ),
                         ],
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
                           color: Colors.white60,
                         ),

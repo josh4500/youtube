@@ -57,7 +57,7 @@ class VideoChannelMembershipButton extends StatelessWidget {
     return CustomActionChip(
       title: 'Join',
       onTap: () {},
-      backgroundColor: Colors.white,
+      backgroundColor: context.theme.colorScheme.surface,
       borderRadius: BorderRadius.circular(24),
       padding: const EdgeInsets.symmetric(
         vertical: 10,
@@ -65,7 +65,7 @@ class VideoChannelMembershipButton extends StatelessWidget {
       ),
       textStyle: const TextStyle(
         fontSize: 12,
-        color: Colors.black,
+        color: Colors.white,
         fontWeight: FontWeight.w500,
       ),
     );
@@ -105,13 +105,13 @@ class _VideoChannelSubscriptionButtonState
       animation: _controller,
       builder: (context, _) {
         return ShaderMask(
-          // blendMode: BlendMode.colorBurn,
+          blendMode: BlendMode.colorBurn,
           shaderCallback: (bounds) {
             return LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: const [
-                AppPalette.blue,
+              colors: [
+                context.theme.primaryColor,
                 Colors.purple,
                 AppPalette.red,
                 Colors.orange,
@@ -128,7 +128,7 @@ class _VideoChannelSubscriptionButtonState
           child: CustomActionButton(
             title: 'Subscribe',
             onTap: () {},
-            backgroundColor: Colors.white,
+            backgroundColor: context.theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(24),
             padding: const EdgeInsets.symmetric(
               vertical: 10,
@@ -136,7 +136,7 @@ class _VideoChannelSubscriptionButtonState
             ),
             textStyle: const TextStyle(
               fontSize: 12,
-              color: Colors.black,
+              color: Colors.white,
               fontWeight: FontWeight.w500,
             ),
           ),
