@@ -52,6 +52,15 @@ import 'widgets/video_chapters_sheet.dart';
 import 'widgets/video_comment_sheet.dart';
 import 'widgets/video_description_sheet.dart';
 
+enum _VideoBottomSheet {
+  comment,
+  chapter,
+  playlist,
+  description,
+  membership,
+  product,
+}
+
 class VideoScreen extends ConsumerStatefulWidget {
   const VideoScreen({
     super.key,
@@ -98,9 +107,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   late final AnimationController _infoOpacityController;
   late final Animation<double> _infoOpacityAnimation;
 
-  late final AnimationController _draggableOpacityController;
-  late final Animation<double> _draggableOpacityAnimation;
-
   late final AnimationController _playerAddedHeightAnimationController;
   late final ValueNotifier<double> _playerAddedHeightNotifier;
 
@@ -119,29 +125,18 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   late final ValueNotifier<bool> _hideGraphicsNotifier;
 
   // Video Comment Sheet
-  bool _commentIsOpened = false;
   late final AnimationController _commentSizeController;
   late final Animation<double> _commentSizeAnimation;
-  final _showCommentsDraggable = ValueNotifier<bool>(false);
-  final _replyController = PageDraggableOverlayChildController(
-    title: 'Replies',
-  );
-  final _commentDraggableController = DraggableScrollableController();
 
   // Video Description Sheet
-  bool _descIsOpened = false;
   late final AnimationController _descSizeController;
   late final Animation<double> _descSizeAnimation;
-  final _showDescDraggable = ValueNotifier<bool>(false);
   final _transcriptController = PageDraggableOverlayChildController(
     title: 'Transcript',
   );
-  final _descDraggableController = DraggableScrollableController();
-
-  // Video Chapter Sheet
-  bool _chaptersIsOpened = false;
-  final _showChaptersDraggable = ValueNotifier<bool>(false);
-  final _chaptersDraggableController = DraggableScrollableController();
+  final _replyController = PageDraggableOverlayChildController(
+    title: 'Replies',
+  );
 
   /// PlayerSignal StreamSubscription
   StreamSubscription<PlayerSignal>? _playerSignalSubscription;
@@ -184,7 +179,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     return screenHeight * minPlayerHeightRatio;
   }
 
-  double get maxInitialDraggableSnapSize => 1 - playerHeightToScreenRatio;
+  double get initialDraggableSnapSize => 1 - playerHeightToScreenRatio;
 
   /// Player View width
   ///
@@ -315,9 +310,90 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   bool _preventGestures = false;
 
+  final Map<_VideoBottomSheet, ValueNotifier<bool>> _draggableNotifiers = {};
+  final Map<_VideoBottomSheet, AnimationController> _draggableAnimationOpacity =
+      {};
+  final Map<_VideoBottomSheet, DraggableScrollableController>
+      _draggableControllers = {};
+  bool get _hasMoreThanOneOpened => _openedDraggableState.length > 1;
+  bool get _hasAtLeastOneOpened => _openedDraggableState.isNotEmpty;
+  final List<_VideoBottomSheet> _openedDraggableState = [];
+
+  void _createDraggableControllers(List<_VideoBottomSheet> sheets) {
+    for (final _VideoBottomSheet sheet in sheets) {
+      _draggableNotifiers[sheet] = ValueNotifier<bool>(false);
+    }
+
+    for (final _VideoBottomSheet sheet in sheets) {
+      _draggableAnimationOpacity[sheet] = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 250),
+      );
+    }
+
+    for (final _VideoBottomSheet sheet in sheets) {
+      _draggableControllers[sheet] = DraggableScrollableController();
+      _draggableControllers[sheet]?.addListener(
+        () => _onSheetSizeChange(sheet),
+      );
+    }
+  }
+
+  void _disposeDraggableControllers() {
+    _draggableNotifiers.forEach((sheet, notifier) {
+      notifier.dispose();
+    });
+    _draggableAnimationOpacity.forEach((sheet, animationController) {
+      animationController.dispose();
+    });
+  }
+
+  ValueNotifier<bool> _getSheetNotifier(_VideoBottomSheet sheet) {
+    return _draggableNotifiers[sheet]!;
+  }
+
+  AnimationController _getSheetAnimationOpacity(_VideoBottomSheet sheet) {
+    return _draggableAnimationOpacity[sheet]!;
+  }
+
+  DraggableScrollableController _getSheetController(_VideoBottomSheet sheet) {
+    return _draggableControllers[sheet]!;
+  }
+
+  void _onSheetSizeChange(_VideoBottomSheet sheet) {
+    final double size = _draggableControllers[sheet]!.size;
+
+    // Ensures Sheet is removed or re-added while dragging
+    if (!(_isPlayerDraggingDown ?? false)) {
+      if (size < (initialDraggableSnapSize / 2)) {
+        _openedDraggableState.remove(sheet);
+      } else if (!_openedDraggableState.contains(sheet)) {
+        _openedDraggableState.add(sheet);
+      }
+    }
+
+    final isNotifierValue = _draggableNotifiers[sheet]?.value ?? false;
+    if (isNotifierValue) {
+      _commonDraggableListenerCallback(size);
+    }
+    // TODO(josh4500): Uncomment when solution to pointer leave Draggable found
+    // final prevSheetIndex = _openedDraggableState.indexOf(sheet) - 1;
+    // if (prevSheetIndex >= 0) {
+    //   _draggableAnimationOpacity[_openedDraggableState[prevSheetIndex]]?.value =
+    //       size.normalize(0, 1 - playerHeightToScreenRatio);
+    // }
+  }
+
   @override
   void initState() {
     super.initState();
+
+    _createDraggableControllers([
+      _VideoBottomSheet.comment,
+      _VideoBottomSheet.chapter,
+      _VideoBottomSheet.description,
+    ]);
+
     _viewController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 100),
@@ -391,16 +467,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       CurvedAnimation(parent: _playerOpacityController, curve: Curves.easeIn),
     );
 
-    _draggableOpacityController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 250),
-    );
-
-    _draggableOpacityAnimation = CurvedAnimation(
-      parent: ReverseAnimation(_draggableOpacityController),
-      curve: Curves.easeIn,
-    );
-
     _playerAddedHeightNotifier = ValueNotifier<double>(
       ui.clampDouble(
         (screenHeight * (1 - kAvgVideoViewPortHeight)) -
@@ -421,17 +487,18 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     // (i.e Comment or Description Sheet)
     _playerAddedHeightNotifier.addListener(() {
       double opacityValue;
-      if (_isResizableExpandingMode) {
-        opacityValue = additionalHeight /
-            (screenHeight - (playerHeightToScreenRatio * screenHeight));
-        _draggableOpacityController.value = opacityValue;
-      } else {
-        opacityValue = additionalHeight / maxAdditionalHeight;
-        _draggableOpacityController.value = opacityValue;
-      }
-      if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
-        _infoOpacityController.value = opacityValue;
-      }
+      // if (_isResizableExpandingMode) {
+      //   opacityValue = additionalHeight /
+      //       (screenHeight - (playerHeightToScreenRatio * screenHeight));
+      //   _draggableOpacityController.value = opacityValue;
+      // } else {
+      //   opacityValue = additionalHeight / maxAdditionalHeight;
+      //   _draggableOpacityController.value = opacityValue;
+      // }
+      //
+      // if (!_hasAtLeastOneOpened) {
+      //   _infoOpacityController.value = opacityValue;
+      // }
     });
 
     _playerMarginNotifier = ValueNotifier<double>(0);
@@ -463,7 +530,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
           screenHeightRatio.normalize(minPlayerHeightRatio, 1);
 
       _showHideNavigationBar(screenHeightRatio);
-      // TODO(josh4500): Needs fix
       _recomputeDraggableOpacityAndHeight(screenHeightRatio);
 
       // Hide or Show infographics
@@ -478,36 +544,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       } else {
         _activeZoomPanning = false;
       }
-    });
-
-    _descDraggableController.addListener(() {
-      final double size = _descDraggableController.size;
-      if (!(_isPlayerDraggingDown ?? false)) {
-        _descIsOpened = (size != 0 || (size == 0 && !localMinimized)) &&
-            _showDescDraggable.value &&
-            _descIsOpened;
-      }
-      if (_showDescDraggable.value) _commonDraggableListenerCallback(size);
-    });
-
-    _commentDraggableController.addListener(() {
-      final double size = _commentDraggableController.size;
-      if (!(_isPlayerDraggingDown ?? false)) {
-        _commentIsOpened = (size != 0 || (size == 0 && !localMinimized)) &&
-            _showCommentsDraggable.value &&
-            _commentIsOpened;
-      }
-      if (_showCommentsDraggable.value) _commonDraggableListenerCallback(size);
-    });
-
-    _chaptersDraggableController.addListener(() {
-      final double size = _chaptersDraggableController.size;
-      if (!(_isPlayerDraggingDown ?? false)) {
-        _chaptersIsOpened = (size != 0 || (size == 0 && !localMinimized)) &&
-            _showChaptersDraggable.value &&
-            _chaptersIsOpened;
-      }
-      if (_showChaptersDraggable.value) _commonDraggableListenerCallback(size);
     });
 
     _descSizeController = AnimationController(
@@ -540,7 +576,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
       // Opens and play video
       // TODO(josh4500): Reconsider to always call this method mount widget
-      ref.read(playerRepositoryProvider).openVideo();
+      // ref.read(playerRepositoryProvider).openVideo();
     });
 
     // NOTE: Do not remove
@@ -550,7 +586,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   ui.FlutterView? _view;
   static const double kOrientationLockBreakpoint = 600;
   static bool localExpanded = false;
-  static bool localMinimized = false;
 
   @override
   void didChangeDependencies() {
@@ -566,17 +601,17 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _playerSignalSubscription ??= playerRepo.playerSignalStream.listen(
       (PlayerSignal signal) {
         if (signal == PlayerSignal.openDescription) {
-          _openDescSheet();
+          _openBottomSheet(_VideoBottomSheet.description);
         } else if (signal == PlayerSignal.closeDescription) {
-          _closeDescSheet();
+          _closeBottomSheet(_VideoBottomSheet.description);
         } else if (signal == PlayerSignal.openComments) {
-          _openCommentSheet();
+          _openBottomSheet(_VideoBottomSheet.comment);
         } else if (signal == PlayerSignal.closeComments) {
-          _closeCommentSheet();
+          _closeBottomSheet(_VideoBottomSheet.comment);
         } else if (signal == PlayerSignal.openChapters) {
-          _openChaptersSheet();
+          _openBottomSheet(_VideoBottomSheet.chapter);
         } else if (signal == PlayerSignal.closeChapters) {
-          _closeChaptersSheet();
+          _closeBottomSheet(_VideoBottomSheet.chapter);
         }
       },
     );
@@ -648,17 +683,10 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _hideGraphicsNotifier.dispose();
     _playerDismissController.dispose();
 
-    _draggableOpacityController.dispose();
     _zoomPanAnimationController.dispose();
     _transformationController.dispose();
 
-    _descDraggableController.dispose();
-    _commentDraggableController.dispose();
-    _chaptersDraggableController.dispose();
-
-    _showDescDraggable.dispose();
-    _showCommentsDraggable.dispose();
-    _showChaptersDraggable.dispose();
+    _disposeDraggableControllers();
 
     _infoScrollController.dispose();
     _infoOpacityController.dispose();
@@ -685,8 +713,10 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   }
 
   void _commonDraggableListenerCallback(double size) {
-    _changePlayerOpacityOnDraggable(size);
-    _changeInfoOpacityOnDraggable(size);
+    if (!_hasMoreThanOneOpened) {
+      _changePlayerOpacityOnDraggable(size);
+      _changeInfoOpacityOnDraggable(size);
+    }
     _checkDraggableSizeToPause(size);
   }
 
@@ -775,11 +805,11 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   /// Callback to updates the info opacity when draggable sheets changes its size
   void _changePlayerOpacityOnDraggable(double size) {
-    if (size > maxInitialDraggableSnapSize) {
+    if (size > initialDraggableSnapSize) {
       _hideControls(true);
 
       _playerOpacityController.value = size.normalize(
-        maxInitialDraggableSnapSize,
+        initialDraggableSnapSize,
         1,
       );
     }
@@ -814,39 +844,20 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     //**************************** Opacity Changes ***************************//
     final double opacityValue =
         1 - newSizeValue.normalize(0, 1 - playerHeightToScreenRatio);
-    if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
+    if (_hasAtLeastOneOpened) {
+      // Changes the opacity level of the last draggable sheets
+      _draggableAnimationOpacity[_openedDraggableState.last]?.value =
+          opacityValue;
+    } else {
       // Changes info opacity when neither of the draggable sheet are opened
       _infoOpacityController.value = (opacityValue - .225).clamp(0, 1);
-    } else {
-      // Changes the opacity level of all draggable sheets
-      _draggableOpacityController.value = opacityValue;
     }
 
-    //**************************** Height Changes ****************************//
-    // Changes Comment Draggable height
-    if (_commentIsOpened) {
+    for (final openedSheet in _openedDraggableState) {
       if (_screenHeightNotifier.value == minPlayerHeightRatio) {
-        _commentDraggableController.jumpTo(0);
+        _draggableControllers[openedSheet]?.jumpTo(0);
       } else {
-        _commentDraggableController.jumpTo(newSizeValue);
-      }
-    }
-
-    // Changes Description Draggable height
-    if (_descIsOpened) {
-      if (_screenHeightNotifier.value == minPlayerHeightRatio) {
-        _descDraggableController.jumpTo(0);
-      } else {
-        _descDraggableController.jumpTo(newSizeValue);
-      }
-    }
-
-    // Changes Chapters Draggable height
-    if (_chaptersIsOpened) {
-      if (_screenHeightNotifier.value == minPlayerHeightRatio) {
-        _chaptersDraggableController.jumpTo(0);
-      } else {
-        _chaptersDraggableController.jumpTo(newSizeValue);
+        _draggableControllers[openedSheet]?.jumpTo(newSizeValue);
       }
     }
   }
@@ -1041,36 +1052,13 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
     // Adjust additional height if within limits
     if (_isResizableExpandingMode) {
-      // TODO(josh4500): Consider _recomputeDraggableOpacityAndHeight method
-
       // Set additional height to its maximum value
       _animateAdditionalHeight(minAdditionalHeight);
 
-      // If comments are opened, animate to the appropriate position
-      if (_commentIsOpened) {
-        _commentDraggableController.animateTo(
-          (playerHeight + additionalHeight) / screenHeight,
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeIn,
-        );
-      }
-
-      // If description is opened, animate to the appropriate position
-      if (_descIsOpened) {
-        _descDraggableController.animateTo(
-          (playerHeight + additionalHeight) / screenHeight,
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeIn,
-        );
-      }
-
-      if (_chaptersIsOpened) {
-        _chaptersDraggableController.animateTo(
-          (playerHeight + additionalHeight) / screenHeight,
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeIn,
-        );
-      }
+      // Ensure bottom sheets are opened, animate to the appropriate position
+      _recomputeDraggableOpacityAndHeight(
+        (playerHeight + additionalHeight) / screenHeight,
+      );
     }
   }
 
@@ -1255,7 +1243,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
         PlayerSignal.hidePlaybackProgress,
       ]);
     } else {
-      localMinimized = false;
       ref.read(playerRepositoryProvider).sendPlayerSignal(<PlayerSignal>[
         PlayerSignal.maximize,
         PlayerSignal.showPlaybackProgress,
@@ -1427,7 +1414,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   }
 
   void _enterMinimizedMode() {
-    localMinimized = true;
     // Note: Do not remove
     // We set to true to emulate player was dragged down to minimize
     _isPlayerDraggingDown = true;
@@ -1457,8 +1443,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _preventPlayerDragDown = false;
     _preventPlayerDragUp = false;
 
-    localMinimized = false;
-
     // Set height and width to maximum
     Future.wait([
       _animateScreenHeight(1),
@@ -1474,112 +1458,58 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     });
   }
 
-  /// Callback to open Comments draggable sheets
-  Future<void> _openCommentSheet() async {
-    _commentIsOpened = true;
-    final bool wait = !_showCommentsDraggable.value;
-    _showCommentsDraggable.value = true;
+  Future<void> _openBottomSheet(_VideoBottomSheet sheet) async {
+    if (_openedDraggableState.contains(sheet)) return;
 
-    if (wait) {
-      await Future<void>.delayed(const Duration(milliseconds: 150));
+    _openedDraggableState.add(sheet);
+    final bool wait = !_getSheetNotifier(sheet).value;
+    _getSheetNotifier(sheet).value = true;
+
+    if (!wait) {
+      _getSheetController(sheet).animateTo(
+        1 - playerHeightToScreenRatio,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeInCubic,
+      );
     }
-
-    if (_isResizableExpandingMode && additionalHeight > 0) {
-      _animateAdditionalHeight(minAdditionalHeight);
-    }
-
-    _commentDraggableController.animateTo(
-      1 - playerHeightToScreenRatio,
-      duration: const Duration(milliseconds: 150),
-      curve: Curves.easeInCubic,
-    );
-
-    _commentSizeController.forward();
-  }
-
-  /// Callback to close Comments draggable sheets
-  void _closeCommentSheet() {
-    if (_replyController.isOpened) {
-      _replyController.close();
-      return;
-    }
-
-    _commentIsOpened = false;
-    _commentDraggableController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 150),
-      curve: Curves.easeOutCubic,
-    );
-    _commentSizeController.reverse();
-  }
-
-  Future<void> _openDescSheet() async {
-    _descIsOpened = true;
-    final bool wait = !_showCommentsDraggable.value;
-    _showDescDraggable.value = true;
-
-    if (wait) {
-      await Future<void>.delayed(const Duration(milliseconds: 150));
-    }
-    if (_isResizableExpandingMode && additionalHeight > 0) {
-      _animateAdditionalHeight(minAdditionalHeight);
-    }
-    _descDraggableController.animateTo(
-      1 - playerHeightToScreenRatio,
-      duration: const Duration(milliseconds: 150),
-      curve: Curves.easeInCubic,
-    );
 
     _descSizeController.forward();
   }
 
-  void _closeDescSheet() {
-    if (_transcriptController.isOpened) {
-      _transcriptController.close();
-      return;
+  void _closeBottomSheet(_VideoBottomSheet sheet) {
+    if (sheet == _VideoBottomSheet.comment) {
+      if (_replyController.isOpened) {
+        _replyController.close();
+        return;
+      }
     }
 
-    _descIsOpened = false;
-    _descDraggableController.animateTo(
+    if (sheet == _VideoBottomSheet.description) {
+      if (_transcriptController.isOpened) {
+        _transcriptController.close();
+        return;
+      }
+    }
+
+    _openedDraggableState.remove(sheet);
+    _getSheetController(sheet).animateTo(
       0,
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeOutCubic,
     );
 
+    // TODO(josh4500): Uncomment when solution to pointer leave Draggable found
+    // final prevSheetIndex = _openedDraggableState.indexOf(sheet) - 1;
+    // if (prevSheetIndex >= 0) {
+    //   _draggableAnimationOpacity[_openedDraggableState[prevSheetIndex]]
+    //       ?.animateTo(1);
+    // }
+
     _descSizeController.reverse();
-  }
-
-  Future<void> _openChaptersSheet() async {
-    _chaptersIsOpened = true;
-    final bool wait = !_showChaptersDraggable.value;
-
-    if (wait) {
-      await Future<void>.delayed(const Duration(milliseconds: 150));
-    }
-    _showChaptersDraggable.value = true;
-
-    // Changes the additional heights to zero on Expanded mode
     if (_isResizableExpandingMode && additionalHeight > 0) {
       _animateAdditionalHeight(minAdditionalHeight);
     }
-
-    _chaptersDraggableController.animateTo(
-      1 - playerHeightToScreenRatio,
-      duration: const Duration(milliseconds: 150),
-      curve: Curves.easeInCubic,
-    );
   }
-
-  void _closeChaptersSheet() {
-    _chaptersIsOpened = false;
-    _chaptersDraggableController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 150),
-      curve: Curves.easeOutCubic,
-    );
-  }
-
-  // TODO(Josh): Will add Membership sheet too
 
   Future<void> _openSettings() async {
     // TODO(josh4500): Create Model for settings final option
@@ -1701,24 +1631,22 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   /// Handles when back navigation system tries to pop route
   Future<void> _handleBackButtonPressed<T>(bool didPop, T? result) async {
-    if (_commentIsOpened) {
-      _closeCommentSheet();
+    if (_openedDraggableState.contains(_VideoBottomSheet.comment)) {
+      _closeBottomSheet(_VideoBottomSheet.comment);
       return;
-    } else if (_descIsOpened) {
-      _closeDescSheet();
+    } else if (_openedDraggableState.contains(_VideoBottomSheet.description)) {
+      _closeBottomSheet(_VideoBottomSheet.description);
       return;
-    } else if (_chaptersIsOpened) {
-      _closeChaptersSheet();
+    } else if (_openedDraggableState.contains(_VideoBottomSheet.chapter)) {
+      _closeBottomSheet(_VideoBottomSheet.chapter);
       return;
     } else if (!_isMinimized) {
       _enterMinimizedMode();
       return;
     }
 
-    if (!_commentIsOpened && !_descIsOpened && !_chaptersIsOpened) {
-      // Closes screen when Player is minimized
-      if (_isMinimized) ref.read(playerRepositoryProvider).closePlayerScreen();
-    }
+    // Closes screen when Player is minimized
+    if (_isMinimized) ref.read(playerRepositoryProvider).closePlayerScreen();
   }
 
   @override
@@ -1984,13 +1912,19 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                             maxWidth: screenWidth * .4,
                           ),
                           sizeFactor: _descSizeAnimation,
-                          visibleListenable: _showDescDraggable,
+                          visibleListenable: _getSheetNotifier(
+                            _VideoBottomSheet.comment,
+                          ),
                           child: VideoDescriptionSheet(
-                            key: _descSheetKey,
                             showDragIndicator: false,
-                            closeDescription: _closeDescSheet,
+                            initialHeight: 0,
+                            closeDescription: () => _closeBottomSheet(
+                              _VideoBottomSheet.description,
+                            ),
                             transcriptController: _transcriptController,
-                            draggableController: _descDraggableController,
+                            draggableController: _getSheetController(
+                              _VideoBottomSheet.description,
+                            ),
                           ),
                         ),
                         PlayerSideSheet(
@@ -1998,14 +1932,20 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                             maxWidth: screenWidth * .4,
                           ),
                           sizeFactor: _commentSizeAnimation,
-                          visibleListenable: _showCommentsDraggable,
+                          visibleListenable: _getSheetNotifier(
+                            _VideoBottomSheet.comment,
+                          ),
                           child: VideoCommentsSheet(
                             key: _commentSheetKey,
-                            maxHeight: 0,
+                            initialHeight: 0,
                             showDragIndicator: false,
-                            closeComment: _closeCommentSheet,
+                            closeComment: () => _closeBottomSheet(
+                              _VideoBottomSheet.comment,
+                            ),
                             replyController: _replyController,
-                            draggableController: _commentDraggableController,
+                            draggableController: _getSheetController(
+                              _VideoBottomSheet.comment,
+                            ),
                           ),
                         ),
                       ],
@@ -2018,55 +1958,77 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
               VideoDraggableSheet(
                 builder: (BuildContext context, ScrollController controller) {
                   return VideoCommentsSheet(
-                    key: _commentSheetKey,
                     controller: controller,
-                    maxHeight: kAvgVideoViewPortHeight,
-                    closeComment: _closeCommentSheet,
+                    initialHeight: kAvgVideoViewPortHeight,
+                    closeComment: () => _closeBottomSheet(
+                      _VideoBottomSheet.comment,
+                    ),
                     replyController: _replyController,
-                    draggableController: _commentDraggableController,
+                    draggableController: _getSheetController(
+                      _VideoBottomSheet.comment,
+                    ),
                   );
                 },
-                opacity: _draggableOpacityAnimation,
-                controller: _commentDraggableController,
-                visibleListenable: _showCommentsDraggable,
+                opacity: _getSheetAnimationOpacity(
+                  _VideoBottomSheet.comment,
+                ),
+                controller: _getSheetController(
+                  _VideoBottomSheet.comment,
+                ),
+                visibleListenable: _getSheetNotifier(
+                  _VideoBottomSheet.comment,
+                ),
                 snapSizes: <double>[
                   0.0,
-                  maxInitialDraggableSnapSize,
+                  initialDraggableSnapSize,
                 ],
               ),
               VideoDraggableSheet(
                 builder: (BuildContext context, ScrollController controller) {
                   return VideoDescriptionSheet(
-                    key: _descSheetKey,
                     controller: controller,
-                    closeDescription: _closeDescSheet,
+                    initialHeight: initialDraggableSnapSize,
+                    closeDescription: () => _closeBottomSheet(
+                      _VideoBottomSheet.description,
+                    ),
                     transcriptController: _transcriptController,
-                    draggableController: _descDraggableController,
+                    draggableController: _getSheetController(
+                      _VideoBottomSheet.description,
+                    ),
                   );
                 },
-                opacity: _draggableOpacityAnimation,
-                controller: _descDraggableController,
-                visibleListenable: _showDescDraggable,
+                opacity: _getSheetAnimationOpacity(
+                  _VideoBottomSheet.description,
+                ),
+                controller: _getSheetController(
+                  _VideoBottomSheet.description,
+                ),
+                visibleListenable: _getSheetNotifier(
+                  _VideoBottomSheet.description,
+                ),
                 snapSizes: <double>[
                   0.0,
-                  maxInitialDraggableSnapSize,
+                  initialDraggableSnapSize,
                 ],
               ),
               VideoDraggableSheet(
                 builder: (BuildContext context, ScrollController controller) {
                   return VideoChaptersSheet(
-                    key: _chaptersSheetKey,
                     controller: controller,
-                    closeChapter: _closeChaptersSheet,
-                    draggableController: _chaptersDraggableController,
+                    initialHeight: initialDraggableSnapSize,
+                    closeChapter: () => _closeBottomSheet(
+                      _VideoBottomSheet.chapter,
+                    ),
+                    draggableController:
+                        _getSheetController(_VideoBottomSheet.chapter),
                   );
                 },
-                opacity: _draggableOpacityAnimation,
-                controller: _chaptersDraggableController,
-                visibleListenable: _showChaptersDraggable,
+                opacity: _getSheetAnimationOpacity(_VideoBottomSheet.chapter),
+                controller: _getSheetController(_VideoBottomSheet.chapter),
+                visibleListenable: _getSheetNotifier(_VideoBottomSheet.chapter),
                 snapSizes: <double>[
                   0.0,
-                  maxInitialDraggableSnapSize,
+                  initialDraggableSnapSize,
                 ],
               ),
             ],

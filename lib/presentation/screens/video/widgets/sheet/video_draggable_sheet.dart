@@ -44,9 +44,11 @@ class VideoDraggableSheet extends StatelessWidget {
               BuildContext context,
               ScrollController controller,
             ) {
-              return FadeTransition(
-                opacity: opacity,
-                child: builder(context, controller),
+              return Material(
+                child: FadeTransition(
+                  opacity: ReverseAnimation(opacity),
+                  child: builder(context, controller),
+                ),
               );
             },
           ),

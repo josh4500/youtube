@@ -55,11 +55,13 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
     super.dispose();
   }
 
-  void _openComment() {
+  void _openComments() {
     ref.read(playerRepositoryProvider).sendPlayerSignal([
       PlayerSignal.openComments,
     ]);
   }
+
+  void _openLiveChats() {}
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +70,6 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
     );
     // TODO(Josh): Check for isLiveVideo
     final random = Random();
-    random.nextBool();
     final isLiveVideo = random.nextBool();
     final showHighlighted = random.nextBool();
 
@@ -76,52 +77,62 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-          child: Row(
-            children: [
-              ListenableBuilder(
-                listenable: _pageController,
-                builder: (context, _) {
-                  return Text(
-                    currentPage == 0 ? 'Comments' : 'Live chat replay',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  );
-                },
-              ),
-              if (!isRestrictedMode) ...[
-                SizedBox(width: 4.w),
+        if (isRestrictedMode)
+          const Text(
+            'Comments',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          )
+        else ...[
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Row(
+              children: [
                 ListenableBuilder(
                   listenable: _pageController,
                   builder: (context, _) {
-                    if (currentPage != 0) return const SizedBox();
-                    return const Text(
-                      '16k',
-                      style: TextStyle(
-                        color: Color(0xFFAAAAAA),
+                    return Text(
+                      currentPage == 0 ? 'Comments' : 'Live chat replay',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
                     );
                   },
                 ),
+                if (!isRestrictedMode) ...[
+                  SizedBox(width: 4.w),
+                  ListenableBuilder(
+                    listenable: _pageController,
+                    builder: (context, _) {
+                      if (currentPage != 0) return const SizedBox();
+                      return const Text(
+                        '16k',
+                        style: TextStyle(
+                          color: Color(0xFFAAAAAA),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+                const Spacer(),
+                if (isLiveVideo && !isRestrictedMode)
+                  ListenableBuilder(
+                    listenable: _pageController,
+                    builder: (BuildContext context, Widget? child) {
+                      return SlidesIndicator(
+                        pageCount: 2,
+                        currentPage: currentPage,
+                      );
+                    },
+                  ),
               ],
-              const Spacer(),
-              if (isLiveVideo && !isRestrictedMode)
-                ListenableBuilder(
-                  listenable: _pageController,
-                  builder: (BuildContext context, Widget? child) {
-                    return SlidesIndicator(
-                      pageCount: 2,
-                      currentPage: currentPage,
-                    );
-                  },
-                ),
-            ],
+            ),
           ),
-        ),
+        ],
         if (isRestrictedMode)
           const SizedBox(height: 8)
         else
@@ -133,20 +144,38 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
           )
         else
           SizedBox(
-            height: 45,
-            child: isLiveVideo == false
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8,
+            child: isLiveVideo
+                ? SizedBox(
+                    height: 45,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: PageView(
+                        controller: _pageController,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        onPageChanged: (page) => currentPage = page,
+                        children: [
+                          if (showHighlighted)
+                            TappableArea(
+                              onTap: _openComments,
+                              padding: EdgeInsets.zero,
+                              child: const VideoHighlightedComment(),
+                            )
+                          else
+                            const VideoCommentInput(),
+                          TappableArea(
+                            onTap: _openLiveChats,
+                            padding: EdgeInsets.zero,
+                            child: const VideoHighlightedLiveComment(),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: showHighlighted
-                        ? const VideoHighlightedComment()
-                        : null,
                   )
-                : null,
+                : showHighlighted
+                    ? const VideoHighlightedComment()
+                    : const VideoCommentInput(),
           ),
-        const SizedBox(height: 8),
+        if (!isRestrictedMode) const SizedBox(height: 8),
       ],
     );
 
@@ -163,64 +192,9 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
         child: LayoutBuilder(
           builder: (context, c) {
             return TappableArea(
-              onTap: _openComment,
+              onTap: _openComments,
               padding: EdgeInsets.zero,
               borderRadius: BorderRadius.circular(16),
-              // stackedPosition: StackedPosition(bottom: 5),
-              // stackedChild: showHighlighted
-              //     ? isLiveVideo
-              //         ? SizedBox(
-              //             height: 45,
-              //             width: c.maxWidth,
-              //             child: PageView(
-              //               controller: _pageController,
-              //               physics: const AlwaysScrollableScrollPhysics(),
-              //               onPageChanged: (page) => currentPage = page,
-              //               children: [
-              //                 TappableArea(
-              //                   onTap: _openComment,
-              //                   padding: const EdgeInsets.symmetric(
-              //                     horizontal: 12.0,
-              //                     vertical: 8,
-              //                   ),
-              //                   child: const VideoHighlightedComment(),
-              //                 ),
-              //                 const TappableArea(
-              //                   padding: EdgeInsets.symmetric(
-              //                     horizontal: 12.0,
-              //                     vertical: 8,
-              //                   ),
-              //                   child: VideoHighlightedLiveComment(),
-              //                 ),
-              //               ],
-              //             ),
-              //           )
-              //         : null
-              //     : Padding(
-              //         padding: const EdgeInsets.symmetric(
-              //           horizontal: 16.0,
-              //           vertical: 12,
-              //         ),
-              //         child: TappableArea(
-              //           padding: EdgeInsets.zero,
-              //           borderRadius: BorderRadius.circular(16),
-              //           child: Container(
-              //             padding: const EdgeInsets.symmetric(
-              //               horizontal: 12.0,
-              //               vertical: 4.0,
-              //             ),
-              //             width: c.maxWidth - 24 - 8,
-              //             decoration: BoxDecoration(
-              //               color: Colors.white10,
-              //               borderRadius: BorderRadius.circular(16),
-              //             ),
-              //             child: const Text(
-              //               'Add a comment...',
-              //               style: TextStyle(fontSize: 12),
-              //             ),
-              //           ),
-              //         ),
-              //       ),
               child: childWidget,
             );
           },
@@ -235,10 +209,54 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
         horizontal: 16,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFF272727),
+        color: context.theme.highlightColor,
         borderRadius: BorderRadius.circular(12),
       ),
+      width: double.infinity,
       child: childWidget,
+    );
+  }
+}
+
+class VideoCommentInput extends StatelessWidget {
+  const VideoCommentInput({super.key});
+
+  void _openCommentInput() {}
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 8,
+      ),
+      child: Row(
+        children: [
+          const AccountAvatar(size: 24),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TappableArea(
+              onTap: _openCommentInput,
+              padding: EdgeInsets.zero,
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12.0,
+                  vertical: 4.0,
+                ),
+                decoration: BoxDecoration(
+                  color: context.theme.highlightColor,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  'Add a comment...',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

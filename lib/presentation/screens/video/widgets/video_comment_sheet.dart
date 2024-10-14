@@ -32,32 +32,49 @@ import 'package:youtube_clone/presentation/widgets.dart';
 import '../../../constants.dart';
 import 'video_comment_guidelines.dart';
 
-class VideoCommentsSheet extends StatelessWidget {
+class VideoCommentsSheet extends StatefulWidget {
   const VideoCommentsSheet({
     super.key,
     this.controller,
     required this.replyController,
     required this.closeComment,
-    required this.maxHeight,
+    required this.initialHeight,
     this.draggableController,
     this.showDragIndicator = true,
   });
   final ScrollController? controller;
   final PageDraggableOverlayChildController replyController;
   final VoidCallback closeComment;
-  final double maxHeight;
+  final double initialHeight;
   final bool showDragIndicator;
   final DraggableScrollableController? draggableController;
+
+  @override
+  State<VideoCommentsSheet> createState() => _VideoCommentsSheetState();
+}
+
+class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.draggableController?.animateTo(
+        1 - widget.initialHeight,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeInCubic,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Comments',
       scrollTag: 'player_comments',
-      controller: controller ?? ScrollController(),
-      onClose: closeComment,
-      showDragIndicator: showDragIndicator,
-      draggableController: draggableController,
+      controller: widget.controller ?? ScrollController(),
+      onClose: widget.closeComment,
+      showDragIndicator: widget.showDragIndicator,
+      draggableController: widget.draggableController,
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(12),
         topRight: Radius.circular(12),
@@ -75,7 +92,7 @@ class VideoCommentsSheet extends StatelessWidget {
               return const VideoCommentGuidelines();
             }
             return CommentTile(
-              openReply: replyController.open,
+              openReply: widget.replyController.open,
               pinned: index == 1,
               byCreator: index == 1,
               creatorLikes: index == 1,
@@ -87,10 +104,10 @@ class VideoCommentsSheet extends StatelessWidget {
         );
       },
       bottom: ListenableBuilder(
-        listenable: replyController,
+        listenable: widget.replyController,
         builder: (context, _) {
           return Visibility(
-            visible: !replyController.isOpened,
+            visible: !widget.replyController.isOpened,
             child: const CommentTextFieldPlaceholder(),
           );
         },
@@ -98,7 +115,7 @@ class VideoCommentsSheet extends StatelessWidget {
       baseHeight: 1 - kAvgVideoViewPortHeight,
       overlayChildren: [
         PageDraggableOverlayChild(
-          controller: replyController,
+          controller: widget.replyController,
           builder: (context, controller, physics) {
             return ListView.builder(
               controller: controller,

@@ -40,19 +40,25 @@ class VideoHighlightedComment extends StatefulWidget {
 class _VideoHighlightedCommentState extends State<VideoHighlightedComment> {
   @override
   Widget build(BuildContext context) {
-    return const Row(
-      children: [
-        AccountAvatar(size: 24, name: 'John Jackson'),
-        SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            'This movie is really interesting but it\'s not getting enough views, I would suggest you promote it more and ask your other',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 12),
+    return const Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.0,
+        vertical: 4,
+      ),
+      child: Row(
+        children: [
+          AccountAvatar(size: 24, name: 'John Jackson'),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'This movie is really interesting but it\'s not getting enough views, I would suggest you promote it more and ask your other',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -62,19 +68,25 @@ class VideoHighlightedLiveComment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
-      children: [
-        Icon(Icons.chat_bubble_outline),
-        SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            'See what others said about this video while it was live',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 12),
+    return const Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.0,
+        vertical: 4,
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.chat_bubble_outline),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'See what others said about this video while it was live',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

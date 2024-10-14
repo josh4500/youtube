@@ -4,26 +4,45 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../../constants.dart';
 
-class VideoChaptersSheet extends StatelessWidget {
+class VideoChaptersSheet extends StatefulWidget {
   const VideoChaptersSheet({
     super.key,
     required this.controller,
     required this.closeChapter,
     required this.draggableController,
+    required this.initialHeight,
   });
   final ScrollController controller;
   final VoidCallback closeChapter;
+  final double initialHeight;
   final DraggableScrollableController draggableController;
+
+  @override
+  State<VideoChaptersSheet> createState() => _VideoChaptersSheetState();
+}
+
+class _VideoChaptersSheetState extends State<VideoChaptersSheet> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.draggableController.animateTo(
+        widget.initialHeight,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeInCubic,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Chapters',
       scrollTag: 'player_chapters',
-      controller: controller,
-      onClose: closeChapter,
+      controller: widget.controller,
+      onClose: widget.closeChapter,
       showDragIndicator: true,
-      draggableController: draggableController,
+      draggableController: widget.draggableController,
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(12),
         topRight: Radius.circular(12),
