@@ -1,17 +1,17 @@
 flutter_native_splash:
   color: "#ffffff"
-  background_image: assets/icon/yt_icon_rgb.png
+  background_image: assets/icon/ic_launcher_288.png
   color_dark: "#0f0f0f"
-  background_image_dark: assets/icon/yt_icon_rgb.png
+  background_image_dark: assets/icon/ic_launcher_288.png
 
-#  android_12:
-#    image: assets/icon/yt_icon_rgb.png
-#    color: "#ffffff"
+  android_12:
+    image: assets/icon/ic_launcher_288.png
+    color: "#ffffff"
 #    icon_background_color: "#ffffff"
-#    image_dark: assets/icon/yt_icon_rgb.png
-#    color_dark: "#0f0f0f"
+    image_dark: assets/icon/ic_launcher_288.png
+    color_dark: "#0f0f0f"
 #    icon_background_color_dark: "#0f0f0f"
-
-  branding: assets/icon/yt_icon_rgb.png
-  branding_mode: bottom
-  branding_dark: assets/icon/yt_icon_rgb.png
+#
+#  branding: assets/icon/ic_launcher.png
+#  branding_mode: bottom
+#  branding_dark: assets/icon/ic_launcher.png

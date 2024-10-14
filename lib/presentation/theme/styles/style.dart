@@ -290,10 +290,12 @@ class ViewableStyle {
   ViewableStyle({
     required this.titleStyle,
     required this.subtitleStyle,
+    required this.backgroundColor,
   });
 
   final TextStyle titleStyle;
   final TextStyle subtitleStyle;
+  final Color backgroundColor;
 
   static ViewableStyle? lerp(
     ViewableStyle? style1,
@@ -313,6 +315,11 @@ class ViewableStyle {
       subtitleStyle: TextStyle.lerp(
         style1?.subtitleStyle,
         style2?.subtitleStyle,
+        t,
+      )!,
+      backgroundColor: Color.lerp(
+        style1?.backgroundColor,
+        style2?.backgroundColor,
         t,
       )!,
     );
@@ -468,6 +475,46 @@ class CommentStyle {
       textStyle: TextStyle.lerp(
         style1?.textStyle,
         style2?.textStyle,
+        t,
+      )!,
+      subtitleTextStyle: TextStyle.lerp(
+        style1?.subtitleTextStyle,
+        style2?.subtitleTextStyle,
+        t,
+      )!,
+    );
+  }
+}
+
+class MiniPlayerStyle {
+  MiniPlayerStyle({
+    required this.backgroundColor,
+    required this.titleTextStyle,
+    required this.subtitleTextStyle,
+  });
+
+  final Color backgroundColor;
+  final TextStyle titleTextStyle;
+  final TextStyle subtitleTextStyle;
+
+  static MiniPlayerStyle? lerp(
+    MiniPlayerStyle? style1,
+    MiniPlayerStyle? style2,
+    double t,
+  ) {
+    if (style1 == null && style2 == null) {
+      return null;
+    }
+
+    return MiniPlayerStyle(
+      backgroundColor: Color.lerp(
+        style1?.backgroundColor,
+        style2?.backgroundColor,
+        t,
+      )!,
+      titleTextStyle: TextStyle.lerp(
+        style1?.titleTextStyle,
+        style2?.titleTextStyle,
         t,
       )!,
       subtitleTextStyle: TextStyle.lerp(
