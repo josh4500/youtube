@@ -49,11 +49,12 @@ class ViewableShortsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ViewableStyle theme = context.theme.appStyles.viewableVideoStyle;
     return Container(
       width: width,
       margin: margin,
       decoration: BoxDecoration(
-        color: Colors.white12,
+        color: theme.backgroundColor,
         borderRadius: borderRadius,
         image: const DecorationImage(
           image: CustomNetworkImage('https://picsum.photos/400/900'),

@@ -39,14 +39,14 @@ class ViewableVideoContext extends StatelessWidget {
   Widget build(BuildContext context) {
     final ViewableStyle theme = context.theme.appStyles.viewableVideoStyle;
     return ColoredBox(
-      color: Colors.white12,
+      color: context.theme.highlightColor,
       child: Column(
         children: [
           Container(
             height: 227,
-            decoration: const BoxDecoration(
-              color: Colors.white38,
-              image: DecorationImage(
+            decoration: BoxDecoration(
+              color: theme.backgroundColor,
+              image: const DecorationImage(
                 image: CustomNetworkImage('https://picsum.photos/450/900'),
                 fit: BoxFit.cover,
               ),

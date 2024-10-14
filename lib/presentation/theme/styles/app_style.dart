@@ -187,6 +187,7 @@ abstract final class AppStyle {
         color: Colors.black54,
         fontSize: 11,
       ),
+      backgroundColor: Colors.black45,
     ),
     dark: ViewableStyle(
       titleStyle: const TextStyle(
@@ -197,6 +198,7 @@ abstract final class AppStyle {
         color: Color(0xFFAAAAAA),
         fontSize: 11,
       ),
+      backgroundColor: Colors.black45,
     ),
   );
   static final BrightnessPair<SlidableStyle> slidableStyle = BrightnessPair(
@@ -279,6 +281,31 @@ abstract final class AppStyle {
       ),
     ),
   );
+
+  static final BrightnessPair<MiniPlayerStyle> miniPlayerStyle = BrightnessPair(
+    light: MiniPlayerStyle(
+      backgroundColor: Colors.black12,
+      titleTextStyle: const TextStyle(
+        fontSize: 12.5,
+        color: Colors.black87,
+      ),
+      subtitleTextStyle: const TextStyle(
+        fontSize: 12.5,
+        color: Colors.black54,
+      ),
+    ),
+    dark: MiniPlayerStyle(
+      backgroundColor: Colors.white12,
+      titleTextStyle: const TextStyle(
+        fontSize: 12.5,
+        color: Colors.white70,
+      ),
+      subtitleTextStyle: const TextStyle(
+        fontSize: 12.5,
+        color: Colors.white54,
+      ),
+    ),
+  );
 }
 
 class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
@@ -296,6 +323,7 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
     required this.dynamicTabStyle,
     required this.homeDrawerStyle,
     required this.commentStyle,
+    required this.miniPlayerStyle,
   });
 
   final TextStyle appBarTextStyle;
@@ -311,6 +339,7 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
   final DynamicTabStyle dynamicTabStyle;
   final HomeDrawerStyle homeDrawerStyle;
   final CommentStyle commentStyle;
+  final MiniPlayerStyle miniPlayerStyle;
 
   @override
   ThemeExtension<AppStylesExtension> copyWith({
@@ -327,6 +356,7 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
     DynamicTabStyle? dynamicTabStyle,
     HomeDrawerStyle? homeDrawerStyle,
     CommentStyle? commentStyle,
+    MiniPlayerStyle? miniPlayerStyle,
   }) {
     return AppStylesExtension(
       appBarTextStyle: appBarTextStyle ?? this.appBarTextStyle,
@@ -346,6 +376,7 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
       dynamicTabStyle: dynamicTabStyle ?? this.dynamicTabStyle,
       homeDrawerStyle: homeDrawerStyle ?? this.homeDrawerStyle,
       commentStyle: commentStyle ?? this.commentStyle,
+      miniPlayerStyle: miniPlayerStyle ?? this.miniPlayerStyle,
     );
   }
 
@@ -422,6 +453,11 @@ class AppStylesExtension extends ThemeExtension<AppStylesExtension> {
       commentStyle: CommentStyle.lerp(
         commentStyle,
         other.commentStyle,
+        t,
+      )!,
+      miniPlayerStyle: MiniPlayerStyle.lerp(
+        miniPlayerStyle,
+        other.miniPlayerStyle,
         t,
       )!,
     );

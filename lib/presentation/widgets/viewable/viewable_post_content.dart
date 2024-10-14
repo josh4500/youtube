@@ -37,6 +37,7 @@ import '../gestures/custom_ink_well.dart';
 import '../gestures/tappable_area.dart';
 import 'context/viewable_answer_context.dart';
 import 'context/viewable_image_context.dart';
+import 'context/viewable_playlist_context.dart';
 import 'context/viewable_slides_context.dart';
 import 'context/viewable_video_context.dart';
 import 'context/viewable_vote_context.dart';
@@ -48,6 +49,7 @@ class ViewablePostContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO(Josh): Be able to hide more button
+
     return Column(
       children: <Widget>[
         const Divider(thickness: .92, height: 0),
@@ -138,7 +140,8 @@ class ViewablePostContent extends StatelessWidget {
           ViewableVideoContext(),
           ViewableSlidesContext(),
           ViewableAnswerContext(),
-        ][Random().nextInt(5)],
+          ViewablePlaylistContext(),
+        ][Random().nextInt(6)],
         Padding(
           padding: const EdgeInsets.all(6.0),
           child: Row(

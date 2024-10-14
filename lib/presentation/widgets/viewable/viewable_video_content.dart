@@ -55,9 +55,9 @@ class ViewableVideoContent extends StatelessWidget {
             ),
             child: PlaybackView(
               placeholder: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFF656565),
-                  image: DecorationImage(
+                decoration: BoxDecoration(
+                  color: theme.backgroundColor,
+                  image: const DecorationImage(
                     image: CustomNetworkImage(
                       'https://picsum.photos/900/500',
                     ),

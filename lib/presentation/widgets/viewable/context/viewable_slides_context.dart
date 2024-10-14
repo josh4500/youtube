@@ -26,6 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../network_image/custom_network_image.dart';
 
@@ -43,6 +44,7 @@ class _ViewableSlidesContextState extends State<ViewableSlidesContext> {
 
   @override
   Widget build(BuildContext context) {
+    final ViewableStyle theme = context.theme.appStyles.viewableVideoStyle;
     return ConstrainedBox(
       constraints: const BoxConstraints.expand(height: 320),
       child: PageView.builder(
@@ -53,7 +55,7 @@ class _ViewableSlidesContextState extends State<ViewableSlidesContext> {
           return Container(
             margin: const EdgeInsets.only(right: 12),
             decoration: BoxDecoration(
-              color: Colors.white38,
+              color: theme.backgroundColor,
               borderRadius: BorderRadius.circular(8),
               image: const DecorationImage(
                 image: CustomNetworkImage('https://picsum.photos/450/900'),

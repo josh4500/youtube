@@ -29,6 +29,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../gestures/tappable_area.dart';
 import '../../network_image/custom_network_image.dart';
@@ -104,7 +105,7 @@ class VoteOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double? imageSize = hasImage ? 96 : null;
-
+    final ViewableStyle theme = context.theme.appStyles.viewableVideoStyle;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double votedSize =
@@ -133,15 +134,15 @@ class VoteOption extends StatelessWidget {
                     if (hasImage)
                       Container(
                         width: imageSize,
-                        decoration: const BoxDecoration(
-                          color: Colors.white38,
-                          image: DecorationImage(
+                        decoration: BoxDecoration(
+                          color: theme.backgroundColor,
+                          image: const DecorationImage(
                             image: CustomNetworkImage(
                               'https://picsum.photos/450/900',
                             ),
                             fit: BoxFit.cover,
                           ),
-                          borderRadius: BorderRadius.only(
+                          borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(4),
                             bottomLeft: Radius.circular(4),
                           ),

@@ -50,6 +50,7 @@ abstract final class AppTheme {
     colorScheme: const ColorScheme.light(
       primary: AppPalette.darkBlue,
       surface: Colors.black,
+      inverseSurface: Colors.white,
       secondary: Color(0xFF065DD0),
       outlineVariant: Colors.white,
     ),
@@ -124,6 +125,7 @@ abstract final class AppTheme {
     dynamicTabStyle: AppStyle.dynamicTabStyle.light,
     homeDrawerStyle: AppStyle.homeDrawerStyle.light,
     commentStyle: AppStyle.commentStyle.light,
+    miniPlayerStyle: AppStyle.miniPlayerStyle.light,
   );
 
   //
@@ -140,6 +142,7 @@ abstract final class AppTheme {
     hintColor: Colors.white38,
     colorScheme: const ColorScheme.dark(
       surface: Colors.white,
+      inverseSurface: Colors.black,
       primary: AppPalette.blue,
       secondary: Color(0xFF3DA3FA),
       outlineVariant: Colors.white,
@@ -216,6 +219,7 @@ abstract final class AppTheme {
     dynamicTabStyle: AppStyle.dynamicTabStyle.dark,
     homeDrawerStyle: AppStyle.homeDrawerStyle.dark,
     commentStyle: AppStyle.commentStyle.dark,
+    miniPlayerStyle: AppStyle.miniPlayerStyle.dark,
   );
 
   static const BrightnessPair<SystemUiOverlayStyle> _systemUiOverlayStyle =

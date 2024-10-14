@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../../theme/icon/y_t_icons_icons.dart';
 import '../../gestures/tappable_area.dart';
@@ -12,7 +13,6 @@ class ViewableAnswerContext extends StatelessWidget {
   Widget build(BuildContext context) {
     final random = Random();
     final bool answered = random.nextBool();
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Column(
@@ -123,7 +123,7 @@ class AnswerOption extends StatelessWidget {
                   child: Text(
                     text,
                     style: const TextStyle(
-                      color: Colors.white54,
+                      //color: Colors.white54,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
