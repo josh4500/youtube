@@ -63,9 +63,9 @@ class VideoChannelMembershipButton extends StatelessWidget {
         vertical: 10,
         horizontal: 14,
       ),
-      textStyle: const TextStyle(
+      textStyle: TextStyle(
         fontSize: 12,
-        color: Colors.white,
+        color: context.theme.colorScheme.inverseSurface,
         fontWeight: FontWeight.w500,
       ),
     );
@@ -101,6 +101,21 @@ class _VideoChannelSubscriptionButtonState
 
   @override
   Widget build(BuildContext context) {
+    return CustomActionButton(
+      title: 'Subscribe',
+      onTap: () {},
+      backgroundColor: context.theme.colorScheme.surface,
+      borderRadius: BorderRadius.circular(24),
+      padding: const EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: 14,
+      ),
+      textStyle: TextStyle(
+        fontSize: 12,
+        color: context.theme.colorScheme.inverseSurface,
+        fontWeight: FontWeight.w500,
+      ),
+    );
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {

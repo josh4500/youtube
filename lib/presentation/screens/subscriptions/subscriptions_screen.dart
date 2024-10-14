@@ -123,7 +123,6 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                                         vertical: 8,
                                         horizontal: 16,
                                       ),
-                                      backgroundColor: Colors.white12,
                                       onTap: () {
                                         context.goto(
                                           AppRoutes.channel.withPrefixParent(
@@ -149,7 +148,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                                 child: TappableArea(
                                   onTap: () {},
                                   padding: const EdgeInsets.all(4.0),
-                                  child:  Text(
+                                  child: Text(
                                     'Settings',
                                     style: TextStyle(
                                       fontSize: 13,

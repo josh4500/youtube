@@ -84,8 +84,10 @@ class PlayableContent extends StatelessWidget {
                         clipper: ClipEdgeClipper(),
                         child: ColoredBox(
                           color: Colors.white60,
-                          child:
-                              SizedBox(width: double.infinity, height: 4.2.h),
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 4.2.h,
+                          ),
                         ),
                       ),
                     ),

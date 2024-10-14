@@ -37,58 +37,60 @@ class MiniPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-         SizedBox(width: 8.w),
-        Expanded(
-          flex: 3,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Consumer(
-                builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                  final isMinimized = ref.watch(
-                    playerViewStateProvider.select(
-                      (state) => state.isMinimized,
-                    ),
-                  );
-                  return Marquee(
-                    text: 'Google Chromecast: Official Video',
-                    enabled: isMinimized,
-                    style: const TextStyle(
-                      fontSize: 12.5,
-                      color: Color(0xFFF1F1F1),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Harris Craycraft',
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 12.5,
-                  color: Color(0xFFAAAAAA),
+    final theme = context.theme.appStyles.miniPlayerStyle;
+    return ColoredBox(
+      color: theme.backgroundColor,
+      child: Row(
+        children: [
+          SizedBox(width: 8.w),
+          Expanded(
+            flex: 3,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Consumer(
+                  builder: (
+                    BuildContext context,
+                    WidgetRef ref,
+                    Widget? child,
+                  ) {
+                    final isMinimized = ref.watch(
+                      playerViewStateProvider.select(
+                        (state) => state.isMinimized,
+                      ),
+                    );
+                    return Marquee(
+                      text: 'Google Chromecast: Official Video',
+                      enabled: isMinimized,
+                      style: theme.titleTextStyle,
+                    );
+                  },
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  'Harris Craycraft',
+                  maxLines: 1,
+                  style: theme.subtitleTextStyle,
+                ),
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          flex: 2,
-          child: ListView(
-            reverse: true,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            scrollDirection: Axis.horizontal,
-            children: const <Widget>[
-              _MiniPlayerCloseButton(),
-              _MiniPlayerPausePlayButton(),
-            ],
+          Expanded(
+            flex: 2,
+            child: ListView(
+              reverse: true,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              scrollDirection: Axis.horizontal,
+              children: const <Widget>[
+                _MiniPlayerCloseButton(),
+                _MiniPlayerPausePlayButton(),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

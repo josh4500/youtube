@@ -91,7 +91,7 @@ class DeviceThemeData {
   int get hashCode => deviceType.hashCode ^ screenSize.hashCode;
 }
 
-class SizerUtils {
+class _SizerUtils {
   static const ui.Size designSize = ui.Size(448, 973.3);
   static late ui.Size deviceSize;
   static late double _dpr;
@@ -100,18 +100,18 @@ class SizerUtils {
 }
 
 extension DensityPixelsExtension on num {
-  double get dp => this / SizerUtils.dpr;
-  double get pt => this / SizerUtils.dpr;
+  double get dp => this / _SizerUtils.dpr;
+  double get pt => this / _SizerUtils.dpr;
 
   double get h {
-    final screenHeight = SizerUtils.deviceSize.height;
-    return (this / SizerUtils.designSize.height) * screenHeight;
+    final screenHeight = _SizerUtils.deviceSize.height;
+    return (this / _SizerUtils.designSize.height) * screenHeight;
   }
 
   double get w {
-    final screenWidth = SizerUtils.deviceSize.width;
+    final screenWidth = _SizerUtils.deviceSize.width;
 
-    return (this / SizerUtils.designSize.width) * screenWidth;
+    return (this / _SizerUtils.designSize.width) * screenWidth;
   }
 }
 
@@ -293,8 +293,8 @@ class _DeviceThemeFromViewState extends State<_DeviceThemeFromView>
   @override
   Widget build(BuildContext context) {
     final DeviceThemeData effectiveData = _data!;
-    SizerUtils.dpr = widget.view.devicePixelRatio;
-    SizerUtils.deviceSize = widget.view.physicalSize / SizerUtils.dpr;
+    _SizerUtils.dpr = widget.view.devicePixelRatio;
+    _SizerUtils.deviceSize = widget.view.physicalSize / _SizerUtils.dpr;
 
     return DeviceTheme(
       data: effectiveData,

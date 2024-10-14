@@ -63,7 +63,10 @@ class VideoChannelContext extends StatelessWidget {
                     ),
                   ),
                 ],
-                style: context.theme.textTheme.bodySmall,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: context.theme.colorScheme.surface,
+                ),
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
@@ -71,7 +74,21 @@ class VideoChannelContext extends StatelessWidget {
           ),
           const SizedBox(width: 24),
           CustomInkWell(
-            onTap: () {},
+            onTap: () {
+              showDynamicSheet(
+                context,
+                items: [
+                  const DynamicSheetOptionItem(
+                    leading: Icon(YTIcons.info_outlined),
+                    title: 'Why am I seeing thhis?',
+                  ),
+                  const DynamicSheetOptionItem(
+                    leading: Icon(YTIcons.feedbck_outlined),
+                    title: 'Send feedback',
+                  ),
+                ],
+              );
+            },
             splashFactory: NoSplash.splashFactory,
             padding: const EdgeInsets.all(4),
             child: const Icon(YTIcons.more_vert_outlined, size: 16),

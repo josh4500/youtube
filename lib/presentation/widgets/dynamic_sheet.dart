@@ -14,11 +14,13 @@ class DynamicSheet extends StatefulWidget {
     super.key,
     this.title,
     this.trailing,
+    this.heightConstraint,
     this.children = const <DynamicSheetItem>[],
   });
 
   final Widget? title;
   final Widget? trailing;
+  final double? heightConstraint;
   final List<DynamicSheetItem> children;
 
   @override
@@ -60,21 +62,26 @@ class _DynamicSheetState extends State<DynamicSheet>
           color: theme.backgroundColor,
           child: Listener(
             onPointerMove: (event) {
-              final deltaY = event.delta.dy;
-              final newHeight = heightNotifier.value + (deltaY * -1);
+              if (widget.heightConstraint != null) {
+                final deltaY = event.delta.dy;
+                final newHeight = heightNotifier.value + (deltaY * -1);
 
-              heightNotifier.value = newHeight.clamp(
-                minSheetHeight,
-                maxSheetHeight,
-              );
+                heightNotifier.value = newHeight.clamp(
+                  minSheetHeight,
+                  maxSheetHeight,
+                );
 
-              customScrollPhysics.canScroll(
-                !(heightNotifier.value <= minSheetHeight && deltaY >= 0),
-              );
+                customScrollPhysics.canScroll(
+                  !(heightNotifier.value <= minSheetHeight && deltaY >= 0),
+                );
+              }
             },
             child: ListenableBuilder(
               listenable: heightNotifier,
               builder: (BuildContext context, Widget? childWidget) {
+                if (widget.heightConstraint == null) {
+                  return SizedBox(child: childWidget);
+                }
                 return ConstrainedBox(
                   constraints: BoxConstraints(
                     maxHeight: heightNotifier.value,
@@ -89,7 +96,9 @@ class _DynamicSheetState extends State<DynamicSheet>
                 child: Scrollbar(
                   controller: scrollController,
                   child: ListView(
-                    physics: const NeverScrollableScrollPhysics(),
+                    physics: widget.heightConstraint == null
+                        ? const AlwaysScrollableScrollPhysics()
+                        : const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     controller: scrollController,
                     children: [
@@ -239,6 +248,7 @@ Future<T?> showDynamicSheet<T>(
   BuildContext context, {
   Widget? title,
   Widget? trailing,
+  double? heightConstraint,
   List<DynamicSheetItem> items = const <DynamicSheetItem>[],
 }) {
   return showModalBottomSheet<T>(
@@ -253,6 +263,7 @@ Future<T?> showDynamicSheet<T>(
       return DynamicSheet(
         title: title,
         trailing: trailing,
+        heightConstraint: heightConstraint,
         children: items,
       );
     },

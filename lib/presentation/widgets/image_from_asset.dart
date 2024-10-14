@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import '../constants/assets.dart';
 
@@ -10,5 +11,18 @@ class ImageFromAsset {
       width: 24,
       height: 24,
     ),
+  );
+
+  static final Widget ytPFullLogo = Builder(
+    builder: (context) {
+      final brightness = context.theme.brightness;
+      return Image.asset(
+        brightness.isLight
+            ? AssetsPath.ytPremiumFullLogoLightBig
+            : AssetsPath.ytPremiumFullLogoDarkBig,
+        fit: BoxFit.fitHeight,
+        height: 40,
+      );
+    },
   );
 }

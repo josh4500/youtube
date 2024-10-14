@@ -266,12 +266,12 @@ class VideoActions extends StatelessWidget {
                     onTap: context.pop,
                     alignment: Alignment.center,
                     backgroundColor: Colors.transparent,
-                    border: Border.all(color: Colors.white12),
+                    border: Border.all(color: context.theme.highlightColor),
                     padding: const EdgeInsets.all(8),
                     borderRadius: BorderRadius.circular(64),
-                    textStyle: const TextStyle(
+                    textStyle: TextStyle(
                       fontSize: 15,
-                      color: Color(0xFF3EA6FF),
+                      color: context.theme.primaryColor,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -282,13 +282,12 @@ class VideoActions extends StatelessWidget {
                     onTap: () {},
                     title: 'Download',
                     alignment: Alignment.center,
-                    backgroundColor: const Color(0xFF3EA6FF),
-                    border: Border.all(color: Colors.white12),
+                    backgroundColor: context.theme.primaryColor,
+                    //border: Border.all(color: Colors.white12),
                     padding: const EdgeInsets.all(8),
                     borderRadius: BorderRadius.circular(64),
                     textStyle: const TextStyle(
                       fontSize: 15,
-                      color: Color(0xFF0F0F0F),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -326,11 +325,7 @@ class VideoActions extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset(
-                    AssetsPath.ytPremiumFullLogoDarkBig,
-                    fit: BoxFit.fitHeight,
-                    height: 40,
-                  ),
+                  ImageFromAsset.ytPFullLogo,
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
