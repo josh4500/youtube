@@ -7,12 +7,12 @@ import '../../../constants.dart';
 class VideoChaptersSheet extends StatefulWidget {
   const VideoChaptersSheet({
     super.key,
-    required this.controller,
+    this.controller,
     required this.onPressClose,
     required this.draggableController,
     required this.initialHeight,
   });
-  final ScrollController controller;
+  final ScrollController? controller;
   final VoidCallback onPressClose;
   final double initialHeight;
   final DraggableScrollableController draggableController;
@@ -39,7 +39,7 @@ class _VideoChaptersSheetState extends State<VideoChaptersSheet> {
     return PageDraggableSheet(
       title: 'Chapters',
       scrollTag: 'player_chapters',
-      controller: widget.controller,
+      controller: widget.controller ?? ScrollController(),
       onClose: widget.onPressClose,
       showDragIndicator: true,
       draggableController: widget.draggableController,

@@ -42,13 +42,13 @@ class VideoCommentsSheet extends StatefulWidget {
     required this.onPressClose,
     required this.initialHeight,
     this.draggableController,
-    this.showDragIndicator = true,
+    this.dragDismissible = true,
   });
   final ScrollController? controller;
   final PageDraggableOverlayChildController replyController;
   final VoidCallback onPressClose;
   final double initialHeight;
-  final bool showDragIndicator;
+  final bool dragDismissible;
   final DraggableScrollableController? draggableController;
 
   @override
@@ -75,7 +75,8 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
       scrollTag: 'player_comments',
       controller: widget.controller ?? ScrollController(),
       onClose: widget.onPressClose,
-      showDragIndicator: widget.showDragIndicator,
+      dragDismissible: widget.dragDismissible,
+      showDragIndicator: widget.dragDismissible,
       draggableController: widget.draggableController,
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(12),

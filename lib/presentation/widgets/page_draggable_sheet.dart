@@ -34,6 +34,7 @@ class PageDraggableSheet extends StatefulWidget {
     this.bottom,
     this.subtitle,
     this.showDivider = true,
+    this.dragDismissible = true,
   });
 
   final String scrollTag;
@@ -43,7 +44,7 @@ class PageDraggableSheet extends StatefulWidget {
   final BorderRadius borderRadius;
   final ScrollController controller;
   final VoidCallback onClose;
-  final bool showDragIndicator, showDivider;
+  final bool showDragIndicator, showDivider, dragDismissible;
   final Widget Function(
     BuildContext context,
     ScrollController controller,
@@ -143,10 +144,6 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
   @override
   void dispose() {
     _innerListController.dispose();
-    for (final PageDraggableOverlayChild overlayChild
-        in widget.overlayChildren) {
-      overlayChild.controller.dispose();
-    }
     super.dispose();
   }
 
@@ -163,6 +160,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
   }
 
   void _onPointerMoveOnSheetContent(PointerMoveEvent event) {
+    if (widget.dragDismissible == false) return;
+
     _velocityTracker?.addPosition(event.timeStamp, event.localPosition);
 
     if (widget.draggableController != null) {
@@ -198,6 +197,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
   }
 
   void _onPointerLeaveOnSheetContent(PointerUpEvent event) {
+    if (widget.dragDismissible == false) return;
+
     if (widget.draggableController != null) {
       _innerListPhysics.canScroll(true);
       if (_overlayAnyChildIsOpened) {
@@ -207,6 +208,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
               .canScroll(true);
         }
       }
+
       final double size = widget.draggableController!.size;
       if ((size != 0.0 || size != widget.baseHeight) && size != 1) {
         widget.draggableController!.animateTo(
@@ -289,7 +291,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                           child: SheetDragIndicator(),
                         )
                       else
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 20),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[

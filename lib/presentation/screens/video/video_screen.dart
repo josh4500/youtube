@@ -52,6 +52,7 @@ import 'widgets/sheet/video_side_sheet.dart';
 import 'widgets/video_chapters_sheet.dart';
 import 'widgets/video_comment_sheet.dart';
 import 'widgets/video_description_sheet.dart';
+import 'widgets/video_playlist_section.dart';
 import 'widgets/video_playlist_sheet.dart';
 
 enum _VideoBottomSheet {
@@ -385,7 +386,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     }
 
     final isNotifierValue = _draggableNotifiers[sheet]?.value ?? false;
-    if (isNotifierValue) {
+    if (isNotifierValue && context.orientation.isPortrait) {
       _commonDraggableListenerCallback(size);
     }
     // TODO(josh4500): Uncomment when solution to pointer leave Draggable found
@@ -1436,7 +1437,10 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   }
 
   Future<void> _openBottomSheet(_VideoBottomSheet sheet) async {
-    if (_openedDraggableState.contains(sheet)) return;
+    // if (_openedDraggableState.contains(sheet) &&
+    //     context.orientation.isPortrait) {
+    //   return;
+    // }
 
     _openedDraggableState.add(sheet);
     final bool wait = !_getSheetNotifier(sheet).value;
@@ -1484,9 +1488,8 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     //       ?.animateTo(1);
     // }
 
-    if (context.orientation.isLandscape) {
-      _getSheetAnimationSize(sheet).reverse();
-    }
+    _getSheetAnimationSize(sheet).reverse();
+
     if (_isResizableExpandingMode && additionalHeight > 0) {
       _animateAdditionalHeight(minAdditionalHeight);
     }
@@ -1794,7 +1797,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     }
 
     final mainPlayer = createPlayerView(interactivePlayerView);
-    // final placeholderPlayer = createPlayerView(const SizedBox());
 
     final infoScrollview = Stack(
       children: [
@@ -1849,11 +1851,8 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     direction: layoutDirection,
                     children: [
-                      Flexible(
+                      Expanded(
                         flex: orientation.isPortrait ? 0 : 1,
-                        fit: orientation.isPortrait
-                            ? FlexFit.tight
-                            : FlexFit.loose,
                         child: FadeTransition(
                           opacity: _playerOpacityAnimation,
                           child: PlayerAnnotationsWrapper(
@@ -1908,19 +1907,23 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                               ),
                             ),
                           ),
+                        )
+                      else ...[
+                        Stack(
+                          children: [
+                            for (final sheet in [
+                              _VideoBottomSheet.description,
+                              _VideoBottomSheet.comment,
+                            ])
+                              PlayerSideSheet(
+                                constraints: BoxConstraints(
+                                  maxWidth: screenWidth * .4,
+                                ),
+                                sizeFactor: _getSheetAnimationSize(sheet),
+                                visibleListenable: _getSheetNotifier(sheet),
+                              ),
+                          ],
                         ),
-                      if (orientation.isLandscape) ...[
-                        for (final sheet in [
-                          _VideoBottomSheet.description,
-                          _VideoBottomSheet.comment,
-                        ])
-                          PlayerSideSheet(
-                            constraints: BoxConstraints(
-                              maxWidth: screenWidth * .4,
-                            ),
-                            sizeFactor: _getSheetAnimationSize(sheet),
-                            visibleListenable: _getSheetNotifier(sheet),
-                          ),
                       ],
                     ],
                   ),
@@ -1929,117 +1932,71 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
             ),
             for (final sheet in _availableSheet)
               VideoDraggableSheet(
-                builder: (BuildContext context, ScrollController controller) {
+                builder: (BuildContext context, ScrollController? controller) {
                   final draggableController = _getSheetController(sheet);
                   void closeSheet() => _closeBottomSheet(sheet);
+
+                  Widget childWidget;
+                  // Use key to preserve widget state across depth in widget tree
                   if (sheet == _VideoBottomSheet.comment) {
-                    return VideoCommentsSheet(
+                    childWidget = VideoCommentsSheet(
+                      key: GlobalObjectKey(sheet),
                       controller: controller,
                       replyController: _replyController,
                       initialHeight: initialDraggableSnapSize,
-                      showDragIndicator: context.orientation.isPortrait,
                       onPressClose: closeSheet,
+                      dragDismissible: orientation.isPortrait,
                       draggableController: draggableController,
                     );
                   } else if (sheet == _VideoBottomSheet.chapter) {
-                    return VideoChaptersSheet(
+                    childWidget = VideoChaptersSheet(
+                      key: GlobalObjectKey(sheet),
                       controller: controller,
                       initialHeight: initialDraggableSnapSize,
                       onPressClose: closeSheet,
                       draggableController: draggableController,
                     );
                   } else if (sheet == _VideoBottomSheet.description) {
-                    return VideoDescriptionSheet(
+                    childWidget = VideoDescriptionSheet(
+                      key: GlobalObjectKey(sheet),
                       controller: controller,
                       transcriptController: _transcriptController,
                       initialHeight: initialDraggableSnapSize,
-                      showDragIndicator: context.orientation.isPortrait,
+                      dragDismissible: orientation.isPortrait,
                       onPressClose: closeSheet,
                       draggableController: draggableController,
                     );
                   } else if (sheet == _VideoBottomSheet.playlist) {
-                    return VideoPlaylistSheet(
+                    childWidget = VideoPlaylistSheet(
+                      key: GlobalObjectKey(sheet),
                       controller: controller,
                       initialHeight: initialDraggableSnapSize,
                       onPressClose: closeSheet,
                       draggableController: draggableController,
                     );
+                  } else {
+                    childWidget = const SizedBox();
                   }
-                  return const SizedBox();
+
+                  if (orientation.isLandscape) {
+                    return PlayerSideSheet(
+                      constraints: BoxConstraints(
+                        maxWidth: screenWidth * .4,
+                      ),
+                      sizeFactor: _getSheetAnimationSize(sheet),
+                      visibleListenable: _getSheetNotifier(sheet),
+                      child: childWidget,
+                    );
+                  } else {
+                    return childWidget;
+                  }
                 },
-                opacity: _getSheetAnimationOpacity(sheet),
                 controller: _getSheetController(sheet),
+                opacity: _getSheetAnimationOpacity(sheet),
                 visibleListenable: _getSheetNotifier(sheet),
-                snapSizes: <double>[
-                  0.0,
-                  initialDraggableSnapSize,
-                ],
+                snapSizes: <double>[0.0, initialDraggableSnapSize],
               ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class VideoPlaylistSection extends StatelessWidget {
-  const VideoPlaylistSection({super.key, required this.onTap});
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Material(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: 12,
-          ),
-          child: TappableArea(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white10,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  const Icon(YTIcons.playlists_outlined),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Next: Distributed Systems 1.2: Computer',
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Next: Distributed Systems series 1/23',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: context.theme.colorScheme.surface
-                                  .withOpacity(.38),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Icon(YTIcons.chevron_down),
-                ],
-              ),
-            ),
-          ),
         ),
       ),
     );

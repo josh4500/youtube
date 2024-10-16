@@ -6,10 +6,12 @@ class PlayerSideSheet extends StatelessWidget {
     required this.visibleListenable,
     required this.sizeFactor,
     required this.constraints,
+    this.child,
   });
   final ValueNotifier<bool> visibleListenable;
   final Animation<double> sizeFactor;
   final BoxConstraints constraints;
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +24,15 @@ class PlayerSideSheet extends StatelessWidget {
       ) {
         return Visibility(
           visible: showSheet,
-          child: SizeTransition(
-            sizeFactor: sizeFactor,
-            axis: Axis.horizontal,
-            child: ConstrainedBox(
-              constraints: constraints,
-              child: SizedBox.expand(),
+          child: Align(
+            alignment: Alignment.topRight,
+            child: SizeTransition(
+              axis: Axis.horizontal,
+              sizeFactor: sizeFactor,
+              child: ConstrainedBox(
+                constraints: constraints,
+                child: child,
+              ),
             ),
           ),
         );

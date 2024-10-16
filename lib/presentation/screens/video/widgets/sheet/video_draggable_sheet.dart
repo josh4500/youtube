@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 typedef PageDraggableBuilder = Widget Function(
   BuildContext context,
-  ScrollController scrollController,
+  ScrollController? scrollController,
 );
 
 class VideoDraggableSheet extends StatelessWidget {
@@ -32,23 +33,30 @@ class VideoDraggableSheet extends StatelessWidget {
       ) {
         return Visibility(
           visible: showSheet,
-          child: DraggableScrollableSheet(
-            snap: true,
-            minChildSize: 0,
-            initialChildSize: 0,
-            snapSizes: snapSizes,
-            shouldCloseOnMinExtent: false,
-            controller: controller,
-            snapAnimationDuration: const Duration(milliseconds: 300),
-            builder: (
-              BuildContext context,
-              ScrollController controller,
-            ) {
-              return Material(
-                child: FadeTransition(
-                  opacity: ReverseAnimation(opacity),
-                  child: builder(context, controller),
-                ),
+          child: Builder(
+            builder: (context) {
+              if (context.orientation.isLandscape) {
+                return builder(context, null);
+              }
+              return DraggableScrollableSheet(
+                snap: true,
+                minChildSize: 0,
+                initialChildSize: 0,
+                snapSizes: snapSizes,
+                shouldCloseOnMinExtent: false,
+                controller: controller,
+                snapAnimationDuration: const Duration(milliseconds: 300),
+                builder: (
+                  BuildContext context,
+                  ScrollController controller,
+                ) {
+                  return Material(
+                    child: FadeTransition(
+                      opacity: ReverseAnimation(opacity),
+                      child: builder(context, controller),
+                    ),
+                  );
+                },
               );
             },
           ),

@@ -36,7 +36,7 @@ class VideoDescriptionSheet extends StatefulWidget {
   const VideoDescriptionSheet({
     super.key,
     this.controller,
-    this.showDragIndicator = true,
+    this.dragDismissible = true,
     required this.transcriptController,
     required this.onPressClose,
     this.draggableController,
@@ -44,7 +44,7 @@ class VideoDescriptionSheet extends StatefulWidget {
   });
 
   final ScrollController? controller;
-  final bool showDragIndicator;
+  final bool dragDismissible;
   final PageDraggableOverlayChildController transcriptController;
   final VoidCallback onPressClose;
   final double initialHeight;
@@ -74,7 +74,8 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
       scrollTag: 'player_description',
       controller: widget.controller ?? ScrollController(),
       onClose: widget.onPressClose,
-      showDragIndicator: widget.showDragIndicator,
+      dragDismissible: widget.dragDismissible,
+      showDragIndicator: widget.dragDismissible,
       draggableController: widget.draggableController,
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(12),
