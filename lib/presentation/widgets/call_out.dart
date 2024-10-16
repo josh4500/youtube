@@ -1,51 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/main.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class CallOut extends StatelessWidget {
   const CallOut({
     super.key,
     this.alignment = Alignment.topCenter,
-    required this.text,
+    this.link,
+    this.controller,
+    this.buildContent,
+    this.useChildAsTarget = true,
+    this.text,
     required this.child,
-    required this.controller,
   });
 
+  final bool useChildAsTarget;
   final Alignment alignment;
-  final String text;
-  final OverlayPortalController controller;
+  final String? text;
+  final Widget Function(BuildContext context)? buildContent;
+  final CallOutLink? link;
+  final OverlayPortalController? controller;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final CallOutLink callOutLink = ModelBinding.of<CallOutLink>(context);
+    final callOutLink = link ?? context.provide<CallOutLink>();
+    final effectiveController = controller ?? callOutLink.controller;
     return OverlayPortal(
-      controller: controller,
+      controller: effectiveController,
       overlayChildBuilder: (BuildContext context) {
         return CompositedTransformFollower(
           link: callOutLink.link,
-          // TODO(josh4500): Fix Offset fall possible use case
-          offset: callOutLink.offset + const Offset(0, 14),
-          targetAnchor: Alignment.bottomLeft,
-          child: Align(
-            alignment: AlignmentDirectional.topCenter,
-            child: CustomPaint(
-              painter: TrianglePainter(
-                alignment: alignment,
-                color: Colors.white,
-              ),
-              child: GestureDetector(
-                onTap: controller.hide,
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
+          // TODO(josh4500): Calculate offset base on triangle position
+          offset: callOutLink.offset + const Offset(0, 12),
+          targetAnchor: Alignment.center,
+          followerAnchor: Alignment.center,
+          child: Material(
+            type: MaterialType.transparency,
+            child: TapRegion(
+              groupId: CallOut,
+              onTapInside: (_) => effectiveController.hide(),
+              onTapOutside: (_) => effectiveController.hide(),
+              child: Align(
+                alignment: AlignmentDirectional.center,
+                child: CustomPaint(
+                  painter: TrianglePainter(
+                    alignment: alignment,
+                    color: context.theme.colorScheme.surface,
                   ),
-                  child: Text(
-                    text,
-                    style: const TextStyle(
-                      color: Colors.black,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: context.theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    child: buildContent?.call(context) ??
+                        Text(
+                          text ?? '',
+                          style: TextStyle(
+                            color: context.theme.colorScheme.inverseSurface,
+                          ),
+                        ),
                   ),
                 ),
               ),
@@ -53,14 +69,27 @@ class CallOut extends StatelessWidget {
           ),
         );
       },
-      child: child,
+      child: Builder(
+        builder: (context) {
+          if (useChildAsTarget) {
+            return CompositedTransformTarget(
+              link: callOutLink.link,
+              child: child,
+            );
+          }
+          return child;
+        },
+      ),
     );
   }
 }
 
 class CallOutLink {
   CallOutLink({this.offset = Offset.zero});
-
+  final controller = OverlayPortalController();
+  void show() => controller.show();
+  void hide() => controller.hide();
+  bool get isShowing => controller.isShowing;
   final Offset offset;
   final LayerLink link = LayerLink();
 }
