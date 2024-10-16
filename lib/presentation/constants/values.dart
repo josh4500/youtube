@@ -16,3 +16,4 @@ const double kMinPlayerScale = 1.0;
 const double kPlayerDismissRate = 1.35;
 
 const String kDotSeparator = '\u00A0\u00A0\u00B7\u00A0\u00A0';
+const double kMaxDragVelocity = 500;
