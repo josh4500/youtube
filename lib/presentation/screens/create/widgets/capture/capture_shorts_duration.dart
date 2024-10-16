@@ -101,6 +101,7 @@ class _CaptureShortsDurationTimerState
       },
       child: CallOut(
         text: 'Record up to 60s',
+        useChildAsTarget: false,
         controller: _overlayController,
         child: AnimatedBuilder(
           animation: animation,
