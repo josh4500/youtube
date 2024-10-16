@@ -8,7 +8,6 @@ import '../constants.dart';
 import 'custom_scroll_physics.dart';
 import 'dynamic_tab.dart';
 import 'gestures/custom_ink_well.dart';
-import 'gestures/tappable_area.dart';
 import 'over_scroll_glow_behavior.dart';
 import 'persistent_header_delegate.dart';
 import 'sheet_drag_indicator.dart';

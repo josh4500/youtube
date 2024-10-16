@@ -39,14 +39,14 @@ class VideoCommentsSheet extends StatefulWidget {
     super.key,
     this.controller,
     required this.replyController,
-    required this.closeComment,
+    required this.onPressClose,
     required this.initialHeight,
     this.draggableController,
     this.showDragIndicator = true,
   });
   final ScrollController? controller;
   final PageDraggableOverlayChildController replyController;
-  final VoidCallback closeComment;
+  final VoidCallback onPressClose;
   final double initialHeight;
   final bool showDragIndicator;
   final DraggableScrollableController? draggableController;
@@ -61,7 +61,7 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.draggableController?.animateTo(
-        1 - widget.initialHeight,
+        widget.initialHeight,
         duration: const Duration(milliseconds: 150),
         curve: Curves.easeInCubic,
       );
@@ -74,7 +74,7 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
       title: 'Comments',
       scrollTag: 'player_comments',
       controller: widget.controller ?? ScrollController(),
-      onClose: widget.closeComment,
+      onClose: widget.onPressClose,
       showDragIndicator: widget.showDragIndicator,
       draggableController: widget.draggableController,
       borderRadius: const BorderRadius.only(

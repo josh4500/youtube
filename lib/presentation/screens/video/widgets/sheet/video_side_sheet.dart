@@ -5,13 +5,11 @@ class PlayerSideSheet extends StatelessWidget {
     super.key,
     required this.visibleListenable,
     required this.sizeFactor,
-    required this.child,
     required this.constraints,
   });
   final ValueNotifier<bool> visibleListenable;
   final Animation<double> sizeFactor;
   final BoxConstraints constraints;
-  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +27,7 @@ class PlayerSideSheet extends StatelessWidget {
             axis: Axis.horizontal,
             child: ConstrainedBox(
               constraints: constraints,
-              child: child,
+              child: SizedBox.expand(),
             ),
           ),
         );

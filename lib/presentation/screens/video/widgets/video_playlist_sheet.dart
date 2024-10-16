@@ -36,13 +36,13 @@ class VideoPlaylistSheet extends StatefulWidget {
   const VideoPlaylistSheet({
     super.key,
     this.controller,
-    required this.close,
+    required this.onPressClose,
     required this.initialHeight,
     this.draggableController,
     this.showDragIndicator = true,
   });
   final ScrollController? controller;
-  final VoidCallback close;
+  final VoidCallback onPressClose;
   final double initialHeight;
   final bool showDragIndicator;
   final DraggableScrollableController? draggableController;
@@ -59,7 +59,7 @@ class _VideoPlaylistSheetState extends State<VideoPlaylistSheet> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.draggableController?.animateTo(
-        1 - widget.initialHeight,
+        widget.initialHeight,
         duration: const Duration(milliseconds: 150),
         curve: Curves.easeInCubic,
       );
@@ -104,7 +104,7 @@ class _VideoPlaylistSheetState extends State<VideoPlaylistSheet> {
         ),
       ),
       controller: widget.controller ?? ScrollController(),
-      onClose: widget.close,
+      onClose: widget.onPressClose,
       showDragIndicator: widget.showDragIndicator,
       showDivider: false,
       draggableController: widget.draggableController,

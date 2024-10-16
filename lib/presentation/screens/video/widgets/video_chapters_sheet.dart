@@ -8,12 +8,12 @@ class VideoChaptersSheet extends StatefulWidget {
   const VideoChaptersSheet({
     super.key,
     required this.controller,
-    required this.closeChapter,
+    required this.onPressClose,
     required this.draggableController,
     required this.initialHeight,
   });
   final ScrollController controller;
-  final VoidCallback closeChapter;
+  final VoidCallback onPressClose;
   final double initialHeight;
   final DraggableScrollableController draggableController;
 
@@ -40,7 +40,7 @@ class _VideoChaptersSheetState extends State<VideoChaptersSheet> {
       title: 'Chapters',
       scrollTag: 'player_chapters',
       controller: widget.controller,
-      onClose: widget.closeChapter,
+      onClose: widget.onPressClose,
       showDragIndicator: true,
       draggableController: widget.draggableController,
       borderRadius: const BorderRadius.only(

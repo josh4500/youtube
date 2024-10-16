@@ -61,6 +61,7 @@ enum _VideoBottomSheet {
   description,
   membership,
   product,
+  news,
 }
 
 class VideoScreen extends ConsumerStatefulWidget {
@@ -394,6 +395,13 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     //       size.normalize(0, 1 - playerHeightToScreenRatio);
     // }
   }
+
+  final List<_VideoBottomSheet> _availableSheet = [
+    _VideoBottomSheet.comment,
+    _VideoBottomSheet.chapter,
+    _VideoBottomSheet.description,
+    _VideoBottomSheet.playlist,
+  ];
 
   @override
   void initState() {
@@ -1795,9 +1803,11 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
           controller: _infoScrollController,
           onScrollNotification: _onScrollInfoScrollNotification,
         ),
-        const FractionalTranslation(
+        FractionalTranslation(
           translation: ui.Offset.zero,
-          child: VideoPlaylistSection(),
+          child: VideoPlaylistSection(
+            onTap: () => _openBottomSheet(_VideoBottomSheet.playlist),
+          ),
         ),
       ],
     );
@@ -1900,161 +1910,71 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                           ),
                         ),
                       if (orientation.isLandscape) ...[
-                        PlayerSideSheet(
-                          constraints: BoxConstraints(
-                            maxWidth: screenWidth * .4,
-                          ),
-                          sizeFactor: _getSheetAnimationSize(
-                            _VideoBottomSheet.description,
-                          ),
-                          visibleListenable: _getSheetNotifier(
-                            _VideoBottomSheet.comment,
-                          ),
-                          child: VideoDescriptionSheet(
-                            showDragIndicator: false,
-                            initialHeight: 0,
-                            closeDescription: () => _closeBottomSheet(
-                              _VideoBottomSheet.description,
+                        for (final sheet in [
+                          _VideoBottomSheet.description,
+                          _VideoBottomSheet.comment,
+                        ])
+                          PlayerSideSheet(
+                            constraints: BoxConstraints(
+                              maxWidth: screenWidth * .4,
                             ),
-                            transcriptController: _transcriptController,
-                            draggableController: _getSheetController(
-                              _VideoBottomSheet.description,
-                            ),
+                            sizeFactor: _getSheetAnimationSize(sheet),
+                            visibleListenable: _getSheetNotifier(sheet),
                           ),
-                        ),
-                        PlayerSideSheet(
-                          constraints: BoxConstraints(
-                            maxWidth: screenWidth * .4,
-                          ),
-                          sizeFactor: _getSheetAnimationSize(
-                            _VideoBottomSheet.description,
-                          ),
-                          visibleListenable: _getSheetNotifier(
-                            _VideoBottomSheet.comment,
-                          ),
-                          child: VideoCommentsSheet(
-                            initialHeight: 0,
-                            showDragIndicator: false,
-                            closeComment: () => _closeBottomSheet(
-                              _VideoBottomSheet.comment,
-                            ),
-                            replyController: _replyController,
-                            draggableController: _getSheetController(
-                              _VideoBottomSheet.comment,
-                            ),
-                          ),
-                        ),
                       ],
                     ],
                   ),
                 ),
               ),
             ),
-            if (orientation.isPortrait) ...[
+            for (final sheet in _availableSheet)
               VideoDraggableSheet(
                 builder: (BuildContext context, ScrollController controller) {
-                  return VideoCommentsSheet(
-                    controller: controller,
-                    initialHeight: kAvgVideoViewPortHeight,
-                    closeComment: () => _closeBottomSheet(
-                      _VideoBottomSheet.comment,
-                    ),
-                    replyController: _replyController,
-                    draggableController: _getSheetController(
-                      _VideoBottomSheet.comment,
-                    ),
-                  );
+                  final draggableController = _getSheetController(sheet);
+                  void closeSheet() => _closeBottomSheet(sheet);
+                  if (sheet == _VideoBottomSheet.comment) {
+                    return VideoCommentsSheet(
+                      controller: controller,
+                      replyController: _replyController,
+                      initialHeight: initialDraggableSnapSize,
+                      showDragIndicator: context.orientation.isPortrait,
+                      onPressClose: closeSheet,
+                      draggableController: draggableController,
+                    );
+                  } else if (sheet == _VideoBottomSheet.chapter) {
+                    return VideoChaptersSheet(
+                      controller: controller,
+                      initialHeight: initialDraggableSnapSize,
+                      onPressClose: closeSheet,
+                      draggableController: draggableController,
+                    );
+                  } else if (sheet == _VideoBottomSheet.description) {
+                    return VideoDescriptionSheet(
+                      controller: controller,
+                      transcriptController: _transcriptController,
+                      initialHeight: initialDraggableSnapSize,
+                      showDragIndicator: context.orientation.isPortrait,
+                      onPressClose: closeSheet,
+                      draggableController: draggableController,
+                    );
+                  } else if (sheet == _VideoBottomSheet.playlist) {
+                    return VideoPlaylistSheet(
+                      controller: controller,
+                      initialHeight: initialDraggableSnapSize,
+                      onPressClose: closeSheet,
+                      draggableController: draggableController,
+                    );
+                  }
+                  return const SizedBox();
                 },
-                opacity: _getSheetAnimationOpacity(
-                  _VideoBottomSheet.comment,
-                ),
-                controller: _getSheetController(
-                  _VideoBottomSheet.comment,
-                ),
-                visibleListenable: _getSheetNotifier(
-                  _VideoBottomSheet.comment,
-                ),
+                opacity: _getSheetAnimationOpacity(sheet),
+                controller: _getSheetController(sheet),
+                visibleListenable: _getSheetNotifier(sheet),
                 snapSizes: <double>[
                   0.0,
                   initialDraggableSnapSize,
                 ],
               ),
-              VideoDraggableSheet(
-                builder: (BuildContext context, ScrollController controller) {
-                  return VideoDescriptionSheet(
-                    controller: controller,
-                    initialHeight: initialDraggableSnapSize,
-                    closeDescription: () => _closeBottomSheet(
-                      _VideoBottomSheet.description,
-                    ),
-                    transcriptController: _transcriptController,
-                    draggableController: _getSheetController(
-                      _VideoBottomSheet.description,
-                    ),
-                  );
-                },
-                opacity: _getSheetAnimationOpacity(
-                  _VideoBottomSheet.description,
-                ),
-                controller: _getSheetController(
-                  _VideoBottomSheet.description,
-                ),
-                visibleListenable: _getSheetNotifier(
-                  _VideoBottomSheet.description,
-                ),
-                snapSizes: <double>[
-                  0.0,
-                  initialDraggableSnapSize,
-                ],
-              ),
-              VideoDraggableSheet(
-                builder: (BuildContext context, ScrollController controller) {
-                  return VideoChaptersSheet(
-                    controller: controller,
-                    initialHeight: initialDraggableSnapSize,
-                    closeChapter: () => _closeBottomSheet(
-                      _VideoBottomSheet.chapter,
-                    ),
-                    draggableController:
-                        _getSheetController(_VideoBottomSheet.chapter),
-                  );
-                },
-                opacity: _getSheetAnimationOpacity(_VideoBottomSheet.chapter),
-                controller: _getSheetController(_VideoBottomSheet.chapter),
-                visibleListenable: _getSheetNotifier(_VideoBottomSheet.chapter),
-                snapSizes: <double>[
-                  0.0,
-                  initialDraggableSnapSize,
-                ],
-              ),
-              VideoDraggableSheet(
-                builder: (BuildContext context, ScrollController controller) {
-                  return VideoPlaylistSheet(
-                    controller: controller,
-                    initialHeight: kAvgVideoViewPortHeight,
-                    close: () => _closeBottomSheet(
-                      _VideoBottomSheet.playlist,
-                    ),
-                    draggableController: _getSheetController(
-                      _VideoBottomSheet.playlist,
-                    ),
-                  );
-                },
-                opacity: _getSheetAnimationOpacity(
-                  _VideoBottomSheet.playlist,
-                ),
-                controller: _getSheetController(
-                  _VideoBottomSheet.playlist,
-                ),
-                visibleListenable: _getSheetNotifier(
-                  _VideoBottomSheet.playlist,
-                ),
-                snapSizes: <double>[
-                  0.0,
-                  initialDraggableSnapSize,
-                ],
-              ),
-            ],
           ],
         ),
       ),
@@ -2063,10 +1983,8 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 }
 
 class VideoPlaylistSection extends StatelessWidget {
-  const VideoPlaylistSection({
-    super.key,
-  });
-
+  const VideoPlaylistSection({super.key, required this.onTap});
+  final VoidCallback onTap;
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -2078,7 +1996,7 @@ class VideoPlaylistSection extends StatelessWidget {
             vertical: 12,
           ),
           child: TappableArea(
-            onTap: () {},
+            onTap: onTap,
             borderRadius: BorderRadius.circular(8),
             child: Container(
               padding: const EdgeInsets.symmetric(
