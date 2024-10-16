@@ -27,35 +27,33 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/main.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../../constants.dart';
-import 'video_comment_guidelines.dart';
 
-class VideoCommentsSheet extends StatefulWidget {
-  const VideoCommentsSheet({
+class VideoPlaylistSheet extends StatefulWidget {
+  const VideoPlaylistSheet({
     super.key,
     this.controller,
-    required this.replyController,
-    required this.closeComment,
+    required this.close,
     required this.initialHeight,
     this.draggableController,
     this.showDragIndicator = true,
   });
   final ScrollController? controller;
-  final PageDraggableOverlayChildController replyController;
-  final VoidCallback closeComment;
+  final VoidCallback close;
   final double initialHeight;
   final bool showDragIndicator;
   final DraggableScrollableController? draggableController;
 
   @override
-  State<VideoCommentsSheet> createState() => _VideoCommentsSheetState();
+  State<VideoPlaylistSheet> createState() => _VideoPlaylistSheetState();
 }
 
-class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
+class _VideoPlaylistSheetState extends State<VideoPlaylistSheet> {
+  final SharedSlidableState _slidableState = SharedSlidableState(null);
+
   @override
   void initState() {
     super.initState();
@@ -69,73 +67,95 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
   }
 
   @override
+  void dispose() {
+    _slidableState.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
-      title: 'Comments',
-      scrollTag: 'player_comments',
+      title: 'Distributed Systems lecture',
+      scrollTag: 'playlist_comments',
+      trailingTitle: '$kDotSeparator 1/23',
+      subtitle: PreferredSize(
+        preferredSize: const Size(double.infinity, 44),
+        child: Row(
+          children: [
+            const SizedBox(width: 4),
+            TappableArea(
+              onTap: () {},
+              padding: const EdgeInsets.all(8),
+              child: const Icon(YTIcons.loop_outlined),
+            ),
+            TappableArea(
+              onTap: () {},
+              padding: const EdgeInsets.all(8),
+              child: const Icon(YTIcons.shuffle_outlined),
+            ),
+            const Spacer(),
+            TappableArea(
+              onTap: () {},
+              padding: const EdgeInsets.all(8),
+              borderRadius: BorderRadius.circular(24),
+              child: const Icon(YTIcons.more_vert_outlined),
+            ),
+          ],
+        ),
+      ),
       controller: widget.controller ?? ScrollController(),
-      onClose: widget.closeComment,
+      onClose: widget.close,
       showDragIndicator: widget.showDragIndicator,
+      showDivider: false,
       draggableController: widget.draggableController,
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(12),
         topRight: Radius.circular(12),
-      ),
-      dynamicTab: const DynamicTab(
-        initialIndex: 0,
-        options: ['Top', 'Timed', 'Newest'],
       ),
       contentBuilder: (context, controller, physics) {
         return ListView.builder(
           physics: physics,
           controller: controller,
           itemBuilder: (context, index) {
-            if (index == 0) {
-              return const VideoCommentGuidelines();
-            }
-            return CommentTile(
-              openReply: widget.replyController.open,
-              pinned: index == 1,
-              byCreator: index == 1,
-              creatorLikes: index == 1,
-              creatorReply: index == 1,
-              showReplies: index == 1,
+            return Slidable(
+              key: ValueKey(index),
+              sharedSlidableState: _slidableState,
+              maxOffset: .3,
+              items: const [
+                SlidableItem(
+                  icon: Icon(YTIcons.hide_outlined),
+                ),
+              ],
+              child: Material(
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        const Icon(YTIcons.move_outlined),
+                        Expanded(
+                          // TODO(josh4500): PlayablePlaylistContent
+                          child: PlayableVideoContent(
+                            width: 142,
+                            height: 88,
+                            onMore: () {},
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             );
           },
           itemCount: 20,
         );
       },
-      bottom: ListenableBuilder(
-        listenable: widget.replyController,
-        builder: (context, _) {
-          return Visibility(
-            visible: !widget.replyController.isOpened,
-            child: const CommentTextFieldPlaceholder(),
-          );
-        },
-      ),
       baseHeight: 1 - kAvgVideoViewPortHeight,
-      overlayChildren: [
-        PageDraggableOverlayChild(
-          controller: widget.replyController,
-          builder: (context, controller, physics) {
-            return ListView.builder(
-              controller: controller,
-              physics: physics,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return CommentTile(
-                    showReplies: false,
-                    backgroundColor: context.theme.highlightColor,
-                  );
-                }
-                return const ReplyTile();
-              },
-              itemCount: 20,
-            );
-          },
-        ),
-      ],
     );
   }
 }

@@ -29,6 +29,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,6 +52,7 @@ import 'widgets/sheet/video_side_sheet.dart';
 import 'widgets/video_chapters_sheet.dart';
 import 'widgets/video_comment_sheet.dart';
 import 'widgets/video_description_sheet.dart';
+import 'widgets/video_playlist_sheet.dart';
 
 enum _VideoBottomSheet {
   comment,
@@ -77,10 +79,7 @@ class VideoScreen extends ConsumerStatefulWidget {
 class _VideoScreenState extends ConsumerState<VideoScreen>
     with TickerProviderStateMixin, WidgetsBindingObserver {
   final GlobalKey _interactivePlayerKey = GlobalKey();
-  final GlobalKey _commentSheetKey = GlobalKey();
-  final GlobalKey _descSheetKey = GlobalKey();
-  final GlobalKey _chaptersSheetKey = GlobalKey();
-
+  VelocityTracker? _infoVelocityTracker;
   double _slideOffsetYValue = 0;
   late final AnimationController _viewController;
   late final Animation<Offset> _playerLandscapeSlideAnimation;
@@ -121,16 +120,8 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   late final ValueNotifier<double> _playerWidthNotifier;
 
   late final ValueNotifier<double> _playerHeightNotifier;
-
   late final ValueNotifier<bool> _hideGraphicsNotifier;
 
-  // Video Comment Sheet
-  late final AnimationController _commentSizeController;
-  late final Animation<double> _commentSizeAnimation;
-
-  // Video Description Sheet
-  late final AnimationController _descSizeController;
-  late final Animation<double> _descSizeAnimation;
   final _transcriptController = PageDraggableOverlayChildController(
     title: 'Transcript',
   );
@@ -313,6 +304,8 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   final Map<_VideoBottomSheet, ValueNotifier<bool>> _draggableNotifiers = {};
   final Map<_VideoBottomSheet, AnimationController> _draggableAnimationOpacity =
       {};
+  final Map<_VideoBottomSheet, AnimationController> _draggableAnimationSize =
+      {};
   final Map<_VideoBottomSheet, DraggableScrollableController>
       _draggableControllers = {};
   bool get _hasMoreThanOneOpened => _openedDraggableState.length > 1;
@@ -337,6 +330,14 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
         () => _onSheetSizeChange(sheet),
       );
     }
+
+    for (final _VideoBottomSheet sheet in sheets) {
+      _draggableAnimationSize[sheet] = AnimationController(
+        vsync: this,
+        value: 0,
+        duration: const Duration(milliseconds: 100),
+      );
+    }
   }
 
   void _disposeDraggableControllers() {
@@ -346,6 +347,12 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _draggableAnimationOpacity.forEach((sheet, animationController) {
       animationController.dispose();
     });
+    _draggableAnimationSize.forEach((sheet, animationController) {
+      animationController.dispose();
+    });
+    _draggableControllers.forEach((sheet, controllers) {
+      controllers.dispose();
+    });
   }
 
   ValueNotifier<bool> _getSheetNotifier(_VideoBottomSheet sheet) {
@@ -354,6 +361,10 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   AnimationController _getSheetAnimationOpacity(_VideoBottomSheet sheet) {
     return _draggableAnimationOpacity[sheet]!;
+  }
+
+  AnimationController _getSheetAnimationSize(_VideoBottomSheet sheet) {
+    return _draggableAnimationSize[sheet]!;
   }
 
   DraggableScrollableController _getSheetController(_VideoBottomSheet sheet) {
@@ -392,6 +403,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       _VideoBottomSheet.comment,
       _VideoBottomSheet.chapter,
       _VideoBottomSheet.description,
+      _VideoBottomSheet.playlist,
     ]);
 
     _viewController = AnimationController(
@@ -481,26 +493,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       _changePlayerPitch(value);
     });
 
-    // Added a callback to animate info opacity when additional heights changes
-    // (i.e when screen going in or out of expanded mode)
-    // Opacity of info does not need to be updated when either bottom sheets are open
-    // (i.e Comment or Description Sheet)
-    _playerAddedHeightNotifier.addListener(() {
-      double opacityValue;
-      // if (_isResizableExpandingMode) {
-      //   opacityValue = additionalHeight /
-      //       (screenHeight - (playerHeightToScreenRatio * screenHeight));
-      //   _draggableOpacityController.value = opacityValue;
-      // } else {
-      //   opacityValue = additionalHeight / maxAdditionalHeight;
-      //   _draggableOpacityController.value = opacityValue;
-      // }
-      //
-      // if (!_hasAtLeastOneOpened) {
-      //   _infoOpacityController.value = opacityValue;
-      // }
-    });
-
     _playerMarginNotifier = ValueNotifier<double>(0);
 
     _playerWidthNotifier = ValueNotifier<double>(
@@ -545,30 +537,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
         _activeZoomPanning = false;
       }
     });
-
-    _descSizeController = AnimationController(
-      vsync: this,
-      value: 0,
-      duration: const Duration(milliseconds: 100),
-    );
-
-    _descSizeAnimation = CurvedAnimation(
-      parent: _descSizeController,
-      curve: Curves.bounceIn,
-      reverseCurve: Curves.bounceInOut,
-    );
-
-    _commentSizeController = AnimationController(
-      vsync: this,
-      value: 0,
-      duration: const Duration(milliseconds: 100),
-    );
-
-    _commentSizeAnimation = CurvedAnimation(
-      parent: _commentSizeController,
-      curve: Curves.bounceIn,
-      reverseCurve: Curves.bounceInOut,
-    );
 
     Future(() {
       // Initial changes
@@ -700,9 +668,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _screenHeightNotifier.dispose();
     _playerMarginNotifier.dispose();
     _playerAddedHeightNotifier.dispose();
-
-    _descSizeController.dispose();
-    _commentSizeController.dispose();
 
     _transcriptController.dispose();
     _replyController.dispose();
@@ -1208,14 +1173,18 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
       if (latestHeightVal >= 0.5) {
         await Future.wait([
-          _animateScreenHeight(velocityY >= 200 ? minPlayerHeightRatio : 1),
+          _animateScreenHeight(
+            velocityY >= kMaxDragVelocity ? minPlayerHeightRatio : 1,
+          ),
           _animatePlayerWidth(
-            velocityY >= 200 ? minVideoViewPortWidthRatio : 1,
+            velocityY >= kMaxDragVelocity ? minVideoViewPortWidthRatio : 1,
           ),
         ]);
       } else {
         await Future.wait([
-          _animateScreenHeight(velocityY <= -150 ? 1 : minPlayerHeightRatio),
+          _animateScreenHeight(
+            velocityY <= -kMaxDragVelocity ? 1 : minPlayerHeightRatio,
+          ),
           _animatePlayerWidth(
             velocityY <= -150 ? 1 : minVideoViewPortWidthRatio,
           ),
@@ -1253,7 +1222,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
     if (_activeZoomPanning) {
       final double velocityY = details.velocity.pixelsPerSecond.dy;
-      if (velocityY < -200) {
+      if (velocityY < -kMaxDragVelocity) {
         _enterFullscreenMode();
       }
     }
@@ -1473,7 +1442,9 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       );
     }
 
-    _descSizeController.forward();
+    if (context.orientation.isLandscape) {
+      _getSheetAnimationSize(sheet).forward();
+    }
   }
 
   void _closeBottomSheet(_VideoBottomSheet sheet) {
@@ -1505,7 +1476,9 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     //       ?.animateTo(1);
     // }
 
-    _descSizeController.reverse();
+    if (context.orientation.isLandscape) {
+      _getSheetAnimationSize(sheet).reverse();
+    }
     if (_isResizableExpandingMode && additionalHeight > 0) {
       _animateAdditionalHeight(minAdditionalHeight);
     }
@@ -1528,11 +1501,16 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     }
   }
 
+  void _onPointerDownOn(PointerDownEvent event) {
+    _infoVelocityTracker = VelocityTracker.withKind(event.kind);
+  }
+
   void _onPointerMove(PointerMoveEvent event) {
     if (_preventGestures) return;
 
     if (_infoScrollController.offset == 0 ||
         (_isResizableExpandingMode && event.delta.dy < 0)) {
+      _infoVelocityTracker?.addPosition(event.timeStamp, event.localPosition);
       if (_allowInfoDrag) {
         _infoScrollPhysics.canScroll(false);
         _playerAddedHeightNotifier.value = ui.clampDouble(
@@ -1566,7 +1544,12 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     if (_preventGestures) return;
 
     if (_allowInfoDrag) {
-      if (additionalHeight > maxAdditionalHeight / 2) {
+      final velocity = _infoVelocityTracker?.getVelocity();
+      final aboveMaxVelocity =
+          velocity != null && velocity.pixelsPerSecond.dy > kMaxDragVelocity;
+
+      if (additionalHeight > maxAdditionalHeight / 2 ||
+          aboveMaxVelocity && event.delta.dy < 1) {
         _enterExpandedMode();
       } else {
         _exitExpandedMode();
@@ -1578,6 +1561,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     if (_infoScrollController.offset == 0) {
       _allowInfoDrag = true;
     }
+    _infoVelocityTracker = null;
   }
 
   /// Callback for when scroll notifications are received in info section
@@ -1804,10 +1788,18 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     final mainPlayer = createPlayerView(interactivePlayerView);
     // final placeholderPlayer = createPlayerView(const SizedBox());
 
-    final infoScrollview = PlayerVideoInfo(
-      physics: _infoScrollPhysics,
-      controller: _infoScrollController,
-      onScrollNotification: _onScrollInfoScrollNotification,
+    final infoScrollview = Stack(
+      children: [
+        PlayerVideoInfo(
+          physics: _infoScrollPhysics,
+          controller: _infoScrollController,
+          onScrollNotification: _onScrollInfoScrollNotification,
+        ),
+        const FractionalTranslation(
+          translation: ui.Offset.zero,
+          child: VideoPlaylistSection(),
+        ),
+      ],
     );
 
     return PopScope(
@@ -1888,6 +1880,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                         Flexible(
                           child: Material(
                             child: Listener(
+                              onPointerDown: _onPointerDownOn,
                               onPointerMove: _onPointerMove,
                               onPointerUp: _onPointerUp,
                               child: AnimatedBuilder(
@@ -1911,7 +1904,9 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                           constraints: BoxConstraints(
                             maxWidth: screenWidth * .4,
                           ),
-                          sizeFactor: _descSizeAnimation,
+                          sizeFactor: _getSheetAnimationSize(
+                            _VideoBottomSheet.description,
+                          ),
                           visibleListenable: _getSheetNotifier(
                             _VideoBottomSheet.comment,
                           ),
@@ -1931,12 +1926,13 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                           constraints: BoxConstraints(
                             maxWidth: screenWidth * .4,
                           ),
-                          sizeFactor: _commentSizeAnimation,
+                          sizeFactor: _getSheetAnimationSize(
+                            _VideoBottomSheet.description,
+                          ),
                           visibleListenable: _getSheetNotifier(
                             _VideoBottomSheet.comment,
                           ),
                           child: VideoCommentsSheet(
-                            key: _commentSheetKey,
                             initialHeight: 0,
                             showDragIndicator: false,
                             closeComment: () => _closeBottomSheet(
@@ -2031,8 +2027,101 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                   initialDraggableSnapSize,
                 ],
               ),
+              VideoDraggableSheet(
+                builder: (BuildContext context, ScrollController controller) {
+                  return VideoPlaylistSheet(
+                    controller: controller,
+                    initialHeight: kAvgVideoViewPortHeight,
+                    close: () => _closeBottomSheet(
+                      _VideoBottomSheet.playlist,
+                    ),
+                    draggableController: _getSheetController(
+                      _VideoBottomSheet.playlist,
+                    ),
+                  );
+                },
+                opacity: _getSheetAnimationOpacity(
+                  _VideoBottomSheet.playlist,
+                ),
+                controller: _getSheetController(
+                  _VideoBottomSheet.playlist,
+                ),
+                visibleListenable: _getSheetNotifier(
+                  _VideoBottomSheet.playlist,
+                ),
+                snapSizes: <double>[
+                  0.0,
+                  initialDraggableSnapSize,
+                ],
+              ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class VideoPlaylistSection extends StatelessWidget {
+  const VideoPlaylistSection({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Material(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 12,
+          ),
+          child: TappableArea(
+            onTap: () {},
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white10,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(YTIcons.playlists_outlined),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Next: Distributed Systems 1.2: Computer',
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Next: Distributed Systems series 1/23',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: context.theme.colorScheme.surface
+                                  .withOpacity(.38),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const Icon(YTIcons.chevron_down),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
