@@ -284,7 +284,7 @@ abstract final class AppStyle {
 
   static final BrightnessPair<MiniPlayerStyle> miniPlayerStyle = BrightnessPair(
     light: MiniPlayerStyle(
-      backgroundColor: Colors.black12,
+      backgroundColor: Colors.transparent,
       titleTextStyle: const TextStyle(
         fontSize: 12.5,
         color: Colors.black87,

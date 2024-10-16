@@ -184,7 +184,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   Timer? countdownTimer;
 
   final CallOutLink callOutLink = CallOutLink(
-    offset: const Offset(-12, 0),
+    offset: const Offset(0, 52),
   );
 
   @override
@@ -1542,7 +1542,7 @@ class CaptureFilterSelector extends StatelessWidget {
                   const Spacer(),
                   GestureDetector(
                     onTap: context.pop,
-                    child:  Text(
+                    child: Text(
                       'DONE',
                       style: TextStyle(
                         color: context.theme.primaryColor,
@@ -1759,7 +1759,7 @@ class DraftDecision extends StatelessWidget {
                   children: [
                     TextButton(
                       onPressed: () => context.pop(true),
-                      child:  Text(
+                      child: Text(
                         'Start over',
                         style: TextStyle(
                           color: context.theme.primaryColor,
@@ -1769,7 +1769,7 @@ class DraftDecision extends StatelessWidget {
                     SizedBox(width: 8.w),
                     TextButton(
                       onPressed: () => context.pop(false),
-                      child:  Text(
+                      child: Text(
                         'Continue',
                         style: TextStyle(
                           color: context.theme.primaryColor,
