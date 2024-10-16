@@ -31,12 +31,13 @@ import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import 'account_avatar.dart';
+import 'call_out.dart';
 import 'custom_action_button.dart';
 import 'dynamic_sheet.dart';
 import 'gestures/custom_ink_well.dart';
 import 'gestures/tappable_area.dart';
 
-class CommentTile extends StatelessWidget {
+class CommentTile extends StatefulWidget {
   const CommentTile({
     super.key,
     this.pinned = false,
@@ -57,16 +58,23 @@ class CommentTile extends StatelessWidget {
   final Color? backgroundColor;
 
   @override
+  State<CommentTile> createState() => _CommentTileState();
+}
+
+class _CommentTileState extends State<CommentTile> {
+  final callOutLink = CallOutLink();
+
+  @override
   Widget build(BuildContext context) {
     const showTranslationOption = true;
     final theme = context.theme.appStyles.commentStyle;
     return Material(
       // type: MaterialType.transparency,
-      color: backgroundColor ?? Colors.transparent,
+      color: widget.backgroundColor ?? Colors.transparent,
       child: Column(
         children: <Widget>[
           TappableArea(
-            onTap: openReply,
+            onTap: widget.openReply,
             padding: const EdgeInsets.symmetric(
               vertical: 8,
               horizontal: 6,
@@ -87,7 +95,7 @@ class CommentTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       const SizedBox(height: 8),
-                      if (pinned) ...[
+                      if (widget.pinned) ...[
                         Row(
                           children: [
                             Icon(
@@ -107,13 +115,13 @@ class CommentTile extends StatelessWidget {
                       Row(
                         children: [
                           Container(
-                            padding: byCreator
+                            padding: widget.byCreator
                                 ? const EdgeInsets.symmetric(
                                     vertical: 4,
                                     horizontal: 8,
                                   )
                                 : null,
-                            decoration: byCreator
+                            decoration: widget.byCreator
                                 ? BoxDecoration(
                                     color: Colors.white24,
                                     borderRadius: BorderRadius.circular(
@@ -125,7 +133,7 @@ class CommentTile extends StatelessWidget {
                               text: TextSpan(
                                 text: '@BussyBoyBonanza',
                                 children: <InlineSpan>[
-                                  if (byCreator)
+                                  if (widget.byCreator)
                                     WidgetSpan(
                                       child: Row(
                                         children: [
@@ -133,7 +141,7 @@ class CommentTile extends StatelessWidget {
                                           Icon(
                                             YTIcons.verified_filled,
                                             size: 12,
-                                            color: byCreator
+                                            color: widget.byCreator
                                                 ? Colors.white
                                                 : const Color(0xFFAAAAAA),
                                           ),
@@ -219,26 +227,30 @@ class CommentTile extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 16),
-                            if (creatorLikes)
-                              TappableArea(
-                                onTap: () {},
-                                releasedColor: Colors.transparent,
-                                padding: const EdgeInsets.all(8),
-                                borderRadius: BorderRadius.circular(24),
-                                child: const Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    AccountAvatar(size: 18),
-                                    Positioned(
-                                      top: 9,
-                                      left: 9,
-                                      child: Icon(
-                                        YTIcons.heart_filled,
-                                        size: 14,
-                                        color: Color(0xFFFF0000),
+                            if (widget.creatorLikes)
+                              CallOut(
+                                link: callOutLink,
+                                text: '❤️ by Bussy is a box',
+                                child: TappableArea(
+                                  onTap: callOutLink.show,
+                                  releasedColor: Colors.transparent,
+                                  padding: const EdgeInsets.all(8),
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: const Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      AccountAvatar(size: 18),
+                                      Positioned(
+                                        top: 9,
+                                        left: 9,
+                                        child: Icon(
+                                          YTIcons.heart_filled,
+                                          size: 14,
+                                          color: Color(0xFFFF0000),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                           ],
@@ -264,19 +276,19 @@ class CommentTile extends StatelessWidget {
               ],
             ),
           ),
-          if (showReplies) ...<Widget>[
+          if (widget.showReplies) ...<Widget>[
             Row(
               children: <Widget>[
                 const SizedBox(width: 32),
                 TappableArea(
-                  onTap: openReply,
+                  onTap: widget.openReply,
                   padding: const EdgeInsets.symmetric(
                     vertical: 14,
                     horizontal: 16,
                   ),
                   child: Row(
                     children: [
-                      if (creatorReply) ...[
+                      if (widget.creatorReply) ...[
                         const AccountAvatar(size: 18),
                         Text(
                           kDotSeparator,
