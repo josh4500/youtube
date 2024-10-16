@@ -193,7 +193,7 @@ class PlayableContent extends StatelessWidget {
                   ),
                   // TODO(josh4500): Fix left space layout caused by outer paddings
                   Transform.translate(
-                    offset: const Offset(8, -6),
+                    offset: const Offset(16, -6),
                     child: TappableArea(
                       onTap: onMore,
                       canRequestFocus: false,
@@ -201,7 +201,7 @@ class PlayableContent extends StatelessWidget {
                       padding: const EdgeInsets.all(6),
                       releasedColor: Colors.transparent,
                       borderRadius: BorderRadius.circular(16),
-                      child: const Icon(YTIcons.more_vert_outlined, size: 14),
+                      child: const Icon(YTIcons.more_vert_outlined, size: 18),
                     ),
                   ),
                 ],

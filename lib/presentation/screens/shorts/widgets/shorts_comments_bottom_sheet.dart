@@ -29,7 +29,7 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet> {
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Comments',
-      subtitle: '7.1k',
+      trailingTitle: '7.1k',
       scrollTag: 'short_comments',
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(8),
