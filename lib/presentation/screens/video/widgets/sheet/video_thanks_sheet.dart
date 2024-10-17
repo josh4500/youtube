@@ -84,111 +84,128 @@ class _VideoThanksSheetState extends State<VideoThanksSheet> {
         topLeft: Radius.circular(12),
         topRight: Radius.circular(12),
       ),
+      actions: const [
+        Icon(YTIcons.info_outlined),
+      ],
       contentBuilder: (context, controller, physics) {
-        return Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            children: [
-              const Text(
-                'Buy a Super Thanks, which directly supports Harris Craycraft.',
-                style: TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 12),
-              Stack(
-                children: [
-                  ValueListenableBuilder(
-                    valueListenable: thanksNotifier,
-                    builder: (context, index, _) {
-                      return Container(
-                        padding: const EdgeInsets.all(12.0),
-                        decoration: BoxDecoration(
-                          color: AppPalette.thanksVariants[index].withOpacity(
-                            .1,
-                          ),
-                          border: Border.all(color: context.theme.hintColor),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const AccountAvatar(),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
+        return CustomScrollView(
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.all(12),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    const Text(
+                      'Buy a Super Thanks, which directly supports Harris Craycraft.',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 12),
+                    Stack(
+                      children: [
+                        ValueListenableBuilder(
+                          valueListenable: thanksNotifier,
+                          builder: (context, index, _) {
+                            return Container(
+                              padding: const EdgeInsets.all(12.0),
+                              decoration: BoxDecoration(
+                                color: AppPalette.thanksVariants[index]
+                                    .withOpacity(
+                                  .1,
+                                ),
+                                border:
+                                    Border.all(color: context.theme.hintColor),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    '@josh4500',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: context.theme.hintColor,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 2.0,
-                                              horizontal: 8,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: AppPalette
-                                                  .thanksVariants[index],
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                16,
-                                              ),
-                                            ),
-                                            child: Row(
+                                  const AccountAvatar(),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '@josh4500',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: context.theme.hintColor,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                Icon(
-                                                  YTIcons.thanks_filled,
-                                                  size: 14,
-                                                  color: context
-                                                      .theme
-                                                      .colorScheme
-                                                      .inverseSurface,
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  '\$${(index + 1) * 10}',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w500,
-                                                    color: context
-                                                        .theme
-                                                        .colorScheme
-                                                        .inverseSurface,
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    vertical: 2.0,
+                                                    horizontal: 8,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: AppPalette
+                                                        .thanksVariants[index],
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                      16,
+                                                    ),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        YTIcons.thanks_filled,
+                                                        size: 14,
+                                                        color: context
+                                                            .theme
+                                                            .colorScheme
+                                                            .inverseSurface,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        '\$${(index + 1) * 10}',
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: context
+                                                              .theme
+                                                              .colorScheme
+                                                              .inverseSurface,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
+                                                const SizedBox(width: 8),
+                                                const Text('Thanks'),
                                               ],
                                             ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          const Text('Thanks'),
-                                        ],
-                                      ),
-                                    ],
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
+                                  const Icon(YTIcons.edit_outlined, size: 18),
                                 ],
                               ),
-                            ),
-                            const Icon(YTIcons.edit_outlined, size: 18),
-                          ],
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              SizedBox(
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(
                 height: 32,
                 child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
                     if (index == 5) {
@@ -223,7 +240,7 @@ class _VideoThanksSheetState extends State<VideoThanksSheet> {
                       );
                     }
                     return CustomActionChip(
-                      title: index == 5 ? 'More' : '\$ ${(index + 1) * 10}',
+                      title: index == 5 ? 'More' : '\$ ${(index + 1) * 100}',
                       onTap: () => thanksNotifier.value = index,
                       padding: const EdgeInsets.symmetric(
                         vertical: 4,
@@ -243,91 +260,112 @@ class _VideoThanksSheetState extends State<VideoThanksSheet> {
                   itemCount: 6,
                 ),
               ),
-              const SizedBox(height: 4),
-              ValueListenableBuilder(
-                valueListenable: showMoreThanks,
-                builder: (context, show, _) {
-                  return Visibility(
-                    visible: show,
-                    child: ValueListenableBuilder(
-                      valueListenable: thanksNotifier,
-                      builder: (context, index, _) {
-                        return SliderTheme(
-                          data: SliderThemeData(
-                            trackHeight: 1.8,
-                            trackShape: CustomTrackShape(),
-                            thumbShape: const RoundSliderThumbShape(
-                              enabledThumbRadius: 8,
-                            ),
-                            thumbColor: AppPalette.thanksVariants[index],
-                            activeTrackColor: AppPalette.thanksVariants[index],
-                            overlayColor: context.theme.highlightColor,
-                            inactiveTrackColor: context.theme.highlightColor,
-                            activeTickMarkColor:
-                                context.theme.colorScheme.surface,
-                            inactiveTickMarkColor:
-                                context.theme.colorScheme.surface,
-                          ),
-                          child: Slider(
-                            value: index + 1,
-                            min: 1,
-                            max: 10,
-                            divisions: 10,
-                            onChanged: (double value) {
-                              thanksNotifier.value = value.floor() - 1;
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 4),
+                    ValueListenableBuilder(
+                      valueListenable: showMoreThanks,
+                      builder: (context, show, _) {
+                        return Visibility(
+                          visible: show,
+                          child: ValueListenableBuilder(
+                            valueListenable: thanksNotifier,
+                            builder: (context, index, _) {
+                              return SliderTheme(
+                                data: SliderThemeData(
+                                  trackHeight: 1.8,
+                                  trackShape: CustomTrackShape(),
+                                  thumbShape: const RoundSliderThumbShape(
+                                    enabledThumbRadius: 8,
+                                  ),
+                                  thumbColor: AppPalette.thanksVariants[index],
+                                  activeTrackColor:
+                                      AppPalette.thanksVariants[index],
+                                  overlayColor: context.theme.highlightColor,
+                                  inactiveTrackColor:
+                                      context.theme.highlightColor,
+                                  activeTickMarkColor:
+                                      context.theme.colorScheme.surface,
+                                  inactiveTickMarkColor:
+                                      context.theme.colorScheme.surface,
+                                ),
+                                child: Slider(
+                                  value: index + 1,
+                                  min: 1,
+                                  max: 10,
+                                  divisions: 10,
+                                  onChanged: (double value) {
+                                    thanksNotifier.value = value.floor();
+                                  },
+                                ),
+                              );
                             },
                           ),
                         );
                       },
                     ),
-                  );
-                },
-              ),
-              const Spacer(),
-              Text.rich(
-                TextSpan(
-                  text: '',
-                  children: [
-                    const TextSpan(
-                        text:
-                            'As an added bonus, the above public comment will be published on your behalf (subject to Community Guidelines). '),
-                    TextSpan(
-                      text: 'Learn more',
-                      style: TextStyle(
-                        color: context.theme.primaryColor,
-                      ),
-                    ),
-                    const TextSpan(
-                        text:
-                            '. By continuing, yo verify that you are at least 18 years old and agree to '),
-                    TextSpan(
-                      text: 'these terms',
-                      style: TextStyle(
-                        color: context.theme.primaryColor,
-                      ),
-                    ),
-                    const TextSpan(text: '.'),
                   ],
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: context.theme.hintColor,
-                  ),
                 ),
               ),
-              const SizedBox(height: 8),
-              CustomActionChip(
-                title: 'Buy and Send',
-                padding: const EdgeInsets.all(12),
-                alignment: Alignment.center,
-                backgroundColor: context.theme.primaryColor,
-                textStyle: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: context.theme.colorScheme.inverseSurface,
+            ),
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  children: [
+                    const Spacer(),
+                    Text.rich(
+                      TextSpan(
+                        text: '',
+                        children: [
+                          const TextSpan(
+                              text:
+                                  'As an added bonus, the above public comment will be published on your behalf (subject to Community Guidelines). '),
+                          TextSpan(
+                            text: 'Learn more',
+                            style: TextStyle(
+                              color: context.theme.primaryColor,
+                            ),
+                          ),
+                          const TextSpan(
+                              text:
+                                  '. By continuing, yo verify that you are at least 18 years old and agree to '),
+                          TextSpan(
+                            text: 'these terms',
+                            style: TextStyle(
+                              color: context.theme.primaryColor,
+                            ),
+                          ),
+                          const TextSpan(text: '.'),
+                        ],
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: context.theme.hintColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    CustomActionChip(
+                      title: 'Buy and Send',
+                      padding: const EdgeInsets.all(12),
+                      alignment: Alignment.center,
+                      backgroundColor: context.theme.primaryColor,
+                      textStyle: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: context.theme.colorScheme.inverseSurface,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
       baseHeight: 1 - kAvgVideoViewPortHeight,
