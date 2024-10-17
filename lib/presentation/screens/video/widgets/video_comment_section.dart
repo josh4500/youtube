@@ -248,7 +248,7 @@ class VideoCommentInput extends StatelessWidget {
                   color: context.theme.highlightColor,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(
+                child: const Text(
                   'Add a comment...',
                   style: TextStyle(fontSize: 12),
                 ),

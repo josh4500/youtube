@@ -65,6 +65,20 @@ abstract final class AppPalette {
     light: Color(0xFFE5E5E5),
     dark: Color(0xFF3F3F3F),
   );
+
+  static const List<Color> thanksVariants = [
+    Color(0xFF00E5FF),
+    Color(0xFF1DE9B6),
+    Color(0xFFF7CA50),
+    Color(0xFFF7CA50),
+    Color(0xFFE68231),
+    Color(0xFFE68231),
+    Color(0xFFD63D65),
+    Color(0xFFD63D65),
+    Color(0xFFE62117),
+    Color(0xFFE62117),
+    Color(0xFFE62117),
+  ];
 }
 
 class AppColorsExtension extends ThemeExtension<AppColorsExtension> {

@@ -76,6 +76,7 @@ class YTIcons {
   static const IconData loop_one_outlined = IconData(0xe834, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData add_outlined = IconData(0xe835, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData share_filled = IconData(0xe836, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData thanks_filled = IconData(0xe837, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData unmuted = IconData(0xe839, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData chevron_down = IconData(0xe83a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData chevron_up_1 = IconData(0xe83b, fontFamily: _kFontFam, fontPackage: _kFontPkg);

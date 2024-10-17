@@ -30,7 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../../constants.dart';
+import '../../../../constants.dart';
 
 class VideoDescriptionSheet extends StatefulWidget {
   const VideoDescriptionSheet({

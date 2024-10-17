@@ -36,6 +36,7 @@ class CommentTextFieldPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isPaused = (() => true)();
     return Material(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -48,11 +49,13 @@ class CommentTextFieldPlaceholder extends StatelessWidget {
             ),
             child: Row(
               children: <Widget>[
-                const Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: AccountAvatar(size: 24),
-                ),
-                const SizedBox(width: 8),
+                if (!isPaused) ...[
+                  const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: AccountAvatar(size: 24),
+                  ),
+                  const SizedBox(width: 8),
+                ],
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -63,24 +66,40 @@ class CommentTextFieldPlaceholder extends StatelessWidget {
                       color: context.theme.highlightColor,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: Text(
-                      'Add a ${isReply ? 'reply' : 'comment'}...',
-                      style: TextStyle(
-                        color: context.theme.hintColor,
-                      ),
-                    ),
+                    child: isPaused
+                        ? RichText(
+                            text: TextSpan(
+                              text: 'Comments are paused. ',
+                              children: [
+                                TextSpan(
+                                  text: 'Learn More',
+                                  style: TextStyle(
+                                    color: context.theme.primaryColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Text(
+                            'Add a ${isReply ? 'reply' : 'comment'}...',
+                            style: TextStyle(
+                              color: context.theme.hintColor,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(width: 4),
-                if (isReply)
-                  const Icon(Icons.camera)
-                else
-                  TappableArea(
-                    onTap: () {},
-                    padding: const EdgeInsets.all(4),
-                    borderRadius: BorderRadius.circular(24),
-                    child: const Icon(YTIcons.thanks_outlined, size: 24),
-                  ),
+                if (!isPaused) ...[
+                  if (isReply)
+                    const Icon(Icons.camera)
+                  else
+                    TappableArea(
+                      onTap: () {},
+                      padding: const EdgeInsets.all(4),
+                      borderRadius: BorderRadius.circular(24),
+                      child: const Icon(YTIcons.thanks_outlined, size: 24),
+                    ),
+                ],
               ],
             ),
           ),

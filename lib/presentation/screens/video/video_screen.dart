@@ -47,13 +47,14 @@ import 'widgets/player/player_components_wrapper.dart';
 import 'widgets/player/player_view.dart';
 import 'widgets/player_video_info.dart';
 import 'widgets/sheet/player_settings_sheet.dart';
+import 'widgets/sheet/video_chapters_sheet.dart';
+import 'widgets/sheet/video_comment_sheet.dart';
+import 'widgets/sheet/video_description_sheet.dart';
 import 'widgets/sheet/video_draggable_sheet.dart';
+import 'widgets/sheet/video_playlist_sheet.dart';
 import 'widgets/sheet/video_side_sheet.dart';
-import 'widgets/video_chapters_sheet.dart';
-import 'widgets/video_comment_sheet.dart';
-import 'widgets/video_description_sheet.dart';
+import 'widgets/sheet/video_thanks_sheet.dart';
 import 'widgets/video_playlist_section.dart';
-import 'widgets/video_playlist_sheet.dart';
 
 enum _VideoBottomSheet {
   comment,
@@ -63,6 +64,7 @@ enum _VideoBottomSheet {
   membership,
   product,
   news,
+  thanks,
 }
 
 class VideoScreen extends ConsumerStatefulWidget {
@@ -402,18 +404,14 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _VideoBottomSheet.chapter,
     _VideoBottomSheet.description,
     _VideoBottomSheet.playlist,
+    _VideoBottomSheet.thanks,
   ];
 
   @override
   void initState() {
     super.initState();
 
-    _createDraggableControllers([
-      _VideoBottomSheet.comment,
-      _VideoBottomSheet.chapter,
-      _VideoBottomSheet.description,
-      _VideoBottomSheet.playlist,
-    ]);
+    _createDraggableControllers(_availableSheet);
 
     _viewController = AnimationController(
       vsync: this,
@@ -589,6 +587,8 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
           _openBottomSheet(_VideoBottomSheet.chapter);
         } else if (signal == PlayerSignal.closeChapters) {
           _closeBottomSheet(_VideoBottomSheet.chapter);
+        } else if (signal == PlayerSignal.openThanks) {
+          _openBottomSheet(_VideoBottomSheet.thanks);
         }
       },
     );
@@ -1914,6 +1914,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                             for (final sheet in [
                               _VideoBottomSheet.description,
                               _VideoBottomSheet.comment,
+                              _VideoBottomSheet.playlist,
                             ])
                               PlayerSideSheet(
                                 constraints: BoxConstraints(
@@ -1968,6 +1969,14 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                     );
                   } else if (sheet == _VideoBottomSheet.playlist) {
                     childWidget = VideoPlaylistSheet(
+                      key: GlobalObjectKey(sheet),
+                      controller: controller,
+                      initialHeight: initialDraggableSnapSize,
+                      onPressClose: closeSheet,
+                      draggableController: draggableController,
+                    );
+                  } else if (sheet == _VideoBottomSheet.thanks) {
+                    return VideoThanksSheet(
                       key: GlobalObjectKey(sheet),
                       controller: controller,
                       initialHeight: initialDraggableSnapSize,

@@ -26,6 +26,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -68,9 +70,12 @@ class _CommentTileState extends State<CommentTile> {
   Widget build(BuildContext context) {
     const showTranslationOption = true;
     final theme = context.theme.appStyles.commentStyle;
+    final isThanks = widget.showReplies;
+    final bgColor = (() =>
+        isThanks ? AppPalette.thanksVariants[1] : widget.backgroundColor)();
     return Material(
       // type: MaterialType.transparency,
-      color: widget.backgroundColor ?? Colors.transparent,
+      color: bgColor?.withOpacity(.1) ?? Colors.transparent,
       child: Column(
         children: <Widget>[
           TappableArea(
@@ -123,7 +128,7 @@ class _CommentTileState extends State<CommentTile> {
                                 : null,
                             decoration: widget.byCreator
                                 ? BoxDecoration(
-                                    color: Colors.white24,
+                                    color: context.theme.hintColor,
                                     borderRadius: BorderRadius.circular(
                                       16,
                                     ),
@@ -165,10 +170,61 @@ class _CommentTileState extends State<CommentTile> {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        'Cutting funding on precautions is going to cost more in the long run',
+                      RichText(
+                        text: TextSpan(
+                          text: '',
+                          children: [
+                            if (isThanks)
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 2.0,
+                                        horizontal: 8,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: bgColor,
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            YTIcons.thanks_filled,
+                                            size: 12,
+                                            color: context.theme.colorScheme
+                                                .inverseSurface,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            r'$12',
+                                            style: theme.textStyle.copyWith(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: context.theme.colorScheme
+                                                  .inverseSurface,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                  ],
+                                ),
+                              ),
+                            const TextSpan(
+                              text:
+                                  'Cutting funding on precautions is going to cost more in the long run',
+                            ),
+                          ],
+                          style: theme.textStyle.copyWith(
+                            textBaseline: TextBaseline.alphabetic,
+                          ),
+                        ),
                         maxLines: 5,
-                        style: theme.textStyle,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 8),
@@ -544,30 +600,50 @@ class CommenterProfileCard extends StatelessWidget {
                 ),
                 SizedBox(
                   height: 76,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                    ),
-                    itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 4,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                          ),
+                          itemBuilder: (BuildContext context, int index) {
+                            return Container(
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              child: const Column(
+                                children: [
+                                  AccountAvatar(size: 52),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Bussy Boy',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          itemCount: 10,
                         ),
-                        child: const Column(
-                          children: [
-                            AccountAvatar(size: 52),
-                            SizedBox(height: 8),
-                            Text(
-                              'Bussy Boy',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TappableArea(
+                          onTap: () {},
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'ALL',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: context.theme.primaryColor,
                             ),
-                          ],
+                          ),
                         ),
-                      );
-                    },
-                    itemCount: 10,
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 8),

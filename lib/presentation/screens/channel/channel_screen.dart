@@ -192,6 +192,65 @@ class _ChannelScreenState extends State<ChannelScreen> {
           ),
         ),
       ),
+      SliverToBoxAdapter(
+        child: SizedBox(
+          height: 112,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12.0,
+                  vertical: 12,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Our members',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Thank you, channel members!',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: context.theme.hintColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    Text(
+                      'Join',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: context.theme.primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  itemBuilder: (BuildContext context, int index) {
+                    return const AccountAvatar();
+                  },
+                  itemCount: 10,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       const SliverToBoxAdapter(
         child: SizedBox(height: 12),
       ),

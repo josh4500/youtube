@@ -27,16 +27,18 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-class VideoActions extends StatelessWidget {
+class VideoActions extends ConsumerWidget {
   const VideoActions({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
       height: 36,
       child: ListView(
@@ -92,11 +94,14 @@ class VideoActions extends StatelessWidget {
             icon: const Icon(Icons.wifi_channel_outlined, size: 18),
             onTap: () => onRemixClicked(context),
           ),
-          const CustomActionChip(
+          CustomActionChip(
             title: 'Thanks',
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            margin: EdgeInsets.symmetric(horizontal: 4),
-            icon: Icon(YTIcons.thanks_outlined, size: 18),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            icon: const Icon(YTIcons.thanks_outlined, size: 18),
+            onTap: () => ref.read(playerRepositoryProvider).sendPlayerSignal(
+              [PlayerSignal.openThanks],
+            ),
           ),
           CustomActionButton(
             title: 'Download',
