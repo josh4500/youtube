@@ -51,6 +51,7 @@ import 'widgets/sheet/video_chapters_sheet.dart';
 import 'widgets/sheet/video_comment_sheet.dart';
 import 'widgets/sheet/video_description_sheet.dart';
 import 'widgets/sheet/video_draggable_sheet.dart';
+import 'widgets/sheet/video_membership_sheet.dart';
 import 'widgets/sheet/video_playlist_sheet.dart';
 import 'widgets/sheet/video_side_sheet.dart';
 import 'widgets/sheet/video_thanks_sheet.dart';
@@ -64,6 +65,7 @@ enum _VideoBottomSheet {
   membership,
   product,
   news,
+  clip,
   thanks,
 }
 
@@ -318,28 +320,40 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   void _createDraggableControllers(List<_VideoBottomSheet> sheets) {
     for (final _VideoBottomSheet sheet in sheets) {
-      _draggableNotifiers[sheet] = ValueNotifier<bool>(false);
-    }
-
-    for (final _VideoBottomSheet sheet in sheets) {
-      _draggableAnimationOpacity[sheet] = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 250),
+      _draggableNotifiers.putIfAbsent(
+        sheet,
+        () => ValueNotifier<bool>(false),
       );
     }
 
     for (final _VideoBottomSheet sheet in sheets) {
-      _draggableControllers[sheet] = DraggableScrollableController();
-      _draggableControllers[sheet]?.addListener(
-        () => _onSheetSizeChange(sheet),
+      _draggableAnimationOpacity.putIfAbsent(
+        sheet,
+        () => AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 250),
+        ),
       );
     }
 
     for (final _VideoBottomSheet sheet in sheets) {
-      _draggableAnimationSize[sheet] = AnimationController(
-        vsync: this,
-        value: 0,
-        duration: const Duration(milliseconds: 100),
+      _draggableControllers.putIfAbsent(
+        sheet,
+        () => DraggableScrollableController()
+          ..addListener(
+            () => _onSheetSizeChange(sheet),
+          ),
+      );
+    }
+
+    for (final _VideoBottomSheet sheet in sheets) {
+      _draggableAnimationSize.putIfAbsent(
+        sheet,
+        () => AnimationController(
+          vsync: this,
+          value: 0,
+          duration: const Duration(milliseconds: 100),
+        ),
       );
     }
   }
@@ -405,6 +419,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _VideoBottomSheet.description,
     _VideoBottomSheet.playlist,
     _VideoBottomSheet.thanks,
+    _VideoBottomSheet.membership,
   ];
 
   @override
@@ -589,6 +604,8 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
           _closeBottomSheet(_VideoBottomSheet.chapter);
         } else if (signal == PlayerSignal.openThanks) {
           _openBottomSheet(_VideoBottomSheet.thanks);
+        } else if (signal == PlayerSignal.openMembership) {
+          _openBottomSheet(_VideoBottomSheet.membership);
         }
       },
     );
@@ -1977,6 +1994,14 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                     );
                   } else if (sheet == _VideoBottomSheet.thanks) {
                     return VideoThanksSheet(
+                      key: GlobalObjectKey(sheet),
+                      controller: controller,
+                      initialHeight: initialDraggableSnapSize,
+                      onPressClose: closeSheet,
+                      draggableController: draggableController,
+                    );
+                  } else if (sheet == _VideoBottomSheet.membership) {
+                    return VideoMembershipSheet(
                       key: GlobalObjectKey(sheet),
                       controller: controller,
                       initialHeight: initialDraggableSnapSize,

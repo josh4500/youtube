@@ -20,7 +20,7 @@ class CaptureRecordingControl extends StatelessWidget {
             builder: (BuildContext context, WidgetRef ref, Widget? _) {
               final album = ref.watch(mediaAlbumStateProvider).value?.selected;
               if (album == null) {
-                return const Icon(Icons.photo_outlined, size: 40);
+                return const Icon(YTIcons.image_outlined, size: 40);
               }
               return Container(
                 width: 40,

@@ -134,7 +134,7 @@ class MediaStoragePermissionRequest extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.photo_outlined, size: 48),
+                              Icon(YTIcons.image_outlined, size: 48),
                               SizedBox(height: 48),
                               Text(
                                 'Let YouTube access your photos and videos',

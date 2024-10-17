@@ -139,7 +139,7 @@ abstract final class AppTheme {
     scaffoldBackgroundColor: const Color(0xFF0F0F0F),
     primaryColor: AppPalette.blue,
     canvasColor: const Color(0xFF0F0F0F),
-    hintColor: Colors.white38,
+    hintColor: const Color(0xFFAAAAAA),
     colorScheme: const ColorScheme.dark(
       surface: Colors.white,
       inverseSurface: Colors.black,

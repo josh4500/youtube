@@ -103,7 +103,7 @@ class AccountChannelSection extends StatelessWidget {
                   ),
                   SizedBox(width: 8),
                   Icon(
-                    Icons.chevron_right,
+                    YTIcons.chevron_right,
                     color: Colors.grey,
                   ),
                 ],

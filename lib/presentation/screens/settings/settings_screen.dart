@@ -82,7 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           showDismissButtons: false,
           action: CustomInkWell(
             onTap: () {},
-            child: const Icon(YTIcons.save_outlined),
+            child: const Icon(YTIcons.add_outlined),
           ),
           child: Container(
             color: context.theme.appColors.settingsPopupBackgroundColor,

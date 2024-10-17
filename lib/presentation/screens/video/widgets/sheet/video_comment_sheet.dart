@@ -83,10 +83,15 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
         topLeft: Radius.circular(12),
         topRight: Radius.circular(12),
       ),
-      dynamicTab: DynamicTab(
-        initialIndex: indexNotifier.value,
-        options: const ['Top', 'Timed', 'Members', 'Newest'],
-        onChanged: (int index) => indexNotifier.value = index,
+      dynamicTab: ValueListenableBuilder(
+        valueListenable: indexNotifier,
+        builder: (context, page, __) {
+          return DynamicTab(
+            initialIndex: page,
+            options: const ['Top', 'Timed', 'Members', 'Newest'],
+            onChanged: (int index) => indexNotifier.value = index,
+          );
+        },
       ),
       contentBuilder: (context, controller, physics) {
         return ListView.builder(
@@ -178,11 +183,14 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
                             ],
                           ),
                         ),
-                        Text(
-                          'View all',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: context.theme.primaryColor,
+                        GestureDetector(
+                          onTap: () => indexNotifier.value = 2,
+                          child: Text(
+                            'View all',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: context.theme.primaryColor,
+                            ),
                           ),
                         ),
                       ],

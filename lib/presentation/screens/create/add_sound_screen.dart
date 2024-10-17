@@ -62,7 +62,7 @@ class AddSoundScreen extends StatelessWidget {
                           contentPadding: EdgeInsets.only(bottom: 12),
                           border: InputBorder.none,
                           prefixIcon: Icon(
-                            Icons.search,
+                            YTIcons.search_outlined,
                             color: Colors.white,
                           ),
                         ),
@@ -155,7 +155,7 @@ class AddSoundBrowsePage extends StatelessWidget {
           child: GroupedPageViewBuilder(
             title: 'Recommended',
             onTap: () {},
-            leading: const Icon(Icons.star_outline),
+            leading: const Icon(YTIcons.star),
             itemBuilder: (BuildContext context, int index) {
               return Container(
                 margin: const EdgeInsets.only(right: 12),

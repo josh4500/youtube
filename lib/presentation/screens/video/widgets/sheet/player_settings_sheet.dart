@@ -266,7 +266,7 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
           ),
         ),
         const DynamicSheetOptionItem(
-          leading: Icon(Icons.video_stable),
+          leading: Icon(YTIcons.stable_volume_outlined),
           title: 'Stable volume',
           enabled: false,
           trailing: PlayerSettingsSwitch(selected: true),

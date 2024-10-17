@@ -82,7 +82,8 @@ enum PlayerSignal {
   closeComments,
   openChapters,
   closeChapters,
-  openThanks;
+  openThanks,
+  openMembership;
 }
 
 enum PlayerLockReason {

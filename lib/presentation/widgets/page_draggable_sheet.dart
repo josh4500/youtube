@@ -6,7 +6,6 @@ import 'package:youtube_clone/presentation/themes.dart';
 
 import '../constants.dart';
 import 'custom_scroll_physics.dart';
-import 'dynamic_tab.dart';
 import 'gestures/custom_ink_well.dart';
 import 'over_scroll_glow_behavior.dart';
 import 'persistent_header_delegate.dart';
@@ -56,7 +55,7 @@ class PageDraggableSheet extends StatefulWidget {
   final PreferredSize? subtitle;
   final List<PageDraggableOverlayChild> overlayChildren;
   final ValueChanged<int>? onOpenOverlayChild;
-  final DynamicTab? dynamicTab;
+  final Widget? dynamicTab;
   final double dynamicTabShowOffset;
   final double baseHeight;
 
@@ -165,7 +164,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     _velocityTracker?.addPosition(event.timeStamp, event.localPosition);
 
     if (widget.draggableController != null) {
-      if (_innerListController.offset == 0 && !_overlayAnyChildIsOpened) {
+      if (!_innerListController.hasClients ||
+          _innerListController.offset == 0 && !_overlayAnyChildIsOpened) {
         _changeDraggableSize(_innerListPhysics, event);
       } else if (_overlayAnyChildIsOpened && _overlayLastChildIndex != null) {
         final PageDraggableOverlayChildController controller =

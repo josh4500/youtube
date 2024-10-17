@@ -91,7 +91,7 @@ class CommentTextFieldPlaceholder extends StatelessWidget {
                 const SizedBox(width: 4),
                 if (!isPaused) ...[
                   if (isReply)
-                    const Icon(Icons.camera)
+                    const Icon(YTIcons.camera_outlined)
                   else
                     TappableArea(
                       onTap: () {},

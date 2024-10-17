@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -49,14 +51,16 @@ class VideoChannelActionButtons extends StatelessWidget {
   }
 }
 
-class VideoChannelMembershipButton extends StatelessWidget {
+class VideoChannelMembershipButton extends ConsumerWidget {
   const VideoChannelMembershipButton({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return CustomActionChip(
       title: 'Join',
-      onTap: () {},
+      onTap: () => ref
+          .read(playerRepositoryProvider)
+          .sendPlayerSignal([PlayerSignal.openMembership]),
       backgroundColor: context.theme.colorScheme.surface,
       borderRadius: BorderRadius.circular(24),
       padding: const EdgeInsets.symmetric(

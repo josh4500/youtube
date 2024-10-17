@@ -43,7 +43,7 @@ class ChannelDescLink extends StatelessWidget {
       child: Row(
         children: <Widget>[
           const Icon(
-            Icons.camera,
+            YTIcons.camera_outlined,
             size: 28,
           ),
           const SizedBox(width: 8),

@@ -91,7 +91,7 @@ class _DynamicTabState extends State<DynamicTab> {
   @override
   void didUpdateWidget(covariant DynamicTab oldWidget) {
     super.didUpdateWidget(oldWidget);
-    //_selectedIndexNotifier.value = widget.initialIndex;
+    _selectedIndexNotifier.value = widget.initialIndex;
   }
 
   @override
