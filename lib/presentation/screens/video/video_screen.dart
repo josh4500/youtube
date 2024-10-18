@@ -1531,6 +1531,12 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
           maxAdditionalHeight,
         );
 
+        if (_availableSheet.contains(VideoBottomSheet.playlist)) {
+          _playlistOffsetController.value = _playerAddedHeightNotifier.value
+              .normalize(minAdditionalHeight, maxAdditionalHeight / 2)
+              .invertByOne;
+        }
+
         if (additionalHeight > 0) {
           // Hides the playback progress while animating "to" expanded view
           ref.read(playerRepositoryProvider).sendPlayerSignal(
