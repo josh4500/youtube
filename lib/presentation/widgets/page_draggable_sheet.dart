@@ -69,20 +69,21 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
   int? _overlayLastChildIndex;
   bool get _overlayAnyChildIsOpened => _overlayChildIndexList.isNotEmpty;
 
-  late final ScrollController _innerListController;
+  late final ScrollController _innerScrollController;
   late final CustomScrollableScrollPhysics _innerListPhysics;
   late final AnimationController _dynamicTabHideController;
   late final Animation<double> _dynamicTabHideAnimation;
 
   VelocityTracker? _velocityTracker;
-
+  double _beginPixels = 0.0;
+  bool _canDragSheet = true;
   bool get hasDynamicTab => widget.dynamicTab != null;
 
   @override
   void initState() {
     super.initState();
 
-    _innerListController = ScrollController();
+    _innerScrollController = ScrollController();
     _innerListPhysics = CustomScrollableScrollPhysics(tag: widget.scrollTag);
 
     for (int i = 0; i < widget.overlayChildren.length; i++) {
@@ -121,8 +122,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
       }
       _overlayChildIndexList.remove(index);
 
-      if (_innerListController.hasClients &&
-          _innerListController.offset < 100 &&
+      if (_innerScrollController.hasClients &&
+          _innerScrollController.offset < 100 &&
           hasDynamicTab) {
         _dynamicTabHideController.forward();
       }
@@ -142,7 +143,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
 
   @override
   void dispose() {
-    _innerListController.dispose();
+    _innerScrollController.dispose();
     super.dispose();
   }
 
@@ -152,29 +153,6 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeIn,
     );
-  }
-
-  void _onPointerDownOnSheet(PointerDownEvent event) {
-    _velocityTracker = VelocityTracker.withKind(event.kind);
-  }
-
-  void _onPointerMoveOnSheetContent(PointerMoveEvent event) {
-    if (widget.dragDismissible == false) return;
-
-    _velocityTracker?.addPosition(event.timeStamp, event.localPosition);
-
-    if (widget.draggableController != null) {
-      if (!_innerListController.hasClients ||
-          _innerListController.offset == 0 && !_overlayAnyChildIsOpened) {
-        _changeDraggableSize(_innerListPhysics, event);
-      } else if (_overlayAnyChildIsOpened && _overlayLastChildIndex != null) {
-        final PageDraggableOverlayChildController controller =
-            widget.overlayChildren[_overlayLastChildIndex!].controller;
-        if (controller._scrollController.offset == 0 && controller.isOpened) {
-          _changeDraggableSize(controller._scrollPhysics, event);
-        }
-      }
-    }
   }
 
   void _changeDraggableSize(
@@ -193,12 +171,40 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     } else {
       scrollPhysics.canScroll(false);
     }
-    widget.draggableController!.jumpTo(newSize);
+
+    if (_canDragSheet) widget.draggableController!.jumpTo(newSize);
+  }
+
+  void _onPointerDownOnSheet(PointerDownEvent event) {
+    _velocityTracker = VelocityTracker.withKind(event.kind);
+  }
+
+  void _onPointerMoveOnSheetContent(PointerMoveEvent event) {
+    if (widget.dragDismissible == false) return;
+
+    if (event.delta.dy <= 0 && _innerScrollController.offset != 0) {
+      _canDragSheet = false;
+    }
+
+    _velocityTracker?.addPosition(event.timeStamp, event.localPosition);
+
+    if (widget.draggableController != null) {
+      if (!_innerScrollController.hasClients ||
+          _innerScrollController.offset == 0 && !_overlayAnyChildIsOpened) {
+        _changeDraggableSize(_innerListPhysics, event);
+      } else if (_overlayAnyChildIsOpened && _overlayLastChildIndex != null) {
+        final PageDraggableOverlayChildController controller =
+            widget.overlayChildren[_overlayLastChildIndex!].controller;
+        if (controller._scrollController.offset == 0 && controller.isOpened) {
+          _changeDraggableSize(controller._scrollPhysics, event);
+        }
+      }
+    }
   }
 
   void _onPointerLeaveOnSheetContent(PointerUpEvent event) {
     if (widget.dragDismissible == false) return;
-
+    _canDragSheet = _innerScrollController.offset == 0;
     if (widget.draggableController != null) {
       _innerListPhysics.canScroll(true);
       if (_overlayAnyChildIsOpened) {
@@ -219,7 +225,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
       }
     }
 
-    if (_innerListController.hasClients && _innerListController.offset == 0) {
+    if (_innerScrollController.hasClients &&
+        _innerScrollController.offset == 0) {
       // Calculate the velocity
       final velocity = _velocityTracker?.getVelocity();
       if (velocity != null && velocity.pixelsPerSecond.dy > kMaxDragVelocity) {
@@ -250,8 +257,6 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     }
     widget.onClose();
   }
-
-  double _beginPixels = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -402,7 +407,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                         },
                         child: widget.contentBuilder(
                           context,
-                          _innerListController,
+                          _innerScrollController,
                           _innerListPhysics,
                         ),
                       ),
