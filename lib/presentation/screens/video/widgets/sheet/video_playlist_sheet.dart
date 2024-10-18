@@ -76,7 +76,6 @@ class _VideoPlaylistSheetState extends State<VideoPlaylistSheet> {
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Distributed Systems lecture',
-      scrollTag: 'playlist_comments',
       trailingTitle: '$kDotSeparator 1/23',
       subtitle: PreferredSize(
         preferredSize: const Size(double.infinity, 44),

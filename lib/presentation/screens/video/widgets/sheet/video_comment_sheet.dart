@@ -73,7 +73,6 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Comments',
-      scrollTag: 'player_comments',
       controller: widget.controller ?? ScrollController(),
       onClose: widget.onPressClose,
       dragDismissible: widget.dragDismissible,

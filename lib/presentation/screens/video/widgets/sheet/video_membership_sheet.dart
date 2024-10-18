@@ -75,7 +75,6 @@ class _VideoMembershipSheetState extends State<VideoMembershipSheet> {
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Membership',
-      scrollTag: 'membership',
       controller: widget.controller ?? ScrollController(),
       onClose: widget.onPressClose,
       draggableController: widget.draggableController,

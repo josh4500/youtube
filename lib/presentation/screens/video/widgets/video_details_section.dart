@@ -8,8 +8,8 @@ import 'video_channel_context.dart';
 import 'video_channel_section.dart';
 import 'video_comment_section.dart';
 
-class PlayerVideoInfo extends StatelessWidget {
-  const PlayerVideoInfo({
+class VideoDetailsSection extends StatelessWidget {
+  const VideoDetailsSection({
     super.key,
     this.physics,
     this.controller,

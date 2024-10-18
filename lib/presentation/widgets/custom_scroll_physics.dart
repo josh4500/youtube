@@ -29,26 +29,27 @@
 import 'package:flutter/widgets.dart';
 
 class CustomScrollableScrollPhysics extends ScrollPhysics {
-  const CustomScrollableScrollPhysics({super.parent, required this.tag});
+  CustomScrollableScrollPhysics({
+    super.parent,
+    bool canScroll = true,
+  }) : _canScroll = canScroll;
 
-  static final Map<String, bool> _shouldScroll = <String, bool>{};
-  final String tag;
+  bool _canScroll;
 
   @override
   CustomScrollableScrollPhysics applyTo(ScrollPhysics? ancestor) {
     return CustomScrollableScrollPhysics(
       parent: buildParent(ancestor),
-      tag: tag,
     );
   }
 
-  void canScroll(bool value) {
-    _shouldScroll[tag] = value;
+  set canScroll(bool value) {
+    _canScroll = value;
   }
 
   @override
-  bool get allowUserScrolling => _shouldScroll[tag] ?? true;
+  bool get allowUserScrolling => _canScroll;
 
   @override
-  bool get allowImplicitScrolling => _shouldScroll[tag] ?? true;
+  bool get allowImplicitScrolling => _canScroll;
 }

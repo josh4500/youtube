@@ -29,9 +29,7 @@ class DynamicSheet extends StatefulWidget {
 
 class _DynamicSheetState extends State<DynamicSheet>
     with SingleTickerProviderStateMixin {
-  final customScrollPhysics = const CustomScrollableScrollPhysics(
-    tag: 'dynamic-sheet',
-  );
+  final customScrollPhysics = CustomScrollableScrollPhysics();
   final ScrollController scrollController = ScrollController();
   final ValueNotifier<double> heightNotifier = ValueNotifier<double>(0);
 
@@ -71,9 +69,8 @@ class _DynamicSheetState extends State<DynamicSheet>
                   maxSheetHeight,
                 );
 
-                customScrollPhysics.canScroll(
-                  !(heightNotifier.value <= minSheetHeight && deltaY >= 0),
-                );
+                customScrollPhysics.canScroll =
+                    !(heightNotifier.value <= minSheetHeight && deltaY >= 0);
               }
             },
             child: ListenableBuilder(

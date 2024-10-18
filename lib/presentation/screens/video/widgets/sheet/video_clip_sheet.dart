@@ -80,7 +80,6 @@ class _VideoClipSheetState extends State<VideoClipSheet> {
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Create clip',
-      scrollTag: 'clip',
       controller: widget.controller ?? ScrollController(),
       onClose: () {
         showDialog(

@@ -70,10 +70,7 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
       DraggableScrollableController();
 
   final ValueNotifier<double> playerBottomPadding = ValueNotifier<double>(0);
-  final CustomScrollableScrollPhysics physics =
-      const CustomScrollableScrollPhysics(
-    tag: 'shorts',
-  );
+  final physics = CustomScrollableScrollPhysics();
   final _replyController = PageDraggableOverlayChildController(
     title: 'Replies',
   );
@@ -143,10 +140,10 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
     final double size = _draggableController.size;
     if (size > 0) {
       ref.read(homeRepositoryProvider).lockNavBarPosition();
-      physics.canScroll(false);
+      physics.canScroll = false;
     } else {
       ref.read(homeRepositoryProvider).unlockNavBarPosition();
-      physics.canScroll(true);
+      physics.canScroll = true;
     }
   }
 

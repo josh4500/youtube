@@ -71,7 +71,6 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Description',
-      scrollTag: 'player_description',
       controller: widget.controller ?? ScrollController(),
       onClose: widget.onPressClose,
       dragDismissible: widget.dragDismissible,

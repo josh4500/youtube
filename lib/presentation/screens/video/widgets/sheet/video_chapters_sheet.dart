@@ -38,7 +38,6 @@ class _VideoChaptersSheetState extends State<VideoChaptersSheet> {
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Chapters',
-      scrollTag: 'player_chapters',
       controller: widget.controller ?? ScrollController(),
       onClose: widget.onPressClose,
       showDragIndicator: true,

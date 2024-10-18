@@ -30,7 +30,6 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet> {
     return PageDraggableSheet(
       title: 'Comments',
       trailingTitle: '7.1k',
-      scrollTag: 'short_comments',
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(8),
         topRight: Radius.circular(8),

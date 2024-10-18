@@ -17,7 +17,6 @@ class PageDraggableSheet extends StatefulWidget {
     required this.title,
     this.trailingTitle,
     this.dragDownDismiss = false,
-    required this.scrollTag,
     this.borderRadius = BorderRadius.zero,
     required this.controller,
     required this.onClose,
@@ -36,7 +35,6 @@ class PageDraggableSheet extends StatefulWidget {
     this.dragDismissible = true,
   });
 
-  final String scrollTag;
   final bool dragDownDismiss;
   final String title;
   final String? trailingTitle;
@@ -84,7 +82,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     super.initState();
 
     _innerScrollController = ScrollController();
-    _innerListPhysics = CustomScrollableScrollPhysics(tag: widget.scrollTag);
+    _innerListPhysics = CustomScrollableScrollPhysics();
 
     for (int i = 0; i < widget.overlayChildren.length; i++) {
       final PageDraggableOverlayChild overlayChild = widget.overlayChildren[i];
@@ -167,9 +165,9 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
         ? clampDouble(size - (yDist / height), 0, widget.baseHeight)
         : clampDouble(size - (yDist / height), 0, 1);
     if (newSize >= widget.baseHeight) {
-      scrollPhysics.canScroll(true);
+      scrollPhysics.canScroll = true;
     } else {
-      scrollPhysics.canScroll(false);
+      scrollPhysics.canScroll = false;
     }
 
     if (_canDragSheet) widget.draggableController!.jumpTo(newSize);
@@ -206,12 +204,11 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     if (widget.dragDismissible == false) return;
     _canDragSheet = _innerScrollController.offset == 0;
     if (widget.draggableController != null) {
-      _innerListPhysics.canScroll(true);
+      _innerListPhysics.canScroll = true;
       if (_overlayAnyChildIsOpened) {
         if (_overlayLastChildIndex != null) {
           widget.overlayChildren[_overlayLastChildIndex!].controller
-              ._scrollPhysics
-              .canScroll(true);
+              ._scrollPhysics.canScroll = true;
         }
       }
 
@@ -502,9 +499,8 @@ class PageDraggableOverlayChildController extends ChangeNotifier {
     required this.title,
   });
   final String title;
-  final ScrollController _scrollController = ScrollController();
-  final CustomScrollableScrollPhysics _scrollPhysics =
-      const CustomScrollableScrollPhysics(tag: 'innerChild');
+  final _scrollController = ScrollController();
+  final _scrollPhysics = CustomScrollableScrollPhysics();
 
   bool _isOpened = false;
   bool get isOpened => _isOpened;

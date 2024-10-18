@@ -501,10 +501,10 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
                   child: const _OverlaySeekDuration(),
                 ),
                 _OverlayProgress(
-                  showPlaybackProgress: _showPlaybackProgress,
-                  hideControlAnimation: _controlsAnimation,
-                  progressAnimation: _progressAnimation,
                   bufferAnimation: _bufferAnimation,
+                  progressAnimation: _progressAnimation,
+                  hideControlAnimation: _controlsAnimation,
+                  showPlaybackProgress: _showPlaybackProgress,
                   onTap: _onPlaybackProgressTap,
                   onVerticalDrag: _onPlaybackVerticalDrag,
                   onVerticalDragStart: _onPlaybackVerticalDragStart,
@@ -679,6 +679,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   void _onDoubleTapDown(TapDownDetails details) {
     if (_preventCommonControlGestures) return;
+    final isLoading = ref.read(playerNotifierProvider).loading;
+    if (isLoading) return;
 
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isForward = details.localPosition.dx > (screenWidth / 2);
@@ -713,6 +715,9 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _startedOnLongPress = true;
 
     final isPlaying = ref.read(playerNotifierProvider).playing;
+    final isLoading = ref.read(playerNotifierProvider).loading;
+
+    if (isLoading) return;
     if (isPlaying) {
       Forward2xSpeedStartPlayerNotification().dispatch(context);
       _show2xSpeed();
@@ -730,6 +735,9 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
     final isPlaying = ref.read(playerNotifierProvider).playing;
     final hasEnded = ref.read(playerNotifierProvider).ended;
+    final isLoading = ref.read(playerNotifierProvider).loading;
+
+    if (isLoading) return;
 
     if (isPlaying && !hasEnded) {
       Forward2xSpeedEndPlayerNotification().dispatch(context);
@@ -746,6 +754,9 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
   void _onLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
     if (_preventCommonControlGestures) return;
+
+    final isLoading = ref.read(playerNotifierProvider).loading;
+    if (isLoading) return;
 
     if (_seekIndicatorNotifier.value.isSlideSeeking) {
       SlideSeekUpdatePlayerNotification().dispatch(context);

@@ -46,7 +46,7 @@ import 'widgets/player/mini_player.dart';
 import 'widgets/player/player_annotations_wrapper.dart';
 import 'widgets/player/player_components_wrapper.dart';
 import 'widgets/player/player_view.dart';
-import 'widgets/player_video_info.dart';
+import 'widgets/video_details_section.dart';
 import 'widgets/sheet/player_settings_sheet.dart';
 import 'widgets/sheet/video_chapters_sheet.dart';
 import 'widgets/sheet/video_clip_sheet.dart';
@@ -77,46 +77,105 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   final GlobalKey _interactivePlayerKey = GlobalKey();
   VelocityTracker? _infoVelocityTracker;
   double _slideOffsetYValue = 0;
-  late final AnimationController _viewController;
-  late final Animation<Offset> _playerLandscapeSlideAnimation;
-  late final Animation<double> _playerLandscapeScaleAnimation;
-
-  final ScrollController _infoScrollController = ScrollController();
-  final CustomScrollableScrollPhysics _infoScrollPhysics =
-      const CustomScrollableScrollPhysics(
-    parent: AlwaysScrollableScrollPhysics(),
-    tag: 'info',
+  late final _viewController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 100),
+  );
+  late final Animation<Offset> _playerLandscapeSlideAnimation = Tween<Offset>(
+    begin: Offset.zero,
+    end: const Offset(0, .05),
+  ).animate(_viewController);
+  late final Animation<double> _playerLandscapeScaleAnimation =
+      _viewController.drive(
+    Tween<double>(begin: 1, end: 0.95),
   );
 
-  final TransformationController _transformationController =
-      TransformationController();
-  late final AnimationController _zoomPanAnimationController;
+  final  _detailsScrollController = ScrollController();
+  final _detailsScrollPhysics =  CustomScrollableScrollPhysics(
+    parent: const AlwaysScrollableScrollPhysics(),
+  );
 
-  late final AnimationController _playerDismissController;
-  late final Animation<double> _playerFadeAnimation;
-  late final Animation<Offset> _playerSlideAnimation;
+  final _transformationController = TransformationController();
+  late final _zoomPanAnimationController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 250),
+  );
 
-  late final AnimationController _playerOpacityController;
-  late final Animation<double> _playerOpacityAnimation;
+  late final _playerDismissController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 125),
+  );
+  late final Animation<double> _playerFadeAnimation = ReverseAnimation(
+    CurvedAnimation(
+      parent: _playerDismissController,
+      curve: Curves.easeInCubic,
+    ),
+  );
+  late final Animation<Offset> _playerSlideAnimation = Tween(
+    begin: Offset.zero,
+    end: const Offset(0, 1),
+  ).animate(_playerDismissController);
 
-  late final AnimationController _infoOpacityController;
-  late final Animation<double> _infoOpacityAnimation;
+  late final _playerOpacityController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 250),
+  );
+  late final Animation<double> _playerOpacityAnimation = ReverseAnimation(
+    CurvedAnimation(parent: _playerOpacityController, curve: Curves.easeIn),
+  );
 
-  late final AnimationController _playerAddedHeightAnimationController;
-  late final ValueNotifier<double> _playerAddedHeightNotifier;
+  late final _infoOpacityController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 250),
+  );
+  late final Animation<double> _infoOpacityAnimation = CurvedAnimation(
+    parent: ReverseAnimation(_infoOpacityController),
+    curve: Curves.easeIn,
+  );
 
-  late final ValueNotifier<double> _playerMarginNotifier;
+  late final _playerAddedHeightAnimationController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 125),
+  );
+  late final _playerAddedHeightNotifier = ValueNotifier<double>(
+    ui.clampDouble(
+      (screenHeight * (1 - kAvgVideoViewPortHeight)) -
+          (screenHeight * (1 - playerHeightToScreenRatio)),
+      minAdditionalHeight,
+      maxAdditionalHeight,
+    ),
+  );
 
-  late final AnimationController _screenHeightAnimationController;
-  late final ValueNotifier<double> _screenHeightNotifier;
-  late final AnimationController _screenWidthAnimationController;
-  late final ValueNotifier<double> _screenWidthNotifier;
+  late final _playerMarginNotifier = ValueNotifier<double>(0);
 
-  late final AnimationController _playerWidthAnimationController;
-  late final ValueNotifier<double> _playerWidthNotifier;
+  late final _screenHeightAnimationController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 125),
+  );
+  late final _screenHeightNotifier = ValueNotifier<double>(
+    kMinVideoViewPortWidthPortrait,
+  );
+  late final _screenWidthAnimationController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 125),
+  );
+  late final _screenWidthNotifier = ValueNotifier<double>(1);
 
-  late final ValueNotifier<double> _playerHeightNotifier;
-  late final ValueNotifier<bool> _hideGraphicsNotifier;
+  late final _playerWidthAnimationController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 125),
+  );
+  late final _playerWidthNotifier = ValueNotifier<double>(
+    kMinVideoViewPortWidthPortrait,
+  );
+
+  late final _playerHeightNotifier = ValueNotifier<double>(
+    kMinVideoViewPortWidthPortrait.normalize(
+      kMinVideoViewPortWidthPortrait,
+      1,
+    ),
+  );
+  late final _hideGraphicsNotifier = ValueNotifier<bool>(true);
 
   final _transcriptController = PageDraggableOverlayChildController(
     title: 'Transcript',
@@ -162,9 +221,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   }
 
   /// Player View Min Height
-  double get playerMinHeight {
-    return screenHeight * minPlayerHeightRatio;
-  }
+  double get playerMinHeight => 60;
 
   double get initialDraggableSnapSize => 1 - playerHeightToScreenRatio;
 
@@ -307,6 +364,10 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   bool get _hasAtLeastOneOpened => _openedDraggableState.isNotEmpty;
   final List<VideoBottomSheet> _openedDraggableState = [];
 
+  /// Creates controllers for [VideoBottomSheet]
+  /// - AnimationControllers (Size and Opacity)
+  /// - DraggableController
+  /// - ValueNotifier (for hiding and showing)
   void _createDraggableControllers(List<VideoBottomSheet> sheets) {
     for (final VideoBottomSheet sheet in sheets) {
       _draggableNotifiers.putIfAbsent(
@@ -336,14 +397,16 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     }
 
     for (final VideoBottomSheet sheet in sheets) {
-      _draggableAnimationSize.putIfAbsent(
-        sheet,
-        () => AnimationController(
-          vsync: this,
-          value: 0,
-          duration: const Duration(milliseconds: 100),
-        ),
-      );
+      if (_sideSheet.contains(sheet)) {
+        _draggableAnimationSize.putIfAbsent(
+          sheet,
+          () => AnimationController(
+            vsync: this,
+            value: 0,
+            duration: const Duration(milliseconds: 100),
+          ),
+        );
+      }
     }
   }
 
@@ -351,15 +414,20 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _draggableNotifiers.forEach((sheet, notifier) {
       notifier.dispose();
     });
+    _draggableNotifiers.clear();
     _draggableAnimationOpacity.forEach((sheet, animationController) {
       animationController.dispose();
     });
+    _draggableAnimationOpacity.clear();
     _draggableAnimationSize.forEach((sheet, animationController) {
       animationController.dispose();
     });
+    _draggableAnimationSize.clear();
     _draggableControllers.forEach((sheet, controllers) {
+      controllers.removeListener(() => _onSheetSizeChange(sheet));
       controllers.dispose();
     });
+    _draggableControllers.clear();
   }
 
   ValueNotifier<bool> _getSheetNotifier(VideoBottomSheet sheet) {
@@ -412,143 +480,26 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     VideoBottomSheet.clip,
   ];
 
+  final List<VideoBottomSheet> _sideSheet = [
+    VideoBottomSheet.description,
+    VideoBottomSheet.comment,
+    VideoBottomSheet.playlist,
+  ];
+
   @override
   void initState() {
     super.initState();
-
     _createDraggableControllers(_availableSheet);
 
-    _viewController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-    );
-
-    _playerLandscapeSlideAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, .05),
-    ).animate(_viewController);
-
-    _playerLandscapeScaleAnimation = _viewController.drive(
-      Tween<double>(begin: 1, end: 0.95),
-    );
-
-    _playerWidthAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 125),
-    );
-    _screenHeightAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 125),
-    );
-    _screenWidthAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 125),
-    );
-
-    _playerAddedHeightAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 125),
-    );
-
-    _playerDismissController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 125),
-    );
-
-    _playerFadeAnimation = ReverseAnimation(
-      CurvedAnimation(
-        parent: _playerDismissController,
-        curve: Curves.easeInCubic,
-      ),
-    );
-
-    _playerSlideAnimation = Tween(
-      begin: Offset.zero,
-      end: const Offset(0, 1),
-    ).animate(_playerDismissController);
-
-    _zoomPanAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 250),
-    );
-
-    _infoOpacityController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 250),
-    );
-
-    _infoOpacityAnimation = CurvedAnimation(
-      parent: ReverseAnimation(_infoOpacityController),
-      curve: Curves.easeIn,
-    );
-
-    _playerOpacityController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 250),
-    );
-
-    _playerOpacityAnimation = ReverseAnimation(
-      CurvedAnimation(parent: _playerOpacityController, curve: Curves.easeIn),
-    );
-
-    _playerAddedHeightNotifier = ValueNotifier<double>(
-      ui.clampDouble(
-        (screenHeight * (1 - kAvgVideoViewPortHeight)) -
-            (screenHeight * (1 - playerHeightToScreenRatio)),
-        minAdditionalHeight,
-        maxAdditionalHeight,
-      ),
-    );
-
-    _playerDismissController.addListener(() {
-      final value = _playerDismissController.value;
-      _changePlayerPitch(value);
-    });
-
-    _playerMarginNotifier = ValueNotifier<double>(0);
-
-    _playerWidthNotifier = ValueNotifier<double>(
-      kMinVideoViewPortWidthPortrait,
-    );
-    _playerHeightNotifier = ValueNotifier<double>(
-      kMinVideoViewPortWidthPortrait.normalize(
-        kMinVideoViewPortWidthPortrait,
-        1,
-      ),
-    );
-    _screenHeightNotifier = ValueNotifier<double>(
-      kMinVideoViewPortWidthPortrait,
-    );
-
-    _screenWidthNotifier = ValueNotifier<double>(1);
-    _hideGraphicsNotifier = ValueNotifier<bool>(true);
-
-    if (additionalHeight > 0) {
-      _infoScrollPhysics.canScroll(false);
+    // Init disable scrolling on Info when _isResizableExpandingMode is true
+    if (_isResizableExpandingMode) {
+      _detailsScrollPhysics.canScroll =false ;
     }
 
-    _screenHeightNotifier.addListener(() {
-      final screenHeightRatio = _screenHeightNotifier.value;
-
-      _playerHeightNotifier.value =
-          screenHeightRatio.normalize(minPlayerHeightRatio, 1);
-
-      _showHideNavigationBar(screenHeightRatio);
-      _recomputeDraggableOpacityAndHeight(screenHeightRatio);
-
-      // Hide or Show infographics
-      _hideGraphicsNotifier.value = screenHeightRatio < 1;
-    });
-
-    _transformationController.addListener(() {
-      final double scale = _transformationController.value.getMaxScaleOnAxis();
-
-      if (scale != kMinPlayerScale) {
-        _activeZoomPanning = true;
-      } else {
-        _activeZoomPanning = false;
-      }
-    });
+    // Adding callbacks
+    _screenHeightNotifier.addListener(_screenHeightListenerCallback);
+    _playerDismissController.addListener(_playerDismissListenerCallback);
+    _transformationController.addListener(_interactiveZoomListenerCallback);
 
     Future(() {
       // Initial changes
@@ -636,6 +587,10 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     // NOTE: Do not remove
     WidgetsBinding.instance.removeObserver(this);
 
+    _screenHeightNotifier.removeListener(_screenHeightListenerCallback);
+    _playerDismissController.removeListener(_playerDismissListenerCallback);
+    _transformationController.removeListener(_interactiveZoomListenerCallback);
+
     _orientationTimer?.cancel();
     _viewController.dispose();
     _playerSignalSubscription?.cancel();
@@ -647,7 +602,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
     _disposeDraggableControllers();
 
-    _infoScrollController.dispose();
+    _detailsScrollController.dispose();
     _infoOpacityController.dispose();
 
     _playerWidthAnimationController.dispose();
@@ -666,6 +621,36 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     resetOrientation();
 
     super.dispose();
+  }
+
+  void _screenHeightListenerCallback() {
+    final screenHeightRatio = _screenHeightNotifier.value;
+
+    _playerHeightNotifier.value = screenHeightRatio.normalize(
+      minPlayerHeightRatio,
+      1,
+    );
+
+    _showHideNavigationBar(screenHeightRatio);
+    _recomputeDraggableOpacityAndHeight(screenHeightRatio);
+
+    // Hide or Show infographics
+    _hideGraphicsNotifier.value = screenHeightRatio < 1;
+  }
+
+  void _playerDismissListenerCallback() {
+    final value = _playerDismissController.value;
+    _changePlayerPitch(value);
+  }
+
+  void _interactiveZoomListenerCallback() {
+    final double scale = _transformationController.value.getMaxScaleOnAxis();
+
+    if (scale != kMinPlayerScale) {
+      _activeZoomPanning = true;
+    } else {
+      _activeZoomPanning = false;
+    }
   }
 
   void _commonDraggableListenerCallback(double size) {
@@ -1151,7 +1136,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
     _hideGraphicsNotifier.value = false;
     _playerMarginNotifier.value = 0;
-    _infoScrollPhysics.canScroll(true);
+    _detailsScrollPhysics.canScroll =true;
   }
 
   Future<void> _onDragEndNotExpandedPlayer(DragEndDetails details) async {
@@ -1209,7 +1194,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       ]);
     }
 
-    _infoScrollPhysics.canScroll(true);
+    _detailsScrollPhysics.canScroll =true;
 
     if (_activeZoomPanning) {
       final double velocityY = details.velocity.pixelsPerSecond.dy;
@@ -1517,11 +1502,11 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   void _onPointerMove(PointerMoveEvent event) {
     if (_preventGestures) return;
 
-    if (_infoScrollController.offset == 0 ||
+    if (_detailsScrollController.offset == 0 ||
         (_isResizableExpandingMode && event.delta.dy < 0)) {
       _infoVelocityTracker?.addPosition(event.timeStamp, event.localPosition);
       if (_allowInfoDrag) {
-        _infoScrollPhysics.canScroll(false);
+        _detailsScrollPhysics.canScroll=false;
         _playerAddedHeightNotifier.value = ui.clampDouble(
           _playerAddedHeightNotifier.value + event.delta.dy,
           minAdditionalHeight,
@@ -1540,12 +1525,12 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       }
     }
 
-    if (event.delta.dy < 0 && _infoScrollController.offset > 0) {
+    if (event.delta.dy < 0 && _detailsScrollController.offset > 0) {
       _allowInfoDrag = false;
     }
 
     if (_playerAddedHeightNotifier.value == 0) {
-      _infoScrollPhysics.canScroll(true);
+      _detailsScrollPhysics.canScroll =true;
     }
   }
 
@@ -1563,11 +1548,11 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       } else {
         _exitExpandedMode();
 
-        _infoScrollPhysics.canScroll(true);
+        _detailsScrollPhysics.canScroll =true;
       }
     }
 
-    if (_infoScrollController.offset == 0) {
+    if (_detailsScrollController.offset == 0) {
       _allowInfoDrag = true;
     }
     _infoVelocityTracker = null;
@@ -1807,16 +1792,14 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
     final infoScrollview = Stack(
       children: [
-        PlayerVideoInfo(
-          physics: _infoScrollPhysics,
-          controller: _infoScrollController,
+        VideoDetailsSection(
+          physics: _detailsScrollPhysics,
+          controller: _detailsScrollController,
           onScrollNotification: _onScrollInfoScrollNotification,
         ),
-        FractionalTranslation(
+        const FractionalTranslation(
           translation: ui.Offset.zero,
-          child: VideoPlaylistSection(
-            onTap: () => _openBottomSheet(VideoBottomSheet.playlist),
-          ),
+          child: VideoPlaylistSection(),
         ),
       ],
     );
@@ -1921,11 +1904,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                         else ...[
                           Stack(
                             children: [
-                              for (final sheet in [
-                                VideoBottomSheet.description,
-                                VideoBottomSheet.comment,
-                                VideoBottomSheet.playlist,
-                              ])
+                              for (final sheet in _sideSheet)
                                 PlayerSideSheet(
                                   constraints: BoxConstraints(
                                     maxWidth: screenWidth * .4,
@@ -1943,8 +1922,10 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
               ),
               for (final sheet in _availableSheet)
                 VideoDraggableSheet(
-                  builder:
-                      (BuildContext context, ScrollController? controller) {
+                  builder: (
+                    BuildContext context,
+                    ScrollController? controller,
+                  ) {
                     final draggableController = _getSheetController(sheet);
                     void closeSheet() => _closeBottomSheet(sheet);
 

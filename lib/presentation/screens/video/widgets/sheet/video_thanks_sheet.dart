@@ -76,7 +76,6 @@ class _VideoThanksSheetState extends State<VideoThanksSheet> {
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Thanks Harris Craycraft',
-      scrollTag: 'thanks',
       controller: widget.controller ?? ScrollController(),
       onClose: widget.onPressClose,
       draggableController: widget.draggableController,
