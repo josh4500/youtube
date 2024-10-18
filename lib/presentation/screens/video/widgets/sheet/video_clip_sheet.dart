@@ -117,9 +117,9 @@ class _VideoClipSheetState extends State<VideoClipSheet> {
                             onTap: () {
                               textFocusNode.unfocus();
                               textEditingController.clear();
-                              widget.onPressClose();
 
                               context.pop();
+                              widget.onPressClose();
                             },
                             title: 'Discard clip',
                             alignment: Alignment.center,

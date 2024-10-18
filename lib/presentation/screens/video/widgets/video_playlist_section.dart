@@ -13,6 +13,7 @@ class VideoPlaylistSection extends StatelessWidget {
       child: SingleChildScrollView(
         reverse: true,
         child: Material(
+          type: MaterialType.transparency,
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 8,
@@ -29,7 +30,7 @@ class VideoPlaylistSection extends StatelessWidget {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white10,
+                  color: context.theme.canvasColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(

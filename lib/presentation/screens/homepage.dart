@@ -77,6 +77,7 @@ class HomeOverlayWrapper extends ConsumerStatefulWidget {
 
 class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
     with TickerProviderStateMixin {
+  final GlobalKey _videoScreenKey = GlobalKey();
   late final AnimationController _overlayPlayerController;
   late final Animation<Offset> _overlayPlayerAnimation;
 
@@ -201,39 +202,48 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
           widget.child,
           LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              return SlideTransition(
-                position: _overlayPlayerAnimation,
-                child: Consumer(
-                  builder: (
-                    BuildContext context,
-                    WidgetRef ref,
-                    Widget? childWidget,
-                  ) {
-                    final showPlayer = ref.watch(playerOverlayStateProvider);
-                    return Visibility(
-                      visible: showPlayer,
-                      child: VideoScreen(
-                        width: constraints.maxWidth,
-                        height: constraints.maxHeight,
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: SlideTransition(
+                      position: _overlayPlayerAnimation,
+                      child: Consumer(
+                        builder: (
+                          BuildContext context,
+                          WidgetRef ref,
+                          Widget? childWidget,
+                        ) {
+                          final showPlayer =
+                              ref.watch(playerOverlayStateProvider);
+                          return Visibility(
+                            visible: showPlayer,
+                            child: VideoScreen(
+                              key: _videoScreenKey,
+                              width: constraints.maxWidth,
+                              height: constraints.maxHeight,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: widget.child.currentIndex != 1,
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: SizeTransition(
+                        sizeFactor: _overlayDnotifAnimation,
+                        child: ExploreDownloadsOverlay(
+                          onNoThanks: onNoThanks,
+                          onGotoDownloads: onGotoDownloads,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               );
             },
-          ),
-          Visibility(
-            visible: widget.child.currentIndex != 1,
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: SizeTransition(
-                sizeFactor: _overlayDnotifAnimation,
-                child: ExploreDownloadsOverlay(
-                  onNoThanks: onNoThanks,
-                  onGotoDownloads: onGotoDownloads,
-                ),
-              ),
-            ),
           ),
         ],
       ),
@@ -260,7 +270,7 @@ class ExploreDownloadsOverlay extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Image.asset(AssetsPath.download130, width: 36.w, height: 36.w),
-          SizedBox(width: 12.w),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -289,16 +299,16 @@ class ExploreDownloadsOverlay extends StatelessWidget {
                         horizontal: 12,
                       ),
                       onTap: onNoThanks,
-                      child: const Text(
+                      child: Text(
                         'No thanks',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF3EA6FF),
+                          color: context.theme.primaryColor,
                         ),
                       ),
                     ),
-                    SizedBox(width: 12.w),
+                    const SizedBox(width: 12),
                     CustomActionChip(
                       title: 'Go to Downloads',
                       onTap: onGotoDownloads,
@@ -306,11 +316,10 @@ class ExploreDownloadsOverlay extends StatelessWidget {
                         vertical: 10,
                         horizontal: 12,
                       ),
-                      backgroundColor: const Color(0xFF3EA6FF),
+                      backgroundColor: context.theme.primaryColor,
                       textStyle: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: Colors.black,
                       ),
                     ),
                   ],

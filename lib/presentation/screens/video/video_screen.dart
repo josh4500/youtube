@@ -46,7 +46,6 @@ import 'widgets/player/mini_player.dart';
 import 'widgets/player/player_annotations_wrapper.dart';
 import 'widgets/player/player_components_wrapper.dart';
 import 'widgets/player/player_view.dart';
-import 'widgets/video_details_section.dart';
 import 'widgets/sheet/player_settings_sheet.dart';
 import 'widgets/sheet/video_chapters_sheet.dart';
 import 'widgets/sheet/video_clip_sheet.dart';
@@ -57,6 +56,7 @@ import 'widgets/sheet/video_membership_sheet.dart';
 import 'widgets/sheet/video_playlist_sheet.dart';
 import 'widgets/sheet/video_side_sheet.dart';
 import 'widgets/sheet/video_thanks_sheet.dart';
+import 'widgets/video_details_section.dart';
 import 'widgets/video_playlist_section.dart';
 
 class VideoScreen extends ConsumerStatefulWidget {
@@ -90,8 +90,8 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     Tween<double>(begin: 1, end: 0.95),
   );
 
-  final  _detailsScrollController = ScrollController();
-  final _detailsScrollPhysics =  CustomScrollableScrollPhysics(
+  final _detailsScrollController = ScrollController();
+  final _detailsScrollPhysics = CustomScrollableScrollPhysics(
     parent: const AlwaysScrollableScrollPhysics(),
   );
 
@@ -124,14 +124,22 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     CurvedAnimation(parent: _playerOpacityController, curve: Curves.easeIn),
   );
 
-  late final _infoOpacityController = AnimationController(
+  late final _detailsOpacityController = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 250),
   );
-  late final Animation<double> _infoOpacityAnimation = CurvedAnimation(
-    parent: ReverseAnimation(_infoOpacityController),
+  late final Animation<double> _detailsOpacityAnimation = CurvedAnimation(
+    parent: ReverseAnimation(_detailsOpacityController),
     curve: Curves.easeIn,
   );
+  late final _playlistOffsetController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 250),
+  );
+  late final _playlistOffsetAnimation = Tween<ui.Offset>(
+    begin: const ui.Offset(0, 1),
+    end: ui.Offset.zero,
+  ).animate(_playlistOffsetController);
 
   late final _playerAddedHeightAnimationController = AnimationController(
     vsync: this,
@@ -458,6 +466,10 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       }
     }
 
+    if (_availableSheet.contains(VideoBottomSheet.playlist)) {
+      _playlistOffsetController.value = size.normalize(0, .25).invertByOne;
+    }
+
     final isNotifierValue = _draggableNotifiers[sheet]?.value ?? false;
     if (isNotifierValue && context.orientation.isPortrait) {
       _commonDraggableListenerCallback(size);
@@ -493,7 +505,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
     // Init disable scrolling on Info when _isResizableExpandingMode is true
     if (_isResizableExpandingMode) {
-      _detailsScrollPhysics.canScroll =false ;
+      _detailsScrollPhysics.canScroll = false;
     }
 
     // Adding callbacks
@@ -603,7 +615,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _disposeDraggableControllers();
 
     _detailsScrollController.dispose();
-    _infoOpacityController.dispose();
+    _detailsOpacityController.dispose();
 
     _playerWidthAnimationController.dispose();
     _screenWidthAnimationController.dispose();
@@ -632,10 +644,13 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     );
 
     _showHideNavigationBar(screenHeightRatio);
-    _recomputeDraggableOpacityAndHeight(screenHeightRatio);
+    _recomputeOpacityAndHeight(screenHeightRatio);
 
     // Hide or Show infographics
     _hideGraphicsNotifier.value = screenHeightRatio < 1;
+    if (_availableSheet.contains(VideoBottomSheet.playlist)) {
+      _playlistOffsetController.value = screenHeightRatio.normalize(.8, 1);
+    }
   }
 
   void _playerDismissListenerCallback() {
@@ -759,7 +774,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   /// Callback to updates the info opacity when draggable sheets changes its size
   void _changeInfoOpacityOnDraggable(double size) {
     if (_screenHeightNotifier.value == 1) {
-      _infoOpacityController.value =
+      _detailsOpacityController.value =
           ui.clampDouble(size / (1 - playerHeightToScreenRatio), 0, 1);
     }
   }
@@ -773,7 +788,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   /// Callback to change Draggable heights when the Player height changes
   /// (via [_screenHeightNotifier])
-  void _recomputeDraggableOpacityAndHeight(double value) {
+  void _recomputeOpacityAndHeight(double value) {
     final double newSizeValue = ui.clampDouble(
       1 -
           (((playerHeight + additionalHeight) + ((1 - value) * screenHeight)) /
@@ -782,16 +797,19 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       1 - playerHeightToScreenRatio,
     );
 
-    //**************************** Opacity Changes ***************************//
-    final double opacityValue =
-        1 - newSizeValue.normalize(0, 1 - playerHeightToScreenRatio);
+    final double opacityValue = newSizeValue
+        .normalize(
+          0,
+          1 - playerHeightToScreenRatio,
+        )
+        .invertByOne;
     if (_hasAtLeastOneOpened) {
       // Changes the opacity level of the last draggable sheets
       _draggableAnimationOpacity[_openedDraggableState.last]?.value =
           opacityValue;
     } else {
       // Changes info opacity when neither of the draggable sheet are opened
-      _infoOpacityController.value = (opacityValue - .225).clamp(0, 1);
+      _detailsOpacityController.value = (opacityValue - .225).clamp(0, 1);
     }
 
     for (final openedSheet in _openedDraggableState) {
@@ -913,7 +931,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _hideControls();
 
     _hideGraphicsNotifier.value = true;
-    _infoOpacityController.reverse();
+    _detailsOpacityController.reverse();
     await resetOrientation();
 
     _showControls(true);
@@ -997,7 +1015,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       _animateAdditionalHeight(minAdditionalHeight);
 
       // Ensure bottom sheets are opened, animate to the appropriate position
-      _recomputeDraggableOpacityAndHeight(
+      _recomputeOpacityAndHeight(
         (playerHeight + additionalHeight) / screenHeight,
       );
     }
@@ -1136,7 +1154,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
     _hideGraphicsNotifier.value = false;
     _playerMarginNotifier.value = 0;
-    _detailsScrollPhysics.canScroll =true;
+    _detailsScrollPhysics.canScroll = true;
   }
 
   Future<void> _onDragEndNotExpandedPlayer(DragEndDetails details) async {
@@ -1194,7 +1212,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       ]);
     }
 
-    _detailsScrollPhysics.canScroll =true;
+    _detailsScrollPhysics.canScroll = true;
 
     if (_activeZoomPanning) {
       final double velocityY = details.velocity.pixelsPerSecond.dy;
@@ -1506,7 +1524,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
         (_isResizableExpandingMode && event.delta.dy < 0)) {
       _infoVelocityTracker?.addPosition(event.timeStamp, event.localPosition);
       if (_allowInfoDrag) {
-        _detailsScrollPhysics.canScroll=false;
+        _detailsScrollPhysics.canScroll = false;
         _playerAddedHeightNotifier.value = ui.clampDouble(
           _playerAddedHeightNotifier.value + event.delta.dy,
           minAdditionalHeight,
@@ -1530,7 +1548,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     }
 
     if (_playerAddedHeightNotifier.value == 0) {
-      _detailsScrollPhysics.canScroll =true;
+      _detailsScrollPhysics.canScroll = true;
     }
   }
 
@@ -1548,7 +1566,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       } else {
         _exitExpandedMode();
 
-        _detailsScrollPhysics.canScroll =true;
+        _detailsScrollPhysics.canScroll = true;
       }
     }
 
@@ -1797,9 +1815,15 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
           controller: _detailsScrollController,
           onScrollNotification: _onScrollInfoScrollNotification,
         ),
-        const FractionalTranslation(
-          translation: ui.Offset.zero,
-          child: VideoPlaylistSection(),
+        AnimatedBuilder(
+          animation: _playlistOffsetAnimation,
+          builder: (BuildContext context, Widget? child) {
+            return FractionalTranslation(
+              translation: _playlistOffsetAnimation.value,
+              child: child,
+            );
+          },
+          child: const VideoPlaylistSection(),
         ),
       ],
     );
@@ -1886,13 +1910,13 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
                                 onPointerMove: _onPointerMove,
                                 onPointerUp: _onPointerUp,
                                 child: AnimatedBuilder(
-                                  animation: _infoOpacityAnimation,
+                                  animation: _detailsOpacityAnimation,
                                   builder: (
                                     BuildContext context,
                                     Widget? childWidget,
                                   ) {
                                     return Opacity(
-                                      opacity: _infoOpacityAnimation.value,
+                                      opacity: _detailsOpacityAnimation.value,
                                       child: childWidget,
                                     );
                                   },
