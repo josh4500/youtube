@@ -70,7 +70,7 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
       DraggableScrollableController();
 
   final ValueNotifier<double> playerBottomPadding = ValueNotifier<double>(0);
-  final physics = CustomScrollableScrollPhysics();
+  final physics = CustomScrollPhysics();
   final _replyController = PageDraggableOverlayChildController(
     title: 'Replies',
   );

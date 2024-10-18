@@ -28,28 +28,27 @@
 
 import 'package:flutter/widgets.dart';
 
-class CustomScrollableScrollPhysics extends ScrollPhysics {
-  CustomScrollableScrollPhysics({
-    super.parent,
-    bool canScroll = true,
-  }) : _canScroll = canScroll;
+class CustomScrollPhysics extends ScrollPhysics {
+  CustomScrollPhysics({super.parent}) : _canScroll = {true};
 
-  bool _canScroll;
+  // To make class kinda* immutable a Set of bool is used, only true or false will be allowed.
+  // Therefore to check whether value is true or false
+  final Set<bool> _canScroll;
 
   @override
-  CustomScrollableScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return CustomScrollableScrollPhysics(
+  CustomScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return CustomScrollPhysics(
       parent: buildParent(ancestor),
     );
   }
 
-  set canScroll(bool value) {
-    _canScroll = value;
-  }
+  set canScroll(bool value) => _canScroll
+    ..remove(!value) // Removes opposite value if present
+    ..add(value); // Adds new value
 
   @override
-  bool get allowUserScrolling => _canScroll;
+  bool get allowUserScrolling => _canScroll.contains(true);
 
   @override
-  bool get allowImplicitScrolling => _canScroll;
+  bool get allowImplicitScrolling => _canScroll.contains(true);
 }

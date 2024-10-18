@@ -29,7 +29,7 @@ class DynamicSheet extends StatefulWidget {
 
 class _DynamicSheetState extends State<DynamicSheet>
     with SingleTickerProviderStateMixin {
-  final customScrollPhysics = CustomScrollableScrollPhysics();
+  final customScrollPhysics = CustomScrollPhysics();
   final ScrollController scrollController = ScrollController();
   final ValueNotifier<double> heightNotifier = ValueNotifier<double>(0);
 

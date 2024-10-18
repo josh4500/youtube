@@ -91,7 +91,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   );
 
   final _detailsScrollController = ScrollController();
-  final _detailsScrollPhysics = CustomScrollableScrollPhysics(
+  final _detailsScrollPhysics = CustomScrollPhysics(
     parent: const AlwaysScrollableScrollPhysics(),
   );
 
@@ -512,6 +512,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _screenHeightNotifier.addListener(_screenHeightListenerCallback);
     _playerDismissController.addListener(_playerDismissListenerCallback);
     _transformationController.addListener(_interactiveZoomListenerCallback);
+    _playerAddedHeightNotifier.addListener(_playerAddedHeightListenerCallback);
 
     Future(() {
       // Initial changes
@@ -602,6 +603,8 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _screenHeightNotifier.removeListener(_screenHeightListenerCallback);
     _playerDismissController.removeListener(_playerDismissListenerCallback);
     _transformationController.removeListener(_interactiveZoomListenerCallback);
+    _playerAddedHeightNotifier
+        .removeListener(_playerAddedHeightListenerCallback);
 
     _orientationTimer?.cancel();
     _viewController.dispose();
@@ -665,6 +668,14 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       _activeZoomPanning = true;
     } else {
       _activeZoomPanning = false;
+    }
+  }
+
+  void _playerAddedHeightListenerCallback() {
+    if (_availableSheet.contains(VideoBottomSheet.playlist)) {
+      _playlistOffsetController.value = _playerAddedHeightNotifier.value
+          .normalize(minAdditionalHeight, maxAdditionalHeight / 2)
+          .invertByOne;
     }
   }
 
@@ -1530,12 +1541,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
           minAdditionalHeight,
           maxAdditionalHeight,
         );
-
-        if (_availableSheet.contains(VideoBottomSheet.playlist)) {
-          _playlistOffsetController.value = _playerAddedHeightNotifier.value
-              .normalize(minAdditionalHeight, maxAdditionalHeight / 2)
-              .invertByOne;
-        }
 
         if (additionalHeight > 0) {
           // Hides the playback progress while animating "to" expanded view

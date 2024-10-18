@@ -89,7 +89,7 @@ class _VideoThanksSheetState extends State<VideoThanksSheet> {
       contentBuilder: (
         BuildContext context,
         ScrollController controller,
-        CustomScrollableScrollPhysics physics,
+        CustomScrollPhysics physics,
       ) {
         return CustomScrollView(
           physics: physics,

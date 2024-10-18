@@ -76,7 +76,7 @@ class _ShortsCommentsBottomSheetState extends State<ShortsCommentsBottomSheet> {
       contentBuilder: (
         BuildContext context,
         ScrollController scrollController,
-        CustomScrollableScrollPhysics scrollPhysics,
+        CustomScrollPhysics scrollPhysics,
       ) {
         return ListView.builder(
           physics: scrollPhysics,

@@ -45,7 +45,7 @@ class PageDraggableSheet extends StatefulWidget {
   final Widget Function(
     BuildContext context,
     ScrollController controller,
-    CustomScrollableScrollPhysics scrollPhysics,
+    CustomScrollPhysics scrollPhysics,
   ) contentBuilder;
   final DraggableScrollableController? draggableController;
   final List<Widget> actions;
@@ -68,7 +68,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
   bool get _overlayAnyChildIsOpened => _overlayChildIndexList.isNotEmpty;
 
   late final ScrollController _innerScrollController;
-  late final CustomScrollableScrollPhysics _innerListPhysics;
+  late final CustomScrollPhysics _innerListPhysics;
   late final AnimationController _dynamicTabHideController;
   late final Animation<double> _dynamicTabHideAnimation;
 
@@ -82,7 +82,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
     super.initState();
 
     _innerScrollController = ScrollController();
-    _innerListPhysics = CustomScrollableScrollPhysics();
+    _innerListPhysics = CustomScrollPhysics();
 
     for (int i = 0; i < widget.overlayChildren.length; i++) {
       final PageDraggableOverlayChild overlayChild = widget.overlayChildren[i];
@@ -154,7 +154,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
   }
 
   void _changeDraggableSize(
-    CustomScrollableScrollPhysics scrollPhysics,
+    CustomScrollPhysics scrollPhysics,
     PointerMoveEvent event,
   ) {
     final double yDist = event.delta.dy;
@@ -439,7 +439,7 @@ class PageDraggableOverlayChild extends StatefulWidget {
   final Widget Function(
     BuildContext context,
     ScrollController controller,
-    CustomScrollableScrollPhysics scrollPhysics,
+    CustomScrollPhysics scrollPhysics,
   ) builder;
 
   @override
@@ -500,7 +500,7 @@ class PageDraggableOverlayChildController extends ChangeNotifier {
   });
   final String title;
   final _scrollController = ScrollController();
-  final _scrollPhysics = CustomScrollableScrollPhysics();
+  final _scrollPhysics = CustomScrollPhysics();
 
   bool _isOpened = false;
   bool get isOpened => _isOpened;
