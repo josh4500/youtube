@@ -9,3 +9,4 @@ export 'core/error_handling/error_boundary.dart';
 export 'core/error_handling/error_reporter.dart';
 export 'core/error_handling/reporter_client.dart';
 export 'core/extensions.dart';
+export 'core/platform_info.dart';

@@ -16,7 +16,9 @@ import 'presentation/app.dart';
 
 Future<void> main() async {
   await setup();
+  await PlatformInfoCollector.instance.initialize();
   final errorReporter = ErrorReporter(
+    platform: PlatformInfoCollector.instance.platformInfo,
     clients: [
       ConsoleReporterClient(),
       // Uncommented till when Firebase setup is complete
@@ -66,7 +68,11 @@ Future<void> setup() async {
 
 Future<void> setupSystemUITheme() async {
   final themeMode = LegacyCache.themeMode.value;
-  final brightness = themeMode.isSystem? ui.PlatformDispatcher.instance.platformBrightness : themeMode.isDark ? Brightness.dark : Brightness.light;
+  final brightness = themeMode.isSystem
+      ? ui.PlatformDispatcher.instance.platformBrightness
+      : themeMode.isDark
+          ? Brightness.dark
+          : Brightness.light;
   AppTheme.setSystemOverlayStyle(brightness);
 }
 

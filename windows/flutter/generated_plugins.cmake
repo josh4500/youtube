@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  battery_plus
   connectivity_plus
   firebase_core
   media_kit_libs_windows_video

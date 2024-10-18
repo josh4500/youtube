@@ -1,17 +1,17 @@
 import 'package:clock/clock.dart' show Clock;
 import 'package:flutter/foundation.dart';
 
-import '../utils/platform_info.dart';
+import '../platform_info.dart';
 import 'reporter_client.dart';
 
 class ErrorReporter {
   ErrorReporter({
     required List<ReporterClient> clients,
     Clock? clock,
-    PlatformInfo? platform,
+    required PlatformInfo platform,
   })  : _clients = clients,
         _clock = clock ?? const Clock(),
-        _platform = platform ?? PlatformInfo();
+        _platform = platform;
 
   final List<ReporterClient> _clients;
   final Clock _clock;
@@ -19,7 +19,7 @@ class ErrorReporter {
 
   void reportError(Object error, StackTrace stackTrace, {Object? extra}) {
     final timestamp = _clock.now();
-    debugPrint('Error reported at $timestamp on ${_platform.name}');
+    debugPrint('Error reported at $timestamp on ${_platform.osType}');
     for (final client in _clients) {
       client.reportError(error, stackTrace, extra: extra);
     }
@@ -47,7 +47,7 @@ class ErrorReporter {
 
   void reportCrash(FlutterErrorDetails details) {
     final timestamp = _clock.now();
-    debugPrint('Error reported at $timestamp on ${_platform.name}');
+    debugPrint('Error reported at $timestamp on ${_platform.osType}');
     for (final client in _clients) {
       client.reportCrash(details);
     }
