@@ -34,6 +34,8 @@ import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import 'video_notification.dart';
+
 class VideoActions extends ConsumerWidget {
   const VideoActions({super.key});
 
@@ -99,9 +101,9 @@ class VideoActions extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             margin: const EdgeInsets.symmetric(horizontal: 4),
             icon: const Icon(YTIcons.thanks_outlined, size: 18),
-            onTap: () => ref.read(playerRepositoryProvider).sendPlayerSignal(
-              [PlayerSignal.openThanks],
-            ),
+            onTap: () => OpenBottomSheetNotification(
+              sheet: VideoBottomSheet.thanks,
+            ).dispatch(context),
           ),
           CustomActionButton(
             title: 'Download',
@@ -115,11 +117,14 @@ class VideoActions extends ConsumerWidget {
             ),
             onTap: () => onDownloadClicked(context),
           ),
-          const CustomActionChip(
+          CustomActionChip(
             title: 'Clip',
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            margin: EdgeInsets.symmetric(horizontal: 4),
-            icon: Icon(YTIcons.clip_outlined, size: 18),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            icon: const Icon(YTIcons.clip_outlined, size: 18),
+            onTap: () => OpenBottomSheetNotification(
+              sheet: VideoBottomSheet.clip,
+            ).dispatch(context),
           ),
           CustomActionChip(
             title: 'Save',

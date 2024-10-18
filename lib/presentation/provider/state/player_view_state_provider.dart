@@ -27,14 +27,16 @@ class PlayerViewState extends _$PlayerViewState {
     return {};
   }
 
-  void addState(ViewState viewState) {
-    state = <ViewState>{...state, viewState};
+  void addState(ViewState? viewState) {
+    if (viewState != null) state = <ViewState>{...state, viewState};
   }
 
-  void removeState(ViewState viewState) {
-    final oldState = state;
-    oldState.remove(viewState);
-    state = <ViewState>{...oldState};
+  void removeState(ViewState? viewState) {
+    if (viewState != null) {
+      final oldState = state;
+      oldState.remove(viewState);
+      state = <ViewState>{...oldState};
+    }
   }
 
   void clearState() {

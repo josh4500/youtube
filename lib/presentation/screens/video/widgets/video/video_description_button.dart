@@ -33,6 +33,8 @@ import 'package:youtube_clone/presentation/provider/repository/player_repository
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../video_notification.dart';
+
 class VideoDescriptionButton extends ConsumerWidget {
   const VideoDescriptionButton({super.key});
 
@@ -45,9 +47,9 @@ class VideoDescriptionButton extends ConsumerWidget {
         children: [
           TappableArea(
             onTap: () {
-              ref
-                  .read(playerRepositoryProvider)
-                  .sendPlayerSignal([PlayerSignal.openDescription]);
+              OpenBottomSheetNotification(
+                sheet: VideoBottomSheet.description,
+              ).dispatch(context);
             },
             padding: const EdgeInsets.symmetric(
               vertical: 8,

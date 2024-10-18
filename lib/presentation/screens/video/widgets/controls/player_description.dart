@@ -5,6 +5,7 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../video/video_description_button.dart';
+import '../video_notification.dart';
 import 'player_notifications.dart';
 
 class PlayerDescription extends ConsumerWidget {
@@ -40,8 +41,10 @@ class PlayerDescription extends ConsumerWidget {
         }
         ref.read(playerRepositoryProvider).sendPlayerSignal([
           PlayerSignal.hideControls,
-          PlayerSignal.openDescription,
         ]);
+        OpenBottomSheetNotification(
+          sheet: VideoBottomSheet.description,
+        ).dispatch(context);
       },
       child: Padding(
         padding: EdgeInsets.symmetric(

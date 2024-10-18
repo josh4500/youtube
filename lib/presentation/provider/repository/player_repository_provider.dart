@@ -75,15 +75,7 @@ enum PlayerSignal {
   enterExpanded,
   exitExpanded,
   hidePlaybackProgress,
-  showPlaybackProgress,
-  openDescription,
-  closeDescription,
-  openComments,
-  closeComments,
-  openChapters,
-  closeChapters,
-  openThanks,
-  openMembership;
+  showPlaybackProgress;
 }
 
 enum PlayerLockReason {
@@ -286,30 +278,6 @@ class PlayerRepository {
         _ref
             .read(playerViewStateProvider.notifier)
             .removeState(ViewState.visibleAmbient);
-      } else if (signal case PlayerSignal.openDescription) {
-        _ref
-            .read(playerViewStateProvider.notifier)
-            .addState(ViewState.visibleDescription);
-      } else if (signal case PlayerSignal.closeDescription) {
-        _ref
-            .read(playerViewStateProvider.notifier)
-            .removeState(ViewState.visibleDescription);
-      } else if (signal case PlayerSignal.openComments) {
-        _ref
-            .read(playerViewStateProvider.notifier)
-            .addState(ViewState.visibleDescription);
-      } else if (signal case PlayerSignal.closeComments) {
-        _ref
-            .read(playerViewStateProvider.notifier)
-            .removeState(ViewState.visibleDescription);
-      } else if (signal case PlayerSignal.openChapters) {
-        _ref
-            .read(playerViewStateProvider.notifier)
-            .addState(ViewState.visibleChapters);
-      } else if (signal case PlayerSignal.closeChapters) {
-        _ref
-            .read(playerViewStateProvider.notifier)
-            .removeState(ViewState.visibleChapters);
       }
       _playerSignalController.sink.add(signal);
     }

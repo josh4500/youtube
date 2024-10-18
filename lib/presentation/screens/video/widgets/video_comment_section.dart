@@ -36,6 +36,7 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'video_highlighted_comment.dart';
+import 'video_notification.dart';
 
 class VideoCommentSection extends ConsumerStatefulWidget {
   const VideoCommentSection({super.key});
@@ -56,9 +57,9 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
   }
 
   void _openComments() {
-    ref.read(playerRepositoryProvider).sendPlayerSignal([
-      PlayerSignal.openComments,
-    ]);
+    OpenBottomSheetNotification(
+      sheet: VideoBottomSheet.comment,
+    ).dispatch(context);
   }
 
   void _openLiveChats() {}

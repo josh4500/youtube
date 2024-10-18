@@ -4,6 +4,8 @@ import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../video_notification.dart';
+
 class PlayerActionsControl extends ConsumerWidget {
   const PlayerActionsControl({super.key});
 
@@ -24,8 +26,10 @@ class PlayerActionsControl extends ConsumerWidget {
                   ref.read(playerRepositoryProvider).sendPlayerSignal([
                     PlayerSignal.hideControls,
                     PlayerSignal.exitExpanded,
-                    PlayerSignal.openComments,
                   ]);
+                  OpenBottomSheetNotification(
+                    sheet: VideoBottomSheet.comment,
+                  ).dispatch(context);
                 },
               ),
               const AppbarAction(icon: YTIcons.save_outlined),
@@ -35,8 +39,10 @@ class PlayerActionsControl extends ConsumerWidget {
                   ref.read(playerRepositoryProvider).sendPlayerSignal([
                     PlayerSignal.hideControls,
                     PlayerSignal.exitExpanded,
-                    PlayerSignal.openDescription,
                   ]);
+                  OpenBottomSheetNotification(
+                    sheet: VideoBottomSheet.description,
+                  ).dispatch(context);
                 },
                 icon: YTIcons.more_horiz_outlined,
               ),
@@ -124,8 +130,10 @@ class PlayerActionsControlV2 extends ConsumerWidget {
                   ref.read(playerRepositoryProvider).sendPlayerSignal([
                     PlayerSignal.hideControls,
                     PlayerSignal.exitExpanded,
-                    PlayerSignal.openComments,
                   ]);
+                  OpenBottomSheetNotification(
+                    sheet: VideoBottomSheet.comment,
+                  ).dispatch(context);
                 },
               ),
               const _ActionV2(icon: YTIcons.share_outlined, title: 'Share'),

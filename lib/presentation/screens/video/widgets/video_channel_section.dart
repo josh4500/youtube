@@ -5,6 +5,7 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'video/video_channel_button.dart';
+import 'video_notification.dart';
 
 class VideoChannelSection extends StatelessWidget {
   const VideoChannelSection({super.key});
@@ -58,9 +59,9 @@ class VideoChannelMembershipButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return CustomActionChip(
       title: 'Join',
-      onTap: () => ref
-          .read(playerRepositoryProvider)
-          .sendPlayerSignal([PlayerSignal.openMembership]),
+      onTap: () => OpenBottomSheetNotification(
+        sheet: VideoBottomSheet.membership,
+      ).dispatch(context),
       backgroundColor: context.theme.colorScheme.surface,
       borderRadius: BorderRadius.circular(24),
       padding: const EdgeInsets.symmetric(

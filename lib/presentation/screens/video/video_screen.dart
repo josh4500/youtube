@@ -37,6 +37,7 @@ import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/screens/video/widgets/video_notification.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -48,6 +49,7 @@ import 'widgets/player/player_view.dart';
 import 'widgets/player_video_info.dart';
 import 'widgets/sheet/player_settings_sheet.dart';
 import 'widgets/sheet/video_chapters_sheet.dart';
+import 'widgets/sheet/video_clip_sheet.dart';
 import 'widgets/sheet/video_comment_sheet.dart';
 import 'widgets/sheet/video_description_sheet.dart';
 import 'widgets/sheet/video_draggable_sheet.dart';
@@ -56,18 +58,6 @@ import 'widgets/sheet/video_playlist_sheet.dart';
 import 'widgets/sheet/video_side_sheet.dart';
 import 'widgets/sheet/video_thanks_sheet.dart';
 import 'widgets/video_playlist_section.dart';
-
-enum _VideoBottomSheet {
-  comment,
-  chapter,
-  playlist,
-  description,
-  membership,
-  product,
-  news,
-  clip,
-  thanks,
-}
 
 class VideoScreen extends ConsumerStatefulWidget {
   const VideoScreen({
@@ -307,26 +297,25 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   bool _preventGestures = false;
 
-  final Map<_VideoBottomSheet, ValueNotifier<bool>> _draggableNotifiers = {};
-  final Map<_VideoBottomSheet, AnimationController> _draggableAnimationOpacity =
+  final Map<VideoBottomSheet, ValueNotifier<bool>> _draggableNotifiers = {};
+  final Map<VideoBottomSheet, AnimationController> _draggableAnimationOpacity =
       {};
-  final Map<_VideoBottomSheet, AnimationController> _draggableAnimationSize =
-      {};
-  final Map<_VideoBottomSheet, DraggableScrollableController>
+  final Map<VideoBottomSheet, AnimationController> _draggableAnimationSize = {};
+  final Map<VideoBottomSheet, DraggableScrollableController>
       _draggableControllers = {};
   bool get _hasMoreThanOneOpened => _openedDraggableState.length > 1;
   bool get _hasAtLeastOneOpened => _openedDraggableState.isNotEmpty;
-  final List<_VideoBottomSheet> _openedDraggableState = [];
+  final List<VideoBottomSheet> _openedDraggableState = [];
 
-  void _createDraggableControllers(List<_VideoBottomSheet> sheets) {
-    for (final _VideoBottomSheet sheet in sheets) {
+  void _createDraggableControllers(List<VideoBottomSheet> sheets) {
+    for (final VideoBottomSheet sheet in sheets) {
       _draggableNotifiers.putIfAbsent(
         sheet,
         () => ValueNotifier<bool>(false),
       );
     }
 
-    for (final _VideoBottomSheet sheet in sheets) {
+    for (final VideoBottomSheet sheet in sheets) {
       _draggableAnimationOpacity.putIfAbsent(
         sheet,
         () => AnimationController(
@@ -336,7 +325,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       );
     }
 
-    for (final _VideoBottomSheet sheet in sheets) {
+    for (final VideoBottomSheet sheet in sheets) {
       _draggableControllers.putIfAbsent(
         sheet,
         () => DraggableScrollableController()
@@ -346,7 +335,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       );
     }
 
-    for (final _VideoBottomSheet sheet in sheets) {
+    for (final VideoBottomSheet sheet in sheets) {
       _draggableAnimationSize.putIfAbsent(
         sheet,
         () => AnimationController(
@@ -373,23 +362,23 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     });
   }
 
-  ValueNotifier<bool> _getSheetNotifier(_VideoBottomSheet sheet) {
+  ValueNotifier<bool> _getSheetNotifier(VideoBottomSheet sheet) {
     return _draggableNotifiers[sheet]!;
   }
 
-  AnimationController _getSheetAnimationOpacity(_VideoBottomSheet sheet) {
+  AnimationController _getSheetAnimationOpacity(VideoBottomSheet sheet) {
     return _draggableAnimationOpacity[sheet]!;
   }
 
-  AnimationController _getSheetAnimationSize(_VideoBottomSheet sheet) {
+  AnimationController _getSheetAnimationSize(VideoBottomSheet sheet) {
     return _draggableAnimationSize[sheet]!;
   }
 
-  DraggableScrollableController _getSheetController(_VideoBottomSheet sheet) {
+  DraggableScrollableController _getSheetController(VideoBottomSheet sheet) {
     return _draggableControllers[sheet]!;
   }
 
-  void _onSheetSizeChange(_VideoBottomSheet sheet) {
+  void _onSheetSizeChange(VideoBottomSheet sheet) {
     final double size = _draggableControllers[sheet]!.size;
 
     // Ensures Sheet is removed or re-added while dragging
@@ -413,13 +402,14 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     // }
   }
 
-  final List<_VideoBottomSheet> _availableSheet = [
-    _VideoBottomSheet.comment,
-    _VideoBottomSheet.chapter,
-    _VideoBottomSheet.description,
-    _VideoBottomSheet.playlist,
-    _VideoBottomSheet.thanks,
-    _VideoBottomSheet.membership,
+  final List<VideoBottomSheet> _availableSheet = [
+    VideoBottomSheet.comment,
+    VideoBottomSheet.chapter,
+    VideoBottomSheet.description,
+    VideoBottomSheet.playlist,
+    VideoBottomSheet.thanks,
+    VideoBottomSheet.membership,
+    VideoBottomSheet.clip,
   ];
 
   @override
@@ -584,31 +574,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _animatePlayerWidth(1);
     _animateScreenHeight(1);
 
-    final PlayerRepository playerRepo = ref.read(playerRepositoryProvider);
-
-    // Listens to PlayerSignal events related to description and comments
-    // Events are usually sent from PlayerLandscapeScreen
-    _playerSignalSubscription ??= playerRepo.playerSignalStream.listen(
-      (PlayerSignal signal) {
-        if (signal == PlayerSignal.openDescription) {
-          _openBottomSheet(_VideoBottomSheet.description);
-        } else if (signal == PlayerSignal.closeDescription) {
-          _closeBottomSheet(_VideoBottomSheet.description);
-        } else if (signal == PlayerSignal.openComments) {
-          _openBottomSheet(_VideoBottomSheet.comment);
-        } else if (signal == PlayerSignal.closeComments) {
-          _closeBottomSheet(_VideoBottomSheet.comment);
-        } else if (signal == PlayerSignal.openChapters) {
-          _openBottomSheet(_VideoBottomSheet.chapter);
-        } else if (signal == PlayerSignal.closeChapters) {
-          _closeBottomSheet(_VideoBottomSheet.chapter);
-        } else if (signal == PlayerSignal.openThanks) {
-          _openBottomSheet(_VideoBottomSheet.thanks);
-        } else if (signal == PlayerSignal.openMembership) {
-          _openBottomSheet(_VideoBottomSheet.membership);
-        }
-      },
-    );
     super.didChangeDependencies();
   }
 
@@ -1453,7 +1418,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     });
   }
 
-  Future<void> _openBottomSheet(_VideoBottomSheet sheet) async {
+  Future<void> _openBottomSheet(VideoBottomSheet sheet) async {
     // if (_openedDraggableState.contains(sheet) &&
     //     context.orientation.isPortrait) {
     //   return;
@@ -1474,17 +1439,25 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     if (context.orientation.isLandscape) {
       _getSheetAnimationSize(sheet).forward();
     }
+
+    ref.read(playerViewStateProvider.notifier).addState(
+          switch (sheet) {
+            VideoBottomSheet.chapter => ViewState.visibleChapters,
+            VideoBottomSheet.description => ViewState.visibleDescription,
+            _ => null,
+          },
+        );
   }
 
-  void _closeBottomSheet(_VideoBottomSheet sheet) {
-    if (sheet == _VideoBottomSheet.comment) {
+  void _closeBottomSheet(VideoBottomSheet sheet) {
+    if (sheet == VideoBottomSheet.comment) {
       if (_replyController.isOpened) {
         _replyController.close();
         return;
       }
     }
 
-    if (sheet == _VideoBottomSheet.description) {
+    if (sheet == VideoBottomSheet.description) {
       if (_transcriptController.isOpened) {
         _transcriptController.close();
         return;
@@ -1510,6 +1483,14 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     if (_isResizableExpandingMode && additionalHeight > 0) {
       _animateAdditionalHeight(minAdditionalHeight);
     }
+
+    ref.read(playerViewStateProvider.notifier).removeState(
+          switch (sheet) {
+            VideoBottomSheet.chapter => ViewState.visibleChapters,
+            VideoBottomSheet.description => ViewState.visibleDescription,
+            _ => null,
+          },
+        );
   }
 
   Future<void> _openSettings() async {
@@ -1643,14 +1624,14 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   /// Handles when back navigation system tries to pop route
   Future<void> _handleBackButtonPressed<T>(bool didPop, T? result) async {
-    if (_openedDraggableState.contains(_VideoBottomSheet.comment)) {
-      _closeBottomSheet(_VideoBottomSheet.comment);
+    if (_openedDraggableState.contains(VideoBottomSheet.comment)) {
+      _closeBottomSheet(VideoBottomSheet.comment);
       return;
-    } else if (_openedDraggableState.contains(_VideoBottomSheet.description)) {
-      _closeBottomSheet(_VideoBottomSheet.description);
+    } else if (_openedDraggableState.contains(VideoBottomSheet.description)) {
+      _closeBottomSheet(VideoBottomSheet.description);
       return;
-    } else if (_openedDraggableState.contains(_VideoBottomSheet.chapter)) {
-      _closeBottomSheet(_VideoBottomSheet.chapter);
+    } else if (_openedDraggableState.contains(VideoBottomSheet.chapter)) {
+      _closeBottomSheet(VideoBottomSheet.chapter);
       return;
     } else if (!_isMinimized) {
       _enterMinimizedMode();
@@ -1659,6 +1640,15 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
     // Closes screen when Player is minimized
     if (_isMinimized) ref.read(playerRepositoryProvider).closePlayerScreen();
+  }
+
+  bool _handleScreenNotification(VideoScreenNotification notification) {
+    if (notification is OpenBottomSheetNotification) {
+      _openBottomSheet(notification.sheet);
+    } else if (notification is CloseBottomSheetNotification) {
+      _closeBottomSheet(notification.sheet);
+    }
+    return true;
   }
 
   @override
@@ -1825,7 +1815,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
         FractionalTranslation(
           translation: ui.Offset.zero,
           child: VideoPlaylistSection(
-            onTap: () => _openBottomSheet(_VideoBottomSheet.playlist),
+            onTap: () => _openBottomSheet(VideoBottomSheet.playlist),
           ),
         ),
       ],
@@ -1834,203 +1824,216 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: _handleBackButtonPressed,
-      child: Material(
-        color: Colors.transparent,
-        type: MaterialType.transparency,
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          clipBehavior: Clip.none,
-          children: [
-            SlideTransition(
-              position: _playerSlideAnimation,
-              child: FadeTransition(
-                opacity: _playerFadeAnimation,
-                child: ListenableBuilder(
-                  listenable: Listenable.merge(
-                    [
-                      if (context.orientation.isLandscape) _screenWidthNotifier,
-                      _screenHeightNotifier,
-                    ],
-                  ),
-                  builder: (
-                    BuildContext context,
-                    Widget? screenWidget,
-                  ) {
-                    return SizedBox(
-                      width: context.orientation.isLandscape
-                          ? screenWidth * _screenWidthNotifier.value
-                          : null,
-                      height: screenHeight * _screenHeightNotifier.value,
-                      child: screenWidget,
-                    );
-                  },
-                  child: Flex(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    direction: layoutDirection,
-                    children: [
-                      Expanded(
-                        flex: orientation.isPortrait ? 0 : 1,
-                        child: FadeTransition(
-                          opacity: _playerOpacityAnimation,
-                          child: PlayerAnnotationsWrapper(
-                            hideGraphicsNotifier: _hideGraphicsNotifier,
-                            child: GestureDetector(
-                              onTap: _onTapPlayer,
-                              onVerticalDragStart: _onDragPlayerStart,
-                              onVerticalDragUpdate: _onDragPlayer,
-                              onVerticalDragEnd: _onDragPlayerEnd,
-                              behavior: HitTestBehavior.opaque,
-                              child: Material(
-                                child: Stack(
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        mainPlayer,
-                                        Expanded(child: miniPlayer),
-                                      ],
-                                    ),
-                                    Positioned(
-                                      bottom: 0,
-                                      child: miniPlayerProgress,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      if (orientation.isPortrait)
-                        Flexible(
-                          child: Material(
-                            child: Listener(
-                              onPointerDown: _onPointerDownOn,
-                              onPointerMove: _onPointerMove,
-                              onPointerUp: _onPointerUp,
-                              child: AnimatedBuilder(
-                                animation: _infoOpacityAnimation,
-                                builder: (
-                                  BuildContext context,
-                                  Widget? childWidget,
-                                ) {
-                                  return Opacity(
-                                    opacity: _infoOpacityAnimation.value,
-                                    child: childWidget,
-                                  );
-                                },
-                                child: infoScrollview,
-                              ),
-                            ),
-                          ),
-                        )
-                      else ...[
-                        Stack(
-                          children: [
-                            for (final sheet in [
-                              _VideoBottomSheet.description,
-                              _VideoBottomSheet.comment,
-                              _VideoBottomSheet.playlist,
-                            ])
-                              PlayerSideSheet(
-                                constraints: BoxConstraints(
-                                  maxWidth: screenWidth * .4,
-                                ),
-                                sizeFactor: _getSheetAnimationSize(sheet),
-                                visibleListenable: _getSheetNotifier(sheet),
-                              ),
-                          ],
-                        ),
+      child: NotificationListener<VideoScreenNotification>(
+        onNotification: _handleScreenNotification,
+        child: Material(
+          color: Colors.transparent,
+          type: MaterialType.transparency,
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            clipBehavior: Clip.none,
+            children: [
+              SlideTransition(
+                position: _playerSlideAnimation,
+                child: FadeTransition(
+                  opacity: _playerFadeAnimation,
+                  child: ListenableBuilder(
+                    listenable: Listenable.merge(
+                      [
+                        if (context.orientation.isLandscape)
+                          _screenWidthNotifier,
+                        _screenHeightNotifier,
                       ],
-                    ],
+                    ),
+                    builder: (
+                      BuildContext context,
+                      Widget? screenWidget,
+                    ) {
+                      return SizedBox(
+                        width: context.orientation.isLandscape
+                            ? screenWidth * _screenWidthNotifier.value
+                            : null,
+                        height: screenHeight * _screenHeightNotifier.value,
+                        child: screenWidget,
+                      );
+                    },
+                    child: Flex(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      direction: layoutDirection,
+                      children: [
+                        Expanded(
+                          flex: orientation.isPortrait ? 0 : 1,
+                          child: FadeTransition(
+                            opacity: _playerOpacityAnimation,
+                            child: PlayerAnnotationsWrapper(
+                              hideGraphicsNotifier: _hideGraphicsNotifier,
+                              child: GestureDetector(
+                                onTap: _onTapPlayer,
+                                onVerticalDragStart: _onDragPlayerStart,
+                                onVerticalDragUpdate: _onDragPlayer,
+                                onVerticalDragEnd: _onDragPlayerEnd,
+                                behavior: HitTestBehavior.opaque,
+                                child: Material(
+                                  child: Stack(
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          mainPlayer,
+                                          Expanded(child: miniPlayer),
+                                        ],
+                                      ),
+                                      Positioned(
+                                        bottom: 0,
+                                        child: miniPlayerProgress,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (orientation.isPortrait)
+                          Flexible(
+                            child: Material(
+                              child: Listener(
+                                onPointerDown: _onPointerDownOn,
+                                onPointerMove: _onPointerMove,
+                                onPointerUp: _onPointerUp,
+                                child: AnimatedBuilder(
+                                  animation: _infoOpacityAnimation,
+                                  builder: (
+                                    BuildContext context,
+                                    Widget? childWidget,
+                                  ) {
+                                    return Opacity(
+                                      opacity: _infoOpacityAnimation.value,
+                                      child: childWidget,
+                                    );
+                                  },
+                                  child: infoScrollview,
+                                ),
+                              ),
+                            ),
+                          )
+                        else ...[
+                          Stack(
+                            children: [
+                              for (final sheet in [
+                                VideoBottomSheet.description,
+                                VideoBottomSheet.comment,
+                                VideoBottomSheet.playlist,
+                              ])
+                                PlayerSideSheet(
+                                  constraints: BoxConstraints(
+                                    maxWidth: screenWidth * .4,
+                                  ),
+                                  sizeFactor: _getSheetAnimationSize(sheet),
+                                  visibleListenable: _getSheetNotifier(sheet),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            for (final sheet in _availableSheet)
-              VideoDraggableSheet(
-                builder: (BuildContext context, ScrollController? controller) {
-                  final draggableController = _getSheetController(sheet);
-                  void closeSheet() => _closeBottomSheet(sheet);
+              for (final sheet in _availableSheet)
+                VideoDraggableSheet(
+                  builder:
+                      (BuildContext context, ScrollController? controller) {
+                    final draggableController = _getSheetController(sheet);
+                    void closeSheet() => _closeBottomSheet(sheet);
 
-                  Widget childWidget;
-                  // Use key to preserve widget state across depth in widget tree
-                  if (sheet == _VideoBottomSheet.comment) {
-                    childWidget = VideoCommentsSheet(
-                      key: GlobalObjectKey(sheet),
-                      controller: controller,
-                      replyController: _replyController,
-                      initialHeight: initialDraggableSnapSize,
-                      onPressClose: closeSheet,
-                      dragDismissible: orientation.isPortrait,
-                      draggableController: draggableController,
-                    );
-                  } else if (sheet == _VideoBottomSheet.chapter) {
-                    childWidget = VideoChaptersSheet(
-                      key: GlobalObjectKey(sheet),
-                      controller: controller,
-                      initialHeight: initialDraggableSnapSize,
-                      onPressClose: closeSheet,
-                      draggableController: draggableController,
-                    );
-                  } else if (sheet == _VideoBottomSheet.description) {
-                    childWidget = VideoDescriptionSheet(
-                      key: GlobalObjectKey(sheet),
-                      controller: controller,
-                      transcriptController: _transcriptController,
-                      initialHeight: initialDraggableSnapSize,
-                      dragDismissible: orientation.isPortrait,
-                      onPressClose: closeSheet,
-                      draggableController: draggableController,
-                    );
-                  } else if (sheet == _VideoBottomSheet.playlist) {
-                    childWidget = VideoPlaylistSheet(
-                      key: GlobalObjectKey(sheet),
-                      controller: controller,
-                      initialHeight: initialDraggableSnapSize,
-                      onPressClose: closeSheet,
-                      draggableController: draggableController,
-                    );
-                  } else if (sheet == _VideoBottomSheet.thanks) {
-                    return VideoThanksSheet(
-                      key: GlobalObjectKey(sheet),
-                      controller: controller,
-                      initialHeight: initialDraggableSnapSize,
-                      onPressClose: closeSheet,
-                      draggableController: draggableController,
-                    );
-                  } else if (sheet == _VideoBottomSheet.membership) {
-                    return VideoMembershipSheet(
-                      key: GlobalObjectKey(sheet),
-                      controller: controller,
-                      initialHeight: initialDraggableSnapSize,
-                      onPressClose: closeSheet,
-                      draggableController: draggableController,
-                    );
-                  } else {
-                    childWidget = const SizedBox();
-                  }
+                    Widget childWidget;
+                    // Use key to preserve widget state across depth in widget tree
+                    if (sheet == VideoBottomSheet.comment) {
+                      childWidget = VideoCommentsSheet(
+                        key: GlobalObjectKey(sheet),
+                        controller: controller,
+                        replyController: _replyController,
+                        initialHeight: initialDraggableSnapSize,
+                        onPressClose: closeSheet,
+                        dragDismissible: orientation.isPortrait,
+                        draggableController: draggableController,
+                      );
+                    } else if (sheet == VideoBottomSheet.chapter) {
+                      childWidget = VideoChaptersSheet(
+                        key: GlobalObjectKey(sheet),
+                        controller: controller,
+                        initialHeight: initialDraggableSnapSize,
+                        onPressClose: closeSheet,
+                        draggableController: draggableController,
+                      );
+                    } else if (sheet == VideoBottomSheet.description) {
+                      childWidget = VideoDescriptionSheet(
+                        key: GlobalObjectKey(sheet),
+                        controller: controller,
+                        transcriptController: _transcriptController,
+                        initialHeight: initialDraggableSnapSize,
+                        dragDismissible: orientation.isPortrait,
+                        onPressClose: closeSheet,
+                        draggableController: draggableController,
+                      );
+                    } else if (sheet == VideoBottomSheet.playlist) {
+                      childWidget = VideoPlaylistSheet(
+                        key: GlobalObjectKey(sheet),
+                        controller: controller,
+                        initialHeight: initialDraggableSnapSize,
+                        onPressClose: closeSheet,
+                        draggableController: draggableController,
+                      );
+                    } else if (sheet == VideoBottomSheet.thanks) {
+                      return VideoThanksSheet(
+                        key: GlobalObjectKey(sheet),
+                        controller: controller,
+                        initialHeight: initialDraggableSnapSize,
+                        onPressClose: closeSheet,
+                        draggableController: draggableController,
+                      );
+                    } else if (sheet == VideoBottomSheet.membership) {
+                      return VideoMembershipSheet(
+                        key: GlobalObjectKey(sheet),
+                        controller: controller,
+                        initialHeight: initialDraggableSnapSize,
+                        onPressClose: closeSheet,
+                        draggableController: draggableController,
+                      );
+                    } else if (sheet == VideoBottomSheet.clip) {
+                      return VideoClipSheet(
+                        key: GlobalObjectKey(sheet),
+                        controller: controller,
+                        initialHeight: initialDraggableSnapSize,
+                        onPressClose: closeSheet,
+                        draggableController: draggableController,
+                      );
+                    } else {
+                      childWidget = const SizedBox();
+                    }
 
-                  if (orientation.isLandscape) {
-                    return PlayerSideSheet(
-                      constraints: BoxConstraints(
-                        maxWidth: screenWidth * .4,
-                      ),
-                      sizeFactor: _getSheetAnimationSize(sheet),
-                      visibleListenable: _getSheetNotifier(sheet),
-                      child: childWidget,
-                    );
-                  } else {
-                    return childWidget;
-                  }
-                },
-                controller: _getSheetController(sheet),
-                opacity: _getSheetAnimationOpacity(sheet),
-                visibleListenable: _getSheetNotifier(sheet),
-                snapSizes: <double>[0.0, initialDraggableSnapSize],
-              ),
-          ],
+                    if (orientation.isLandscape) {
+                      return PlayerSideSheet(
+                        constraints: BoxConstraints(
+                          maxWidth: screenWidth * .4,
+                        ),
+                        sizeFactor: _getSheetAnimationSize(sheet),
+                        visibleListenable: _getSheetNotifier(sheet),
+                        child: childWidget,
+                      );
+                    } else {
+                      return childWidget;
+                    }
+                  },
+                  controller: _getSheetController(sheet),
+                  opacity: _getSheetAnimationOpacity(sheet),
+                  visibleListenable: _getSheetNotifier(sheet),
+                  snapSizes: <double>[0.0, initialDraggableSnapSize],
+                ),
+            ],
+          ),
         ),
       ),
     );

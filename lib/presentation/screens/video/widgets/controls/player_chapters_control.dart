@@ -6,6 +6,7 @@ import 'package:youtube_clone/presentation/provider/state/player_view_state_prov
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../video_notification.dart';
 import 'player_notifications.dart';
 
 class PlayerChapterControl extends ConsumerWidget {
@@ -20,9 +21,10 @@ class PlayerChapterControl extends ConsumerWidget {
         if (context.orientation.isLandscape) {
           ExitFullscreenPlayerNotification().dispatch(context);
         }
-
+        OpenBottomSheetNotification(
+          sheet: VideoBottomSheet.chapter,
+        ).dispatch(context);
         ref.read(playerRepositoryProvider).sendPlayerSignal([
-          PlayerSignal.openChapters,
           if (ref.read(playerViewStateProvider).showChapters)
             PlayerSignal.showControls
           else
