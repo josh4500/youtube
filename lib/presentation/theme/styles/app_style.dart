@@ -198,7 +198,7 @@ abstract final class AppStyle {
         color: Color(0xFFAAAAAA),
         fontSize: 11,
       ),
-      backgroundColor: Colors.black45,
+      backgroundColor: Colors.white38,
     ),
   );
   static final BrightnessPair<SlidableStyle> slidableStyle = BrightnessPair(

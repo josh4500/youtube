@@ -87,7 +87,11 @@ class _VideoThanksSheetState extends State<VideoThanksSheet> {
       actions: const [
         Icon(YTIcons.info_outlined),
       ],
-      contentBuilder: (context, controller, physics) {
+      contentBuilder: (
+        BuildContext context,
+        ScrollController controller,
+        CustomScrollableScrollPhysics physics,
+      ) {
         return CustomScrollView(
           physics: physics,
           controller: controller,
