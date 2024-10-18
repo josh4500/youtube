@@ -89,6 +89,8 @@ class _VideoThanksSheetState extends State<VideoThanksSheet> {
       ],
       contentBuilder: (context, controller, physics) {
         return CustomScrollView(
+          physics: physics,
+          controller: controller,
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.all(12),
