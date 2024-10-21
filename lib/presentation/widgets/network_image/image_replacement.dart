@@ -57,7 +57,8 @@ class ImageReplacement {
     );
 
     if (text != null) {
-      final initials = text![0];
+      final splitText = text!.split(' ');
+      final initials = splitText.first.length == 2 ? splitText.first : text![0];
       final textPainter = TextPainter(
         text: TextSpan(
           text: initials,
