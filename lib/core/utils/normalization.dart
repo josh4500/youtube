@@ -12,7 +12,7 @@ extension NormalizeDoubleExtension on double {
 
   /// Normalizes between  0 - 1  to [min] - [max]
   double normalizeRange(double min, double max) {
-    assert(this >= min || this <= max, 'Value must be in range 0 ... 1');
+    assert(this >= 0 || this <= 1, 'Value must be in range 0 ... 1');
     return (this * (max - min)) + min;
   }
 }
