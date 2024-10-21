@@ -28,6 +28,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -61,9 +63,13 @@ class AccountSection extends ConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      const Text(
-                        'Josh',
-                        style: TextStyle(
+                      Text(
+                        switch (account) {
+                          UserViewModel _ => account.name,
+                          ChannelViewModel _ => account.name,
+                          AccountViewModel() => throw UnimplementedError(),
+                        },
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w600,
                         ),
@@ -76,11 +82,15 @@ class AccountSection extends ConsumerWidget {
                           children: [
                             Text.rich(
                               TextSpan(
-                                text:
-                                    isChannel ? '@josh4500' : 'Create channel',
+                                text: switch (account) {
+                                  UserViewModel _ => 'Create channel',
+                                  ChannelViewModel _ => '@${account.tag}',
+                                  AccountViewModel() =>
+                                    throw UnimplementedError(),
+                                },
                                 children: [
                                   if (isChannel) ...[
-                                    const TextSpan(text: ' · '),
+                                    const TextSpan(text: kDotSeparator),
                                     const TextSpan(text: 'View channel'),
                                   ],
                                 ],

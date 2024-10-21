@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class SheetDragIndicator extends StatelessWidget {
   const SheetDragIndicator({super.key, this.color});
@@ -12,7 +13,7 @@ class SheetDragIndicator extends StatelessWidget {
         height: 4,
         width: 44,
         decoration: BoxDecoration(
-          color: color ?? Colors.white24,
+          color: context.theme.highlightColor,
           borderRadius: BorderRadius.circular(4),
         ),
       ),

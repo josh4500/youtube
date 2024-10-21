@@ -585,7 +585,7 @@ extension GotoExtension on BuildContext {
     );
   }
 
-  void replaceR(
+  void replaceScreen(
     RouteInfo routeInfo, {
     Map<String, String> pathParameters = const <String, String>{},
     Map<String, dynamic> queryParameters = const <String, dynamic>{},

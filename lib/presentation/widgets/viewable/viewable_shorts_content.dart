@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../gestures/custom_ink_well.dart';
@@ -49,6 +50,7 @@ class ViewableShortsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shorts = context.provide<ShortsViewModel>();
     final ViewableStyle theme = context.theme.appStyles.viewableVideoStyle;
     return Container(
       width: width,
@@ -92,11 +94,11 @@ class ViewableShortsContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 if (showTitle)
-                  const Text(
-                    'Frame Generation is Game Changing',
+                  Text(
+                    shorts.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 15,
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
@@ -109,11 +111,12 @@ class ViewableShortsContent extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(height: 8),
-                const Text(
-                  '1.7k views',
+                // TODO(josh4500): Needs counter extension;
+                Text(
+                  '${shorts.views} views',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 13,
                     fontWeight: FontWeight.w300,

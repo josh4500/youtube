@@ -177,10 +177,10 @@ class _ForYouFeedScreenState extends State<ForYouFeedScreen> {
                     else if (state.isAuthenticated) ...[
                       ModelBinding(
                         model: <ShortsViewModel>[
-                          ShortsViewModel(),
-                          ShortsViewModel(),
-                          ShortsViewModel(),
-                          ShortsViewModel(),
+                          ShortsViewModel.test,
+                          ShortsViewModel.test,
+                          ShortsViewModel.test,
+                          ShortsViewModel.test,
                         ],
                         child: SliverGroupShorts(
                           layout: ShortsGroupLayout.grid,

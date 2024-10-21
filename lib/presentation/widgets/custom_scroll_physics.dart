@@ -25,30 +25,46 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 import 'package:flutter/widgets.dart';
 
 class CustomScrollPhysics extends ScrollPhysics {
-  CustomScrollPhysics({super.parent}) : _canScroll = {true};
+  CustomScrollPhysics({
+    super.parent,
+    bool canScroll = true,
+  }) : _canScroll = {canScroll};
 
   // To make class kinda* immutable a Set of bool is used, only true or false will be allowed.
   // Therefore to check whether value is true or false
   final Set<bool> _canScroll;
+  static bool bVal = true;
 
   @override
   CustomScrollPhysics applyTo(ScrollPhysics? ancestor) {
     return CustomScrollPhysics(
       parent: buildParent(ancestor),
+      canScroll: _canScroll.contains(true),
     );
   }
 
-  set canScroll(bool value) => _canScroll
-    ..remove(!value) // Removes opposite value if present
-    ..add(value); // Adds new value
+  set canScroll(bool value) {
+    bVal = value;
+    _canScroll
+      ..remove(!value) // Removes opposite value if present
+      ..add(value); // Adds new value
+    //print('First set with $value ${_booValue.value}');
+  }
+
+  bool get canScroll => _canScroll.contains(true);
 
   @override
-  bool get allowUserScrolling => _canScroll.contains(true);
+  bool get allowUserScrolling {
+    return bVal;
+  }
 
   @override
-  bool get allowImplicitScrolling => _canScroll.contains(true);
+  bool get allowImplicitScrolling {
+    _canScroll.contains(true);
+
+    return bVal;
+  }
 }

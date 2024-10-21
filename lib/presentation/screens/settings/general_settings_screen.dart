@@ -31,7 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core/enums/settings_enums.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
-import 'package:youtube_clone/presentation/preferences.dart';
+import 'package:youtube_clone/presentation/provider/state/preferences.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import 'view_models/pref_option.dart';

@@ -177,12 +177,12 @@ class _ChannelScreenState extends State<ChannelScreen> {
                   itemBuilder: (BuildContext context, int index) {
                     if (index == 2) {
                       return ForYouContent(
-                        content: VideoViewModel(),
+                        content: VideoViewModel.test,
                       );
                     }
 
                     return ForYouContent(
-                      content: ShortsViewModel(),
+                      content: ShortsViewModel.test,
                     );
                   },
                   itemCount: 10,

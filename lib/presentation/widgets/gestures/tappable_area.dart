@@ -517,9 +517,9 @@ class _TappableWidgetState extends State<_TappableWidget>
   Duration getFadeDurationForType(HighlightType type) {
     switch (type) {
       case HighlightType.pressed:
-        return const Duration(milliseconds: 200);
+        return const Duration(milliseconds: 500);
       case HighlightType.released:
-        return const Duration(milliseconds: 400);
+        return const Duration(milliseconds: 500);
       case HighlightType.hover:
       case HighlightType.focus:
         return widget.hoverDuration ?? const Duration(milliseconds: 50);

@@ -154,17 +154,28 @@ class _CommentTileState extends State<CommentTile> {
                                       ),
                                     ),
                                 ],
-                                style: theme.subtitleTextStyle,
+                                style: theme.subtitleTextStyle.copyWith(
+                                  color: widget.byCreator
+                                      ? Colors.white
+                                      : const Color(0xFFAAAAAA),
+                                ),
                               ),
                             ),
                           ),
                           Text.rich(
                             TextSpan(
                               text: kDotSeparator,
-                              children: const <InlineSpan>[
-                                TextSpan(text: '7mo ago'),
+                              children: <InlineSpan>[
+                                TextSpan(
+                                  text: '7mo ago',
+                                  style: theme.subtitleTextStyle.copyWith(
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
                               ],
-                              style: theme.subtitleTextStyle,
+                              style: theme.subtitleTextStyle.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
@@ -189,23 +200,20 @@ class _CommentTileState extends State<CommentTile> {
                                         color: bgColor,
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                      child: Row(
+                                      child: const Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Icon(
                                             YTIcons.thanks_filled,
                                             size: 12,
-                                            color: context.theme.colorScheme
-                                                .inverseSurface,
+                                            color: Colors.black,
                                           ),
-                                          const SizedBox(width: 4),
+                                          SizedBox(width: 4),
                                           Text(
                                             r'$12',
-                                            style: theme.textStyle.copyWith(
+                                            style: TextStyle(
                                               fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: context.theme.colorScheme
-                                                  .inverseSurface,
+                                              color: Colors.black,
                                             ),
                                           ),
                                         ],
@@ -366,7 +374,6 @@ class _CommentTileState extends State<CommentTile> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
           ],
         ],
       ),

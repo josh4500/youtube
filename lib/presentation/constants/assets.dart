@@ -1,4 +1,4 @@
-class AssetsPath {
+abstract class AssetsPath {
   static const String _logoPrefix = 'assets/logo/';
   static const String _iconPrefix = 'assets/icon/';
   static const String _imagePrefix = 'assets/image/';

@@ -26,6 +26,24 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:youtube_clone/presentation/models.dart';
+
 import 'content_view_model.dart';
 
-class ShortsViewModel extends ContentViewModel {}
+class ShortsViewModel extends ContentViewModel {
+  const ShortsViewModel({
+    required super.id,
+    required super.title,
+    required super.channel,
+    required super.publishedAt,
+    required super.views,
+  });
+
+  static final ShortsViewModel test = ShortsViewModel(
+    id: 'XfjKEk82939hdow',
+    channel: ChannelSnippet.test,
+    publishedAt: DateTime.now(),
+    views: 200,
+    title: 'Mappa making new kind of anime',
+  );
+}

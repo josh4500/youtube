@@ -181,9 +181,9 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                 ),
                 ModelBinding(
                   model: <ShortsViewModel>[
-                    ShortsViewModel(),
-                    ShortsViewModel(),
-                    ShortsViewModel(),
+                    ShortsViewModel.test,
+                    ShortsViewModel.test,
+                    ShortsViewModel.test,
                   ],
                   child: SliverGroupShorts(
                     onMore: () {

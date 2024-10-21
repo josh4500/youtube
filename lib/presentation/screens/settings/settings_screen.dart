@@ -106,7 +106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context.goto(AppRoutes.watchOnTv);
       return;
     } else if (tab == SettingsTab.tryExperimental) {
-      context.replaceR(AppRoutes.tryExperimental);
+      context.replaceScreen(AppRoutes.tryExperimental);
     }
 
     _currentScreen = tab;

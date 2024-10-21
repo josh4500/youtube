@@ -27,16 +27,17 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 abstract class Account {
+  Account({required this.name});
+
+  final String name;
+
   bool get isChannel => false;
   bool get isPremium => false;
 }
 
-class GuestAccount extends Account {}
-
 class UserAccount extends Account {
-  UserAccount({required this.id, required this.name, required this.username});
+  UserAccount({required super.name, required this.id, required this.username});
 
   final String id;
-  final String name;
   final String username;
 }

@@ -227,7 +227,10 @@ class DynamicSheetOptionItem<T> extends DynamicSheetItem {
 
     if (enabled) {
       if (useTappable) {
-        child = TappableArea(onTap: () => performAction(context), child: child);
+        child = TappableArea(
+          onTap: () => performAction(context),
+          child: child,
+        );
       } else {
         child = CustomInkWell(
           onTap: () => performAction(context),

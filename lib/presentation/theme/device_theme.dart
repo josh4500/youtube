@@ -128,7 +128,11 @@ class DeviceTheme extends InheritedModel<_DeviceThemeAspects> {
   }
 
   static Orientation orientationOf(BuildContext context) {
-    return _of(context).orientation;
+    return _of(context, _DeviceThemeAspects.orientation).orientation;
+  }
+
+  static ui.Size sizeOf(BuildContext context) {
+    return _of(context, _DeviceThemeAspects.screenSize).screenSize;
   }
 
   static DeviceThemeData _of(

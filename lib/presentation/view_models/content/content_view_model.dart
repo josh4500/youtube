@@ -26,4 +26,26 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-abstract class ContentViewModel {}
+import 'package:flutter/widgets.dart';
+
+import '../account/channel_view_model.dart';
+
+abstract class ContentViewModel {
+  const ContentViewModel({
+    required this.id,
+    required this.title,
+    required this.views,
+    required this.channel,
+    required this.publishedAt,
+  });
+
+  final String id;
+  final String title;
+  final int views;
+  final ChannelSnippet channel;
+  final DateTime publishedAt;
+
+  Future<String> sharableUrl(BuildContext context) async {
+    throw UnimplementedError();
+  }
+}

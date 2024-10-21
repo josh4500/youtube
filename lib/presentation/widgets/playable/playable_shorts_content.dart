@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../gestures/tappable_area.dart';
@@ -49,6 +50,7 @@ class PlayableShortsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shorts = context.provide<ShortsViewModel>();
     final PlayableStyle theme = context.theme.appStyles.playableStyle;
     return GestureDetector(
       onTap: onTap,
@@ -98,10 +100,10 @@ class PlayableShortsContent extends StatelessWidget {
             ),
             Container(
               margin: const EdgeInsets.all(4),
-              child: const Text(
-                'mappa animators making',
+              child: Text(
+                shorts.title,
                 maxLines: 2,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 15,
                   color: Colors.white,
                   shadows: [

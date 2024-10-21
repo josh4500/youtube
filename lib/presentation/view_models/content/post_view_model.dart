@@ -26,23 +26,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import '../account/channel_view_model.dart';
 import 'content_view_model.dart';
 
-class VideoViewModel extends ContentViewModel {
-  VideoViewModel({
+class PostViewModel extends ContentViewModel {
+  PostViewModel({
     required super.id,
     required super.title,
     required super.channel,
     required super.publishedAt,
     required super.views,
   });
-
-  static final VideoViewModel test = VideoViewModel(
-    id: 'XfjKEk82939hdow',
-    channel: ChannelSnippet.test,
-    publishedAt: DateTime.now(),
-    views: 200,
-    title: 'Mappa making new kind of anime',
-  );
 }

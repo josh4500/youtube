@@ -1,4 +1,8 @@
+export 'view_models/account/account_view_model.dart';
+export 'view_models/account/channel_view_model.dart';
+
 export 'view_models/content/content_view_model.dart';
+export 'view_models/content/post_view_model.dart';
 export 'view_models/content/shorts_view_model.dart';
 export 'view_models/content/video_view_model.dart';
 

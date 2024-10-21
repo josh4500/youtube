@@ -222,9 +222,9 @@ class _TrendingScreenState extends State<TrendingScreen>
       ),
       ModelBinding(
         model: <ShortsViewModel>[
-          ShortsViewModel(),
-          ShortsViewModel(),
-          ShortsViewModel(),
+          ShortsViewModel.test,
+          ShortsViewModel.test,
+          ShortsViewModel.test,
         ],
         child: const SliverGroupShorts(),
       ),

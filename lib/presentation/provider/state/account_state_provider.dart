@@ -27,9 +27,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/models.dart';
 
-import '../../../domain/models/account.dart';
-
-final accountStateProvider = StateProvider<Account>((ref) {
-  return GuestAccount();
+final accountStateProvider = StateProvider<AccountViewModel>((ref) {
+  return UserViewModel.test;
 });

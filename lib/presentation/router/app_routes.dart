@@ -28,7 +28,7 @@
 
 import 'router_info.dart';
 
-class AppRoutes {
+abstract class AppRoutes {
   static final RouteInfo dashboard = RouteInfo(
     name: 'Dashboard',
     path: '/',

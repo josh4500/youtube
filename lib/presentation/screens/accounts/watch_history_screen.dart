@@ -229,9 +229,9 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen>
                       itemHeadGetter: (DateTime item) => item.asHeader.index,
                       sliver: ModelBinding(
                         model: <ShortsViewModel>[
-                          ShortsViewModel(),
-                          ShortsViewModel(),
-                          ShortsViewModel(),
+                          ShortsViewModel.test,
+                          ShortsViewModel.test,
+                          ShortsViewModel.test,
                         ],
                         child: SliverGroupShorts(
                           width: 125,

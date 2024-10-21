@@ -214,8 +214,9 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
                           WidgetRef ref,
                           Widget? childWidget,
                         ) {
-                          final showPlayer =
-                              ref.watch(playerOverlayStateProvider);
+                          final showPlayer = ref.watch(
+                            playerOverlayStateProvider,
+                          );
                           return Visibility(
                             visible: showPlayer,
                             child: VideoScreen(

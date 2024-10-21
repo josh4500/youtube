@@ -78,7 +78,7 @@ class ShortsInfoSection extends StatelessWidget {
                             onTap: () {},
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                vertical: 10,
+                                vertical: 8,
                                 horizontal: 12,
                               ),
                               decoration: BoxDecoration(

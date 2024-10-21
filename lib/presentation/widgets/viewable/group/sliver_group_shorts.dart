@@ -67,8 +67,7 @@ class SliverGroupShorts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final shorts = context.provide<List<ShortsViewModel>>();
-
+    final shortsContents = context.provide<List<ShortsViewModel>>();
     return SliverMainAxisGroup(
       slivers: [
         SliverToBoxAdapter(
@@ -107,18 +106,25 @@ class SliverGroupShorts extends StatelessWidget {
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
                   if (view == ShortsGroupView.viewable) {
-                    ViewableShortsContent(
-                      onMore: onMore,
-                      margin: itemMargin,
-                      borderRadius: BorderRadius.circular(8),
+                    return ModelBinding<ShortsViewModel>(
+                      model: shortsContents[index],
+                      child: ViewableShortsContent(
+                        onMore: onMore,
+                        margin: itemMargin,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     );
                   }
-                  return PlayableShortsContent(
-                    onMore: onMore,
-                    margin: itemMargin,
+
+                  return ModelBinding<ShortsViewModel>(
+                    model: shortsContents[index],
+                    child: PlayableShortsContent(
+                      onMore: onMore,
+                      margin: itemMargin,
+                    ),
                   );
                 },
-                childCount: shorts.length,
+                childCount: shortsContents.length,
               ),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,
@@ -137,20 +143,26 @@ class SliverGroupShorts extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
                   if (view == ShortsGroupView.viewable) {
-                    return ViewableShortsContent(
+                    return ModelBinding<ShortsViewModel>(
+                      model: shortsContents[index],
+                      child: ViewableShortsContent(
+                        width: width ?? 196.h,
+                        onMore: onMore,
+                        margin: itemMargin,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    );
+                  }
+                  return ModelBinding<ShortsViewModel>(
+                    model: shortsContents[index],
+                    child: PlayableShortsContent(
                       width: width ?? 196.h,
                       onMore: onMore,
                       margin: itemMargin,
-                      borderRadius: BorderRadius.circular(8),
-                    );
-                  }
-                  return PlayableShortsContent(
-                    width: width ?? 196.h,
-                    onMore: onMore,
-                    margin: itemMargin,
+                    ),
                   );
                 },
-                itemCount: shorts.length,
+                itemCount: shortsContents.length,
               ),
             ),
           ),

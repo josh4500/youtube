@@ -63,7 +63,9 @@ class HomeRepository extends ChangeNotifier {
     if (_lockNavBarPos == false) {
       final oldValue = _navBarPos;
       _navBarPos = value.clamp(0, 1);
-      if (value != oldValue) notifyListeners();
+      Future(() {
+        if (value != oldValue) notifyListeners();
+      });
     }
   }
 
