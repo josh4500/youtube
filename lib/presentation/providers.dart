@@ -34,3 +34,4 @@ export './provider/state/account_state_provider.dart';
 export './provider/state/auth_state_provider.dart';
 export './provider/state/player_state_provider.dart';
 export './provider/state/player_view_state_provider.dart';
+export './provider/state/preferences.dart';
