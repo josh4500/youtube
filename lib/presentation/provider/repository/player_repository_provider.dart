@@ -35,7 +35,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:youtube_clone/core/utils/progress.dart';
 import 'package:youtube_clone/infrastructure.dart';
 import 'package:youtube_clone/presentation/models.dart';
-import 'package:youtube_clone/presentation/preferences.dart';
+import 'package:youtube_clone/presentation/provider/state/preferences.dart';
 
 import '../state/player_state_provider.dart';
 import '../state/player_view_state_provider.dart';

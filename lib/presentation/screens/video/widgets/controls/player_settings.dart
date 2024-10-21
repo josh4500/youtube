@@ -16,8 +16,8 @@ class PlayerSettings extends StatelessWidget {
   }
 }
 
-class PlayerSettingsSwitch extends StatelessWidget {
-  const PlayerSettingsSwitch({
+class CustomSwitch extends StatelessWidget {
+  const CustomSwitch({
     super.key,
     required this.selected,
     this.thumbSize = 18,
@@ -32,7 +32,9 @@ class PlayerSettingsSwitch extends StatelessWidget {
       width: thumbSize * 2,
       padding: const EdgeInsets.all(1),
       decoration: BoxDecoration(
-        color: selected ? Colors.white : const Color(0xFFAAAAAA),
+        color: selected
+            ? context.theme.colorScheme.surface
+            : context.theme.colorScheme.surface.withOpacity(.2),
         borderRadius: BorderRadius.circular(64),
       ),
       child: Align(
@@ -41,7 +43,7 @@ class PlayerSettingsSwitch extends StatelessWidget {
           width: thumbSize,
           height: thumbSize,
           decoration: BoxDecoration(
-            color: const Color(0xFF212121),
+            color: context.theme.colorScheme.inverseSurface.withOpacity(.9),
             borderRadius: BorderRadius.circular(64),
           ),
         ),

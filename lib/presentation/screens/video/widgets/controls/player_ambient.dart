@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/preferences.dart';
+import 'package:youtube_clone/presentation/provider/state/preferences.dart';
 
 class PlayerAmbient extends ConsumerWidget {
   const PlayerAmbient({super.key});

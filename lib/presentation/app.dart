@@ -30,11 +30,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/infrastructure.dart';
-import 'package:youtube_clone/presentation/theme/app_theme.dart';
-import 'package:youtube_clone/presentation/theme/device_theme.dart';
+import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 import '../generated/l10n.dart';
-import 'preferences.dart';
 import 'router/app_router.dart';
 import 'widgets/error_overlay.dart';
 
@@ -56,12 +55,11 @@ class _AppState extends State<App>
           builder: (BuildContext context, WidgetRef ref, _) {
             // Watch only 2 properties to ensure it only rebuilds entire app only when
             // `ThemeMode` and `Locale` changes
-            final (ThemeMode, Locale) preferences = ref.watch(
+            final (themeMode, locale) = ref.watch(
               preferencesProvider.select(
                 (PreferenceState state) => (state.themeMode, state.locale),
               ),
             );
-            final (themeMode, locale) = preferences;
 
             return MaterialApp.router(
               title: 'Youtube',

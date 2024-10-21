@@ -11,7 +11,11 @@ class PlayerActionsControl extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerViewState = ref.watch(playerViewStateProvider);
+    final (isExpanded, showDescription) = ref.watch(
+      playerViewStateProvider.select(
+        (state) => (state.isExpanded, state.showDescription),
+      ),
+    );
     final childWidget = Row(
       children: [
         Expanded(
@@ -49,20 +53,20 @@ class PlayerActionsControl extends ConsumerWidget {
             ],
           ),
         ),
-        if (playerViewState.isExpanded == false) const Spacer(),
+        if (isExpanded == false) const Spacer(),
         const PlayerMoreVideos(),
       ],
     );
 
     if (context.orientation.isLandscape) {
       // Hides Action controls when description or comments is show
-      if (playerViewState.showDescription) {
+      if (showDescription) {
         return const SizedBox();
       }
       return childWidget;
     } else {
       // Shows Action controls when video is expanded
-      if (playerViewState.isExpanded) {
+      if (isExpanded) {
         return childWidget;
       }
       return const SizedBox();

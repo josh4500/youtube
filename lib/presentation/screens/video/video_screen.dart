@@ -204,7 +204,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   double get minPlayerHeightRatio {
     return context.orientation.isPortrait
-        ? kMinPlayerHeightPortrait
+        ? 60 / screenHeight
         : kMinPlayerHeightLandscape;
   }
 
@@ -1588,7 +1588,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   }
 
   /// Callback for when scroll notifications are received in info section
-  bool _onScrollInfoScrollNotification(ScrollNotification notification) {
+  bool _onScrollDetailsScrollNotification(ScrollNotification notification) {
     // Prevents info to be dragged down while scrolling in DynamicTab
     if (notification.depth >= 1) {
       if (notification is ScrollStartNotification) {
@@ -1821,10 +1821,12 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
     final infoScrollview = Stack(
       children: [
-        VideoDetailsSection(
-          physics: _detailsScrollPhysics,
-          controller: _detailsScrollController,
-          onScrollNotification: _onScrollInfoScrollNotification,
+        NotificationListener<ScrollNotification>(
+          onNotification: _onScrollDetailsScrollNotification,
+          child: VideoDetailsSection(
+            physics: _detailsScrollPhysics,
+            controller: _detailsScrollController,
+          ),
         ),
         AnimatedBuilder(
           animation: _playlistOffsetAnimation,

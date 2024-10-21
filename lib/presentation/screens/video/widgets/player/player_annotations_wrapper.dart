@@ -113,7 +113,9 @@ class _PlayerAnnotationsWrapperState extends State<PlayerAnnotationsWrapper> {
             Positioned.fill(
               child: Consumer(
                 builder: (context, ref, child) {
-                  final playerViewState = ref.watch(playerViewStateProvider);
+                  final isExpanded = ref.watch(
+                    playerViewStateProvider.select((state) => state.isExpanded),
+                  );
                   return AnnotationVisibility(
                     visible: listenable.showVisuals,
                     alignment: Alignment.bottomLeft,
@@ -121,7 +123,7 @@ class _PlayerAnnotationsWrapperState extends State<PlayerAnnotationsWrapper> {
                       Alignment.centerLeft,
                       Alignment.bottomLeft,
                       context.orientation.isPortrait
-                          ? playerViewState.isExpanded
+                          ? isExpanded
                               ? 0.9
                               : 0.75
                           : 0.45,

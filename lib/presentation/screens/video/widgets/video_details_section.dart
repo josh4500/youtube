@@ -13,17 +13,14 @@ class VideoDetailsSection extends StatelessWidget {
     super.key,
     this.physics,
     this.controller,
-    required this.onScrollNotification,
   });
 
   final ScrollPhysics? physics;
   final ScrollController? controller;
-  final bool Function(ScrollNotification notification) onScrollNotification;
 
   @override
   Widget build(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: onScrollNotification,
+    return Material(
       child: CustomScrollView(
         physics: physics,
         controller: controller,

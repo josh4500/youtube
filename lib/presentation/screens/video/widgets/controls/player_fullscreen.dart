@@ -42,13 +42,17 @@ class PlayerFullscreen extends ConsumerWidget {
     // TODO(josh4500): Check if Expanded mode is on
     const bool isResizableExpandedMode = false;
 
-    final playerViewState = ref.watch(playerViewStateProvider);
+    final isExpanded = ref.watch(
+      playerViewStateProvider.select(
+        (state) => state.isExpanded,
+      ),
+    );
     return OrientationBuilder(
       builder: (BuildContext context, Orientation orientation) {
         return PlayerControlButton(
           onTap: () {
-            if (isResizableExpandedMode || playerViewState.isExpanded) {
-              if (playerViewState.isExpanded) {
+            if (isResizableExpandedMode || isExpanded) {
+              if (isExpanded) {
                 ExitExpandPlayerNotification().dispatch(context);
               } else {
                 EnterExpandPlayerNotification().dispatch(context);
@@ -64,7 +68,7 @@ class PlayerFullscreen extends ConsumerWidget {
           backgroundColor: Colors.transparent,
           horizontalPadding: 8,
           builder: (context, _) {
-            return playerViewState.isExpanded || context.orientation.isLandscape
+            return isExpanded || context.orientation.isLandscape
                 ? const Icon(YTIcons.exit_fullscreen_outlined)
                 : const Icon(YTIcons.fullscreen);
           },

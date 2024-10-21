@@ -28,77 +28,40 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
-import 'package:youtube_clone/presentation/provider/state/player_state_provider.dart';
+import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../providers/player_signal_provider.dart';
-
-class PlayerLoadingIndicator extends ConsumerStatefulWidget {
+class PlayerLoadingIndicator extends ConsumerWidget {
   const PlayerLoadingIndicator({super.key});
 
   @override
-  ConsumerState<PlayerLoadingIndicator> createState() =>
-      _PlayerLoadingIndicatorState();
-}
-
-class _PlayerLoadingIndicatorState extends ConsumerState<PlayerLoadingIndicator>
-    with TickerProviderStateMixin {
-  late final AnimationController _controlsOpacityController;
-  late final Animation<double> _controlsAnimation;
-  @override
-  void initState() {
-    super.initState();
-    _controlsOpacityController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 175),
-      reverseDuration: const Duration(milliseconds: 100),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final showBuffer = ref.watch(
+      playerViewStateProvider.select((state) => state.showBuffer),
     );
 
-    _controlsAnimation = CurvedAnimation(
-      parent: ReverseAnimation(_controlsOpacityController),
-      curve: Curves.easeIn,
-    );
-  }
+    return Consumer(
+      builder: (BuildContext context, WidgetRef ref, childWidget) {
+        final (isLoading, isBuffering) = ref.watch(
+          playerNotifierProvider.select(
+            (state) => (state.loading, state.buffering),
+          ),
+        );
 
-  @override
-  void dispose() {
-    _controlsOpacityController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final playerNotifier = ref.watch(playerNotifierProvider);
-    final isLoading = playerNotifier.loading || playerNotifier.buffering;
-
-    if (!isLoading) {
-      return const SizedBox();
-    }
-
-    ref.listen(playerSignalProvider, (previous, next) {
-      final signal = next.asData?.value;
-      if (signal == PlayerSignal.minimize) {
-        _controlsOpacityController.forward();
-      } else if (signal == PlayerSignal.maximize) {
-        _controlsOpacityController.reverse();
-      }
-    });
-
-    return AnimatedBuilder(
-      animation: _controlsAnimation,
-      builder: (context, childWidget) {
-        return Opacity(
-          opacity: _controlsAnimation.value,
-          child: childWidget,
+        return ValuedVisibility(
+          curve: Curves.easeIn,
+          duration: Durations.long3,
+          alignment: Alignment.center,
+          visible: showBuffer && (isLoading || isBuffering),
+          child: const SizedBox.square(
+            dimension: 56,
+            child: CircularProgressIndicator(
+              color: Colors.white,
+              strokeWidth: 2.5,
+            ),
+          ),
         );
       },
-      child: const SizedBox.square(
-        dimension: 60,
-        child: CircularProgressIndicator(
-          color: Colors.white,
-          strokeWidth: 2.5,
-        ),
-      ),
     );
   }
 }

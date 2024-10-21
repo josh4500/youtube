@@ -78,6 +78,9 @@ class CommentTextFieldPlaceholder extends StatelessWidget {
                                   ),
                                 ),
                               ],
+                              style: TextStyle(
+                                color: context.theme.hintColor,
+                              ),
                             ),
                           )
                         : Text(

@@ -5,6 +5,7 @@ part 'player_view_state_provider.g.dart';
 enum ViewState {
   expanded,
   minimized,
+  visibleBuffer,
   visibleAmbient,
   visibleControls,
   visibleChapters,
@@ -14,6 +15,7 @@ enum ViewState {
 extension PlayerViewStateExtension on Set<ViewState> {
   bool get isExpanded => contains(ViewState.expanded);
   bool get isMinimized => contains(ViewState.minimized);
+  bool get showBuffer => contains(ViewState.visibleBuffer);
   bool get showAmbient => contains(ViewState.visibleAmbient);
   bool get showControls => contains(ViewState.visibleControls);
   bool get showChapters => contains(ViewState.visibleChapters);

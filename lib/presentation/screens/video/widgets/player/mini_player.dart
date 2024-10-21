@@ -42,38 +42,39 @@ class MiniPlayer extends StatelessWidget {
       color: theme.backgroundColor,
       child: Row(
         children: [
-          SizedBox(width: 8.w),
           Expanded(
             flex: 3,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Consumer(
-                  builder: (
-                    BuildContext context,
-                    WidgetRef ref,
-                    Widget? child,
-                  ) {
-                    final isMinimized = ref.watch(
-                      playerViewStateProvider.select(
-                        (state) => state.isMinimized,
-                      ),
-                    );
-                    return Marquee(
-                      text: 'Google Chromecast: Official Video',
-                      enabled: isMinimized,
-                      style: theme.titleTextStyle,
-                    );
-                  },
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Harris Craycraft',
-                  maxLines: 1,
-                  style: theme.subtitleTextStyle,
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Consumer(
+                    builder: (
+                      BuildContext context,
+                      WidgetRef ref,
+                      Widget? child,
+                    ) {
+                      final isMinimized = ref.watch(
+                        playerViewStateProvider.select(
+                          (state) => state.isMinimized,
+                        ),
+                      );
+                      return Marquee(
+                        text: 'Google Chromecast: Official Video',
+                        enabled: isMinimized,
+                        style: theme.titleTextStyle,
+                      );
+                    },
+                  ),
+                  Text(
+                    'Harris Craycraft',
+                    maxLines: 1,
+                    style: theme.subtitleTextStyle,
+                  ),
+                ],
+              ),
             ),
           ),
           Expanded(

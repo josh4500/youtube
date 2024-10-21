@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/models.dart';
-import 'package:youtube_clone/presentation/preferences.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -35,6 +34,7 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
         leading: const Icon(YTIcons.playback_speed_outlined),
         title: 'Playback speed',
         value: 'Playback speed',
+        useTappable: true,
         trailing: Row(
           children: [
             Consumer(
@@ -63,21 +63,20 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
         title: 'Captions',
         value: 'Captions',
         enabled: false,
+        useTappable: true,
       ),
       const DynamicSheetOptionItem(
         leading: Icon(YTIcons.private_circle_outlined),
         title: 'Lock screen',
         value: 'Lock screen',
+        useTappable: true,
       ),
       const DynamicSheetOptionItem(
         leading: Icon(YTIcons.settings_outlined),
         title: 'Additional settings',
         value: 'Additional settings',
-        trailing: Icon(
-          YTIcons.chevron_right,
-          size: 16,
-          color: Color(0xFFAAAAAA),
-        ),
+        useTappable: true,
+        trailing: Icon(YTIcons.chevron_right, size: 16),
       ),
     ],
   );
@@ -104,14 +103,14 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
           ),
         ),
       ),
-      trailing: const Column(
+      trailing: Column(
         children: [
-          Padding(
+          const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.0),
             child: Divider(thickness: 1, height: 0),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 8,
             ),
@@ -122,7 +121,9 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
                 children: [
                   TextSpan(
                     text: ' Settings > Video Quality Preferences.',
-                    style: TextStyle(color: Color(0xFF3EA6FF)),
+                    style: TextStyle(
+                      color: context.theme.primaryColor,
+                    ),
                   ),
                 ],
               ),
@@ -167,6 +168,7 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
             ),
             title: speed.sRate,
             value: speed,
+            useTappable: true,
           ),
       ],
     );
@@ -214,6 +216,7 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
               selected: title == 'Turn off captions',
             ),
             title: title,
+            useTappable: true,
           ),
       ],
     );
@@ -244,12 +247,14 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
         const DynamicSheetOptionItem(
           leading: Icon(YTIcons.loop_outlined),
           title: 'Loop video',
-          trailing: PlayerSettingsSwitch(selected: false),
+          trailing: CustomSwitch(selected: false),
+          useTappable: true,
         ),
         DynamicSheetOptionItem(
           leading: const Icon(YTIcons.ambient_mode_outlined),
           title: 'Ambient mode',
           value: 'Ambient mode',
+          useTappable: true,
           trailing: Consumer(
             builder: (
               BuildContext context,
@@ -261,7 +266,7 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
                   (preferences) => preferences.ambientMode,
                 ),
               );
-              return PlayerSettingsSwitch(selected: ambientModeEnabled);
+              return CustomSwitch(selected: ambientModeEnabled);
             },
           ),
         ),
@@ -269,11 +274,13 @@ Future<dynamic> openSettingsSheet(BuildContext context) async {
           leading: Icon(YTIcons.stable_volume_outlined),
           title: 'Stable volume',
           enabled: false,
-          trailing: PlayerSettingsSwitch(selected: true),
+          useTappable: true,
+          trailing: CustomSwitch(selected: true),
         ),
         const DynamicSheetOptionItem(
           leading: Icon(YTIcons.youtube_music_outlined),
           title: 'Listen with YouTube Music',
+          useTappable: true,
           trailing: Icon(YTIcons.external_link_rounded_outlined),
         ),
       ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 
 class SlidesIndicator extends StatelessWidget {
   const SlidesIndicator({
@@ -18,10 +19,13 @@ class SlidesIndicator extends StatelessWidget {
         return Container(
           width: 6,
           height: 6,
-          margin:
-              index != pageCount - 1 ? const EdgeInsets.only(right: 4) : null,
+          margin: index != pageCount - 1
+              ? const EdgeInsets.only(right: 4)
+              : EdgeInsets.zero,
           decoration: BoxDecoration(
-            color: currentPage == index ? Colors.white : Colors.white12,
+            color: currentPage == index
+                ? context.theme.colorScheme.surface
+                : context.theme.colorScheme.surface.withOpacity(.1),
             shape: BoxShape.circle,
           ),
         );

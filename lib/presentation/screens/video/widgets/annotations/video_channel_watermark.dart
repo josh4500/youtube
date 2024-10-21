@@ -36,9 +36,12 @@ class VideoChannelWatermark extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerViewState = ref.watch(playerViewStateProvider);
+    final isExpanded = ref.watch(
+      playerViewStateProvider.select((state) => state.isExpanded),
+    );
+
     return Visibility(
-      visible: playerViewState.isExpanded || context.orientation.isLandscape,
+      visible: isExpanded || context.orientation.isLandscape,
       child: Container(
         width: 45,
         height: 45,

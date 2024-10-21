@@ -26,17 +26,20 @@ class PlayerDescription extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerViewState = ref.watch(playerViewStateProvider);
-    if (showOnExpanded && !playerViewState.isExpanded) {
+    final (isExpanded, showDescription) = ref.watch(
+      playerViewStateProvider.select(
+        (state) => (state.isExpanded, state.showDescription),
+      ),
+    );
+    if (showOnExpanded && !isExpanded) {
       return const SizedBox();
-    } else if (playerViewState.showDescription ||
-        context.orientation.isPortrait) {
+    } else if (showDescription || context.orientation.isPortrait) {
       return const SizedBox();
     }
 
     return GestureDetector(
       onTap: () {
-        if (playerViewState.isExpanded) {
+        if (isExpanded) {
           ExitExpandPlayerNotification().dispatch(context);
         }
         ref.read(playerRepositoryProvider).sendPlayerSignal([
@@ -104,9 +107,11 @@ class PlayerDescriptionV2 extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playerViewState = ref.watch(playerViewStateProvider);
+    final isExpanded = ref.watch(
+      playerViewStateProvider.select((state) => state.isExpanded),
+    );
 
-    if (showOnExpanded && !playerViewState.isExpanded) {
+    if (showOnExpanded && !isExpanded) {
       return const SizedBox();
     }
     return Padding(
