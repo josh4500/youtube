@@ -1,7 +1,9 @@
+import 'dart:collection';
 import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../constants.dart';
@@ -10,6 +12,11 @@ import 'gestures/custom_ink_well.dart';
 import 'over_scroll_glow_behavior.dart';
 import 'persistent_header_delegate.dart';
 import 'sheet_drag_indicator.dart';
+
+typedef PageDraggableBuilder = Widget Function(
+  BuildContext context,
+  ScrollController? scrollController,
+);
 
 class PageDraggableSheet extends StatefulWidget {
   const PageDraggableSheet({
@@ -594,5 +601,204 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
         ),
       ),
     );
+  }
+}
+
+// TODO(josh4500): Complete new API for Draggable
+// Tasks left
+// 1: Close using the controller
+// 2: Back button should close (using controller), which closes opened children
+//    (PageDraggableOverlayChild) consecutively.
+// 3: Change bottom opacity based on top sheet draggable size.
+// 4: Change horizontal size based on pointer event.
+// 5: Whether to pass or dynamic create the controller.
+// 6: Create grouped draggable which add or remove DraggableSheet entry based on max size of group.
+//
+//
+
+class StackedPageDraggable extends StatefulWidget {
+  const StackedPageDraggable({super.key, required this.child});
+  final Widget child;
+
+  static _StackedPageDraggableState? _maybeOf(BuildContext context) {
+    return context.findAncestorStateOfType<_StackedPageDraggableState>();
+  }
+
+  static _StackedPageDraggableState _of(BuildContext context) {
+    return _maybeOf(context)!;
+  }
+
+  static void open(
+    BuildContext context,
+    Object key,
+    PageDraggableBuilder builder,
+  ) {
+    _of(context).openBottomSheet(key, builder);
+  }
+
+  @override
+  State<StackedPageDraggable> createState() => _StackedPageDraggableState();
+}
+
+class _StackedPageDraggableState extends State<StackedPageDraggable> {
+  final _History _history = _History();
+  final GlobalKey<OverlayState> _overlayKey = GlobalKey();
+
+  OverlayState get _overlayState => _overlayKey.currentState!;
+
+  @override
+  void dispose() {
+    _history.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Overlay(
+      key: _overlayKey,
+      initialEntries: [
+        OverlayEntry(builder: (BuildContext context) => widget.child),
+      ],
+    );
+  }
+
+  void openBottomSheet(Object key, PageDraggableBuilder builder) {
+    final controller = DraggableScrollableController();
+
+    final newEntry = OverlayEntry(
+      builder: (BuildContext context) {
+        final properties = context.provide<DraggableProperties>();
+        return DraggableSheet(
+          builder: builder,
+          controller: controller,
+          snapSizes: properties.snapSizes,
+          initialHeight: properties.initialHeight,
+        );
+      },
+    );
+    final didAdd = _history.addDraggable(key, newEntry);
+    if (didAdd) {
+      _overlayState.insert(newEntry);
+    }
+  }
+}
+
+class DraggableProperties {
+  DraggableProperties({
+    required this.snapSizes,
+    required this.initialHeight,
+  }) : assert(
+          initialHeight >= 0 || initialHeight <= 1,
+          'initialHeight cannot be less than 0 or greater tha 1',
+        );
+
+  final List<double> snapSizes;
+  final double initialHeight;
+}
+
+class DraggableSheet extends StatefulWidget {
+  const DraggableSheet({
+    super.key,
+    required this.controller,
+    required this.snapSizes,
+    required this.builder,
+    required this.initialHeight,
+  });
+
+  final double initialHeight;
+  final List<double> snapSizes;
+  final PageDraggableBuilder builder;
+  final DraggableScrollableController controller;
+
+  @override
+  State<DraggableSheet> createState() => _DraggableSheetState();
+}
+
+class _DraggableSheetState extends State<DraggableSheet>
+    with TickerProviderStateMixin {
+  late final sizeController = AnimationController(
+    vsync: this,
+    value: 0,
+    duration: Durations.medium1,
+  );
+
+  late final opacityController = AnimationController(
+    vsync: this,
+    value: 0,
+    duration: Durations.medium1,
+  );
+
+  @override
+  void dispose() {
+    sizeController.dispose();
+    opacityController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener(
+      child: Builder(
+        builder: (context) {
+          if (context.orientation.isLandscape) {
+            return SizeTransition(
+              axis: Axis.horizontal,
+              axisAlignment: -1,
+              sizeFactor: CurvedAnimation(
+                parent: sizeController,
+                curve: Curves.bounceInOut,
+              ),
+              child: Listener(
+                child: widget.builder(context, null),
+              ),
+            );
+          }
+          return DraggableScrollableSheet(
+            snap: true,
+            minChildSize: 0,
+            snapSizes: widget.snapSizes,
+            controller: widget.controller,
+            shouldCloseOnMinExtent: false,
+            initialChildSize: widget.initialHeight,
+            snapAnimationDuration: Durations.medium4,
+            builder: (
+              BuildContext context,
+              ScrollController controller,
+            ) {
+              return Material(
+                child: FadeTransition(
+                  opacity: ReverseAnimation(opacityController),
+                  child: widget.builder(context, controller),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _History extends ChangeNotifier {
+  final _entryKeys = <Object?>[];
+  final _entries = <Object, OverlayEntry>{};
+
+  Object? get lastEntryKey => _entryKeys.isNotEmpty ? _entryKeys.last : null;
+  bool addDraggable(Object key, OverlayEntry entry) {
+    bool didAdd = false;
+
+    _entries.putIfAbsent(key, () {
+      didAdd = true;
+      _entryKeys.add(key);
+      return entry;
+    });
+
+    return didAdd;
+  }
+
+  void pop() => _removeDraggable(lastEntryKey);
+
+  void _removeDraggable(Object? key) {
+    _entries.remove(key)?.remove();
   }
 }

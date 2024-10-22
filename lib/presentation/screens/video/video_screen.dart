@@ -649,6 +649,16 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _showHideNavigationBar(screenHeightRatio);
     _recomputeOpacityAndHeight(screenHeightRatio);
 
+    if (screenHeightRatio == 1) {
+      ref
+          .read(playerViewStateProvider.notifier)
+          .addState(ViewState.visibleBuffer);
+    } else {
+      ref
+          .read(playerViewStateProvider.notifier)
+          .removeState(ViewState.visibleBuffer);
+    }
+
     // Hide or Show infographics
     _hideGraphicsNotifier.value = screenHeightRatio < 1;
     if (_availableSheet.contains(VideoBottomSheet.playlist)) {
@@ -1430,6 +1440,16 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
       _showControls(ref.read(playerNotifierProvider).ended);
     });
+  }
+
+  Future<void> _openCommentTextfield() async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return const CommentTextField();
+      },
+    );
   }
 
   Future<void> _openBottomSheet(VideoBottomSheet sheet) async {

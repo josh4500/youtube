@@ -334,12 +334,11 @@ class TranscriptTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
             decoration: BoxDecoration(
-              color: context.theme.primaryColor.withOpacity(0.2),
+              color: context.theme.primaryColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -350,8 +349,10 @@ class TranscriptTile extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 32),
-          const Text('You do know that the one piece treasure'),
+          const SizedBox(width: 16),
+          const Flexible(
+            child: Text('You do know that the one piece treasure'),
+          ),
         ],
       ),
     );

@@ -39,7 +39,7 @@ export 'widgets/builders/scree_size_widget_builder.dart';
 export 'widgets/call_out.dart';
 export 'widgets/channel_subscription_tile.dart';
 export 'widgets/clip_thumb_clipper.dart';
-export 'widgets/comment_textfield_placeholder.dart';
+export 'widgets/comment_textfield.dart';
 export 'widgets/comment_tile.dart';
 export 'widgets/connection_snackbar.dart';
 export 'widgets/custom_action_button.dart';

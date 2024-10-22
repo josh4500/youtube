@@ -28,7 +28,101 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/widgets.dart';
+
+import 'account_avatar.dart';
+import 'gestures/tappable_area.dart';
+
+class CommentTextField extends StatelessWidget {
+  const CommentTextField({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).width / 7;
+    return Material(
+      color: const Color(0xFF212121),
+      child: SizedBox(
+        height: height * 2,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  const Divider(height: 0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      children: [
+                        const AccountAvatar(size: 32),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Container(
+                            height: height - 16,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            alignment: Alignment.center,
+                            child: TextField(
+                              // autofocus: true,
+                              decoration: const InputDecoration(
+                                hintText: 'Add a comment...',
+                                contentPadding: EdgeInsets.zero,
+                                focusedBorder: InputBorder.none,
+                              ),
+                              cursorColor: context.theme.primaryColor,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        TappableArea(
+                          onTap: () {},
+                          padding: const EdgeInsets.all(8),
+                          borderRadius: BorderRadius.circular(32),
+                          child: const Icon(
+                            YTIcons.thanks_outlined,
+                            size: 24,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 0),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Row(
+                children: [
+                  ...['❤️', '😂', '🎉', '😓', '😲', '😅', '😊'].map((emoji) {
+                    return Expanded(
+                      child: TappableArea(
+                        onTap: () {},
+                        child: Center(
+                          child: Text(
+                            emoji,
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+            const Divider(height: 0),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class CommentTextFieldPlaceholder extends StatelessWidget {
   const CommentTextFieldPlaceholder({super.key, this.isReply = false});

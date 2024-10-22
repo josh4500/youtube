@@ -47,20 +47,23 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scaffoldKey = ref.read(homeRepositoryProvider).scaffoldKey;
     final overlayKey = ref.read(homeRepositoryProvider).overlayKey;
-    return Scaffold(
-      key: scaffoldKey,
-      drawerEnableOpenDragGesture: false,
-      extendBody: true,
-      drawer: const HomeDrawer(),
-      body: HomeOverlayWrapper(key: overlayKey, child: child),
-      bottomNavigationBar: HomeNavigatorBar(
-        selectedIndex: child.currentIndex,
-        onChangeIndex: (int index) {
-          child.goBranch(
-            index,
-            initialLocation: index == child.currentIndex,
-          );
-        },
+
+    return StackedPageDraggable(
+      child: Scaffold(
+        key: scaffoldKey,
+        drawerEnableOpenDragGesture: false,
+        extendBody: true,
+        drawer: const HomeDrawer(),
+        body: HomeOverlayWrapper(key: overlayKey, child: child),
+        bottomNavigationBar: HomeNavigatorBar(
+          selectedIndex: child.currentIndex,
+          onChangeIndex: (int index) {
+            child.goBranch(
+              index,
+              initialLocation: index == child.currentIndex,
+            );
+          },
+        ),
       ),
     );
   }
