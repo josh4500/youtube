@@ -193,7 +193,7 @@ class PlayableContent extends StatelessWidget {
                   ),
                   // TODO(josh4500): Fix left space layout caused by outer paddings
                   Transform.translate(
-                    offset: const Offset(16, -6),
+                    offset: const Offset(12, -6),
                     child: TappableArea(
                       onTap: onMore,
                       canRequestFocus: false,

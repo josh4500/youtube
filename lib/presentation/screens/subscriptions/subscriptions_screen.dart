@@ -73,25 +73,44 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                     child: Material(
                       child: Column(
                         children: <Widget>[
-                          AppBar(
-                            automaticallyImplyLeading: false,
-                            leadingWidth: 120,
-                            leading: const AppLogo(),
-                            actions: <Widget>[
-                              AppbarAction(
-                                icon: YTIcons.cast_outlined,
-                                onTap: () {},
-                              ),
-                              AppbarAction(
-                                icon: YTIcons.notification_outlined,
-                                onTap: () =>
-                                    context.goto(AppRoutes.notifications),
-                              ),
-                              AppbarAction(
-                                icon: YTIcons.search_outlined,
-                                onTap: () => context.goto(AppRoutes.search),
-                              ),
-                            ],
+                          ListenableBuilder(
+                            listenable: _selectedChannel,
+                            builder: (
+                              BuildContext context,
+                              Widget? _,
+                            ) {
+                              final selected = _selectedChannel.value != null;
+                              return AppBar(
+                                automaticallyImplyLeading: false,
+                                leadingWidth: selected ? null : 120,
+                                leading: selected
+                                    ? CustomBackButton(
+                                        onPressed: () {
+                                          _selectedChannel.value = null;
+                                        },
+                                      )
+                                    : const AppLogo(),
+                                title: selected
+                                    ? const Text('Marques Brownlee')
+                                    : null,
+                                actions: <Widget>[
+                                  AppbarAction(
+                                    icon: YTIcons.cast_outlined,
+                                    onTap: () {},
+                                  ),
+                                  AppbarAction(
+                                    icon: YTIcons.notification_outlined,
+                                    onTap: () => context.goto(
+                                      AppRoutes.notifications,
+                                    ),
+                                  ),
+                                  AppbarAction(
+                                    icon: YTIcons.search_outlined,
+                                    onTap: () => context.goto(AppRoutes.search),
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                           SizedBox(
                             height: 100,
