@@ -32,16 +32,28 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'account_avatar.dart';
 import 'gestures/tappable_area.dart';
 
-class CommentTextField extends StatelessWidget {
+class CommentTextField extends StatefulWidget {
   const CommentTextField({super.key});
 
   @override
+  State<CommentTextField> createState() => _CommentTextFieldState();
+}
+
+class _CommentTextFieldState extends State<CommentTextField> {
+  final controller = TextEditingController();
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).width / 7;
     return Material(
       color: const Color(0xFF212121),
       child: SizedBox(
-        height: height * 2,
+        height: 96,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -52,7 +64,7 @@ class CommentTextField extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12.0,
-                      vertical: 8,
+                      vertical: 4,
                     ),
                     child: Row(
                       children: [
@@ -60,20 +72,26 @@ class CommentTextField extends StatelessWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Container(
-                            height: height - 16,
+                            height: 40,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                             ),
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.white),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: .8,
+                              ),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             alignment: Alignment.center,
                             child: TextField(
                               // autofocus: true,
+                              controller: controller,
                               decoration: const InputDecoration(
                                 hintText: 'Add a comment...',
-                                contentPadding: EdgeInsets.zero,
+                                contentPadding: EdgeInsets.only(
+                                  bottom: 8,
+                                ),
                                 focusedBorder: InputBorder.none,
                               ),
                               cursorColor: context.theme.primaryColor,
@@ -103,7 +121,26 @@ class CommentTextField extends StatelessWidget {
                   ...['❤️', '😂', '🎉', '😓', '😲', '😅', '😊'].map((emoji) {
                     return Expanded(
                       child: TappableArea(
-                        onTap: () {},
+                        onTap: () {
+                          final cursorPosition = controller.selection.start;
+                          final currentText = controller.text;
+                          if (cursorPosition == -1) {
+                            controller.text = currentText + emoji;
+                          } else {
+                            final newText = currentText.replaceRange(
+                              cursorPosition,
+                              cursorPosition,
+                              emoji,
+                            );
+
+                            controller.value = TextEditingValue(
+                              text: newText,
+                              selection: TextSelection.collapsed(
+                                offset: cursorPosition + emoji.length,
+                              ),
+                            );
+                          }
+                        },
                         child: Center(
                           child: Text(
                             emoji,

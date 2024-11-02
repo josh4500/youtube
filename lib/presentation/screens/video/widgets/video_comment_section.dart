@@ -221,8 +221,6 @@ class _VideoCommentSectionState extends ConsumerState<VideoCommentSection> {
 class VideoCommentInput extends StatelessWidget {
   const VideoCommentInput({super.key});
 
-  void _openCommentInput() {}
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -236,7 +234,7 @@ class VideoCommentInput extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: TappableArea(
-              onTap: _openCommentInput,
+              onTap: () => OpenCommentNotification().dispatch(context),
               padding: EdgeInsets.zero,
               borderRadius: BorderRadius.circular(16),
               child: Container(

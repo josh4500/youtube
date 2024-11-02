@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/screens/channel/widgets/menu/show_channel_menu.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -320,8 +321,11 @@ class _ChannelScreenState extends State<ChannelScreen> {
         SliverGrid(
           delegate: SliverChildBuilderDelegate(
             (BuildContext context, int index) {
-              return const ViewableShortsContent(
-                showTitle: false,
+              return ModelBinding(
+                model: ShortsViewModel.test,
+                child: const ViewableShortsContent(
+                  showTitle: false,
+                ),
               );
             },
             childCount: 6,

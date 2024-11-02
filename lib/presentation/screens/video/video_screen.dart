@@ -1443,9 +1443,9 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   }
 
   Future<void> _openCommentTextfield() async {
-    showModalBottomSheet(
+    await showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
+      useSafeArea: true,
       builder: (BuildContext context) {
         return const CommentTextField();
       },
@@ -1457,7 +1457,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     //     context.orientation.isPortrait) {
     //   return;
     // }
-
+    _openedDraggableState.remove(sheet);
     _openedDraggableState.add(sheet);
     final bool wait = !_getSheetNotifier(sheet).value;
     _getSheetNotifier(sheet).value = true;
@@ -1681,6 +1681,8 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       _openBottomSheet(notification.sheet);
     } else if (notification is CloseBottomSheetNotification) {
       _closeBottomSheet(notification.sheet);
+    } else if (notification is OpenCommentNotification) {
+      _openCommentTextfield();
     }
     return true;
   }

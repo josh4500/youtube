@@ -28,19 +28,21 @@ class ModelBinding<T> extends StatefulWidget {
   final Map<Type, ModelBindingAction> commands;
 
   static T of<T>(BuildContext context) {
-    final scope = context.findAncestorStateOfType<_ModelBindingState<T>>();
+    final scope =
+        context.findAncestorWidgetOfExactType<_ModelBindingScope<T>>();
     if (scope == null) {
       throw Exception('');
     }
-    return scope.currentModel;
+    return scope.bindingState.currentModel;
   }
 
   static void update<T>(BuildContext context, T value) {
-    final scope = context.findAncestorStateOfType<_ModelBindingState<T>>();
+    final scope =
+        context.findAncestorWidgetOfExactType<_ModelBindingScope<T>>();
     if (scope == null) {
       throw Exception('');
     }
-    scope.updateModelValue(value);
+    scope.bindingState.updateModelValue(value);
   }
 
   @override

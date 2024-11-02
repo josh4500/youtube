@@ -72,10 +72,10 @@ abstract final class AppTheme {
         systemNavigationBarDividerColor: Colors.white,
       ),
     ),
-    tabBarTheme: const TabBarTheme(
-      indicatorColor: Colors.black,
-      dividerColor: Colors.black12,
-    ),
+    // tabBarTheme: const TabBarTheme(
+    //   indicatorColor: Colors.black,
+    //   dividerColor: Colors.black12,
+    // ),
     radioTheme: RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith(
         (states) {
@@ -165,10 +165,10 @@ abstract final class AppTheme {
         systemNavigationBarDividerColor: Color(0xFF0F0F0F),
       ),
     ),
-    tabBarTheme: const TabBarTheme(
-      indicatorColor: Colors.white,
-      dividerColor: Colors.white10,
-    ),
+    // tabBarTheme: const TabBarTheme(
+    //   indicatorColor: Colors.white,
+    //   dividerColor: Colors.white10,
+    // ),
     radioTheme: RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith(
         (states) {

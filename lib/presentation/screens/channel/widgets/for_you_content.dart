@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/screens/channel/widgets/for_you_shorts_content.dart';
 import 'package:youtube_clone/presentation/screens/channel/widgets/for_you_video_content.dart';
 import 'package:youtube_clone/presentation/view_models/content/content_view_model.dart';
@@ -39,7 +40,10 @@ class ForYouContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (content is ShortsViewModel) {
-      return const ForYouShortsContent();
+      return ModelBinding<ShortsViewModel>(
+        model: content as ShortsViewModel,
+        child: const ForYouShortsContent(),
+      );
     } else {
       return const ForYouVideoContent();
     }

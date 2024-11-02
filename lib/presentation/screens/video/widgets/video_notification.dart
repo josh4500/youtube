@@ -25,3 +25,5 @@ class CloseBottomSheetNotification extends VideoScreenNotification {
 
   final VideoBottomSheet sheet;
 }
+
+class OpenCommentNotification extends VideoScreenNotification {}

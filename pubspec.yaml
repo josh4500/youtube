@@ -34,7 +34,7 @@ dependencies:
   palette_generator: ^0.3.3+3
   path_provider: ^2.1.4
   permission_handler: ^11.3.1
-  photo_manager: ^3.2.3
+  photo_manager: ^3.5.1
   photo_manager_image_provider: ^2.1.1
   riverpod_annotation: ^2.3.5
   rxdart: ^0.28.0

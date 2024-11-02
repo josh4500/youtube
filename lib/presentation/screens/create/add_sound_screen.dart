@@ -153,8 +153,8 @@ class AddSoundBrowsePage extends StatelessWidget {
       slivers: [
         SliverToBoxAdapter(
           child: GroupedPageViewBuilder(
-            title: 'Recommended',
             onTap: () {},
+            title: 'Recommended',
             leading: const Icon(YTIcons.star),
             itemBuilder: (BuildContext context, int index) {
               return Container(
@@ -175,8 +175,8 @@ class AddSoundBrowsePage extends StatelessWidget {
         ),
         SliverToBoxAdapter(
           child: GroupedPageViewBuilder(
-            title: 'Top rated',
             onTap: () {},
+            title: 'Top rated',
             leading: const Icon(YTIcons.trending_up_outlined),
             itemBuilder: (BuildContext context, int index) {
               return Container(
