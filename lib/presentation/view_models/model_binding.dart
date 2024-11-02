@@ -10,7 +10,9 @@ class _ModelBindingScope<T> extends InheritedWidget {
   final _ModelBindingState<T> bindingState;
 
   @override
-  bool updateShouldNotify(_ModelBindingScope oldWidget) => true;
+  bool updateShouldNotify(_ModelBindingScope oldWidget) {
+    return oldWidget.bindingState.currentModel != bindingState.currentModel;
+  }
 }
 
 class ModelBinding<T> extends StatefulWidget {
