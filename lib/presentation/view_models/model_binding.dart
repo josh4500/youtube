@@ -30,21 +30,24 @@ class ModelBinding<T> extends StatefulWidget {
   final Map<Type, ModelBindingAction> commands;
 
   static T of<T>(BuildContext context) {
-    final scope =
-        context.findAncestorWidgetOfExactType<_ModelBindingScope<T>>();
-    if (scope == null) {
-      throw Exception('');
-    }
-    return scope.bindingState.currentModel;
+    return context
+        .findAncestorWidgetOfExactType<_ModelBindingScope<T>>()!
+        .bindingState
+        .currentModel;
+  }
+
+  static T? maybeOf<T>(BuildContext context) {
+    return context
+        .findAncestorWidgetOfExactType<_ModelBindingScope<T>>()
+        ?.bindingState
+        .currentModel;
   }
 
   static void update<T>(BuildContext context, T value) {
-    final scope =
-        context.findAncestorWidgetOfExactType<_ModelBindingScope<T>>();
-    if (scope == null) {
-      throw Exception('');
-    }
-    scope.bindingState.updateModelValue(value);
+    context
+        .findAncestorWidgetOfExactType<_ModelBindingScope<T>>()!
+        .bindingState
+        .updateModelValue(value);
   }
 
   @override
@@ -85,5 +88,9 @@ class _ModelBindingState<T> extends State<ModelBinding<T>> {
 extension ModelBindingExtension on BuildContext {
   T provide<T>() {
     return ModelBinding.of<T>(this);
+  }
+
+  T? maybeProvide<T>() {
+    return ModelBinding.maybeOf<T>(this);
   }
 }
