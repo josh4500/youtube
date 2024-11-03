@@ -37,8 +37,10 @@ enum Environment {
   bool get isProd => this == prod;
   bool get isTesting => this == testing;
 
-  static const String _envMode =
-      String.fromEnvironment('env.mode', defaultValue: 'dev');
+  static const String _envMode = String.fromEnvironment(
+    'ENV_MODE',
+    defaultValue: 'dev',
+  );
 
   static Environment _derive() {
     if (io.Platform.environment.containsKey('FLUTTER_TEST')) {
