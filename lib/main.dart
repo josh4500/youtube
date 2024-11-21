@@ -68,10 +68,10 @@ Future<void> setup() async {
   // Recommended for infrastructure and Domain
   switch (environment) {
     case Environment.dev:
-      await Firebase.initializeApp();
       setupDevRepositories();
       break;
     case Environment.prod:
+      await Firebase.initializeApp();
       break;
     case Environment.testing:
       break;
