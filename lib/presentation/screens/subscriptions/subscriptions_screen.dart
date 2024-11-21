@@ -32,6 +32,7 @@ import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/provider/repository/account_repository_provider.dart';
 import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/screens.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -54,7 +55,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
       builder: (context, state) {
         if (state.isInIncognito) {
           return const SubscriptionsIncognitoScreen();
-        } else if (state.isNotAuthenticated) {
+        } else if (state.isUnauthenticated) {
           return const UnAuthenticatedSubscriptionScreen();
         }
         return Scaffold(
@@ -335,40 +336,49 @@ class UnAuthenticatedSubscriptionScreen extends StatelessWidget {
       ),
       body: ListView(
         padding: const EdgeInsets.all(24.0),
-        children: const <Widget>[
-          SizedBox(height: 24),
-          Icon(Icons.subscriptions_sharp, size: 120),
-          SizedBox(height: 48),
-          Text(
+        children: <Widget>[
+          const SizedBox(height: 24),
+          Icon(
+            Icons.subscriptions_sharp,
+            size: 120,
+            color: context.theme.colorScheme.surface.withOpacity(.54),
+          ),
+          const SizedBox(height: 48),
+          const Text(
             'Don\'t miss new videos',
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             'Sign in to see updates from your favorite\n YouTube channels',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white54,
+              color: context.theme.hintColor,
             ),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CustomActionChip(
                 alignment: Alignment.center,
-                backgroundColor: Color(0xFF3EA6FF),
+                backgroundColor: context.theme.primaryColor,
                 title: 'Sign in',
-                borderRadius: BorderRadius.zero,
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                textStyle: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w400,
+                borderRadius: BorderRadius.circular(4),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 16,
                 ),
+                textStyle: TextStyle(
+                  color: context.theme.colorScheme.inverseSurface,
+                  fontWeight: FontWeight.w500,
+                ),
+                onTap: () => showAccountDialog(context),
               ),
             ],
           ),

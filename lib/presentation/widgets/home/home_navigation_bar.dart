@@ -118,8 +118,9 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
                           AuthStateBuilder(
                             builder: (BuildContext context, AuthState state) {
                               return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal:
+                                      12 + (state.isAuthenticated ? 0 : 12),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: constraints.maxWidth >= 600
@@ -264,7 +265,7 @@ class _NavLibraryButton extends StatelessWidget {
               if (state.isInIncognito)
                 const Icon(Icons.hourglass_top)
               else
-                state.isNotAuthenticated
+                state.isUnauthenticated
                     ? Container(
                         margin: const EdgeInsets.all(4),
                         decoration: BoxDecoration(

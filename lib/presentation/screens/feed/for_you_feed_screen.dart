@@ -172,7 +172,7 @@ class _ForYouFeedScreenState extends State<ForYouFeedScreen> {
                             )
                           : null,
                     ),
-                    if (historyOff || state.isInIncognito)
+                    if (historyOff || !state.isAuthenticated)
                       const SliverToBoxAdapter(child: HomeFeedHistoryOff())
                     else if (state.isAuthenticated) ...[
                       ModelBinding(

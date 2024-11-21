@@ -33,6 +33,7 @@ import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/screens/accounts/account_incognito_screen.dart';
 import 'package:youtube_clone/presentation/screens/accounts/widgets/account_option_tile.dart';
 import 'package:youtube_clone/presentation/screens/accounts/widgets/account_section.dart';
+import 'package:youtube_clone/presentation/screens/settings/settings_screen.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -69,7 +70,7 @@ class AccountsScreen extends StatelessWidget {
         builder: (BuildContext context, AuthState state) {
           if (state.isInIncognito) {
             return const AccountIncognitoScreen();
-          } else if (state.isNotAuthenticated) {
+          } else if (state.isUnauthenticated) {
             return const UnAuthenticatedAccountScreen();
           }
           return CustomScrollView(
@@ -238,43 +239,51 @@ class UnAuthenticatedAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(24.0),
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
       child: Column(
         children: [
-          SizedBox(height: 24),
-          Icon(Icons.folder, size: 120),
-          SizedBox(height: 48),
-          Text(
+          const SizedBox(height: 24),
+          Icon(
+            Icons.folder,
+            size: 120,
+            color: context.theme.colorScheme.surface.withOpacity(.54),
+          ),
+          const SizedBox(height: 48),
+          const Text(
             'Enjoy your favorite videos',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             'Sign in to access videos that you\'ve liked or\nsaved',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white54,
+              color: context.theme.hintColor,
             ),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CustomActionChip(
                 alignment: Alignment.center,
-                backgroundColor: Color(0xFF3EA6FF),
+                backgroundColor: context.theme.primaryColor,
                 title: 'Sign in',
-                borderRadius: BorderRadius.zero,
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                textStyle: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w400,
+                borderRadius: BorderRadius.circular(4),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 16,
                 ),
+                textStyle: TextStyle(
+                  color: context.theme.colorScheme.inverseSurface,
+                  fontWeight: FontWeight.w500,
+                ),
+                onTap: () => showAccountDialog(context),
               ),
             ],
           ),

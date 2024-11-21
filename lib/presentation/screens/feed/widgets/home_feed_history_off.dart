@@ -29,7 +29,6 @@ class HomeFeedHistoryOff extends StatelessWidget {
                 Consumer(
                   builder: (context, ref, child) {
                     return CustomActionButton(
-                      backgroundColor: Colors.white10,
                       padding: const EdgeInsets.all(10),
                       borderRadius: BorderRadius.circular(24),
                       useTappable: false,
@@ -45,11 +44,10 @@ class HomeFeedHistoryOff extends StatelessWidget {
                 Expanded(
                   child: CustomActionButton(
                     title: 'Search YouTube',
-                    textStyle: const TextStyle(
+                    textStyle: TextStyle(
                       fontSize: 16,
-                      color: Colors.white30,
+                      color: context.theme.hintColor,
                     ),
-                    backgroundColor: Colors.white10,
                     padding: const EdgeInsets.symmetric(
                       vertical: 10,
                       horizontal: 16,
@@ -61,7 +59,6 @@ class HomeFeedHistoryOff extends StatelessWidget {
                 ),
                 SizedBox(width: 12.w),
                 CustomActionButton(
-                  backgroundColor: Colors.white10,
                   padding: const EdgeInsets.all(10),
                   borderRadius: BorderRadius.circular(24),
                   useTappable: false,
@@ -74,19 +71,22 @@ class HomeFeedHistoryOff extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.075),
+              color: context.theme.brightness.isLight
+                  ? context.theme.colorScheme.inverseSurface
+                  : context.theme.colorScheme.surface.withOpacity(.075),
               borderRadius: BorderRadius.circular(12),
-              // boxShadow: const [
-              //   BoxShadow(
-              //     blurRadius: 8,
-              //     spreadRadius: -4,
-              //     color: Colors.black54,
-              //   )
-              // ],
+              boxShadow: [
+                if (context.theme.brightness.isLight)
+                  BoxShadow(
+                    blurRadius: 8,
+                    spreadRadius: 8,
+                    color: context.theme.highlightColor,
+                  ),
+              ],
             ),
             child: AuthStateBuilder(
               builder: (BuildContext context, state) {
-                if (state.isInIncognito) {
+                if (state.isInIncognito || state.isUnauthenticated) {
                   return Column(
                     children: [
                       const SizedBox(height: 18),
@@ -99,12 +99,12 @@ class HomeFeedHistoryOff extends StatelessWidget {
                       ),
                       const SizedBox(height: 18),
                       RichText(
-                        text: const TextSpan(
+                        text: TextSpan(
                           text:
                               'Start watching videos to help us build a feed of videos you\'ll love.',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white60,
+                            color: context.theme.hintColor,
                           ),
                         ),
                         textAlign: TextAlign.center,

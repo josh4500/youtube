@@ -71,7 +71,7 @@ class SettingsTile extends StatelessWidget {
             value: prefOption!.value,
             onChanged: (_) {
               if ((networkRequired && isConnected) || !networkRequired) {
-                prefOption!.onToggle!();
+                prefOption?.onToggle?.call();
               }
             },
           ),

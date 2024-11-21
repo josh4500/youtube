@@ -31,11 +31,11 @@ import 'package:flutter/material.dart';
 class LazyIndexedStack extends StatefulWidget {
   const LazyIndexedStack({
     super.key,
-    this.alignment = AlignmentDirectional.topStart,
+    this.index = 0,
     this.textDirection,
+    this.alignment = AlignmentDirectional.topStart,
     this.clipBehavior = Clip.hardEdge,
     this.sizing = StackFit.loose,
-    this.index = 0,
     this.children = const <Widget>[],
   });
 
@@ -51,7 +51,6 @@ class LazyIndexedStack extends StatefulWidget {
 }
 
 class _LazyIndexedStackState extends State<LazyIndexedStack> {
-  late int _lastIndex = widget.index ?? 0;
   late int index = widget.index ?? 0;
   final List<Widget> _lazyChildren = <Widget>[];
   final Set<int> _addedChildren = <int>{};
@@ -74,22 +73,21 @@ class _LazyIndexedStackState extends State<LazyIndexedStack> {
   void didUpdateWidget(covariant LazyIndexedStack oldWidget) {
     super.didUpdateWidget(oldWidget);
     index = widget.index ?? 0;
-    if (_lastIndex != index) {
-      _lazyChildren.insert(_lastIndex, const SizedBox());
-      _addedChildren.remove(_lastIndex);
-      _lastIndex = index;
+    if (oldWidget.index != widget.index) {
+      _lazyChildren.insert(index, const SizedBox());
+      _addedChildren.remove(index);
+
+      _updateChildren();
     }
-    _updateChildren();
   }
 
   void _updateChildren() {
-    if (widget.children.isNotEmpty) {
-      if (!_addedChildren.contains(index)) {
-        _lazyChildren.insert(index, widget.children[index]);
-        _addedChildren.add(index);
-      }
-      setState(() {});
+    assert(widget.children.isNotEmpty, '"children" cannot be empty');
+    if (!_addedChildren.contains(index)) {
+      _lazyChildren.insert(index, widget.children[index]);
+      _addedChildren.add(index);
     }
+    setState(() {});
   }
 
   @override

@@ -28,10 +28,10 @@
 
 enum AuthState {
   authenticated,
-  notAuthenticated,
+  unauthenticated,
   incognito;
 
-  bool get isNotAuthenticated => this == notAuthenticated;
+  bool get isUnauthenticated => this == unauthenticated;
   bool get isAuthenticated => this == authenticated;
   bool get isInIncognito => this == incognito;
 }

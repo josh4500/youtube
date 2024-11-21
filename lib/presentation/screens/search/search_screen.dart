@@ -149,7 +149,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white10,
+                              color: context.theme.highlightColor,
                               borderRadius: BorderRadius.circular(24),
                             ),
                             alignment: Alignment.center,
@@ -179,10 +179,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                         keyboardType: TextInputType.text,
                                         textInputAction: TextInputAction.search,
                                         cursorColor: _hasTextNotifier.value
-                                            ? Colors.white
-                                            : Colors.white54,
+                                            ? context.theme.colorScheme.surface
+                                            : context.theme.colorScheme.surface,
                                         cursorWidth:
-                                            _hasTextNotifier.value ? 1.5 : 3,
+                                            _hasTextNotifier.value ? 1.5 : 1,
                                         onSubmitted: _onSubmitSearch,
                                         onTap: _onTapSearchField,
                                         showCursor: true,
@@ -318,7 +318,7 @@ class _SearchActionsState extends State<SearchActions> {
                   onTap: _onVoiceSearch,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white10,
+                      color: context.theme.highlightColor,
                       borderRadius: BorderRadius.circular(24),
                     ),
                     padding: const EdgeInsets.all(4),
