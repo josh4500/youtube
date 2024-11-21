@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class ChannelSubscribeTile extends StatelessWidget {
-  const ChannelSubscribeTile({super.key, required this.title});
+  const ChannelSubscribeTile({super.key, this.leading, required this.title});
 
+  final Widget? leading;
   final String title;
 
   @override
@@ -14,7 +16,13 @@ class ChannelSubscribeTile extends StatelessWidget {
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            const SizedBox(width: 60),
+            if (leading != null) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(60),
+                child: leading,
+              ),
+              const SizedBox(width: 8),
+            ],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

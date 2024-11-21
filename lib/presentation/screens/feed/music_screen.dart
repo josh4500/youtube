@@ -123,8 +123,11 @@ class MusicScreen extends StatelessWidget {
   List<Widget> _buildHome(BuildContext context) {
     return [
       const SliverToBoxAdapter(child: ViewableContentSlides()),
-      const SliverToBoxAdapter(
-        child: ChannelSubscribeTile(title: 'Music'),
+      SliverToBoxAdapter(
+        child: ChannelSubscribeTile(
+          leading: ImageFromAsset.musicAvatar,
+          title: 'Music',
+        ),
       ),
       const SliverToBoxAdapter(child: ViewableContentSlides()),
     ];

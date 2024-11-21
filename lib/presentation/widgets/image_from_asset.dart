@@ -38,13 +38,31 @@ class ImageFromAsset {
     fit: BoxFit.contain,
     height: 60,
     width: 60,
-  );static final Widget fashionAnimated = Image.asset(
+  );
+
+  static final Widget fashionAnimated = Image.asset(
     AssetsPath.fashionAnimated,
     fit: BoxFit.contain,
     height: 60,
     width: 60,
-  );static final Widget liveAnimated = Image.asset(
+  );
+
+  static final Widget liveAnimated = Image.asset(
     AssetsPath.liveAnimated,
+    fit: BoxFit.contain,
+    height: 60,
+    width: 60,
+  );
+
+  static final Widget musicAvatar = Image.asset(
+    AssetsPath.musicAvatar,
+    fit: BoxFit.contain,
+    height: 60,
+    width: 60,
+  );
+
+  static final Widget sportAvatar = Image.asset(
+    AssetsPath.sportAvatar,
     fit: BoxFit.contain,
     height: 60,
     width: 60,

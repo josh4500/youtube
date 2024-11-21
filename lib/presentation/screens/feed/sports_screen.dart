@@ -67,8 +67,11 @@ class SportsScreen extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             const SliverToBoxAdapter(child: ViewableContentSlides()),
-            const SliverToBoxAdapter(
-              child: ChannelSubscribeTile(title: 'Sports'),
+            SliverToBoxAdapter(
+              child: ChannelSubscribeTile(
+                title: 'Sports',
+                leading: ImageFromAsset.sportAvatar,
+              ),
             ),
             SliverToBoxAdapter(
               child: GroupedViewBuilder(

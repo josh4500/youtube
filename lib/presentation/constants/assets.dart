@@ -14,6 +14,8 @@ abstract class AssetsPath {
   static String gameAnimated = '${_imagePrefix}game_animated.webp';
   static String liveAnimated = '${_imagePrefix}live_animated.webp';
   static String fashionAnimated = '${_imagePrefix}fashion_animated.webp';
+  static String musicAvatar = '${_imagePrefix}music_profile.jpg';
+  static String sportAvatar = '${_imagePrefix}sport_profile.jpg';
 
   static const String ytFullLogoMediumDark =
       '${_logoPrefix}yt_full_logo_dark_medium.png';
