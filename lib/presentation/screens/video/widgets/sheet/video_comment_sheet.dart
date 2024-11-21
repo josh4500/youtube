@@ -27,11 +27,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/main.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../../../constants.dart';
 import '../video_comment_guidelines.dart';
 
 class VideoCommentsSheet extends StatefulWidget {
@@ -144,7 +143,7 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
                             ],
                           ),
                         ),
-                        const Divider(height: 0, thickness: 1)
+                        const Divider(height: 0, thickness: 1),
                       ],
                     );
                   }

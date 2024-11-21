@@ -28,10 +28,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/models.dart';
-import 'package:youtube_clone/presentation/screens/channel/widgets/for_you_shorts_content.dart';
-import 'package:youtube_clone/presentation/screens/channel/widgets/for_you_video_content.dart';
-import 'package:youtube_clone/presentation/view_models/content/content_view_model.dart';
-import 'package:youtube_clone/presentation/view_models/content/shorts_view_model.dart';
+
+import 'for_you_shorts_content.dart';
+import 'for_you_video_content.dart';
 
 class ForYouContent extends StatelessWidget {
   const ForYouContent({super.key, required this.content});

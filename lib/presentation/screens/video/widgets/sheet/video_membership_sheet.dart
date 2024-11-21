@@ -27,11 +27,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/infrastructure.dart';
+import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-
-import '../../../../constants.dart';
 
 class VideoMembershipSheet extends StatefulWidget {
   const VideoMembershipSheet({

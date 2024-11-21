@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/widgets.dart';
 
 class ChannelSubscribeTile extends StatelessWidget {
   const ChannelSubscribeTile({super.key, this.leading, required this.title});

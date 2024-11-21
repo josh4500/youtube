@@ -329,8 +329,9 @@ class _VideoThanksSheetState extends State<VideoThanksSheet> {
                         text: '',
                         children: [
                           const TextSpan(
-                              text:
-                                  'As an added bonus, the above public comment will be published on your behalf (subject to Community Guidelines). '),
+                            text:
+                                'As an added bonus, the above public comment will be published on your behalf (subject to Community Guidelines). ',
+                          ),
                           TextSpan(
                             text: 'Learn more',
                             style: TextStyle(
@@ -338,8 +339,9 @@ class _VideoThanksSheetState extends State<VideoThanksSheet> {
                             ),
                           ),
                           const TextSpan(
-                              text:
-                                  '. By continuing, yo verify that you are at least 18 years old and agree to '),
+                            text:
+                                '. By continuing, yo verify that you are at least 18 years old and agree to ',
+                          ),
                           TextSpan(
                             text: 'these terms',
                             style: TextStyle(

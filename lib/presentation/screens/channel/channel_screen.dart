@@ -31,14 +31,12 @@ import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/router.dart';
-import 'package:youtube_clone/presentation/screens/channel/widgets/menu/show_channel_menu.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/view_models/content/shorts_view_model.dart';
-import 'package:youtube_clone/presentation/view_models/content/video_view_model.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'widgets/channel_section.dart';
 import 'widgets/for_you_content.dart';
+import 'widgets/menu/show_channel_menu.dart';
 
 class ChannelScreen extends StatefulWidget {
   const ChannelScreen({super.key});

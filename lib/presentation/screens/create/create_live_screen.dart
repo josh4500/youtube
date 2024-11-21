@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/screens/accounts/accounts_screen.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 

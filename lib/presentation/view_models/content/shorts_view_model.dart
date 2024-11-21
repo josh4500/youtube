@@ -26,8 +26,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:youtube_clone/presentation/models.dart';
-
+import '../account/channel_view_model.dart';
 import 'content_view_model.dart';
 
 class ShortsViewModel extends ContentViewModel {

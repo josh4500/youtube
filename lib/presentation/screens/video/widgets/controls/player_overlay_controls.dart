@@ -34,7 +34,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/models.dart';
-import 'package:youtube_clone/presentation/provider/state/preferences.dart';
 import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
