@@ -149,7 +149,10 @@ class SettingsPopupContainer<T> extends StatelessWidget {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              if (action != null) action!,
+                              if (action != null) ...[
+                                const SizedBox(width: 8),
+                                action!,
+                              ],
                             ],
                           ),
                           if (subtitle != null) ...<Widget>[

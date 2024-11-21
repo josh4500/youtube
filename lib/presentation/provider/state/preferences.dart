@@ -192,6 +192,11 @@ class Preferences extends _$Preferences {
     state = state.copyWith(uploadNetwork: uploadNetwork);
   }
 
+  set dataSaving(DataSavingPreferences dataSaving) {
+    _dataSaving.value = dataSaving;
+    state = state.copyWith(dataSaving: dataSaving);
+  }
+
   set zoomFillScreen(bool zoomFillScreen) {
     _zoomFillScreen.value = zoomFillScreen;
     state = state.copyWith(zoomFillScreen: zoomFillScreen);
@@ -295,6 +300,7 @@ class Preferences extends _$Preferences {
       videoQualityPreferences: _videoQuality.value,
       downloadPreferences: _downloads.value,
       accessibilityPreferences: _accessibility.value,
+      dataSavingPreferences: _dataSaving.value,
       autoplay: _autoPlay.value,
     );
   }
@@ -316,6 +322,7 @@ class PreferenceState {
     required this.videoQualityPreferences,
     required this.downloadPreferences,
     required this.accessibilityPreferences,
+    required this.dataSavingPreferences,
     required this.autoplay,
   });
   final bool ambientMode;
@@ -333,6 +340,7 @@ class PreferenceState {
   final VideoQualityPreferences videoQualityPreferences;
   final DownloadPreferences downloadPreferences;
   final AccessibilityPreferences accessibilityPreferences;
+  final DataSavingPreferences dataSavingPreferences;
   final bool autoplay;
 
   PreferenceState copyWith({
@@ -351,6 +359,7 @@ class PreferenceState {
     DownloadPreferences? downloadPreferences,
     AccessibilityPreferences? accessibilityPreferences,
     bool? autoplay,
+    DataSavingPreferences? dataSaving,
   }) {
     return PreferenceState(
       ambientMode: ambientMode ?? this.ambientMode,
@@ -370,6 +379,7 @@ class PreferenceState {
       accessibilityPreferences:
           accessibilityPreferences ?? this.accessibilityPreferences,
       autoplay: autoplay ?? this.autoplay,
+      dataSavingPreferences: dataSaving ?? this.dataSavingPreferences,
     );
   }
 }
@@ -521,6 +531,28 @@ class DataSavingPreferences {
       'selectVideoQuality': selectVideoQuality,
       'usageReminder': usageReminder,
     });
+  }
+
+  DataSavingPreferences copyWith({
+    bool? reduceVideoQuality,
+    bool? reduceDownloadQuality,
+    bool? reduceSmartDownloadQuality,
+    bool? onlyWifiUpload,
+    bool? mutedPlaybackOnWifi,
+    bool? selectVideoQuality,
+    bool? usageReminder,
+  }) {
+    return DataSavingPreferences(
+      reduceVideoQuality: reduceVideoQuality ?? this.reduceVideoQuality,
+      reduceDownloadQuality:
+          reduceDownloadQuality ?? this.reduceDownloadQuality,
+      reduceSmartDownloadQuality:
+          reduceSmartDownloadQuality ?? this.reduceSmartDownloadQuality,
+      onlyWifiUpload: onlyWifiUpload ?? this.onlyWifiUpload,
+      mutedPlaybackOnWifi: mutedPlaybackOnWifi ?? this.mutedPlaybackOnWifi,
+      selectVideoQuality: selectVideoQuality ?? this.selectVideoQuality,
+      usageReminder: usageReminder ?? this.usageReminder,
+    );
   }
 }
 

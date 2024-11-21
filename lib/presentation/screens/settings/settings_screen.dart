@@ -73,34 +73,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     AboutScreen(),
   ];
 
-  Future<void> _showAccountDialog() async {
-    await showDialog(
-      context: context,
-      builder: (_) {
-        return SettingsPopupContainer(
-          title: S.current.account,
-          showDismissButtons: false,
-          action: CustomInkWell(
-            onTap: () {},
-            child: const Icon(YTIcons.add_outlined),
-          ),
-          child: Container(
-            color: context.theme.appColors.settingsPopupBackgroundColor,
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: SettingsTile(
-              title: S.current.addAccount,
-              networkRequired: true,
-              onTap: () {},
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Future<void> _showSettingsPrefScreen(SettingsTab tab) async {
     if (tab == SettingsTab.account) {
-      await _showAccountDialog();
+      await showAccountDialog(context);
       return;
     } else if (tab == SettingsTab.watchOnTv) {
       context.goto(AppRoutes.watchOnTv);
@@ -421,4 +396,26 @@ class SettingsSection extends StatelessWidget {
       ],
     );
   }
+}
+
+Future<void> showAccountDialog(BuildContext context) async {
+  await showDialog(
+    context: context,
+    builder: (_) {
+      return SettingsPopupContainer(
+        title: S.current.account,
+        showDismissButtons: false,
+        action: const Icon(YTIcons.add_outlined),
+        child: Container(
+          color: context.theme.appColors.settingsPopupBackgroundColor,
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: SettingsTile(
+            title: S.current.addAccount,
+            networkRequired: true,
+            onTap: () {},
+          ),
+        ),
+      );
+    },
+  );
 }

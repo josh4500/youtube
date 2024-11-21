@@ -27,16 +27,21 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/screens/settings/view_models/pref_option.dart';
 
 import 'widgets/settings_list_view.dart';
 import 'widgets/settings_tile.dart';
 
-class DataSavingSettingsScreen extends StatelessWidget {
+class DataSavingSettingsScreen extends ConsumerWidget {
   const DataSavingSettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final PreferenceState preferences = ref.watch(preferencesProvider);
+    final DataSavingPreferences dataSavingPreferences =
+        preferences.dataSavingPreferences;
     return Material(
       child: SettingsListView(
         children: <Widget>[
@@ -62,43 +67,60 @@ class DataSavingSettingsScreen extends StatelessWidget {
             title: 'Reduce video quality',
             prefOption: PrefOption(
               type: PrefOptionType.toggle,
-              value: false,
+              value: dataSavingPreferences.reduceVideoQuality,
+              onToggle: () =>
+                  _changeReduceVideoQuality(dataSavingPreferences, ref),
             ),
+            onTap: () => _changeReduceVideoQuality(dataSavingPreferences, ref),
           ),
           SettingsTile(
             title: 'Reduce download quality',
             prefOption: PrefOption(
               type: PrefOptionType.toggle,
-              value: false,
+              value: dataSavingPreferences.reduceDownloadQuality,
+              onToggle: () =>
+                  _changeReduceDownloadQuality(dataSavingPreferences, ref),
             ),
+            onTap: () =>
+                _changeReduceDownloadQuality(dataSavingPreferences, ref),
           ),
           SettingsTile(
             title: 'Reduce Smart downloads quality',
             prefOption: PrefOption(
               type: PrefOptionType.toggle,
-              value: false,
+              value: dataSavingPreferences.reduceSmartDownloadQuality,
+              onToggle: () =>
+                  _changeReduceSmartQuality(dataSavingPreferences, ref),
             ),
+            onTap: () => _changeReduceSmartQuality(dataSavingPreferences, ref),
           ),
           SettingsTile(
             title: 'Only download over Wi-Fi and unrestricted mobile data',
             prefOption: PrefOption(
               type: PrefOptionType.toggle,
-              value: false,
+              value: dataSavingPreferences.onlyWifiUpload,
+              onToggle: () => _changeOnlyWifiUpload(dataSavingPreferences, ref),
             ),
+            onTap: () => _changeOnlyWifiUpload(dataSavingPreferences, ref),
           ),
           SettingsTile(
             title: 'Upload over Wi-Fi only',
             prefOption: PrefOption(
               type: PrefOptionType.toggle,
-              value: false,
+              value: dataSavingPreferences.onlyWifiUpload,
+              onToggle: () => _changeOnlyWifiUpload(dataSavingPreferences, ref),
             ),
+            onTap: () => _changeOnlyWifiUpload(dataSavingPreferences, ref),
           ),
           SettingsTile(
             title: 'Muted playback in feeds over Wi-Fi only',
             prefOption: PrefOption(
               type: PrefOptionType.toggle,
-              value: false,
+              value: dataSavingPreferences.mutedPlaybackOnWifi,
+              onToggle: () =>
+                  _changeMutedPlaybackOnWifi(dataSavingPreferences, ref),
             ),
+            onTap: () => _changeMutedPlaybackOnWifi(dataSavingPreferences, ref),
           ),
           const Divider(
             thickness: 4,
@@ -120,18 +142,94 @@ class DataSavingSettingsScreen extends StatelessWidget {
             title: 'Select quality for every video',
             prefOption: PrefOption(
               type: PrefOptionType.toggle,
-              value: false,
+              value: dataSavingPreferences.selectVideoQuality,
+              onToggle: () =>
+                  _changeSelectVideoQuality(dataSavingPreferences, ref),
             ),
+            onTap: () => _changeSelectVideoQuality(dataSavingPreferences, ref),
           ),
           SettingsTile(
             title: 'Mobile data usage reminder',
             prefOption: PrefOption(
               type: PrefOptionType.toggle,
-              value: false,
+              value: dataSavingPreferences.usageReminder,
+              onToggle: () => _changeUsageReminder(dataSavingPreferences, ref),
             ),
+            onTap: () => _changeUsageReminder(dataSavingPreferences, ref),
           ),
         ],
       ),
+    );
+  }
+
+  _changeReduceVideoQuality(
+    DataSavingPreferences dataSavingPreferences,
+    WidgetRef ref,
+  ) {
+    ref.read(preferencesProvider.notifier).dataSaving =
+        dataSavingPreferences.copyWith(
+      reduceVideoQuality: !dataSavingPreferences.reduceVideoQuality,
+    );
+  }
+
+  _changeUsageReminder(
+    DataSavingPreferences dataSavingPreferences,
+    WidgetRef ref,
+  ) {
+    ref.read(preferencesProvider.notifier).dataSaving =
+        dataSavingPreferences.copyWith(
+      usageReminder: !dataSavingPreferences.usageReminder,
+    );
+  }
+
+  _changeSelectVideoQuality(
+    DataSavingPreferences dataSavingPreferences,
+    WidgetRef ref,
+  ) {
+    ref.read(preferencesProvider.notifier).dataSaving =
+        dataSavingPreferences.copyWith(
+      selectVideoQuality: !dataSavingPreferences.selectVideoQuality,
+    );
+  }
+
+  _changeMutedPlaybackOnWifi(
+    DataSavingPreferences dataSavingPreferences,
+    WidgetRef ref,
+  ) {
+    ref.read(preferencesProvider.notifier).dataSaving =
+        dataSavingPreferences.copyWith(
+      mutedPlaybackOnWifi: !dataSavingPreferences.mutedPlaybackOnWifi,
+    );
+  }
+
+  _changeOnlyWifiUpload(
+    DataSavingPreferences dataSavingPreferences,
+    WidgetRef ref,
+  ) {
+    ref.read(preferencesProvider.notifier).dataSaving =
+        dataSavingPreferences.copyWith(
+      onlyWifiUpload: !dataSavingPreferences.onlyWifiUpload,
+    );
+  }
+
+  _changeReduceSmartQuality(
+    DataSavingPreferences dataSavingPreferences,
+    WidgetRef ref,
+  ) {
+    ref.read(preferencesProvider.notifier).dataSaving =
+        dataSavingPreferences.copyWith(
+      reduceSmartDownloadQuality:
+          !dataSavingPreferences.reduceSmartDownloadQuality,
+    );
+  }
+
+  _changeReduceDownloadQuality(
+    DataSavingPreferences dataSavingPreferences,
+    WidgetRef ref,
+  ) {
+    ref.read(preferencesProvider.notifier).dataSaving =
+        dataSavingPreferences.copyWith(
+      reduceDownloadQuality: !dataSavingPreferences.reduceDownloadQuality,
     );
   }
 }

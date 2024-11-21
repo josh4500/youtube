@@ -89,9 +89,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   /// Y position of user pointer when long press action starts
   double _longPressYStartPosition = 0;
 
-  /// X position of user pointer when long press action starts
-  double _longPressXStartPosition = 0;
-
   /// Timer used for hiding `Release` message while slide seeking.
   Timer? _releaseTimer;
 
@@ -707,7 +704,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     if (_preventCommonControlGestures) return;
 
     _longPressYStartPosition = details.localPosition.dy;
-    _longPressXStartPosition = details.localPosition.dx;
     _slideSeekDuration =
         ref.read(playerRepositoryProvider).currentVideoPosition;
 
@@ -765,7 +761,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       final lastPosition =
           ref.read(playerRepositoryProvider).currentVideoPosition;
 
-      final localX = details.localPosition.dx;
       final localY = details.localPosition.dy;
       final screenWidth = MediaQuery.sizeOf(context).width;
 
@@ -779,8 +774,6 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
         final localDeltaX = details.localOffsetFromOrigin.dx;
         final value = ((localDeltaX / screenWidth) * totalMilliseconds).floor();
-
-        _longPressXStartPosition = localX;
 
         _slideSeekDuration += Duration(microseconds: value);
 

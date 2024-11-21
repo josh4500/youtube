@@ -35,6 +35,8 @@ import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../../settings/settings_screen.dart';
+
 class AccountSection extends ConsumerWidget {
   const AccountSection({super.key});
   @override
@@ -121,7 +123,7 @@ class AccountSection extends ConsumerWidget {
                 children: <Widget>[
                   CustomActionChip(
                     title: 'Switch account',
-                    onTap: () {},
+                    onTap: () => showAccountDialog(context),
                     icon: const Icon(YTIcons.switch_accounts, size: 16),
                     padding: const EdgeInsets.symmetric(horizontal: 8.55),
                     padEnd: true,

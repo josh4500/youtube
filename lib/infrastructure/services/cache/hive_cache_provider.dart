@@ -27,8 +27,6 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'dart:async';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 
 import 'cache_provider.dart';
 
@@ -92,9 +90,9 @@ class HiveCacheProvider<E> extends CacheProvider<E> {
 }
 
 Future<void> hiveInit() async {
-  final Directory dir = await getApplicationDocumentsDirectory();
-  final String appPath = dir.path;
+  // final Directory dir = await getApplicationDocumentsDirectory();
+  // final String appPath = dir.path;
 
-// Set Hive default directory
-// Hive.defaultDirectory = appPath;
+  // Set Hive default directory
+  // Hive.defaultDirectory = appPath;
 }
