@@ -77,6 +77,7 @@ class YTIcons {
   static const IconData add_outlined = IconData(0xe835, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData share_filled = IconData(0xe836, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData thanks_filled = IconData(0xe837, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData connected_outlined = IconData(0xe838, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData unmuted = IconData(0xe839, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData chevron_down = IconData(0xe83a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData chevron_up_1 = IconData(0xe83b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
@@ -188,6 +189,10 @@ class YTIcons {
   static const IconData poll_outlined = IconData(0xe8b0, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData account_circle_outlined = IconData(0xe8b1, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData camera_outlined = IconData(0xe8b2, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData purchases_outlined = IconData(0xe8b3, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData billing_outlined = IconData(0xe8b4, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData privacy_person_outlined = IconData(0xe8b5, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData verified_music_account = IconData(0xe8b6, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData discover_outlined = IconData(0xe900, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData subscriptions_outlined = IconData(0xe901, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData shorts_outlined = IconData(0xe902, fontFamily: _kFontFam, fontPackage: _kFontPkg);

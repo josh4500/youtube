@@ -108,18 +108,24 @@ class _FashionAndBeautyScreenState extends State<FashionAndBeautyScreen>
         child: CustomScrollView(
           controller: scrollController,
           slivers: <Widget>[
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 12.0,
                   vertical: 4,
                 ),
-                child: Text(
-                  'Fashion & Beauty',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Row(
+                  children: [
+                    ImageFromAsset.fashionAnimated,
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Fashion & Beauty',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

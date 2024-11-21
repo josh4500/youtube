@@ -122,12 +122,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     context.pop();
   }
 
-  bool _isSelected(int index) {
+  bool _isSelected(SettingsTab tab) {
     if (context.orientation.isLandscape) {
-      if (index == 1 && _currentScreen == SettingsTab.settings) {
+      if (tab.index == 1 && _currentScreen == SettingsTab.settings) {
         _currentScreen = SettingsTab.general;
       }
-      return _currentScreen.index == index;
+      return _currentScreen == tab;
     }
 
     return false;
@@ -137,109 +137,161 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final SettingsListView settingsList = SettingsListView(
       children: <Widget>[
-        SettingsTile(
-          title: 'Family Center',
-          onTap: () {},
+        SettingsSection(
+          title: 'Account',
+          divide: false,
+          children: [
+            SettingsTile(
+              leadingIcon: YTIcons.settings_outlined,
+              title: S.current.general,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.general),
+              selected: _isSelected(SettingsTab.general),
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.switch_accounts,
+              title: S.current.account,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.account),
+              networkRequired: true,
+            ),
+            SettingsTile(
+              title: 'Family Center',
+              onTap: () {},
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.notification_outlined,
+              title: S.current.notifications,
+              networkRequired: true,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.notifications),
+              selected: _isSelected(SettingsTab.notifications),
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.purchases_outlined,
+              title: S.current.purchases,
+              networkRequired: true,
+              accountRequired: true,
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.billing_outlined,
+              title: S.current.billsAndPayment,
+              networkRequired: true,
+              accountRequired: true,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.billsAndPayment),
+              selected: _isSelected(SettingsTab.billsAndPayment),
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.history_outlined,
+              title: S.current.manageAllHistory,
+              networkRequired: true,
+              accountRequired: true,
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.privacy_person_outlined,
+              title: S.current.yourDataInYT,
+              networkRequired: true,
+              accountRequired: true,
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.private_circle_outlined,
+              title: S.current.privacy,
+              networkRequired: true,
+              accountRequired: true,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.privacy),
+              selected: _isSelected(SettingsTab.privacy),
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.connected_outlined,
+              title: S.current.connectedApps,
+              networkRequired: true,
+              accountRequired: true,
+            ),
+            SettingsTile(
+              title: S.current.tryExperimental,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.tryExperimental),
+              networkRequired: true,
+            ),
+          ],
         ),
-        SettingsTile(
-          title: S.current.general,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.general),
-          selected: _isSelected(1),
+        SettingsSection(
+          title: 'Video and audio preferences',
+          children: [
+            SettingsTile(
+              leadingIcon: Icons.high_quality_outlined,
+              title: S.current.videoQualityPref,
+              onTap: () => _showSettingsPrefScreen(
+                SettingsTab.videoQualityPref,
+              ),
+              selected: _isSelected(SettingsTab.videoQualityPref),
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.play_arrow,
+              title: S.current.playback,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.playback),
+              selected: _isSelected(SettingsTab.playback),
+              networkRequired: true,
+            ),
+            SettingsTile(
+              leadingIcon: Icons.closed_caption_off,
+              title: S.current.captions,
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.tune_outlined,
+              title: S.current.dataSaving,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.dataSaving),
+              selected: _isSelected(SettingsTab.dataSaving),
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.download_outlined,
+              title: S.current.downloads,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.downloads),
+              selected: _isSelected(SettingsTab.downloads),
+              accountRequired: true,
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.live_outlined,
+              title: S.current.liveChat,
+              networkRequired: true,
+              accountRequired: true,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.liveChat),
+              selected: _isSelected(SettingsTab.liveChat),
+            ),
+            SettingsTile(
+              title: S.current.accessibility,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.accessibility),
+              selected: _isSelected(SettingsTab.accessibility),
+            ),
+            SettingsTile(
+              title: S.current.watchOnTv,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.watchOnTv),
+            ),
+          ],
         ),
-        SettingsTile(
-          title: S.current.account,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.account),
-          networkRequired: true,
+        SettingsSection(
+          title: 'Help and Policy',
+          children: [
+            SettingsTile(
+              leadingIcon: YTIcons.help_outlined,
+              title: 'Help',
+              onTap: () {},
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.feedbck_outlined,
+              title: 'YouTube Terms of Service',
+              onTap: () {},
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.feedbck_outlined,
+              title: 'Send feedback',
+              onTap: () {},
+            ),
+            SettingsTile(
+              leadingIcon: YTIcons.info_outlined,
+              title: S.current.about,
+              onTap: () => _showSettingsPrefScreen(SettingsTab.about),
+              selected: _isSelected(SettingsTab.about),
+            ),
+          ],
         ),
-        SettingsTile(
-          title: S.current.dataSaving,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.dataSaving),
-          selected: _isSelected(2),
-        ),
-        SettingsTile(
-          title: S.current.autoPlay,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.autoPlay),
-          selected: _isSelected(3),
-          networkRequired: true,
-        ),
-        SettingsTile(
-          title: S.current.videoQualityPref,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.videoQualityPref),
-          selected: _isSelected(4),
-        ),
-        SettingsTile(
-          title: S.current.downloads,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.downloads),
-          selected: _isSelected(5),
-          accountRequired: true,
-        ),
-        SettingsTile(
-          title: S.current.watchOnTv,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.watchOnTv),
-        ),
-        SettingsTile(
-          title: S.current.manageAllHistory,
-          networkRequired: true,
-          accountRequired: true,
-        ),
-        SettingsTile(
-          title: S.current.yourDataInYT,
-          networkRequired: true,
-          accountRequired: true,
-        ),
-        SettingsTile(
-          title: S.current.privacy,
-          networkRequired: true,
-          accountRequired: true,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.privacy),
-          selected: _isSelected(6),
-        ),
-        SettingsTile(
-          title: S.current.tryExperimental,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.tryExperimental),
-          networkRequired: true,
-        ),
-        SettingsTile(
-          title: S.current.purchases,
-          networkRequired: true,
-          accountRequired: true,
-        ),
-        SettingsTile(
-          title: S.current.billsAndPayment,
-          networkRequired: true,
-          accountRequired: true,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.billsAndPayment),
-          selected: _isSelected(7),
-        ),
-        SettingsTile(
-          title: S.current.notifications,
-          networkRequired: true,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.notifications),
-          selected: _isSelected(8),
-        ),
-        SettingsTile(
-          title: S.current.connectedApps,
-          networkRequired: true,
-          accountRequired: true,
-        ),
-        SettingsTile(
-          title: S.current.liveChat,
-          networkRequired: true,
-          accountRequired: true,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.liveChat),
-          selected: _isSelected(9),
-        ),
-        SettingsTile(title: S.current.captions),
-        SettingsTile(
-          title: S.current.accessibility,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.accessibility),
-          selected: _isSelected(10),
-        ),
-        SettingsTile(
-          title: S.current.about,
-          onTap: () => _showSettingsPrefScreen(SettingsTab.about),
-          selected: _isSelected(11),
-        ),
+        const SettingsSection(title: 'Developer preferences', children: []),
       ],
     );
     return PopScope(
@@ -291,7 +343,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       SettingsTab.settings => S.current.settings,
       SettingsTab.general => S.current.general,
       SettingsTab.dataSaving => S.current.dataSaving,
-      SettingsTab.autoPlay => S.current.autoPlay,
+      SettingsTab.playback => S.current.playback,
       SettingsTab.videoQualityPref => S.current.videoQualityPref,
       SettingsTab.downloads => S.current.downloads,
       SettingsTab.privacy => S.current.privacy,
@@ -309,7 +361,7 @@ enum SettingsTab {
   settings,
   general,
   dataSaving,
-  autoPlay,
+  playback,
   videoQualityPref,
   downloads,
   privacy,
@@ -329,4 +381,44 @@ enum SettingsTab {
   connectedApps;
 
   bool get isSettings => this == settings;
+}
+
+class SettingsSection extends StatelessWidget {
+  const SettingsSection({
+    super.key,
+    required this.title,
+    required this.children,
+    this.divide = true,
+  });
+
+  final String title;
+  final bool divide;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (divide) ...[
+          const Divider(height: 0),
+          const SizedBox(height: 12),
+        ],
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 4.0,
+          ),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        ...children,
+      ],
+    );
+  }
 }

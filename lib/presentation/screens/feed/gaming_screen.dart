@@ -108,18 +108,24 @@ class _GamingScreenState extends State<GamingScreen>
         child: CustomScrollView(
           controller: scrollController,
           slivers: <Widget>[
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 12.0,
                   vertical: 4,
                 ),
-                child: Text(
-                  'Gaming',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Row(
+                  children: [
+                    ImageFromAsset.gameAnimated,
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Gaming',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

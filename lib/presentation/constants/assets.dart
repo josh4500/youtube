@@ -9,6 +9,12 @@ abstract class AssetsPath {
 
   static const String logoShorts32 = '${_logoPrefix}yt_shorts_logo_32.webp';
 
+  static const String trendingAnimated =
+      '${_imagePrefix}trending_animated.webp';
+  static String gameAnimated = '${_imagePrefix}game_animated.webp';
+  static String liveAnimated = '${_imagePrefix}live_animated.webp';
+  static String fashionAnimated = '${_imagePrefix}fashion_animated.webp';
+
   static const String ytFullLogoMediumDark =
       '${_logoPrefix}yt_full_logo_dark_medium.png';
   static const String ytFullLogoMediumLight =

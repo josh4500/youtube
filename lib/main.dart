@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -63,7 +64,18 @@ Future<void> setup() async {
     InternetConnectivity.instance.initialize(),
   ]);
 
-  setupRepositories();
+  // Initialize services and repository depending on the environment
+  // Recommended for infrastructure and Domain
+  switch (environment) {
+    case Environment.dev:
+      await Firebase.initializeApp();
+      setupDevRepositories();
+      break;
+    case Environment.prod:
+      break;
+    case Environment.testing:
+      break;
+  }
 }
 
 Future<void> setupSystemUITheme() async {
@@ -90,19 +102,7 @@ Future<void> setupSystemLocale() async {
   await S.load(locale);
 }
 
-// TODO(Josh): Inject repositories
-void setupRepositories() {
-  // Initialize services and repository depending on the environment
-  // Recommended for infrastructure and Domain
-  switch (environment) {
-    case Environment.dev:
-      break;
-    case Environment.prod:
-      break;
-    case Environment.testing:
-      break;
-  }
-
+void setupDevRepositories() {
   final DataRepository remoteDataRepository = RemoteDataRepository();
   final GrpcResourceClient grpcResourceClient = GrpcResourceClient();
   // TODO(Josh): Create a static class that has methods to assign local and remote data repository

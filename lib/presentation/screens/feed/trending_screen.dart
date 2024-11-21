@@ -113,18 +113,24 @@ class _TrendingScreenState extends State<TrendingScreen>
             controller: scrollController,
             headerSliverBuilder: (BuildContext context, bool isScrolled) {
               return <Widget>[
-                const SliverToBoxAdapter(
+                SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
+                    padding: const EdgeInsets.symmetric(
                       horizontal: 12.0,
                       vertical: 8,
                     ),
-                    child: Text(
-                      'Trending',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    child: Row(
+                      children: [
+                        ImageFromAsset.trendingAnimated,
+                        const SizedBox(width: 12),
+                        const Text(
+                          'Trending',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

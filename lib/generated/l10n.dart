@@ -299,6 +299,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Playback`
+  String get playback {
+    return Intl.message(
+      'Playback',
+      name: 'playback',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

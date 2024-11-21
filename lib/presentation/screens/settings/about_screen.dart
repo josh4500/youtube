@@ -40,21 +40,6 @@ class AboutScreen extends StatelessWidget {
       child: SettingsListView(
         children: <Widget>[
           SettingsTile(
-            title: 'Help',
-            summary: 'Find answers to your YouTube questions here',
-            onTap: () {},
-          ),
-          SettingsTile(
-            title: 'Send feedback',
-            summary: 'Help us make YouTube better',
-            onTap: () {},
-          ),
-          SettingsTile(
-            title: 'YouTube Terms of Service',
-            summary: 'Read Youtube\'s Terms of Service',
-            onTap: () {},
-          ),
-          SettingsTile(
             title: 'Google Privacy Policy',
             summary: ' Read Mobile Privacy Policy',
             onTap: () {},

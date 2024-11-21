@@ -107,18 +107,24 @@ class _LiveScreenState extends State<LiveScreen>
         child: CustomScrollView(
           controller: scrollController,
           slivers: <Widget>[
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 12.0,
                   vertical: 4,
                 ),
-                child: Text(
-                  'Live',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Row(
+                  children: [
+                    ImageFromAsset.liveAnimated,
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Live',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

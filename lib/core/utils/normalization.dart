@@ -4,7 +4,7 @@ double normalizeDouble(double value, double min, double max) {
   return (value - min) / (max - min);
 }
 
-extension NormalizeDoubleExtension on double {
+extension NormalizeDoubleExtension on num {
   /// Normalizes value to 0 - 1
   double normalize(double min, double max) {
     return (this - min) / (max - min);

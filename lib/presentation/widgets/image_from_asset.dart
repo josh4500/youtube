@@ -25,4 +25,28 @@ class ImageFromAsset {
       );
     },
   );
+
+  static final Widget trendingAnimated = Image.asset(
+    AssetsPath.trendingAnimated,
+    fit: BoxFit.contain,
+    height: 60,
+    width: 60,
+  );
+
+  static final Widget gameAnimated = Image.asset(
+    AssetsPath.gameAnimated,
+    fit: BoxFit.contain,
+    height: 60,
+    width: 60,
+  );static final Widget fashionAnimated = Image.asset(
+    AssetsPath.fashionAnimated,
+    fit: BoxFit.contain,
+    height: 60,
+    width: 60,
+  );static final Widget liveAnimated = Image.asset(
+    AssetsPath.liveAnimated,
+    fit: BoxFit.contain,
+    height: 60,
+    width: 60,
+  );
 }

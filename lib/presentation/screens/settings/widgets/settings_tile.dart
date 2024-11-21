@@ -38,6 +38,7 @@ class SettingsTile extends StatelessWidget {
   const SettingsTile({
     super.key,
     required this.title,
+    this.leadingIcon,
     this.summary,
     this.onGenerateSummary,
     this.networkRequired = false,
@@ -48,6 +49,7 @@ class SettingsTile extends StatelessWidget {
     this.prefOption,
     this.onTap,
   });
+  final IconData? leadingIcon;
   final String title;
   final String? summary;
   final String? Function(PrefOption prefOption)? onGenerateSummary;
@@ -117,6 +119,7 @@ class SettingsTile extends StatelessWidget {
 
             return ListTile(
               selected: selected,
+              leading: leadingIcon != null ? Icon(leadingIcon) : null,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 1,

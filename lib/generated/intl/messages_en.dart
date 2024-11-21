@@ -40,6 +40,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "manageAllHistory":
             MessageLookupByLibrary.simpleMessage("Manage all history"),
         "notifications": MessageLookupByLibrary.simpleMessage("Notifications"),
+        "playback": MessageLookupByLibrary.simpleMessage("Playback"),
         "privacy": MessageLookupByLibrary.simpleMessage("Privacy"),
         "purchases":
             MessageLookupByLibrary.simpleMessage("Purchases and memberships"),
