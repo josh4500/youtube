@@ -28,7 +28,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
-import 'package:youtube_clone/presentation/screens/settings/widgets/settings_popup_container.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class DateRangePicker extends StatefulWidget {
@@ -114,14 +113,14 @@ class _DateRangePickerState extends State<DateRangePicker> {
   }
 
   void _showStartStop([bool start = true]) async {
-    final SettingsPopupContainerController<Duration> controller =
-        SettingsPopupContainerController<Duration>(
+    final PopupContainerController<Duration> controller =
+        PopupContainerController<Duration>(
       value: start ? startDuration : stopDuration,
     );
     final Duration? duration = await showDialog(
       context: context,
       builder: (_) {
-        return SettingsPopupContainer<Duration>(
+        return PopupContainer<Duration>(
           controller: controller,
           title: '${start ? 'Start' : 'Stop'} time',
           showAffirmButton: true,

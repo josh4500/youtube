@@ -46,7 +46,6 @@ import 'notifications_settings_screen.dart';
 import 'privacy_settings_screen.dart';
 import 'video_quality_settings_screen.dart';
 import 'widgets/settings_list_view.dart';
-import 'widgets/settings_popup_container.dart';
 import 'widgets/settings_tile.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -402,12 +401,11 @@ Future<void> showAccountDialog(BuildContext context) async {
   await showDialog(
     context: context,
     builder: (_) {
-      return SettingsPopupContainer(
+      return PopupContainer(
         title: S.current.account,
         showDismissButtons: false,
         action: const Icon(YTIcons.add_outlined),
-        child: Container(
-          color: context.theme.appColors.settingsPopupBackgroundColor,
+        child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: SettingsTile(
             title: S.current.addAccount,

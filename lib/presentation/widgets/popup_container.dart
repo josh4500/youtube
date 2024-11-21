@@ -32,8 +32,8 @@ import 'package:youtube_clone/presentation/theme/app_theme.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-class SettingsPopupContainer<T> extends StatelessWidget {
-  const SettingsPopupContainer({
+class PopupContainer<T> extends StatelessWidget {
+  const PopupContainer({
     super.key,
     this.action,
     this.density,
@@ -49,7 +49,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
     required this.child,
   });
 
-  factory SettingsPopupContainer.builder({
+  factory PopupContainer.builder({
     Key? key,
     required String title,
     String? subtitle,
@@ -61,7 +61,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
     VisualDensity? density,
     bool capitalizeDismissButtons = false,
   }) {
-    return SettingsPopupContainer(
+    return PopupContainer(
       key: key,
       title: title,
       subtitle: subtitle,
@@ -92,7 +92,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
   final bool showTitle;
   final VisualDensity? density;
   final Alignment alignment;
-  final SettingsPopupContainerController<T>? controller;
+  final PopupContainerController<T>? controller;
   final bool showDismissButtons;
   final bool showAffirmButton;
   final bool capitalizeDismissButtons;
@@ -101,8 +101,8 @@ class SettingsPopupContainer<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SettingsPopupContainerController<T> effectiveController =
-        controller ?? SettingsPopupContainerController();
+    final PopupContainerController<T> effectiveController =
+        controller ?? PopupContainerController();
     final double width = density == null
         ? MediaQuery.sizeOf(context).width * 0.85
         : density == VisualDensity.compact
@@ -116,7 +116,7 @@ class SettingsPopupContainer<T> extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(4),
           ),
-          color: context.theme.appColors.settingsPopupBackgroundColor,
+          color: context.theme.appColors.popupBackgroundColor,
           child: ListenableBuilder(
             listenable: effectiveController,
             builder: (BuildContext context, Widget? _) {
@@ -222,6 +222,6 @@ class SettingsPopupContainer<T> extends StatelessWidget {
   }
 }
 
-class SettingsPopupContainerController<T> extends ValueNotifier<T?> {
-  SettingsPopupContainerController({T? value}) : super(value);
+class PopupContainerController<T> extends ValueNotifier<T?> {
+  PopupContainerController({T? value}) : super(value);
 }

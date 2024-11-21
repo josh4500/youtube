@@ -172,6 +172,11 @@ class Preferences extends _$Preferences {
     state = state.copyWith(autoplay: autoPlay);
   }
 
+  set enableDataSaving(bool enableDataSaving) {
+    _enableDataSaving.value = enableDataSaving;
+    state = state.copyWith(enableDataSaving: enableDataSaving);
+  }
+
   set playbackInFeeds(PlaybackInFeeds playbackInFeeds) {
     _playbackInFeeds.value = playbackInFeeds;
     state = state.copyWith(playbackInFeeds: playbackInFeeds);
@@ -194,7 +199,7 @@ class Preferences extends _$Preferences {
 
   set dataSaving(DataSavingPreferences dataSaving) {
     _dataSaving.value = dataSaving;
-    state = state.copyWith(dataSaving: dataSaving);
+    state = state.copyWith(dataSavingPreferences: dataSaving);
   }
 
   set zoomFillScreen(bool zoomFillScreen) {
@@ -302,6 +307,7 @@ class Preferences extends _$Preferences {
       accessibilityPreferences: _accessibility.value,
       dataSavingPreferences: _dataSaving.value,
       autoplay: _autoPlay.value,
+      enableDataSaving: _enableDataSaving.value,
     );
   }
 }
@@ -324,6 +330,7 @@ class PreferenceState {
     required this.accessibilityPreferences,
     required this.dataSavingPreferences,
     required this.autoplay,
+    required this.enableDataSaving,
   });
   final bool ambientMode;
   final ThemeMode themeMode;
@@ -342,6 +349,7 @@ class PreferenceState {
   final AccessibilityPreferences accessibilityPreferences;
   final DataSavingPreferences dataSavingPreferences;
   final bool autoplay;
+  final bool enableDataSaving;
 
   PreferenceState copyWith({
     bool? ambientMode,
@@ -359,7 +367,8 @@ class PreferenceState {
     DownloadPreferences? downloadPreferences,
     AccessibilityPreferences? accessibilityPreferences,
     bool? autoplay,
-    DataSavingPreferences? dataSaving,
+    DataSavingPreferences? dataSavingPreferences,
+    bool? enableDataSaving,
   }) {
     return PreferenceState(
       ambientMode: ambientMode ?? this.ambientMode,
@@ -378,8 +387,10 @@ class PreferenceState {
       downloadPreferences: downloadPreferences ?? this.downloadPreferences,
       accessibilityPreferences:
           accessibilityPreferences ?? this.accessibilityPreferences,
+      dataSavingPreferences:
+          dataSavingPreferences ?? this.dataSavingPreferences,
       autoplay: autoplay ?? this.autoplay,
-      dataSavingPreferences: dataSaving ?? this.dataSavingPreferences,
+      enableDataSaving: enableDataSaving ?? this.enableDataSaving,
     );
   }
 }

@@ -50,8 +50,12 @@ class DataSavingSettingsScreen extends ConsumerWidget {
             summary: 'Automatically adjusts settings to save mobile data',
             prefOption: PrefOption(
               type: PrefOptionType.toggle,
-              value: false,
+              value: preferences.enableDataSaving,
+              onToggle: () =>
+                  _changeEnableDataSaving(preferences.enableDataSaving, ref),
             ),
+            onTap: () =>
+                _changeEnableDataSaving(preferences.enableDataSaving, ref),
           ),
           const SizedBox(height: 28),
           const Padding(
@@ -231,5 +235,9 @@ class DataSavingSettingsScreen extends ConsumerWidget {
         dataSavingPreferences.copyWith(
       reduceDownloadQuality: !dataSavingPreferences.reduceDownloadQuality,
     );
+  }
+
+  _changeEnableDataSaving(bool enableDataSaving, WidgetRef ref) {
+    ref.read(preferencesProvider.notifier).enableDataSaving = !enableDataSaving;
   }
 }

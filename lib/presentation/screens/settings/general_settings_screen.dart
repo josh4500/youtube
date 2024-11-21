@@ -31,15 +31,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core/enums/settings_enums.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
-import 'package:youtube_clone/presentation/provider/state/preferences.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'view_models/pref_option.dart';
 import 'widgets/date_range_picker.dart';
 import 'widgets/frequency_picker.dart';
 import 'widgets/round_check_item.dart';
 import 'widgets/settings_list_view.dart';
-import 'widgets/settings_popup_container.dart';
 import 'widgets/settings_tile.dart';
 
 class GeneralSettingsScreen extends ConsumerStatefulWidget {
@@ -208,15 +208,15 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
     final PreferenceState preferences = ref.read(preferencesProvider);
 
     // Set the initial value to the controller
-    final SettingsPopupContainerController<Duration> controller =
-        SettingsPopupContainerController(
+    final PopupContainerController<Duration> controller =
+        PopupContainerController(
       value: preferences.remindForBreak.frequency,
     );
 
     final Duration? affirmedChanges = await showDialog<Duration>(
       context: context,
       builder: (_) {
-        return SettingsPopupContainer<Duration>(
+        return PopupContainer<Duration>(
           controller: controller,
           title: 'Reminder frequency',
           density: VisualDensity.compact,
@@ -243,8 +243,8 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
   Future<void> _onChangeRemindForBedtime() async {
     final PreferenceState preferences = ref.read(preferencesProvider);
     // Controller popup
-    final SettingsPopupContainerController<RemindForBedtime> controller =
-        SettingsPopupContainerController<RemindForBedtime>(
+    final PopupContainerController<RemindForBedtime> controller =
+        PopupContainerController<RemindForBedtime>(
       value: preferences.remindForBedtime,
     );
     // State value for popup
@@ -255,7 +255,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
       builder: (_) {
         return StatefulBuilder(
           builder: (BuildContext context, setState) {
-            return SettingsPopupContainer<RemindForBedtime>(
+            return PopupContainer<RemindForBedtime>(
               title: 'Remind me when it\'s bedtime',
               showAffirmButton: true,
               controller: controller,
@@ -361,7 +361,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
     final ThemeMode? result = await showAdaptiveDialog<ThemeMode>(
       context: context,
       builder: (BuildContext context) {
-        return SettingsPopupContainer<ThemeMode>.builder(
+        return PopupContainer<ThemeMode>.builder(
           title: 'Appearance',
           capitalizeDismissButtons: true,
           itemBuilder: (BuildContext _, int index) {
@@ -401,7 +401,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
     final PlaybackInFeeds? result = await showDialog<PlaybackInFeeds>(
       context: context,
       builder: (_) {
-        return SettingsPopupContainer<PlaybackInFeeds>.builder(
+        return PopupContainer<PlaybackInFeeds>.builder(
           title: 'Playback in feeds',
           itemBuilder: (_, int index) {
             final PlaybackInFeeds playbackInFeeds =
@@ -441,7 +441,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
     final int? result = await showDialog<int>(
       context: context,
       builder: (_) {
-        return SettingsPopupContainer<int>.builder(
+        return PopupContainer<int>.builder(
           title: 'Double-tap to seek',
           itemBuilder: (_, int index) {
             final int seekSeconds = <int>[5, 10, 15, 20, 30, 60][index];
@@ -480,7 +480,7 @@ class _GeneralSettingsScreenState extends ConsumerState<GeneralSettingsScreen>
     final UploadNetwork? result = await showDialog<UploadNetwork>(
       context: context,
       builder: (_) {
-        return SettingsPopupContainer<UploadNetwork>.builder(
+        return PopupContainer<UploadNetwork>.builder(
           title: 'Uploads',
           itemBuilder: (_, int index) {
             final UploadNetwork uploadNetwork = UploadNetwork.values[index];

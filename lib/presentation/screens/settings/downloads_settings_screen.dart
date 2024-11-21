@@ -29,13 +29,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:youtube_clone/presentation/provider/state/preferences.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/screens/settings/view_models/pref_option.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../widgets/download_storage_usage.dart';
 import 'widgets/round_check_item.dart';
 import 'widgets/settings_list_view.dart';
-import 'widgets/settings_popup_container.dart';
 import 'widgets/settings_tile.dart';
 
 class DownloadsSettingsScreen extends ConsumerStatefulWidget {
@@ -141,7 +140,7 @@ class _DownloadsSettingsScreenState
     final int? result = await showDialog<int>(
       context: context,
       builder: (_) {
-        return SettingsPopupContainer<int>.builder(
+        return PopupContainer<int>.builder(
           title: 'Download quality',
           itemBuilder: (_, int index) {
             final int quality = qualities[index];

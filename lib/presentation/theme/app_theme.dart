@@ -107,7 +107,7 @@ abstract final class AppTheme {
   static final AppColorsExtension _lightAppColors = AppColorsExtension(
     primary: AppPalette.primary.light,
     background: AppPalette.backgroundColor.light,
-    settingsPopupBackgroundColor: AppPalette.settingsPopupBackgroundColor.light,
+    popupBackgroundColor: AppPalette.popupBackgroundColor.light,
     shimmer: AppPalette.shimmerColor.light,
   );
 
@@ -201,7 +201,7 @@ abstract final class AppTheme {
   static final AppColorsExtension _darkAppColors = AppColorsExtension(
     primary: AppPalette.primary.dark,
     background: AppPalette.backgroundColor.dark,
-    settingsPopupBackgroundColor: AppPalette.settingsPopupBackgroundColor.dark,
+    popupBackgroundColor: AppPalette.popupBackgroundColor.dark,
     shimmer: AppPalette.shimmerColor.dark,
   );
 
