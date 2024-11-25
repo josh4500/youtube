@@ -33,6 +33,53 @@ class NotificationsScreen extends StatelessWidget {
           ),
         ],
       ),
+      body: ScrollConfiguration(
+        behavior: const NoScrollGlowBehavior(),
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverFillRemaining(
+              child: Padding(
+                padding: const EdgeInsets.all(48.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.notifications,
+                      size: 108,
+                      color: context.theme.colorScheme.surface.withOpacity(.20),
+                    ),
+                    const SizedBox(height: 48),
+                    const Text(
+                      'Your notifications live here',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8.0,
+                        horizontal: 12,
+                      ),
+                      child: Text(
+                        'Subscribe to your channels to get notified about their latest video.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: context.theme.hintColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 160),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
