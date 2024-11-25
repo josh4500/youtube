@@ -89,3 +89,7 @@ class NoOverScrollGlowBehavior extends ScrollBehavior {
     }
   }
 }
+
+class NoScrollGlowBehavior extends OverScrollGlowBehavior {
+  const NoScrollGlowBehavior() : super(enabled: false);
+}

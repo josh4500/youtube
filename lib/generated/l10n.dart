@@ -309,6 +309,66 @@ class S {
       args: [],
     );
   }
+
+  /// `Your watch history is off`
+  String get yourWatchHistoryIsOff {
+    return Intl.message(
+      'Your watch history is off',
+      name: 'yourWatchHistoryIsOff',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Try searching to get started`
+  String get trySearchingToGetStarted {
+    return Intl.message(
+      'Try searching to get started',
+      name: 'trySearchingToGetStarted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Start watching videos to help us build a feed of videos you'll love.`
+  String get startWatchingVideos {
+    return Intl.message(
+      'Start watching videos to help us build a feed of videos you\'ll love.',
+      name: 'startWatchingVideos',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can change setting at any time to get the latest videos tailored to you.`
+  String get youCanChangeSettings {
+    return Intl.message(
+      'You can change setting at any time to get the latest videos tailored to you.',
+      name: 'youCanChangeSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Update Setting`
+  String get updateSetting {
+    return Intl.message(
+      'Update Setting',
+      name: 'updateSetting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Learn more`
+  String get learnMore {
+    return Intl.message(
+      'Learn more',
+      name: 'learnMore',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

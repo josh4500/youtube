@@ -29,6 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
 import 'package:youtube_clone/infrastructure/services/internet_connectivity/connectivity_state.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets/builders/auth_state_builder.dart';
 
 import '../../../widgets/builders/network_builder.dart';
@@ -119,7 +120,9 @@ class SettingsTile extends StatelessWidget {
 
             return ListTile(
               selected: selected,
-              leading: leadingIcon != null ? Icon(leadingIcon) : null,
+              leading: leadingIcon != null
+                  ? Icon(leadingIcon, color: context.theme.colorScheme.surface)
+                  : null,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 1,

@@ -31,5 +31,11 @@
   "connectedApps": "Connected apps",
   "searchYoutube": "Search YouTube",
   "searchDownloads": "Search downloads",
-  "playback": "Playback"
+  "playback": "Playback",
+  "yourWatchHistoryIsOff": "Your watch history is off",
+  "trySearchingToGetStarted": "Try searching to get started",
+  "startWatchingVideos": "Start watching videos to help us build a feed of videos you'll love.",
+  "youCanChangeSettings": "You can change setting at any time to get the latest videos tailored to you.",
+  "updateSetting": "Update Setting",
+  "learnMore": "Learn more"
 }

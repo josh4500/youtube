@@ -137,7 +137,7 @@ class PopupContainer<T> extends StatelessWidget {
                             : CrossAxisAlignment.start,
                         children: <Widget>[
                           Row(
-                            mainAxisSize: MainAxisSize.min,
+                            //mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: action == null
                                 ? MainAxisAlignment.start
                                 : MainAxisAlignment.spaceBetween,
@@ -149,10 +149,13 @@ class PopupContainer<T> extends StatelessWidget {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              if (action != null) ...[
-                                const SizedBox(width: 8),
-                                action!,
-                              ],
+                              if (action != null)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0,
+                                  ),
+                                  child: action,
+                                ),
                             ],
                           ),
                           if (subtitle != null) ...<Widget>[

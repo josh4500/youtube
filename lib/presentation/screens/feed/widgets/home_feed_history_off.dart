@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/generated/l10n.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -43,7 +44,7 @@ class HomeFeedHistoryOff extends StatelessWidget {
                 SizedBox(width: 12.w),
                 Expanded(
                   child: CustomActionButton(
-                    title: 'Search YouTube',
+                    title: S.current.searchYoutube,
                     textStyle: TextStyle(
                       fontSize: 16,
                       color: context.theme.hintColor,
@@ -62,6 +63,10 @@ class HomeFeedHistoryOff extends StatelessWidget {
                   padding: const EdgeInsets.all(10),
                   borderRadius: BorderRadius.circular(24),
                   useTappable: false,
+                  onTap: () => context.goto(
+                    AppRoutes.search,
+                    queryParameters: {'voice': true},
+                  ),
                   icon: const Icon(YTIcons.mic_outlined, size: 20),
                 ),
               ],
@@ -90,9 +95,9 @@ class HomeFeedHistoryOff extends StatelessWidget {
                   return Column(
                     children: [
                       const SizedBox(height: 18),
-                      const Text(
-                        'Try searching to get started',
-                        style: TextStyle(
+                      Text(
+                        S.current.trySearchingToGetStarted,
+                        style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                         ),
@@ -100,8 +105,7 @@ class HomeFeedHistoryOff extends StatelessWidget {
                       const SizedBox(height: 18),
                       RichText(
                         text: TextSpan(
-                          text:
-                              'Start watching videos to help us build a feed of videos you\'ll love.',
+                          text: S.current.startWatchingVideos,
                           style: TextStyle(
                             fontSize: 14,
                             color: context.theme.hintColor,
@@ -117,9 +121,9 @@ class HomeFeedHistoryOff extends StatelessWidget {
                 return Column(
                   children: [
                     const SizedBox(height: 18),
-                    const Text(
-                      'Your watch history is off',
-                      style: TextStyle(
+                    Text(
+                      S.current.yourWatchHistoryIsOff,
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
                       ),
@@ -127,11 +131,10 @@ class HomeFeedHistoryOff extends StatelessWidget {
                     const SizedBox(height: 18),
                     RichText(
                       text: TextSpan(
-                        text:
-                            'You can change setting at any time to get the latest videos tailored to you. ',
+                        text: S.current.youCanChangeSettings,
                         children: [
                           TextSpan(
-                            text: 'Learn more',
+                            text: S.current.learnMore,
                             style: TextStyle(
                               fontSize: 14,
                               color: context.theme.primaryColor,
@@ -147,7 +150,7 @@ class HomeFeedHistoryOff extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     CustomActionButton(
-                      title: 'Update Setting',
+                      title: S.current.updateSetting,
                       backgroundColor: Colors.white.withOpacity(0.08),
                       padding: const EdgeInsets.symmetric(
                         vertical: 10,

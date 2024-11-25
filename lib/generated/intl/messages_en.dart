@@ -36,6 +36,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "general": MessageLookupByLibrary.simpleMessage("General"),
         "helloWorld": MessageLookupByLibrary.simpleMessage("Hello World!"),
         "language": MessageLookupByLibrary.simpleMessage("English"),
+        "learnMore": MessageLookupByLibrary.simpleMessage("Learn more"),
         "liveChat": MessageLookupByLibrary.simpleMessage("Live chat"),
         "manageAllHistory":
             MessageLookupByLibrary.simpleMessage("Manage all history"),
@@ -48,12 +49,21 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Search downloads"),
         "searchYoutube": MessageLookupByLibrary.simpleMessage("Search YouTube"),
         "settings": MessageLookupByLibrary.simpleMessage("Settings"),
+        "startWatchingVideos": MessageLookupByLibrary.simpleMessage(
+            "Start watching videos to help us build a feed of videos you\'ll love."),
         "tryExperimental": MessageLookupByLibrary.simpleMessage(
             "Try experimental new features"),
+        "trySearchingToGetStarted": MessageLookupByLibrary.simpleMessage(
+            "Try searching to get started"),
+        "updateSetting": MessageLookupByLibrary.simpleMessage("Update Setting"),
         "videoQualityPref":
             MessageLookupByLibrary.simpleMessage("Video quality preferences"),
         "watchOnTv": MessageLookupByLibrary.simpleMessage("Watch on TV"),
+        "youCanChangeSettings": MessageLookupByLibrary.simpleMessage(
+            "You can change setting at any time to get the latest videos tailored to you."),
         "yourDataInYT":
-            MessageLookupByLibrary.simpleMessage("Your data in Youtube")
+            MessageLookupByLibrary.simpleMessage("Your data in Youtube"),
+        "yourWatchHistoryIsOff":
+            MessageLookupByLibrary.simpleMessage("Your watch history is off")
       };
 }

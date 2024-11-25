@@ -130,6 +130,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SettingsTile(
               title: 'Family Center',
               onTap: () {},
+              accountRequired: true,
             ),
             SettingsTile(
               leadingIcon: YTIcons.notification_outlined,
@@ -229,11 +230,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               selected: _isSelected(SettingsTab.liveChat),
             ),
             SettingsTile(
+              leadingIcon: Icons.accessibility,
               title: S.current.accessibility,
               onTap: () => _showSettingsPrefScreen(SettingsTab.accessibility),
               selected: _isSelected(SettingsTab.accessibility),
             ),
             SettingsTile(
+              leadingIcon: Icons.tv_outlined,
               title: S.current.watchOnTv,
               onTap: () => _showSettingsPrefScreen(SettingsTab.watchOnTv),
             ),
@@ -386,7 +389,7 @@ class SettingsSection extends StatelessWidget {
           child: Text(
             title,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
