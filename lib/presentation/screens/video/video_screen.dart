@@ -33,6 +33,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/constants.dart';
 import 'package:youtube_clone/presentation/models.dart';
@@ -699,7 +700,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   Future<void> _animateScreenHeight(double to) async {
     if (_screenHeightNotifier.value != to) {
-      await _tweenAnimateNotifier(
+      await animateDoubleNotifier(
         notifier: _screenHeightNotifier,
         controller: _screenHeightAnimationController,
         value: to,
@@ -709,7 +710,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   Future<void> _animateScreenWidth(double to) async {
     if (_screenWidthNotifier.value != to) {
-      await _tweenAnimateNotifier(
+      await animateDoubleNotifier(
         notifier: _screenWidthNotifier,
         controller: _screenWidthAnimationController,
         value: to,
@@ -719,7 +720,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   Future<void> _animatePlayerWidth(double to) async {
     if (_playerWidthNotifier.value != to) {
-      await _tweenAnimateNotifier(
+      await animateDoubleNotifier(
         notifier: _playerWidthNotifier,
         controller: _playerWidthAnimationController,
         value: to,
@@ -729,35 +730,12 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   Future<void> _animateAdditionalHeight(double to) async {
     if (_playerAddedHeightNotifier.value != to) {
-      await _tweenAnimateNotifier(
+      await animateDoubleNotifier(
         notifier: _playerAddedHeightNotifier,
         controller: _playerAddedHeightAnimationController,
         value: to,
       );
     }
-  }
-
-  Future<void> _tweenAnimateNotifier({
-    required ValueNotifier<double> notifier,
-    required AnimationController controller,
-    required double value,
-  }) async {
-    final Animation<double> tween = Tween<double>(
-      begin: notifier.value,
-      end: value,
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeInCubic,
-      ),
-    );
-    tween.addListener(() => notifier.value = tween.value);
-
-    // Reset the animation controller to its initial state
-    controller.reset();
-
-    // Start the animation by moving it forward
-    await controller.forward();
   }
 
   /// Callback to pause and play video when draggable sheets change its size

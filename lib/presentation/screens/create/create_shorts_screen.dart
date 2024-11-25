@@ -33,6 +33,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
@@ -158,6 +159,16 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   final dragZoomLevelNotifier = ValueNotifier<double>(0);
   final recordOuterButtonPosition = ValueNotifier<Offset?>(null);
   final recordInnerButtonPosition = ValueNotifier<Offset?>(null);
+  // Position controller
+  late final recordInnerButtonPController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 200),
+  );
+  // Position controller
+  late final recordOuterButtonPController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 200),
+  );
   late final recordOuterButtonController = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 900),
@@ -186,6 +197,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   final CallOutLink callOutLink = CallOutLink(
     offset: const Offset(0, 52),
   );
+
+  BoxConstraints? viewConstraints;
 
   @override
   void initState() {
@@ -225,6 +238,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     focusController.dispose();
     _doubleTapTimer?.cancel();
 
+    recordOuterButtonPController.dispose();
+    recordInnerButtonPController.dispose();
     recordOuterButtonController.dispose();
     recordingNotifier.dispose();
     dragRecordNotifier.dispose();
@@ -238,7 +253,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     super.dispose();
   }
 
-  Offset getDragCircleInitPosition(BoxConstraints constraints) {
+  Offset getOuterButtonInitPosition(BoxConstraints constraints) {
     return Offset(
       (constraints.maxWidth / 2) - (kRecordOuterButtonSize / 2),
       (constraints.maxHeight) - kRecordOuterButtonSize - bottomPadding,
@@ -250,7 +265,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   static const bottomOffset = offsetYFromCircle - bottomPadding;
 
-  Offset getCenterButtonInitPosition(BoxConstraints constraints) {
+  Offset getInnerButtonInitPosition(BoxConstraints constraints) {
     return Offset(
       (constraints.maxWidth / 2) - (kRecordInnerButtonSize / 2),
       (constraints.maxHeight) - kRecordOuterButtonSize + bottomOffset,
@@ -699,16 +714,13 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     disableDragMode = false;
     recordingNotifier.value = false;
     recordOuterButtonController.reverse(from: .7);
-    droppedButton = false;
 
     if (revertDrag) {
       dragRecordNotifier.value = false;
       recordingNotifier.value = false;
       hideZoomController.reverse();
-      // Reset positions
-      recordOuterButtonPosition.value = null;
-      recordInnerButtonPosition.value = null;
-      recordOuterButtonController.reverse();
+
+      _resetButtonPositions(viewConstraints);
     }
   }
 
@@ -720,6 +732,47 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       final Recording recording = ref.read(currentRecordingProvider);
       ref.read(shortRecordingProvider.notifier).addRecording(recording);
     }
+  }
+
+  void _resetButtonPositions(BoxConstraints? constraints) {
+    if (constraints != null) {
+      animate<Offset>(
+        controller: recordOuterButtonPController,
+        begin: recordOuterButtonPosition.value!,
+        end: getOuterButtonInitPosition(constraints),
+        onAnimate: (value) {
+          if (!dragRecordNotifier.value) {
+            recordOuterButtonPosition.value = value;
+          }
+        },
+      );
+
+      if (!droppedButton) {
+        animate<Offset>(
+          controller: recordInnerButtonPController,
+          begin: recordInnerButtonPosition.value!,
+          end: getInnerButtonInitPosition(constraints),
+          onAnimate: (value) {
+            if (!droppedButton && !dragRecordNotifier.value) {
+              recordInnerButtonPosition.value = value;
+            }
+            if (value == getInnerButtonInitPosition(constraints)) {
+              droppedButton = false;
+            }
+          },
+        );
+      } else {
+        recordInnerButtonPosition.value = getInnerButtonInitPosition(
+          constraints,
+        );
+        droppedButton = false;
+      }
+    } else {
+      recordOuterButtonPosition.value = null;
+      recordInnerButtonPosition.value = null;
+    }
+
+    recordOuterButtonController.reverse();
   }
 
   void handleOnTapRecordButton() {
@@ -761,17 +814,11 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     _stopRecording();
 
-    droppedButton = false;
-
     dragRecordNotifier.value = false;
     recordingNotifier.value = false;
     hideZoomController.reverse();
 
-    // Reset positions
-    recordOuterButtonPosition.value = getDragCircleInitPosition(constraints);
-    recordInnerButtonPosition.value = getCenterButtonInitPosition(constraints);
-
-    recordOuterButtonController.reverse();
+    _resetButtonPositions(constraints);
   }
 
   void handleLongPressUpdateRecordButton(
@@ -788,22 +835,29 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       position.dy - kRecordOuterButtonSize,
     );
 
+    if (position.dy <= maxHeight * .8) {
+      if (droppedButton == false) {
+        animate<Offset>(
+          controller: recordInnerButtonPController,
+          begin: recordInnerButtonPosition.value!,
+          end: getInnerButtonInitPosition(constraints),
+          onAnimate: (value) {
+            if (droppedButton) {
+              recordInnerButtonPosition.value = value;
+            }
+          },
+        );
+      }
+      droppedButton = true;
+    } else {
+      droppedButton = false;
+    }
+
     if (droppedButton == false) {
       recordInnerButtonPosition.value = Offset(
         position.dx - kRecordInnerButtonSize / 2,
         position.dy - kRecordInnerButtonSize - offsetYFromCircle,
       );
-    }
-
-    if (position.dy <= maxHeight * .8) {
-      droppedButton = true;
-      // TODO(josh4500): Animate
-      recordInnerButtonPosition.value =
-          getCenterButtonInitPosition(constraints);
-    } else if (droppedButton &&
-        position.dy >=
-            maxHeight - (kRecordOuterButtonSize / 2) - bottomPadding) {
-      droppedButton = false;
     }
   }
 
@@ -940,6 +994,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                   BuildContext context,
                   BoxConstraints constraints,
                 ) {
+                  viewConstraints = constraints;
                   return Listener(
                     onPointerMove: (PointerMoveEvent event) {
                       handlePointerMoveEvent(event, constraints);
@@ -1000,7 +1055,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                             Offset? position,
                             Widget? childWidget,
                           ) {
-                            position ??= getDragCircleInitPosition(constraints);
+                            position ??=
+                                getOuterButtonInitPosition(constraints);
 
                             return Positioned(
                               top: position.dy,
@@ -1034,7 +1090,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                             Widget? childWidget,
                           ) {
                             position ??=
-                                getCenterButtonInitPosition(constraints);
+                                getInnerButtonInitPosition(constraints);
 
                             return Positioned(
                               top: position.dy,

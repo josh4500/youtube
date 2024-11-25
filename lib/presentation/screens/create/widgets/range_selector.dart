@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
 
 class RangeSelector extends StatefulWidget {
@@ -66,25 +67,6 @@ class _RangeSelectorState<T> extends State<RangeSelector>
     super.dispose();
   }
 
-  Future<void> _tweenAnimateNotifier(Alignment value) async {
-    final Animation<Alignment> tween = AlignmentTween(
-      begin: alignmentNotifier.value,
-      end: value,
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Curves.linearToEaseOut,
-      ),
-    );
-    tween.addListener(() => alignmentNotifier.value = tween.value);
-
-    // Reset the animation controller to its initial state
-    controller.reset();
-
-    // Start the animation by moving it forward
-    await controller.forward();
-  }
-
   int _getIndexFromPosition(double position, double width) {
     return (position.clamp(0, width) / (width / itemCount))
         .floor()
@@ -95,8 +77,11 @@ class _RangeSelectorState<T> extends State<RangeSelector>
     final value = _getIndexFromPosition(position, width);
 
     _updateSelected(value);
-    await _tweenAnimateNotifier(
-      Alignment((value / (itemCount - 1)).normalizeRange(-1, 1), 0),
+    await animateAlignmentNotifier(
+      notifier: alignmentNotifier,
+      controller: controller,
+      value: Alignment((value / (itemCount - 1)).normalizeRange(-1, 1), 0),
+      curve: Curves.linearToEaseOut,
     );
   }
 
