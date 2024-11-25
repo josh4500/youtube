@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -17,32 +19,52 @@ import 'widgets/create_close_button.dart';
 import 'widgets/create_media_preview.dart';
 import 'widgets/create_permission_reason.dart';
 
-final _checkMediaStoragePerm = FutureProvider.autoDispose<bool>(
-  (ref) async {
-    final PermissionState ps = await PhotoManager.requestPermissionExtend();
-    return ps.isAuth;
-  },
-);
+Future<bool> _checkMediaStoragePerm() async {
+  final PermissionState ps = await PhotoManager.requestPermissionExtend();
+  return ps.isAuth;
+}
 
-class CreateVideoScreen extends ConsumerWidget {
+class CreateVideoScreen extends StatefulWidget {
   const CreateVideoScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  State<CreateVideoScreen> createState() => _CreateVideoScreenState();
+}
+
+class _CreateVideoScreenState extends State<CreateVideoScreen> {
+  final completer = Completer<bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    completer.complete(_checkMediaStoragePerm());
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black38,
-      body: Builder(
-        builder: (context) {
-          final permResult = ref.watch(_checkMediaStoragePerm);
-          return permResult.when(
-            data: (bool hasPermissions) {
-              if (hasPermissions) {
-                return const SelectMediaView();
-              }
-              return const MediaStoragePermissionRequest(checking: false);
-            },
-            error: (e, _) => const MediaStoragePermissionRequest(),
-            loading: MediaStoragePermissionRequest.new,
+      body: FutureBuilder<bool>(
+        initialData: false,
+        future: completer.future,
+        builder: (
+          BuildContext context,
+          AsyncSnapshot<bool> snapshot,
+        ) {
+          final bool hasPermissions = snapshot.data!;
+          return ModelBinding<bool>(
+            model: hasPermissions,
+            child: Builder(
+              builder: (BuildContext context) {
+                if (hasPermissions) {
+                  return const SelectMediaView();
+                }
+
+                return MediaStoragePermissionRequest(
+                  checking: snapshot.connectionState == ConnectionState.waiting,
+                );
+              },
+            ),
           );
         },
       ),
@@ -166,10 +188,13 @@ class MediaStoragePermissionRequest extends StatelessWidget {
                           builder: (context, ref, child) {
                             return GestureDetector(
                               onTap: () async {
-                                await Permission.storage.request();
-                                await Permission.mediaLibrary.request();
-
-                                ref.refresh(_checkMediaStoragePerm);
+                                final allowed = await _checkMediaStoragePerm();
+                                if (context.mounted) {
+                                  ModelBinding.update<bool>(
+                                    context,
+                                    (_) => allowed,
+                                  );
+                                }
                               },
                               child: Container(
                                 width: double.infinity,

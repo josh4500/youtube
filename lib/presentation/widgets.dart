@@ -86,6 +86,7 @@ export 'widgets/player/playback/playback_view.dart';
 export 'widgets/popup_container.dart';
 
 export 'widgets/range_slider.dart';
+export 'widgets/range_selector.dart';
 export 'widgets/reply_tile.dart';
 export 'widgets/roulette_scroll.dart';
 export 'widgets/slidable.dart';

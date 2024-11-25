@@ -1,25 +1,27 @@
 import 'package:flutter/widgets.dart';
 
+typedef StateUpdater<T> = T Function(T current);
+
 /// `_ModelBindingScope` is an `InheritedWidget` used to expose the
 /// `_ModelBindingState` to the widget tree. This allows widgets in the
 /// subtree to access the current model and listen for updates.
 class _ModelBindingScope<T> extends InheritedWidget {
   const _ModelBindingScope({
     super.key,
-    required this.bindingState,
+    required this.state,
     required super.child,
   });
 
   /// Holds a reference to the `_ModelBindingState`, where the model data
   /// and its update methods are managed.
-  final _ModelBindingState<T> bindingState;
+  final _ModelBindingState<T> state;
 
   /// Determines whether widgets that depend on `_ModelBindingScope` should
   /// rebuild when `bindingState` changes. It compares the `currentModel` of
   /// the old and new state instances.
   @override
   bool updateShouldNotify(_ModelBindingScope oldWidget) {
-    return oldWidget.bindingState.currentModel != bindingState.currentModel;
+    return oldWidget.state.currentModel != state.currentModel;
   }
 }
 
@@ -62,7 +64,7 @@ class ModelBinding<T> extends StatefulWidget {
   static T of<T>(BuildContext context) {
     return context
         .findAncestorWidgetOfExactType<_ModelBindingScope<T>>()!
-        .bindingState
+        .state
         .currentModel;
   }
 
@@ -71,17 +73,17 @@ class ModelBinding<T> extends StatefulWidget {
   static T? maybeOf<T>(BuildContext context) {
     return context
         .findAncestorWidgetOfExactType<_ModelBindingScope<T>>()
-        ?.bindingState
+        ?.state
         .currentModel;
   }
 
   /// Updates the model value by finding the nearest `_ModelBindingScope` and
   /// calling `updateModelValue` with the new value.
-  static void update<T>(BuildContext context, T value) {
+  static void update<T>(BuildContext context, StateUpdater<T> updater) {
     context
         .findAncestorWidgetOfExactType<_ModelBindingScope<T>>()!
-        .bindingState
-        .updateModelValue(value);
+        .state
+        .updateModelValue(updater);
   }
 
   /// Executes a command action by its type, if found in the `commands` map
@@ -89,7 +91,7 @@ class ModelBinding<T> extends StatefulWidget {
   static void performAction<T>(BuildContext context, Type action) {
     context
         .findAncestorWidgetOfExactType<_ModelBindingScope<T>>()!
-        .bindingState
+        .state
         .performAction(action);
   }
 
@@ -116,7 +118,8 @@ class _ModelBindingState<T> extends State<ModelBinding<T>> {
 
   /// Updates the model value if it has changed and triggers `onUpdate` callback
   /// if provided. Calls `setState` to rebuild widgets depending on this model.
-  void updateModelValue(T value) {
+  void updateModelValue(StateUpdater<T> updater) {
+    final value = updater(currentModel);
     if (value != currentModel) {
       currentModel = value;
       widget.onUpdate?.call(value);
@@ -131,7 +134,7 @@ class _ModelBindingState<T> extends State<ModelBinding<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return _ModelBindingScope<T>(bindingState: this, child: widget.child);
+    return _ModelBindingScope<T>(state: this, child: widget.child);
   }
 }
 

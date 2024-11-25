@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../provider/current_recording_state.dart';
 import '../notifications/capture_notification.dart';
-import '../range_selector.dart';
 
 class CaptureSpeed extends ConsumerWidget {
   const CaptureSpeed({super.key});

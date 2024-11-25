@@ -44,19 +44,20 @@ import 'provider/current_recording_state.dart';
 import 'provider/index_notifier.dart';
 import 'provider/short_recording_state.dart';
 import 'widgets/capture/capture_button.dart';
+import 'widgets/capture/capture_draft_decision.dart';
 import 'widgets/capture/capture_effects.dart';
+import 'widgets/capture/capture_filter_selector.dart';
 import 'widgets/capture/capture_focus_indicator.dart';
+import 'widgets/capture/capture_permission_request.dart';
 import 'widgets/capture/capture_recording_control.dart';
 import 'widgets/capture/capture_shorts_duration.dart';
 import 'widgets/capture/capture_speed.dart';
+import 'widgets/capture/capture_timer_selector.dart';
 import 'widgets/capture/capture_zoom_indicator.dart';
-import 'widgets/check_permission.dart';
 import 'widgets/create_close_button.dart';
-import 'widgets/create_permission_reason.dart';
 import 'widgets/create_progress.dart';
 import 'widgets/notifications/capture_notification.dart';
 import 'widgets/notifications/create_notification.dart';
-import 'widgets/range_selector.dart';
 import 'widgets/video_effect_options.dart';
 
 class CreateShortsScreen extends StatefulWidget {
@@ -94,7 +95,7 @@ class _CreateShortsScreenState extends State<CreateShortsScreen> {
                 if (state.hasPermissions && state.cameras.isNotEmpty) {
                   return const CaptureShortsView();
                 }
-                return CreateShortsPermissionRequest(
+                return CaptureShortsPermissionRequest(
                   checking: !state.requested,
                 );
               },
@@ -361,7 +362,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       final startOver = await showDialog<bool?>(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) => const DraftDecision(),
+        builder: (BuildContext context) => const CaptureDraftDecision(),
       );
       if (startOver != null && startOver) {
         ref.read(shortRecordingProvider.notifier).clear();
@@ -518,21 +519,20 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   void _handleCameraException(CameraException e) {
     if (context.mounted) {
-      final cameraState = ModelBinding.of<CreateCameraState>(context);
       switch (e.code) {
         case 'CameraAccessDenied' ||
               'CameraAccessDeniedWithoutPrompt' ||
               'CameraAccessRestricted':
           ModelBinding.update<CreateCameraState>(
             context,
-            cameraState.copyWith(permissionsDenied: true),
+            (state) => state.copyWith(permissionsDenied: true),
           );
         case 'AudioAccessDenied' ||
               'AudioAccessDeniedWithoutPrompt' ||
               'AudioAccessRestricted':
           ModelBinding.update<CreateCameraState>(
             context,
-            cameraState.copyWith(permissionsDenied: true),
+            (state) => state.copyWith(permissionsDenied: true),
           );
         case _:
           return;
@@ -827,7 +827,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   ) {
     if (disableDragMode || _guardRecording) return;
 
-    final position = details.globalPosition;
+    final position = details.localPosition;
     final maxHeight = constraints.maxHeight;
 
     recordOuterButtonPosition.value = Offset(
@@ -1055,8 +1055,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                             Offset? position,
                             Widget? childWidget,
                           ) {
-                            position ??=
-                                getOuterButtonInitPosition(constraints);
+                            position ??= getOuterButtonInitPosition(
+                              constraints,
+                            );
 
                             return Positioned(
                               top: position.dy,
@@ -1064,8 +1065,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                               child: childWidget!,
                             );
                           },
-                          child: HideOnCountdown(
-                            notifier: countdownHidden,
+                          child: HideCaptureWidget(
+                            listenable: countdownHidden,
+                            hideCallback: () => !countdownHidden.value,
                             child: AnimatedVisibility(
                               animation: hideAnimation,
                               alignment: Alignment.bottomCenter,
@@ -1089,8 +1091,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                             Offset? position,
                             Widget? childWidget,
                           ) {
-                            position ??=
-                                getInnerButtonInitPosition(constraints);
+                            position ??= getInnerButtonInitPosition(
+                              constraints,
+                            );
 
                             return Positioned(
                               top: position.dy,
@@ -1098,8 +1101,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                               child: childWidget!,
                             );
                           },
-                          child: HideOnCountdown(
-                            notifier: countdownHidden,
+                          child: HideCaptureWidget(
+                            listenable: countdownHidden,
+                            hideCallback: () => !countdownHidden.value,
                             child: AnimatedVisibility(
                               animation: hideAnimation,
                               alignment: Alignment.bottomCenter,
@@ -1213,21 +1217,24 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                               children: [
                                 const CreateProgress(),
                                 const SizedBox(height: 12),
-                                HideOnCountdown(
-                                  notifier: countdownHidden,
-                                  child: HideOnRecording(
-                                    notifier: recordingNotifier,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        CreateCloseButton(
-                                          onPopInvoked: _onPopInvoked,
-                                        ),
-                                        const CaptureMusicButton(),
-                                        const CaptureShortsDuration(),
-                                      ],
-                                    ),
+                                HideCaptureWidget(
+                                  listenable: Listenable.merge(
+                                    [countdownHidden, recordingNotifier],
+                                  ),
+                                  hideCallback: () {
+                                    return !countdownHidden.value ||
+                                        recordingNotifier.value;
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CreateCloseButton(
+                                        onPopInvoked: _onPopInvoked,
+                                      ),
+                                      const CaptureMusicButton(),
+                                      const CaptureShortsDuration(),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -1253,38 +1260,44 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                         controller: dragZoomLevelNotifier,
                       ),
                     ),
-                    HideOnCountdown(
-                      notifier: countdownHidden,
-                      child: HideOnRecording(
-                        notifier: recordingNotifier,
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: CaptureEffects(controller: effectsController),
-                        ),
+                    HideCaptureWidget(
+                      listenable: Listenable.merge(
+                        [countdownHidden, recordingNotifier],
+                      ),
+                      hideCallback: () {
+                        return !countdownHidden.value ||
+                            recordingNotifier.value;
+                      },
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: CaptureEffects(controller: effectsController),
                       ),
                     ),
-                    HideOnCountdown(
-                      notifier: countdownHidden,
-                      child: HideOnRecording(
-                        notifier: recordingNotifier,
-                        child: AnimatedVisibility(
-                          animation: hideAnimation,
-                          alignment: Alignment.bottomCenter,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              AnimatedVisibility(
-                                animation: hideSpeedController,
-                                child: ScaleTransition(
-                                  scale: speedSelectorScaleAnimation,
-                                  child: const CaptureSpeed(),
-                                ),
+                    HideCaptureWidget(
+                      listenable: Listenable.merge(
+                        [countdownHidden, recordingNotifier],
+                      ),
+                      hideCallback: () {
+                        return !countdownHidden.value ||
+                            recordingNotifier.value;
+                      },
+                      child: AnimatedVisibility(
+                        animation: hideAnimation,
+                        alignment: Alignment.bottomCenter,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            AnimatedVisibility(
+                              animation: hideSpeedController,
+                              child: ScaleTransition(
+                                scale: speedSelectorScaleAnimation,
+                                child: const CaptureSpeed(),
                               ),
-                              const SizedBox(height: 36),
-                              const CaptureRecordingControl(),
-                              const SizedBox(height: bottomPadding),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 36),
+                            const CaptureRecordingControl(),
+                            const SizedBox(height: bottomPadding),
+                          ],
                         ),
                       ),
                     ),
@@ -1337,168 +1350,26 @@ class ControlMessageEvent extends StatelessWidget {
   }
 }
 
-class CreateShortsPermissionRequest extends StatelessWidget {
-  const CreateShortsPermissionRequest({
+class HideCaptureWidget extends StatelessWidget {
+  const HideCaptureWidget({
     super.key,
-    this.checking = true,
-  });
-
-  final bool checking;
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        image: checking
-            ? null
-            : const DecorationImage(
-                image: CustomNetworkImage(
-                  'https://images.pexels.com/photos/26221937/pexels-photo-26221937/free-photo-of-a-woman-taking-a-photo.jpeg?auto=compress&cs=tinysrgb&w=600',
-                ),
-                fit: BoxFit.cover,
-              ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const CreateCloseButton(),
-            Expanded(
-              child: Builder(
-                builder: (BuildContext context) {
-                  if (checking) {
-                    return const CheckingPermission();
-                  } else {
-                    return const SizedBox(
-                      width: double.infinity,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Spacer(),
-                          Padding(
-                            padding: EdgeInsets.all(24.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(YTIcons.shorts_outline_outlined, size: 48),
-                                SizedBox(height: 48),
-                                Text(
-                                  'To record, let YouTube access your camera and microphone',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                SizedBox(height: 12),
-                                CreatePermissionReason(
-                                  icon: YTIcons.info_outlined,
-                                  title: 'Why is this needed?',
-                                  subtitle:
-                                      'So you can take photos, record videos, and preview effects',
-                                ),
-                                SizedBox(height: 12),
-                                CreatePermissionReason(
-                                  icon: YTIcons.settings_outlined,
-                                  title: 'You are in control',
-                                  subtitle:
-                                      'Change your permissions any time in Settings',
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 12),
-                          PermissionRequestButton(),
-                          SizedBox(height: 12),
-                        ],
-                      ),
-                    );
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PermissionRequestButton extends StatelessWidget {
-  const PermissionRequestButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final state = ModelBinding.of<CreateCameraState>(context);
-    return GestureDetector(
-      onTap: () async {
-        if (state.permissionsDenied == false) {
-          final state = await CreateCameraState.requestCamera();
-          if (context.mounted) {
-            ModelBinding.update<CreateCameraState>(context, state);
-          }
-        }
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          vertical: 16,
-          horizontal: 12,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(32),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          state.permissionsDenied ? 'Open settings' : 'Continue',
-          style: const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class HideOnRecording extends StatelessWidget {
-  const HideOnRecording({
-    super.key,
-    required this.notifier,
+    required this.listenable,
+    this.hideCallback,
     required this.child,
   });
-  final ValueNotifier<bool> notifier;
-  final Widget child;
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: notifier,
-      builder: (BuildContext context, bool recording, Widget? _) {
-        return Offstage(
-          offstage: recording,
-          child: child,
-        );
-      },
-    );
-  }
-}
 
-class HideOnCountdown extends StatelessWidget {
-  const HideOnCountdown({
-    super.key,
-    required this.notifier,
-    required this.child,
-  });
-  final ValueNotifier<bool> notifier;
+  final Listenable listenable;
   final Widget child;
+  final bool Function()? hideCallback;
+
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: notifier,
-      builder: (BuildContext context, bool hidden, Widget? _) {
+    return ListenableBuilder(
+      listenable: listenable,
+      builder: (BuildContext context, Widget? _) {
+        final hidden = hideCallback?.call() ?? false;
         return Offstage(
-          offstage: hidden == false,
+          offstage: hidden,
           child: child,
         );
       },
@@ -1512,6 +1383,7 @@ class PreExitCaptureOptionsSheet extends ConsumerWidget {
     required this.exit,
     required this.showNavigator,
   });
+
   final VoidCallback exit;
   final VoidCallback showNavigator;
 
@@ -1567,320 +1439,6 @@ class PreExitCaptureOptionsSheet extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class CaptureFilterSelector extends StatelessWidget {
-  const CaptureFilterSelector({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppPalette.black,
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(12),
-        topRight: Radius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  const Text(
-                    'Filter',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: context.pop,
-                    child: Text(
-                      'DONE',
-                      style: TextStyle(
-                        color: context.theme.primaryColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 80,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (BuildContext context, int index) {
-                  return Column(
-                    children: [
-                      const SizedBox(height: 4),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white60,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                          ),
-                          padding: const EdgeInsets.all(12),
-                          child: const Icon(
-                            YTIcons.not_interested_outlined,
-                            size: 32,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'No filter',
-                        style: TextStyle(fontSize: 10.5),
-                      ),
-                    ],
-                  );
-                },
-                itemCount: 20,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class CaptureTimerSelector extends StatelessWidget {
-  const CaptureTimerSelector({super.key, this.onStart});
-  final ValueChanged<int>? onStart;
-
-  @override
-  Widget build(BuildContext context) {
-    final countdowns = [3, 10, 20];
-    int selectedIndex = 0;
-    return Material(
-      color: AppPalette.black,
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(12),
-        topRight: Radius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Text(
-                  'Timer',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                ),
-                const Spacer(),
-                Consumer(
-                  builder: (BuildContext context, WidgetRef ref, Widget? _) {
-                    return GestureDetector(
-                      onTap: () {
-                        ref
-                            .read(shortRecordingProvider.notifier)
-                            .updateCountdownStoppage(null);
-                        context.pop();
-                      },
-                      child: const Icon(
-                        YTIcons.close_outlined,
-                        color: Colors.white70,
-                        size: 20,
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const Text('Countdown'),
-            const SizedBox(height: 8),
-            RangeSelector(
-              initialIndex: selectedIndex,
-              indicatorHeight: 40,
-              backgroundColor: Colors.white12,
-              selectedColor: Colors.white12,
-              itemBuilder: (
-                BuildContext context,
-                int selectedIndex,
-                int index,
-              ) {
-                return Text(
-                  '${countdowns[index]}s',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: AppFont.youTubeSans,
-                  ),
-                );
-              },
-              onChanged: (int index) => selectedIndex = index,
-              itemCount: countdowns.length,
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Drag to change where recording stops',
-              style: TextStyle(fontSize: 15),
-            ),
-            const SizedBox(height: 12),
-            const CountdownRangeSlider(),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () {
-                  onStart?.call(countdowns[selectedIndex]);
-                  context.pop();
-                },
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateColor.resolveWith(
-                    (_) => context.theme.primaryColor,
-                  ),
-                  overlayColor: WidgetStateColor.resolveWith(
-                    (_) => Colors.white12,
-                  ),
-                  textStyle: WidgetStateTextStyle.resolveWith(
-                    (_) => const TextStyle(
-                      fontSize: 15,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                child: const Text(
-                  'START',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class DraftDecision extends StatelessWidget {
-  const DraftDecision({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Material(
-        color: AppPalette.black,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.sizeOf(context).width * .85,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 8),
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Continue your draft video?',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Starting over will discard your last draft.',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => context.pop(true),
-                      child: Text(
-                        'Start over',
-                        style: TextStyle(
-                          color: context.theme.primaryColor,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    TextButton(
-                      onPressed: () => context.pop(false),
-                      child: Text(
-                        'Continue',
-                        style: TextStyle(
-                          color: context.theme.primaryColor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class CountdownRangeSlider extends ConsumerWidget {
-  const CountdownRangeSlider({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final shortsRecording = ref.read(shortRecordingProvider);
-    final start = shortsRecording.duration.inSeconds /
-        shortsRecording.recordDuration.inSeconds;
-
-    const textStyle = TextStyle(fontSize: 14, color: Colors.white24);
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('0s', style: textStyle),
-            Text(
-              '${shortsRecording.recordDuration.inSeconds}s',
-              style: textStyle,
-            ),
-          ],
-        ),
-        OneWayRangeSlider(
-          value: RangeValue(start: start, end: 1),
-          onChanged: (double value) {
-            final milli = shortsRecording.recordDuration.inMilliseconds;
-            final stopMilliseconds = (milli * value).ceil() -
-                shortsRecording.duration.inMilliseconds;
-
-            final duration = Duration(milliseconds: stopMilliseconds);
-
-            ref.read(shortRecordingProvider.notifier).updateCountdownStoppage(
-                  stopMilliseconds == 0 || value == 1 ? null : duration,
-                );
-          },
-        ),
-      ],
     );
   }
 }
