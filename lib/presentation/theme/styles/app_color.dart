@@ -99,14 +99,13 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     Color? primary,
     Color? background,
     Color? shimmer,
-    Color? settingsPopupBackgroundColor,
+    Color? popupBackgroundColor,
   }) {
     return AppColorsExtension(
       primary: primary ?? this.primary,
       background: background ?? this.background,
       shimmer: shimmer ?? this.shimmer,
-      popupBackgroundColor:
-          settingsPopupBackgroundColor ?? this.popupBackgroundColor,
+      popupBackgroundColor: popupBackgroundColor ?? this.popupBackgroundColor,
     );
   }
 

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 import 'package:youtube_clone/presentation/router.dart';
-import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
-import 'package:youtube_clone/presentation/view_models/create/create_short_recording_state.dart';
 
 import '../../provider/media_album_state.dart';
 import '../../provider/short_recording_state.dart';
@@ -113,7 +111,6 @@ class CaptureRecordingControl extends StatelessWidget {
 
 class _CompleteButton extends StatelessWidget {
   const _CompleteButton({
-    super.key,
     required this.isPublishable,
   });
 

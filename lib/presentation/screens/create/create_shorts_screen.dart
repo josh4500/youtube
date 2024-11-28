@@ -39,7 +39,6 @@ import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import 'add_sound_screen.dart';
 import 'provider/current_recording_state.dart';
 import 'provider/index_notifier.dart';
 import 'provider/short_recording_state.dart';
@@ -368,7 +367,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   Future<void> _showDraftDecision() async {
     final hasDraft = ref.read(shortRecordingProvider.notifier).loadDraft();
-    if (hasDraft && context.mounted) {
+    if (hasDraft && mounted) {
       final startOver = await showDialog<bool?>(
         context: context,
         barrierDismissible: false,
@@ -376,7 +375,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       );
       if (startOver != null && startOver) {
         ref.read(shortRecordingProvider.notifier).clear();
-      } else if (context.mounted) {
+      } else if (mounted) {
         CreateNotification(hideNavigator: true).dispatch(context);
       }
     }
@@ -599,7 +598,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   }
 
   void _flipCamera() {
-    final cameraState = ModelBinding.of<CreateCameraState>(context);
+    final cameraState = context.provide<CreateCameraState>();
     final List<CameraDescription> cameras = cameraState.cameras;
 
     if (cameras.length > 1) {

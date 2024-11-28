@@ -228,6 +228,11 @@ class Preferences extends _$Preferences {
     state = state.copyWith(ambientMode: value);
   }
 
+  set voiceSearchLocale(Locale locale) {
+    _voiceSearchLocale.value = locale;
+    state = state.copyWith(voiceSearchLocale: locale);
+  }
+
   void changeRemindForBreak({Duration? frequency, bool? enabled}) {
     if (frequency == null && enabled == null) return;
 
@@ -308,6 +313,7 @@ class Preferences extends _$Preferences {
       dataSavingPreferences: _dataSaving.value,
       autoplay: _autoPlay.value,
       enableDataSaving: _enableDataSaving.value,
+      voiceSearchLocale: _voiceSearchLocale.value,
     );
   }
 }
@@ -331,7 +337,9 @@ class PreferenceState {
     required this.dataSavingPreferences,
     required this.autoplay,
     required this.enableDataSaving,
+    required this.voiceSearchLocale,
   });
+
   final bool ambientMode;
   final ThemeMode themeMode;
   final Locale locale;
@@ -350,6 +358,7 @@ class PreferenceState {
   final DataSavingPreferences dataSavingPreferences;
   final bool autoplay;
   final bool enableDataSaving;
+  final Locale voiceSearchLocale;
 
   PreferenceState copyWith({
     bool? ambientMode,
@@ -369,6 +378,7 @@ class PreferenceState {
     bool? autoplay,
     DataSavingPreferences? dataSavingPreferences,
     bool? enableDataSaving,
+    Locale? voiceSearchLocale,
   }) {
     return PreferenceState(
       ambientMode: ambientMode ?? this.ambientMode,
@@ -391,6 +401,7 @@ class PreferenceState {
           dataSavingPreferences ?? this.dataSavingPreferences,
       autoplay: autoplay ?? this.autoplay,
       enableDataSaving: enableDataSaving ?? this.enableDataSaving,
+      voiceSearchLocale: voiceSearchLocale ?? this.voiceSearchLocale,
     );
   }
 }
