@@ -24,7 +24,7 @@ class VideoDetailsSection extends StatelessWidget {
       child: CustomScrollView(
         physics: physics,
         controller: controller,
-        scrollBehavior: const NoOverScrollGlowBehavior(),
+        scrollBehavior: const NoScrollGlowBehavior(),
         slivers: <Widget>[
           const SliverToBoxAdapter(
             child: Stack(

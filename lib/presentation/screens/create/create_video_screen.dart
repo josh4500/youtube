@@ -42,9 +42,9 @@ class _CreateVideoScreenState extends State<CreateVideoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black38,
-      body: FutureBuilder<bool>(
+    return Material(
+      color: Colors.black38,
+      child: FutureBuilder<bool>(
         initialData: false,
         future: completer.future,
         builder: (

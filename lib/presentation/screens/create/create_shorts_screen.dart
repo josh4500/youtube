@@ -43,6 +43,7 @@ import 'add_sound_screen.dart';
 import 'provider/current_recording_state.dart';
 import 'provider/index_notifier.dart';
 import 'provider/short_recording_state.dart';
+import 'widgets/add_music_button.dart';
 import 'widgets/capture/capture_button.dart';
 import 'widgets/capture/capture_draft_decision.dart';
 import 'widgets/capture/capture_effects.dart';
@@ -78,9 +79,8 @@ class _CreateShortsScreenState extends State<CreateShortsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: FutureBuilder<CreateCameraState>(
+    return Material(
+      child: FutureBuilder<CreateCameraState>(
         initialData: CreateCameraState(hasPermissions: false),
         future: completer.future,
         builder: (
@@ -199,7 +199,14 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     offset: const Offset(0, 52),
   );
 
+  final ValueNotifier<bool> hideEffectsNotifier = ValueNotifier<bool>(false);
+
   BoxConstraints? viewConstraints;
+
+  /// Prevents initializing or disposing camera.
+  ///
+  /// Its changed when on `InitCameraNotification` or DisposeCameraNotification is dispatch.
+  bool _preventInitDispose = false;
 
   @override
   void initState() {
@@ -251,6 +258,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     hideController.dispose();
     hideSpeedController.dispose();
     hideZoomController.dispose();
+
+    hideEffectsNotifier.dispose();
     super.dispose();
   }
 
@@ -278,42 +287,55 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (hasInitCameraNotifier.value == null) {
-      final cameraState = ModelBinding.of<CreateCameraState>(context);
-      if (cameraState.cameras.isNotEmpty) {
-        onNewCameraSelected(cameraState.cameras.first).then((_) {
-          _showDraftDecision();
-        });
-      }
-    }
+    _initCamera(true);
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void _initCamera([bool screenInit = false]) {
     final CameraController? cameraController = controller;
 
     // App state changed before we got the chance to initialize.
-    if (cameraController == null || !cameraController.value.isInitialized) {
-      return;
+    if (cameraController == null ||
+        !cameraController.value.isInitialized ||
+        _preventInitDispose) {
+      if (!screenInit) return;
     }
 
-    if (currentTabIndex != CreateTab.shorts) return;
-
-    if (state == AppLifecycleState.inactive) {
-      hasInitCameraNotifier.value = null;
-      cameraController.dispose();
-
-      _handleFailedRecording();
-    } else if (state == AppLifecycleState.resumed) {
-      if (hasInitCameraNotifier.value == null) {
-        onNewCameraSelected(cameraController.description).then((_) {
+    if (hasInitCameraNotifier.value == null) {
+      final cameraDescription = cameraController?.description ??
+          context.provide<CreateCameraState>().cameras.first;
+      onNewCameraSelected(cameraDescription).then((_) {
+        if (screenInit) {
           // Re-add effects that was previously removed when controller was disposed
           for (final effect in _enabledCaptureEffects) {
             _onUpdateCaptureEffect(effect, true);
           }
-        });
-      }
+        } else {
+          _showDraftDecision();
+        }
+      });
+    }
+  }
 
+  void _disposeCamera() {
+    final CameraController? cameraController = controller;
+    if (cameraController == null ||
+        !cameraController.value.isInitialized ||
+        _preventInitDispose) {
+      return;
+    }
+    hasInitCameraNotifier.value = null;
+    cameraController.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (currentTabIndex != CreateTab.shorts) return;
+
+    if (state == AppLifecycleState.inactive) {
+      _disposeCamera();
+      _handleFailedRecording();
+    } else if (state == AppLifecycleState.resumed) {
+      _initCamera();
       if (_hasFailedRecording) {
         _showErrorSnackbar('Last recording failed.');
       }
@@ -322,22 +344,10 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   @override
   void onIndexChanged(int newIndex) {
-    final CameraController? cameraController = controller;
-
-    // Create tab changed before we got the chance to initialize.
-    if (cameraController == null || !cameraController.value.isInitialized) {
-      return;
-    }
     if (newIndex != CreateTab.shorts.index) {
-      hasInitCameraNotifier.value = null;
-      cameraController.dispose();
+      _disposeCamera();
     } else if (newIndex == CreateTab.shorts.index) {
-      onNewCameraSelected(cameraController.description).then((_) {
-        // Re-add effects that was previously removed when controller was disposed
-        for (final effect in _enabledCaptureEffects) {
-          _onUpdateCaptureEffect(effect, true);
-        }
-      });
+      _initCamera();
     }
   }
 
@@ -604,7 +614,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   Future<void> _showFilterSelector() async {
     hideController.forward();
-    // TODO(josh4500): Hide CaptureEffects widget
+    hideEffectsNotifier.value = true;
     // Hiding widget should use one notifier
     await showModalBottomSheet(
       context: context,
@@ -614,6 +624,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
         return const CaptureFilterSelector();
       },
     );
+    hideEffectsNotifier.value = false;
     hideController.reverse();
   }
 
@@ -827,7 +838,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   ) {
     if (disableDragMode || _guardRecording) return;
 
-    final position = details.localPosition;
+    final position = details.globalPosition;
     final maxHeight = constraints.maxHeight;
 
     recordOuterButtonPosition.value = Offset(
@@ -968,6 +979,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       if (!ref.read(shortRecordingProvider).hasRecordings) {
         CreateNotification(hideNavigator: false).dispatch(context);
       }
+    } else if (notification is InitCameraNotification) {
+      _preventInitDispose = false;
+      _initCamera();
+    } else if (notification is DisposeCameraNotification) {
+      _disposeCamera();
+      _preventInitDispose = true;
     }
     return true;
   }
@@ -1065,7 +1082,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                               child: childWidget!,
                             );
                           },
-                          child: HideCaptureWidget(
+                          child: HiddenListenableWidget(
                             listenable: countdownHidden,
                             hideCallback: () => !countdownHidden.value,
                             child: AnimatedVisibility(
@@ -1101,7 +1118,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                               child: childWidget!,
                             );
                           },
-                          child: HideCaptureWidget(
+                          child: HiddenListenableWidget(
                             listenable: countdownHidden,
                             hideCallback: () => !countdownHidden.value,
                             child: AnimatedVisibility(
@@ -1217,7 +1234,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                               children: [
                                 const CreateProgress(),
                                 const SizedBox(height: 12),
-                                HideCaptureWidget(
+                                HiddenListenableWidget(
                                   listenable: Listenable.merge(
                                     [countdownHidden, recordingNotifier],
                                   ),
@@ -1232,7 +1249,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                                       CreateCloseButton(
                                         onPopInvoked: _onPopInvoked,
                                       ),
-                                      const CaptureMusicButton(),
+                                      const AddMusicButton(),
                                       const CaptureShortsDuration(),
                                     ],
                                   ),
@@ -1260,20 +1277,25 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                         controller: dragZoomLevelNotifier,
                       ),
                     ),
-                    HideCaptureWidget(
+                    HiddenListenableWidget(
                       listenable: Listenable.merge(
-                        [countdownHidden, recordingNotifier],
+                        [
+                          countdownHidden,
+                          recordingNotifier,
+                          hideEffectsNotifier,
+                        ],
                       ),
                       hideCallback: () {
                         return !countdownHidden.value ||
-                            recordingNotifier.value;
+                            recordingNotifier.value ||
+                            hideEffectsNotifier.value;
                       },
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: CaptureEffects(controller: effectsController),
                       ),
                     ),
-                    HideCaptureWidget(
+                    HiddenListenableWidget(
                       listenable: Listenable.merge(
                         [countdownHidden, recordingNotifier],
                       ),
@@ -1312,27 +1334,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   }
 }
 
-class CaptureMusicButton extends StatelessWidget {
-  const CaptureMusicButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomActionChip(
-      title: 'Add sound',
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) => const AddSoundScreen(),
-        );
-      },
-      icon: const Icon(YTIcons.music, size: 18),
-      backgroundColor: Colors.black38,
-      textStyle: const TextStyle(fontSize: 13),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-    );
-  }
-}
-
 class ControlMessageEvent extends StatelessWidget {
   const ControlMessageEvent({super.key, required this.message});
   final String message;
@@ -1346,33 +1347,6 @@ class ControlMessageEvent extends StatelessWidget {
         color: Colors.white60,
         fontWeight: FontWeight.w500,
       ),
-    );
-  }
-}
-
-class HideCaptureWidget extends StatelessWidget {
-  const HideCaptureWidget({
-    super.key,
-    required this.listenable,
-    this.hideCallback,
-    required this.child,
-  });
-
-  final Listenable listenable;
-  final Widget child;
-  final bool Function()? hideCallback;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: listenable,
-      builder: (BuildContext context, Widget? _) {
-        final hidden = hideCallback?.call() ?? false;
-        return Offstage(
-          offstage: hidden,
-          child: child,
-        );
-      },
     );
   }
 }

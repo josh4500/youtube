@@ -111,7 +111,7 @@ class _CustomActionChipState extends State<CustomActionChip>
           child: Container(
             margin: widget.margin,
             padding: widget.padding ?? theme.padding,
-            alignment: widget.alignment,
+            // alignment: widget.alignment,
             decoration: BoxDecoration(
               border: widget.border,
               color: widget.backgroundColor ?? theme.backgroundColor,

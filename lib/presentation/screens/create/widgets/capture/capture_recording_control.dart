@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
+import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/router/app_router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/view_models/create/create_short_recording_state.dart';
 
 import '../../provider/media_album_state.dart';
 import '../../provider/short_recording_state.dart';
+import '../notifications/capture_notification.dart';
 import '../notifications/create_notification.dart';
 
 class CaptureRecordingControl extends StatelessWidget {
@@ -91,19 +95,8 @@ class CaptureRecordingControl extends StatelessWidget {
                       SizedBox(width: 38.w),
                     SizedBox(width: 36.w),
                     if (timelineState.hasRecordings)
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: timelineState.isPublishable
-                              ? Colors.white
-                              : Colors.white24,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          YTIcons.check_outlined,
-                          color: Colors.black,
-                          size: 32,
-                        ),
+                      _CompleteButton(
+                        isPublishable: timelineState.isPublishable,
                       )
                     else
                       SizedBox(width: 38.w),
@@ -113,6 +106,42 @@ class CaptureRecordingControl extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CompleteButton extends StatelessWidget {
+  const _CompleteButton({
+    super.key,
+    required this.isPublishable,
+  });
+
+  final bool isPublishable;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        if (isPublishable) {
+          DisposeCameraNotification().dispatch(context);
+          await context.goto(AppRoutes.shortsEditor);
+          if (context.mounted) {
+            InitCameraNotification().dispatch(context);
+          }
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: isPublishable ? Colors.white : Colors.white24,
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(
+          YTIcons.check_outlined,
+          color: Colors.black,
+          size: 32,
+        ),
       ),
     );
   }

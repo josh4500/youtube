@@ -173,6 +173,11 @@ abstract class AppRoutes {
     path: '/create',
   );
 
+  static final RouteInfo shortsEditor = RouteInfo(
+    name: 'shorts-editor',
+    path: 'shorts-editor',
+  );
+
   ///
   ///
   /// Comments

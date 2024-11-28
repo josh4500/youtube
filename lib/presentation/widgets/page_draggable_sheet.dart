@@ -268,7 +268,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
       child: Material(
         borderRadius: widget.borderRadius,
         child: ScrollConfiguration(
-          behavior: const NoOverScrollGlowBehavior(),
+          behavior: const NoScrollGlowBehavior(),
           child: CustomScrollView(
             controller: widget.controller,
             slivers: <Widget>[
@@ -641,9 +641,7 @@ class StackedPageDraggable extends StatefulWidget {
 
 class _StackedPageDraggableState extends State<StackedPageDraggable> {
   final _History _history = _History();
-  final GlobalKey<OverlayState> _overlayKey = GlobalKey();
-
-  OverlayState get _overlayState => _overlayKey.currentState!;
+  OverlayState get _overlayState => Overlay.of(context);
 
   @override
   void dispose() {
@@ -652,14 +650,7 @@ class _StackedPageDraggableState extends State<StackedPageDraggable> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Overlay(
-      key: _overlayKey,
-      initialEntries: [
-        OverlayEntry(builder: (BuildContext context) => widget.child),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => widget.child;
 
   void openBottomSheet(Object key, PageDraggableBuilder builder) {
     final controller = DraggableScrollableController();

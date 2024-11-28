@@ -102,12 +102,14 @@ class VideoEffectOptions extends StatefulWidget {
     this.items = const <EffectOption>[],
     this.labelGetter,
     this.onOpenChanged,
+    this.maxShowMore = 4,
   });
 
   final EffectController? controller;
   final List<EffectOption> items;
   final ValueChanged<bool>? onOpenChanged;
   final String Function(Enum enumValue)? labelGetter;
+  final int maxShowMore;
 
   @override
   State<VideoEffectOptions> createState() => _VideoEffectOptionsState();
@@ -119,7 +121,7 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
   late final Animation<double> animation;
   final ValueNotifier<bool> _showLabelNotifier = ValueNotifier<bool>(true);
   Timer? initialShowTimer;
-  static const int maxInitialShown = 4;
+  int get maxShowMore => widget.maxShowMore;
 
   @override
   void initState() {
@@ -159,7 +161,7 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
 
   void openOrCloseCallback() {
     initialShowTimer?.cancel();
-    if (widget.items.length > maxInitialShown) {
+    if (widget.items.length > maxShowMore) {
       final isExpanded = widget.controller!.isOpened;
       _showLabelNotifier.value = isExpanded;
 
@@ -219,7 +221,7 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             for (int i = 0;
-                                i < maxInitialShown && i < widget.items.length;
+                                i < maxShowMore && i < widget.items.length;
                                 i++)
                               GestureDetector(
                                 onTap: () => effectiveSelectItem(
@@ -237,16 +239,16 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
                               ),
                           ],
                         ),
-                        if (widget.items.length > maxInitialShown) ...[
+                        if (widget.items.length > maxShowMore) ...[
                           SizeTransition(
                             sizeFactor: animation,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: List.generate(
-                                widget.items.length - maxInitialShown,
+                                widget.items.length - maxShowMore,
                                 (int index) {
                                   final item =
-                                      widget.items[maxInitialShown + index];
+                                      widget.items[maxShowMore + index];
                                   return GestureDetector(
                                     onTap: () => effectiveSelectItem(item),
                                     child: Container(
@@ -295,7 +297,7 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
                 children: [
                   Column(
                     children: [
-                      for (int i = 0; i < maxInitialShown; i++)
+                      for (int i = 0; i < maxShowMore; i++)
                         EffectWidget(
                           item: widget.items[i],
                           margin: itemVerticalMargin,
@@ -303,12 +305,12 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
                         ),
                     ],
                   ),
-                  if (widget.items.length > maxInitialShown) ...[
+                  if (widget.items.length > maxShowMore) ...[
                     SizeTransition(
                       sizeFactor: animation,
                       child: Column(
                         children: [
-                          for (int i = maxInitialShown;
+                          for (int i = maxShowMore;
                               i < widget.items.length;
                               i++)
                             EffectWidget(

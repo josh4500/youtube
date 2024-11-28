@@ -45,7 +45,7 @@ class SearchSuggestions extends StatelessWidget {
               },
             );
           },
-          itemCount: 9,
+          itemCount: 20,
         );
       },
     );

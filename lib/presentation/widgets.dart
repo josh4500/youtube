@@ -57,6 +57,9 @@ export 'widgets/gestures/custom_ink_well.dart';
 export 'widgets/gestures/tappable_area.dart';
 
 export 'widgets/grouped_view_builder.dart';
+
+export 'widgets/hidden.dart';
+
 export 'widgets/image_from_asset.dart';
 export 'widgets/info_buttons.dart';
 export 'widgets/lazy_indexed_stack.dart';
@@ -85,8 +88,8 @@ export 'widgets/player/playback/playback_view.dart';
 
 export 'widgets/popup_container.dart';
 
-export 'widgets/range_slider.dart';
 export 'widgets/range_selector.dart';
+export 'widgets/range_slider.dart';
 export 'widgets/reply_tile.dart';
 export 'widgets/roulette_scroll.dart';
 export 'widgets/slidable.dart';

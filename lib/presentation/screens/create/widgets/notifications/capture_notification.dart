@@ -20,6 +20,10 @@ class StartCountdownNotification extends CaptureNotification {
 
 class StopCountdownNotification extends CaptureNotification {}
 
+class InitCameraNotification extends CaptureNotification {}
+
+class DisposeCameraNotification extends CaptureNotification {}
+
 class UpdateStopTimerNotification extends CaptureNotification {
   UpdateStopTimerNotification({this.duration});
 

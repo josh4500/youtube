@@ -12,35 +12,55 @@ class CreateLiveScreen extends StatelessWidget {
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
-            const SizedBox(height: 40),
-            const Text(
-              'Eligibility',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
+            const Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      // 'Eligibility',
+                      'Almost there!',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(12.0),
+                      child: Text(
+                        'Try creating more Shorts to reach 50 subscribers and unlock live streaming',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const Spacer(),
             CustomActionChip(
               onTap: () {},
-              title: 'OK',
+              title: 'Create Shorts',
               backgroundColor: Colors.white,
               textStyle: TextStyle(
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: context.theme.colorScheme.inverseSurface,
               ),
               alignment: Alignment.center,
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             CustomActionChip(
               onTap: () {},
               title: 'Learn More',
               alignment: Alignment.center,
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
               textStyle: TextStyle(
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: context.theme.colorScheme.surface,
               ),

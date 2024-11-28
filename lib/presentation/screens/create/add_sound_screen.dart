@@ -247,8 +247,8 @@ class _SoundTileState extends State<SoundTile>
         child: Row(
           children: [
             Container(
-              width: 56.w,
-              height: 56.h,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
                 color: Colors.grey,
                 borderRadius: BorderRadius.circular(4),

@@ -32,6 +32,7 @@ class _CreateScreenState extends State<CreateScreen>
     vsync: this,
     duration: const Duration(milliseconds: 300),
   );
+  late final ValueNotifier<bool> collapseNotifier = ValueNotifier<bool>(false);
   final Gradient _overflowShader = const LinearGradient(
     stops: [0, .4, .6, 1],
     colors: <Color>[
@@ -51,6 +52,7 @@ class _CreateScreenState extends State<CreateScreen>
   void dispose() {
     SystemChrome.setPreferredOrientations(DeviceOrientation.values);
     controller.dispose();
+    collapseNotifier.dispose();
     hideNController.dispose();
     indexNotifier.dispose();
     super.dispose();
@@ -76,6 +78,7 @@ class _CreateScreenState extends State<CreateScreen>
                     } else {
                       hideNController.reverse();
                     }
+                    // collapseNotifier.value = notification.collapseNavigator;
                     return true;
                   },
                   child: ModelBinding<IndexNotifier>(
@@ -99,89 +102,97 @@ class _CreateScreenState extends State<CreateScreen>
               ),
               ColoredBox(
                 color: Colors.black,
-                child: ShaderMask(
-                  shaderCallback: _overflowShader.createShader,
-                  child: SizedBox(
-                    height: 88,
-                    width: double.infinity,
-                    child: AnimatedVisibility(
-                      animation: ReverseAnimation(hideNController),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 16,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white24,
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            child: Opacity(
-                              opacity: 0,
-                              child: ListenableBuilder(
-                                listenable: indexNotifier,
-                                builder: (BuildContext context, Widget? _) {
-                                  final index = indexNotifier.currentIndex;
-                                  return Text(
-                                    CreateTab.values[index].name,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
+                child: ValueListenableBuilder(
+                  valueListenable: collapseNotifier,
+                  builder: (BuildContext context, bool collapse, Widget? _) {
+                    if (collapse) return const SizedBox();
+                    return ShaderMask(
+                      shaderCallback: _overflowShader.createShader,
+                      child: SizedBox(
+                        height: 88,
+                        width: double.infinity,
+                        child: AnimatedVisibility(
+                          animation: ReverseAnimation(hideNController),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 16,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white24,
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                                child: Opacity(
+                                  opacity: 0,
+                                  child: ListenableBuilder(
+                                    listenable: indexNotifier,
+                                    builder: (BuildContext context, Widget? _) {
+                                      final index = indexNotifier.currentIndex;
+                                      return Text(
+                                        CreateTab.values[index].name,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                              PageView.builder(
+                                controller: controller,
+                                onPageChanged: onPageChangeCallback,
+                                itemCount: CreateTab.values.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return GestureDetector(
+                                    onTap: () => controller.animateToPage(
+                                      index,
+                                      duration:
+                                          const Duration(milliseconds: 250),
+                                      curve: Curves.easeInToLinear,
+                                    ),
+                                    child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                          horizontal: 16,
+                                        ),
+                                        child: ListenableBuilder(
+                                          listenable: indexNotifier,
+                                          builder: (
+                                            BuildContext context,
+                                            Widget? _,
+                                          ) {
+                                            return FittedBox(
+                                              child: Text(
+                                                CreateTab.values[index].name,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: index ==
+                                                          indexNotifier
+                                                              .currentIndex
+                                                      ? Colors.white
+                                                      : Colors.grey,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
                                     ),
                                   );
                                 },
                               ),
-                            ),
+                            ],
                           ),
-                          PageView.builder(
-                            controller: controller,
-                            onPageChanged: onPageChangeCallback,
-                            itemCount: CreateTab.values.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return GestureDetector(
-                                onTap: () => controller.animateToPage(
-                                  index,
-                                  duration: const Duration(milliseconds: 250),
-                                  curve: Curves.easeInToLinear,
-                                ),
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 10,
-                                      horizontal: 16,
-                                    ),
-                                    child: ListenableBuilder(
-                                      listenable: indexNotifier,
-                                      builder: (
-                                        BuildContext context,
-                                        Widget? _,
-                                      ) {
-                                        return FittedBox(
-                                          child: Text(
-                                            CreateTab.values[index].name,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: index ==
-                                                      indexNotifier.currentIndex
-                                                  ? Colors.white
-                                                  : Colors.grey,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ),
             ],

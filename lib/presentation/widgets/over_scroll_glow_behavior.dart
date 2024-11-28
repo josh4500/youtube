@@ -54,36 +54,8 @@ class OverScrollGlowBehavior extends ScrollBehavior {
         return GlowingOverscrollIndicator(
           showLeading: enabled,
           showTrailing: enabled,
-          axisDirection: AxisDirection.down,
+          axisDirection: details.direction,
           color: color,
-          child: child,
-        );
-    }
-  }
-}
-
-class NoOverScrollGlowBehavior extends ScrollBehavior {
-  const NoOverScrollGlowBehavior();
-
-  @override
-  Widget buildOverscrollIndicator(
-    BuildContext context,
-    Widget child,
-    ScrollableDetails details,
-  ) {
-    switch (getPlatform(context)) {
-      case TargetPlatform.iOS:
-        return child;
-      case TargetPlatform.android ||
-            TargetPlatform.fuchsia ||
-            TargetPlatform.linux ||
-            TargetPlatform.macOS ||
-            TargetPlatform.windows:
-        return GlowingOverscrollIndicator(
-          showLeading: false,
-          showTrailing: false,
-          axisDirection: AxisDirection.down,
-          color: Colors.transparent,
           child: child,
         );
     }
