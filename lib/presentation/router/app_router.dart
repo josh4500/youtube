@@ -514,7 +514,7 @@ class AppRouter {
             path: AppRoutes.shortsEditor.path,
             pageBuilder: (BuildContext context, GoRouterState state) {
               return const NoTransitionPage(
-                child: ShortsEditorScreen(),
+                child: EditorScreen(),
               );
             },
           ),

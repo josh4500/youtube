@@ -5,30 +5,26 @@ const double kRecordButtonStrokeWidth = 4;
 const double kRecordOuterButtonSize = 66.0;
 const double kRecordInnerButtonSize = 55.5;
 
-class CaptureDragZoomButton extends StatelessWidget {
-  const CaptureDragZoomButton({
+class RecordDragButton extends StatelessWidget {
+  const RecordDragButton({
     super.key,
     required this.animation,
     required this.isRecording,
-    required this.isDragging,
+    this.isDragging = false,
   });
-  final AnimationController animation;
+  final Animation animation;
   final bool isRecording;
   final bool isDragging;
 
   @override
   Widget build(BuildContext context) {
-    final sizeAnimation = CurvedAnimation(
-      parent: animation,
-      curve: Curves.easeInCubic,
-    );
     return AnimatedBuilder(
-      animation: sizeAnimation,
+      animation: animation,
       builder: (BuildContext context, Widget? _) {
         return CustomPaint(
           size: const Size.square(kRecordOuterButtonSize),
           foregroundPainter: CircledButton(
-            sizeFactor: sizeAnimation.value,
+            sizeFactor: animation.value,
             scale: isDragging ? 1.35 : 1.15,
             color: isRecording ? const Color(0xFFFF0000) : Colors.white,
           ),
@@ -103,8 +99,8 @@ class CircledButton extends CustomPainter {
   }
 }
 
-class CaptureButton extends StatelessWidget {
-  const CaptureButton({super.key, required this.isRecording});
+class RecordButton extends StatelessWidget {
+  const RecordButton({super.key, this.isRecording = false});
 
   final bool isRecording;
 
@@ -113,9 +109,8 @@ class CaptureButton extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       margin: EdgeInsets.all(isRecording ? 12 : 0),
-      width: isRecording ? kRecordInnerButtonSize - 24 : kRecordInnerButtonSize,
-      height:
-          isRecording ? kRecordInnerButtonSize - 24 : kRecordInnerButtonSize,
+      width: isRecording ? kRecordInnerButtonSize / 2 : kRecordInnerButtonSize,
+      height: isRecording ? kRecordInnerButtonSize / 2 : kRecordInnerButtonSize,
       decoration: BoxDecoration(
         color: const Color(0xFFFF0000),
         borderRadius: BorderRadius.circular(

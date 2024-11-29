@@ -12,22 +12,20 @@ class AddSoundScreen extends StatelessWidget {
     final List<String> tabs = ['Browse', 'Saved'];
     return Scaffold(
       appBar: AppBar(
-        leading: InkWell(
-          onTap: context.pop,
-          splashFactory: NoSplash.splashFactory,
-          child: const Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 8.0,
-              horizontal: 12,
-            ),
-            child: Icon(
+        leading: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: CustomInkWell(
+            onTap: context.pop,
+            splashFactory: NoSplash.splashFactory,
+            padding: const EdgeInsets.all(8),
+            borderRadius: BorderRadius.circular(24),
+            child: const Icon(
               YTIcons.close_outlined,
               size: 20,
               color: Colors.white70,
             ),
           ),
         ),
-        leadingWidth: 28,
         title: const Text(
           'Sounds',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),

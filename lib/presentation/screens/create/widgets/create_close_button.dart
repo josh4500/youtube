@@ -4,8 +4,9 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class CreateCloseButton extends StatelessWidget {
-  const CreateCloseButton({super.key, this.onPopInvoked});
+  const CreateCloseButton({super.key, this.icon, this.onPopInvoked});
   final bool Function()? onPopInvoked;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +16,7 @@ class CreateCloseButton extends StatelessWidget {
         if (onPopInvoked != null) shouldPop = onPopInvoked!();
         if (shouldPop) context.pop();
       },
+      borderRadius: BorderRadius.circular(24),
       splashFactory: NoSplash.splashFactory,
       child: Container(
         padding: const EdgeInsets.all(10),
@@ -22,8 +24,8 @@ class CreateCloseButton extends StatelessWidget {
           color: Colors.black38,
           shape: BoxShape.circle,
         ),
-        child: const Icon(
-          YTIcons.close_outlined,
+        child: Icon(
+          icon ?? YTIcons.close_outlined,
           color: Colors.white,
           size: 22,
         ),

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets/sheet_drag_indicator.dart';
 
-class CaptureFilterSelector extends StatelessWidget {
-  const CaptureFilterSelector({super.key});
+class FilterSelector extends StatelessWidget {
+  const FilterSelector({super.key, this.isEditing = false});
+  final bool isEditing;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppPalette.black,
+      color: isEditing ? Colors.black : AppPalette.black,
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(12),
         topRight: Radius.circular(12),
@@ -18,8 +20,15 @@ class CaptureFilterSelector extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (isEditing) ...[
+              const SizedBox(height: 8),
+              const SheetDragIndicator(),
+            ],
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.symmetric(
+                vertical: isEditing ? 2 : 8,
+                horizontal: 8.0,
+              ),
               child: Row(
                 children: [
                   const Text(
@@ -27,15 +36,24 @@ class CaptureFilterSelector extends StatelessWidget {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                   ),
                   const Spacer(),
-                  GestureDetector(
-                    onTap: context.pop,
-                    child: Text(
-                      'DONE',
-                      style: TextStyle(
-                        color: context.theme.primaryColor,
+                  if (isEditing)
+                    GestureDetector(
+                      onTap: context.pop,
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(YTIcons.check_outlined),
+                      ),
+                    )
+                  else
+                    GestureDetector(
+                      onTap: context.pop,
+                      child: Text(
+                        'DONE',
+                        style: TextStyle(
+                          color: context.theme.primaryColor,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),

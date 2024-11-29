@@ -417,7 +417,7 @@ class _EffectWidgetState extends State<EffectWidget>
     return CustomActionChip(
       onTap: handleTap,
       margin: widget.margin,
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.all(4),
       icon: Builder(
         builder: (BuildContext context) {
           if (widget.item.animation == EffectTapAnimation.rotate) {
@@ -433,7 +433,7 @@ class _EffectWidgetState extends State<EffectWidget>
                   child: childWidget,
                 );
               },
-              child: Icon(widget.item.icon, size: 24),
+              child: Icon(widget.item.icon, size: 18),
             );
           }
 
@@ -444,7 +444,7 @@ class _EffectWidgetState extends State<EffectWidget>
                 active
                     ? widget.item.activeIcon ?? widget.item.icon
                     : widget.item.icon,
-                size: 24,
+                size: 18,
               );
             },
           );

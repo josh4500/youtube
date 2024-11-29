@@ -43,10 +43,8 @@ import 'provider/current_recording_state.dart';
 import 'provider/index_notifier.dart';
 import 'provider/short_recording_state.dart';
 import 'widgets/add_music_button.dart';
-import 'widgets/capture/capture_button.dart';
 import 'widgets/capture/capture_draft_decision.dart';
 import 'widgets/capture/capture_effects.dart';
-import 'widgets/capture/capture_filter_selector.dart';
 import 'widgets/capture/capture_focus_indicator.dart';
 import 'widgets/capture/capture_permission_request.dart';
 import 'widgets/capture/capture_recording_control.dart';
@@ -56,8 +54,10 @@ import 'widgets/capture/capture_timer_selector.dart';
 import 'widgets/capture/capture_zoom_indicator.dart';
 import 'widgets/create_close_button.dart';
 import 'widgets/create_progress.dart';
+import 'widgets/filter_selector.dart';
 import 'widgets/notifications/capture_notification.dart';
 import 'widgets/notifications/create_notification.dart';
+import 'widgets/record_button.dart';
 import 'widgets/video_effect_options.dart';
 
 class CreateShortsScreen extends StatefulWidget {
@@ -620,7 +620,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       isDismissible: false,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return const CaptureFilterSelector();
+        return const FilterSelector();
       },
     );
     hideEffectsNotifier.value = false;
@@ -1090,8 +1090,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                               child: ListenableBuilder(
                                 listenable: recordingNotifier,
                                 builder: (BuildContext context, Widget? _) {
-                                  return CaptureDragZoomButton(
-                                    animation: recordOuterButtonController,
+                                  final sizeAnimation = CurvedAnimation(
+                                    parent: recordOuterButtonController,
+                                    curve: Curves.easeInCubic,
+                                  );
+                                  return RecordDragButton(
+                                    animation: sizeAnimation,
                                     isDragging: dragRecordNotifier.value,
                                     isRecording: recordingNotifier.value,
                                   );
@@ -1150,7 +1154,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                                     ],
                                   ),
                                   builder: (BuildContext context, Widget? _) {
-                                    return CaptureButton(
+                                    return RecordButton(
                                       isRecording: recordingNotifier.value &&
                                           !dragRecordNotifier.value,
                                     );
