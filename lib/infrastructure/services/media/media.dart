@@ -20,6 +20,7 @@ extension MediaTypeExtension on List<MediaType> {
 class MediaAlbum extends AssetPathEntity {
   MediaAlbum({
     required this.count,
+    required this.videoCount,
     required this.thumbAsset,
     required super.id,
     required super.name,
@@ -35,6 +36,7 @@ class MediaAlbum extends AssetPathEntity {
 
   final int count;
   final MediaFile thumbAsset;
+  final int videoCount;
 
   @override
   bool operator ==(Object other) =>

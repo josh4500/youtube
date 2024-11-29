@@ -1,4 +1,6 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/infrastructure/services/media/media.dart';
 
 class MediaDiscovery {
@@ -16,6 +18,9 @@ class MediaDiscovery {
     final paths = await PhotoManager.getAssetPathList(
       type: types.toRequestType,
     );
+    final videoPaths = await PhotoManager.getAssetPathList(
+      type: RequestType.video,
+    );
     return <MediaAlbum>[
       for (final path in paths)
         MediaAlbum(
@@ -30,6 +35,10 @@ class MediaDiscovery {
           isAll: path.isAll,
           lastModified: path.lastModified,
           count: await path.assetCountAsync,
+          videoCount: await videoPaths
+                  .firstWhereOrNull((videoPath) => videoPath.id == path.id)
+                  ?.assetCountAsync ??
+              0,
           thumbAsset: MediaFile.fromAssetEntity(
             (await path.getAssetListRange(start: 0, end: 1)).first,
           ),
@@ -49,7 +58,7 @@ class MediaDiscovery {
     return Future.value(
       MediaFileQueryResult(
         files: entities.map(MediaFile.fromAssetEntity).toList(),
-        hasMore: false,
+        hasMore: album.count > 1000,
       ),
     );
   }

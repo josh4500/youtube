@@ -11,7 +11,8 @@ import '../provider/media_files_state.dart';
 import 'create_close_button.dart';
 
 class AlbumSelector extends ConsumerWidget {
-  const AlbumSelector({super.key});
+  const AlbumSelector({super.key, this.videoOnly = true});
+  final bool videoOnly;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,6 +54,9 @@ class AlbumSelector extends ConsumerWidget {
                   delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
                       final MediaAlbum album = albums[index];
+                      if (album.videoCount <= 0 && videoOnly) {
+                        return const SizedBox();
+                      }
                       return InkWell(
                         onTap: () {
                           ref
@@ -91,7 +95,9 @@ class AlbumSelector extends ConsumerWidget {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      album.count.toString(),
+                                      videoOnly
+                                          ? album.videoCount.toString()
+                                          : album.count.toString(),
                                       style: const TextStyle(
                                         color: Colors.grey,
                                       ),
@@ -115,4 +121,61 @@ class AlbumSelector extends ConsumerWidget {
       },
     );
   }
+}
+
+class AlbumSelectorButton extends ConsumerWidget {
+  const AlbumSelectorButton({super.key, this.videoOnly = true});
+  final bool videoOnly;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentAlbum = ref.watch(mediaAlbumStateProvider).value?.selected;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => showAlbumSelector(
+        context,
+        videoOnly: videoOnly,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(
+              currentAlbum?.name ?? 'No album',
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.fade,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          SizedBox(width: 8.w),
+          const RotatedBox(
+            quarterTurns: 1,
+            child: Icon(Icons.chevron_right_rounded),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+void showAlbumSelector(BuildContext context, {bool videoOnly = true}) {
+  showModalBottomSheet(
+    context: context,
+    enableDrag: false,
+    useSafeArea: true,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    constraints: const BoxConstraints.expand(),
+    sheetAnimationStyle: AnimationStyle(
+      curve: Curves.easeInCubic,
+      duration: const Duration(milliseconds: 300),
+    ),
+    builder: (BuildContext context) {
+      return AlbumSelector(videoOnly: videoOnly);
+    },
+  );
 }

@@ -125,7 +125,6 @@ class _EditorTextInputState extends State<EditorTextInput> {
                         controller: textController,
                         textAlign: textAlign,
                         cursorColor: Colors.white,
-                        //expands: true,
                         maxLines: null,
                         decoration: const InputDecoration.collapsed(
                           hintText: '',

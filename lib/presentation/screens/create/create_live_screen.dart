@@ -44,6 +44,7 @@ class CreateLiveScreen extends StatelessWidget {
             CustomActionChip(
               onTap: () {},
               title: 'Create Shorts',
+              expanded: true,
               backgroundColor: Colors.white,
               textStyle: TextStyle(
                 fontSize: 14,
@@ -57,6 +58,7 @@ class CreateLiveScreen extends StatelessWidget {
             CustomActionChip(
               onTap: () {},
               title: 'Learn More',
+              expanded: true,
               alignment: Alignment.center,
               padding: const EdgeInsets.all(8),
               textStyle: TextStyle(

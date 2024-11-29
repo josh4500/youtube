@@ -5,17 +5,17 @@ import 'package:media_kit/media_kit.dart' as mkit;
 import 'package:media_kit_video/media_kit_video.dart' as mkit_video;
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
-import 'package:youtube_clone/core/utils/duration.dart';
 
+import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/infrastructure.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import 'create_close_button.dart';
+import '../create_close_button.dart';
 
-class CreateMediaPreview extends StatelessWidget {
-  const CreateMediaPreview({super.key});
+class MediaPreview extends StatelessWidget {
+  const MediaPreview({super.key});
 
   @override
   Widget build(BuildContext context) {

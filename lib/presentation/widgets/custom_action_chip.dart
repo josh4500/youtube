@@ -46,6 +46,7 @@ class CustomActionChip extends StatefulWidget {
     this.title,
     this.onLongPress,
     this.padEnd = false,
+    this.expanded = false,
   });
   final String? title;
   final Widget? icon;
@@ -60,6 +61,7 @@ class CustomActionChip extends StatefulWidget {
   final VoidCallback? onLongPress;
   final VoidCallback? onTapCancel;
   final bool padEnd;
+  final bool expanded;
 
   @override
   State<CustomActionChip> createState() => _CustomActionChipState();
@@ -90,7 +92,7 @@ class _CustomActionChipState extends State<CustomActionChip>
   Widget build(BuildContext context) {
     final CustomActionChipStyle theme =
         context.theme.appStyles.customActionChipStyle;
-    return Listener(
+    final child = Listener(
       behavior: HitTestBehavior.opaque,
       onPointerHover: (_) {
         controller.forward();
@@ -138,5 +140,8 @@ class _CustomActionChipState extends State<CustomActionChip>
         ),
       ),
     );
+    return widget.expanded
+        ? SizedBox(width: double.infinity, child: child)
+        : child;
   }
 }

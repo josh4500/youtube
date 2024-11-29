@@ -6,6 +6,8 @@ import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../provider/media_album_state.dart';
 import '../../provider/short_recording_state.dart';
+import '../album_selector.dart';
+import '../media/media_selector.dart';
 import '../notifications/capture_notification.dart';
 import '../notifications/create_notification.dart';
 
@@ -24,20 +26,23 @@ class CaptureRecordingControl extends StatelessWidget {
               if (album == null) {
                 return const Icon(YTIcons.image_outlined, size: 40);
               }
-              return Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white12,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white, width: 2),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: AssetEntityImage(
-                    album.thumbAsset,
-                    fit: BoxFit.cover,
-                    isOriginal: false, // Defaults to `true`.
+              return GestureDetector(
+                onTap: () => showMediaSelector(context, videoOnly: false),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white12,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: AssetEntityImage(
+                      album.thumbAsset,
+                      fit: BoxFit.cover,
+                      isOriginal: false, // Defaults to `true`.
+                    ),
                   ),
                 ),
               );

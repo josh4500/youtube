@@ -3,20 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
-import 'package:youtube_clone/core/utils/duration.dart';
-import 'package:youtube_clone/infrastructure.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import 'provider/media_album_state.dart';
-import 'provider/media_files_state.dart';
-import 'widgets/album_selector.dart';
 import 'widgets/check_permission.dart';
 import 'widgets/create_close_button.dart';
-import 'widgets/create_media_preview.dart';
 import 'widgets/create_permission_reason.dart';
+import 'widgets/media/media_selector.dart';
 
 Future<bool> _checkMediaStoragePerm() async {
   final PermissionState ps = await PhotoManager.requestPermissionExtend();
@@ -56,7 +50,7 @@ class _CreateVideoScreenState extends State<CreateVideoScreen> {
             child: Builder(
               builder: (BuildContext context) {
                 if (hasPermissions) {
-                  return const SelectMediaView();
+                  return const MediaSelector();
                 }
 
                 return MediaStoragePermissionRequest(
@@ -67,48 +61,6 @@ class _CreateVideoScreenState extends State<CreateVideoScreen> {
           );
         },
       ),
-    );
-  }
-}
-
-class SelectMediaView extends StatelessWidget {
-  const SelectMediaView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
-          child: Row(
-            children: [
-              const Expanded(child: AlbumSelectorButton()),
-              SizedBox(width: 24.w),
-              const CreateCloseButton(),
-            ],
-          ),
-        ),
-        Expanded(
-          child: ScrollConfiguration(
-            behavior: const OverScrollGlowBehavior(enabled: false),
-            child: Consumer(
-              builder: (BuildContext context, WidgetRef ref, Widget? _) {
-                final files = ref.watch(mediaFilesStateProvider).value;
-                if (files == null) return const SizedBox();
-                return GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                  ),
-                  itemBuilder: (BuildContext context, int index) {
-                    return AssetThumbnail(media: files[index]);
-                  },
-                  itemCount: files.length,
-                );
-              },
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
@@ -170,7 +122,7 @@ class MediaStoragePermissionRequest extends StatelessWidget {
                                 icon: YTIcons.info_outlined,
                                 title: 'Why is this needed?',
                                 subtitle:
-                                    'So you can import photos and videos from your gallary',
+                                    'So you can import photos and videos from your gallery',
                               ),
                               SizedBox(height: 12),
                               CreatePermissionReason(
@@ -224,132 +176,6 @@ class MediaStoragePermissionRequest extends StatelessWidget {
                 }
               },
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class AssetThumbnail extends StatefulWidget {
-  const AssetThumbnail({super.key, required this.media});
-
-  final MediaFile media;
-
-  @override
-  State<AssetThumbnail> createState() => _AssetThumbnailState();
-}
-
-class _AssetThumbnailState extends State<AssetThumbnail> {
-  Future<void> handleLongPress() async {
-    await showGeneralDialog(
-      context: context,
-      barrierLabel: '${widget.media.title ?? 'File'} preview',
-      barrierDismissible: true,
-      pageBuilder: (
-        BuildContext context,
-        Animation<double> animation,
-        Animation<double> _,
-      ) {
-        final forwardPosition = Tween<Offset>(
-          begin: const Offset(0, .2),
-          end: Offset.zero,
-        ).animate(animation);
-        final reversePosition = Tween<Offset>(
-          begin: const Offset(0, .5),
-          end: Offset.zero,
-        ).animate(animation);
-        return SlideTransition(
-          position: animation.status == AnimationStatus.forward
-              ? forwardPosition
-              : reversePosition,
-          child: ModelBinding<MediaFile>(
-            model: widget.media,
-            child: const CreateMediaPreview(),
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: handleLongPress,
-      child: Stack(
-        children: [
-          AssetEntityImage(
-            widget.media,
-            fit: BoxFit.cover,
-            height: double.infinity,
-            width: double.infinity,
-            isOriginal: false, // Defaults to `true`.
-          ),
-          if (widget.media.duration > 0)
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  widget.media.videoDuration.hoursMinutesSeconds,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class AlbumSelectorButton extends ConsumerWidget {
-  const AlbumSelectorButton({super.key});
-
-  void showDraggableBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      enableDrag: false,
-      useSafeArea: true,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      constraints: const BoxConstraints.expand(),
-      sheetAnimationStyle: AnimationStyle(
-        curve: Curves.easeInCubic,
-        duration: const Duration(milliseconds: 300),
-      ),
-      builder: (BuildContext context) {
-        return const AlbumSelector();
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentAlbum = ref.watch(mediaAlbumStateProvider).value?.selected;
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        showDraggableBottomSheet(context);
-      },
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: Text(
-              currentAlbum?.name ?? 'No album',
-              maxLines: 1,
-              softWrap: false,
-              overflow: TextOverflow.fade,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          SizedBox(width: 8.w),
-          const RotatedBox(
-            quarterTurns: 1,
-            child: Icon(Icons.chevron_right_rounded),
           ),
         ],
       ),

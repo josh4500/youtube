@@ -23,7 +23,7 @@ class MediaAlbumSelector {
   int get hashCode => albums.hashCode ^ selected.hashCode;
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class MediaAlbumState extends _$MediaAlbumState {
   final _cache = SharedPrefProvider<MediaAlbum>('media_album_state');
   late final _selectedMediaAlbum = ReadWriteValue<MediaAlbum?>(
