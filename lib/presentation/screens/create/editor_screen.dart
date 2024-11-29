@@ -7,6 +7,7 @@ import 'widgets/create_close_button.dart';
 import 'widgets/editor/editor_effects.dart';
 import 'widgets/editor/editor_nav_buttons.dart';
 import 'widgets/editor/editor_sticker_selector.dart';
+import 'widgets/editor/editor_text_input.dart';
 import 'widgets/editor/editor_timeline.dart';
 import 'widgets/editor/editor_voiceover_recorder.dart';
 import 'widgets/filter_selector.dart';
@@ -27,6 +28,10 @@ class _EditorScreenState extends State<EditorScreen>
     vsync: this,
     duration: Durations.medium2,
   );
+  late final AnimationController textEditorController = AnimationController(
+    vsync: this,
+    duration: Durations.short3,
+  );
   final ValueNotifier<double> hideNavButtons = ValueNotifier<double>(1);
   final ValueNotifier<bool> hideEditorEffects = ValueNotifier<bool>(false);
 
@@ -39,6 +44,7 @@ class _EditorScreenState extends State<EditorScreen>
   @override
   void dispose() {
     effectsController.removeStatusListener(effectStatusListener);
+    textEditorController.dispose();
     hideNavButtons.dispose();
     hideEditorEffects.dispose();
     timelineSizeAnimation.dispose();
@@ -79,7 +85,7 @@ class _EditorScreenState extends State<EditorScreen>
     final effect = option.value as EditorEffect;
     switch (effect) {
       case EditorEffect.text:
-      // TODO: Handle this case.
+        _openTextEditor();
       case EditorEffect.trim:
       // TODO: Handle this case.
       case EditorEffect.filter:
@@ -89,6 +95,16 @@ class _EditorScreenState extends State<EditorScreen>
       case EditorEffect.stickers:
         _showStickerSelector();
     }
+  }
+
+  Future<void> _openTextEditor() async {
+    hideNavButtons.value = 0;
+    textEditorController.forward();
+  }
+
+  Future<void> _closeTextEditor() async {
+    await textEditorController.reverse();
+    hideNavButtons.value = 1;
   }
 
   Future<void> _showFilterSelector() async {
@@ -144,6 +160,8 @@ class _EditorScreenState extends State<EditorScreen>
       _openTimeline();
     } else if (notification is CloseTimelineNotification) {
       _closeTimeline();
+    } else if (notification is CreateTextArtifactNotification) {
+      _closeTextEditor();
     }
     return true;
   }
@@ -192,30 +210,46 @@ class _EditorScreenState extends State<EditorScreen>
                             ),
                           ],
                         ),
-                        const Padding(
-                          padding: EdgeInsets.all(12.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CreateCloseButton(
-                                icon: YTIcons.arrow_back_outlined,
-                              ),
-                              AddMusicButton(),
-                              SizedBox(width: 48),
-                            ],
-                          ),
+                        AnimatedVisibility(
+                          animation: textEditorController,
+                          child: const EditorTextInput(),
                         ),
-                        HiddenListenableWidget(
-                          listenable: hideEditorEffects,
-                          hideCallback: () => hideEditorEffects.value,
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: EditorEffects(
-                                controller: effectsController,
+                        AnimatedVisibility(
+                          animation: ReverseAnimation(
+                            textEditorController,
+                          ),
+                          child: Column(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.all(12.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CreateCloseButton(
+                                      icon: YTIcons.arrow_back_outlined,
+                                    ),
+                                    AddMusicButton(),
+                                    SizedBox(width: 48),
+                                  ],
+                                ),
                               ),
-                            ),
+                              Expanded(
+                                child: HiddenListenableWidget(
+                                  listenable: hideEditorEffects,
+                                  hideCallback: () => hideEditorEffects.value,
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: EditorEffects(
+                                        controller: effectsController,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
