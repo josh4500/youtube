@@ -237,7 +237,7 @@ class _MediaSelectorState extends State<MediaSelector> {
                       ),
                     );
                   },
-                )
+                ),
               ],
             ),
           ),

@@ -102,7 +102,7 @@ class _RangeSelectorState<T> extends State<RangeSelector>
           onHorizontalDragUpdate: (details) async {
             final value = details.localPosition.dx / constraints.maxWidth;
             alignmentNotifier.value = Alignment(
-              value.clamp(0, 1).toDouble().normalizeRange(-1, 1),
+              value.clamp(0, 1).normalizeRange(-1, 1),
               0,
             );
             final selectedValue = (value * itemCount).floor();

@@ -6,7 +6,6 @@ import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../provider/media_album_state.dart';
 import '../../provider/short_recording_state.dart';
-import '../album_selector.dart';
 import '../media/media_selector.dart';
 import '../notifications/capture_notification.dart';
 import '../notifications/create_notification.dart';

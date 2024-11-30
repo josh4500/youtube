@@ -4,6 +4,7 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'widgets/add_music_button.dart';
 import 'widgets/create_close_button.dart';
+import 'widgets/editor/editor_artifact.dart';
 import 'widgets/editor/editor_effects.dart';
 import 'widgets/editor/editor_nav_buttons.dart';
 import 'widgets/editor/editor_sticker_selector.dart';
@@ -183,18 +184,11 @@ class _EditorScreenState extends State<EditorScreen>
                         Column(
                           children: [
                             Expanded(
-                              child: LayoutBuilder(
-                                builder: (
-                                  BuildContext context,
-                                  BoxConstraints constraints,
-                                ) {
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Container(
-                                      color: Colors.white54,
-                                    ),
-                                  );
-                                },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Container(
+                                  color: Colors.white54,
+                                ),
                               ),
                             ),
                             Align(
@@ -210,6 +204,7 @@ class _EditorScreenState extends State<EditorScreen>
                             ),
                           ],
                         ),
+                        const EditorArtifact(),
                         AnimatedVisibility(
                           animation: textEditorController,
                           child: const EditorTextInput(),

@@ -11,9 +11,11 @@ class CallOut extends StatelessWidget {
     this.buildContent,
     this.useChildAsTarget = true,
     this.text,
+    this.padding = const EdgeInsets.all(12),
     required this.child,
   });
 
+  final EdgeInsets padding;
   final bool useChildAsTarget;
   final Alignment alignment;
   final String? text;
@@ -49,7 +51,7 @@ class CallOut extends StatelessWidget {
                     color: context.theme.colorScheme.surface,
                   ),
                   child: Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: padding,
                     decoration: BoxDecoration(
                       color: context.theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(8),

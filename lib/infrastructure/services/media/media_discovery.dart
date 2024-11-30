@@ -1,4 +1,3 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/infrastructure/services/media/media.dart';
