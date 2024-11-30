@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/screens/create/widgets/editor/artifacts/artifact.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -35,6 +36,7 @@ class _EditorScreenState extends State<EditorScreen>
   );
   final ValueNotifier<double> hideNavButtons = ValueNotifier<double>(1);
   final ValueNotifier<bool> hideEditorEffects = ValueNotifier<bool>(false);
+  final artifactsNotifier = ValueNotifier<List<ArtifactData>>([]);
 
   @override
   void initState() {
@@ -45,6 +47,7 @@ class _EditorScreenState extends State<EditorScreen>
   @override
   void dispose() {
     effectsController.removeStatusListener(effectStatusListener);
+    artifactsNotifier.dispose();
     textEditorController.dispose();
     hideNavButtons.dispose();
     hideEditorEffects.dispose();
@@ -161,8 +164,14 @@ class _EditorScreenState extends State<EditorScreen>
       _openTimeline();
     } else if (notification is CloseTimelineNotification) {
       _closeTimeline();
-    } else if (notification is CreateTextArtifactNotification) {
-      _closeTextEditor();
+    } else if (notification is CreateArtifactNotification) {
+      if (notification.artifact is TextArtifact) {
+        artifactsNotifier.value = [
+          ...artifactsNotifier.value,
+          notification.artifact,
+        ];
+        _closeTextEditor();
+      }
     }
     return true;
   }
@@ -204,7 +213,12 @@ class _EditorScreenState extends State<EditorScreen>
                             ),
                           ],
                         ),
-                        const EditorArtifact(),
+                        AnimatedVisibility(
+                          animation: ReverseAnimation(
+                            textEditorController,
+                          ),
+                          child: EditorArtifact(data: artifactsNotifier),
+                        ),
                         AnimatedVisibility(
                           animation: textEditorController,
                           child: const EditorTextInput(),

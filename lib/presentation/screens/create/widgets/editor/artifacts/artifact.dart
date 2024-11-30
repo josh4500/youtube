@@ -6,17 +6,20 @@ import 'package:youtube_clone/presentation/widgets.dart';
 import '../../notifications/editor_notification.dart';
 
 class DurationRange {
-  DurationRange({required this.start, required this.end});
+  const DurationRange({required this.start, required this.end});
 
   final Duration start;
   final Duration end;
 }
 
 abstract class ArtifactData {
-  ArtifactData({required this.range, this.alignment});
+  ArtifactData({
+    this.range = const DurationRange(start: Duration.zero, end: Duration.zero),
+    this.alignment,
+  });
 
   final DurationRange range;
-  final Alignment? alignment;
+  final FractionalOffset? alignment;
 }
 
 enum TextArtifactDecoration {
@@ -28,7 +31,7 @@ enum TextArtifactDecoration {
 
 class TextArtifact extends ArtifactData {
   TextArtifact({
-    required super.range,
+    super.range,
     super.alignment,
     required this.text,
     required this.textAlign,
@@ -49,7 +52,7 @@ class TextArtifact extends ArtifactData {
     TextStyle? style,
     bool? readOutLoad,
     DurationRange? range,
-    Alignment? alignment,
+    FractionalOffset? alignment,
     TextArtifactDecoration? decoration,
   }) {
     return TextArtifact(
@@ -62,11 +65,36 @@ class TextArtifact extends ArtifactData {
       decoration: decoration ?? this.decoration,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TextArtifact &&
+          runtimeType == other.runtimeType &&
+          text == other.text &&
+          textAlign == other.textAlign &&
+          style == other.style &&
+          readOutLoad == other.readOutLoad &&
+          decoration == other.decoration;
+
+  @override
+  int get hashCode =>
+      text.hashCode ^
+      textAlign.hashCode ^
+      style.hashCode ^
+      readOutLoad.hashCode ^
+      decoration.hashCode;
 }
 
 class DragHitNotification extends EditorNotification {
-  DragHitNotification({required this.hit});
+  DragHitNotification({
+    required this.hit,
+    this.dragging = false,
+    this.hitDelete = false,
+  });
 
+  final bool dragging;
+  final bool hitDelete;
   final DragHit hit;
 }
 
@@ -118,7 +146,7 @@ class Artifact extends StatefulWidget {
 
 class _ArtifactState extends State<Artifact> {
   final GlobalKey itemKey = GlobalKey();
-  final alignmentNotifier = ValueNotifier(Alignment.center);
+  final alignmentNotifier = ValueNotifier(FractionalOffset.center);
 
   Size get itemSize {
     return itemKey.currentContext!.size!;
@@ -141,7 +169,21 @@ class _ArtifactState extends State<Artifact> {
     DragEndDetails details,
     BoxConstraints constraints,
   ) {
-    DragHitNotification(hit: DragHit()).dispatch(context);
+    final position = details.globalPosition;
+    final maxWidth = constraints.maxWidth;
+    final maxHeight = constraints.maxHeight;
+    DragHitNotification(
+      hit: DragHit(),
+      hitDelete: position.dy - maxHeight <= 6 &&
+          (position.dx - 56 - maxWidth / 2).abs() <= 6,
+    ).dispatch(context);
+    ModelBinding.update<ArtifactData>(context, (state) {
+      final update = (state as TextArtifact).copyWith(
+        alignment: alignmentNotifier.value,
+      );
+
+      return update;
+    });
   }
 
   void handlePanStart(
@@ -159,29 +201,26 @@ class _ArtifactState extends State<Artifact> {
     final maxWidth = constraints.maxWidth;
     final maxHeight = constraints.maxHeight;
 
-    alignmentNotifier.value = Alignment(
-      (position.dx / maxWidth).clamp(0, 1).normalizeRange(-1, 1),
-      (position.dy / maxHeight).clamp(0, 1).normalizeRange(-1, 1),
+    alignmentNotifier.value = FractionalOffset(
+      position.dx / maxWidth,
+      position.dy / maxHeight,
     );
 
     final offset = itemOffset;
 
-    final bool hitTop = position.dy.abs() <= 24;
-    final bool hitLeft = offset.dx.abs() <= 24;
-    final bool hitRight = offset.dx.abs() + itemSize.width >= maxWidth - 24;
-    final bool hitBottom = position.dy + itemSize.height >= maxHeight - 24;
-    final bool hitXCenter = (position.dx - maxWidth / 2).abs() <= 6;
-    final bool hitYCenter = (position.dy - maxHeight / 2).abs() <= 6;
-
+    // TODO(josh4500): Switch dragging item to top
     DragHitNotification(
       hit: DragHit(
-        hitTop: hitTop,
-        hitLeft: hitLeft,
-        hitRight: hitRight,
-        hitBottom: hitBottom,
-        hitXCenter: hitXCenter,
-        hitYCenter: hitYCenter,
+        hitTop: position.dy.abs() <= 24,
+        hitLeft: offset.dx.abs() <= 24,
+        hitRight: offset.dx.abs() + itemSize.width >= maxWidth - 24,
+        hitBottom: position.dy + itemSize.height >= maxHeight - 24,
+        hitXCenter: (position.dx - maxWidth / 2).abs() <= 6,
+        hitYCenter: (position.dy - maxHeight / 2).abs() <= 6,
       ),
+      dragging: true,
+      hitDelete: position.dy - maxHeight <= 56 &&
+          (position.dx - maxWidth / 2).abs() <= 6,
     ).dispatch(context);
   }
 
@@ -205,7 +244,7 @@ class _ArtifactState extends State<Artifact> {
               Widget? childWidget,
             ) {
               return Align(
-                alignment: data.alignment ?? alignment,
+                alignment: alignment,
                 child: childWidget,
               );
             },

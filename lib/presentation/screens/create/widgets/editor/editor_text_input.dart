@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/screens/create/widgets/editor/artifacts/artifact.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../notifications/editor_notification.dart';
@@ -12,7 +13,7 @@ class EditorTextInput extends StatefulWidget {
 
 class _EditorTextInputState extends State<EditorTextInput> {
   final FocusNode focusNode = FocusNode();
-  final textController = TextEditingController(text: 'Test');
+  final textController = TextEditingController();
   final ValueNotifier<TextStyle> styleNotifier = ValueNotifier(
     const TextStyle(),
   );
@@ -61,7 +62,18 @@ class _EditorTextInputState extends State<EditorTextInput> {
               GestureDetector(
                 onTap: () {
                   focusNode.unfocus();
-                  CreateTextArtifactNotification().dispatch(context);
+
+                  if (textController.text.isNotEmpty) {
+                    CreateArtifactNotification(
+                      artifact: TextArtifact(
+                        text: textController.text,
+                        textAlign: textAlignNotifier.value,
+                        style: styleNotifier.value,
+                        readOutLoad: false,
+                      ),
+                    ).dispatch(context);
+                    textController.clear();
+                  }
                 },
                 child: const Text(
                   'DONE',

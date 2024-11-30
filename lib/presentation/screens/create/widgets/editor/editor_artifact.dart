@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/models.dart';
-import 'package:youtube_clone/presentation/screens/create/widgets/editor/artifacts/artifact.dart';
-import 'package:youtube_clone/presentation/screens/create/widgets/notifications/editor_notification.dart';
+import 'package:youtube_clone/presentation/theme/styles/app_color.dart';
+
+import '../notifications/editor_notification.dart';
+import 'artifacts/artifact.dart';
 
 class EditorArtifact extends StatefulWidget {
-  const EditorArtifact({super.key});
+  const EditorArtifact({super.key, required this.data});
+  final ValueNotifier<List<ArtifactData>> data;
 
   @override
   State<EditorArtifact> createState() => _EditorArtifactState();
@@ -12,6 +15,8 @@ class EditorArtifact extends StatefulWidget {
 
 class _EditorArtifactState extends State<EditorArtifact> {
   final hitNotifier = ValueNotifier(DragHit());
+  final ValueNotifier<bool> draggingNotifier = ValueNotifier(false);
+  final ValueNotifier<bool> hitDeleteNotifier = ValueNotifier(false);
 
   @override
   void dispose() {
@@ -22,6 +27,13 @@ class _EditorArtifactState extends State<EditorArtifact> {
   bool handleEditorNotification(EditorNotification notification) {
     if (notification is DragHitNotification) {
       hitNotifier.value = notification.hit;
+      draggingNotifier.value = notification.dragging;
+      hitDeleteNotifier.value = notification.hitDelete;
+
+      if (notification.hitDelete && !notification.dragging) {
+        // TODO(josh4500): Handle delete
+        hitDeleteNotifier.value = false;
+      }
       return true;
     }
     return false;
@@ -31,43 +43,72 @@ class _EditorArtifactState extends State<EditorArtifact> {
   Widget build(BuildContext context) {
     return NotificationListener<EditorNotification>(
       onNotification: handleEditorNotification,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          LayoutBuilder(
-            builder: (
-              BuildContext context,
-              BoxConstraints constraints,
-            ) {
-              return ValueListenableBuilder(
-                valueListenable: hitNotifier,
+      child: ListenableBuilder(
+        listenable: widget.data,
+        builder: (BuildContext context, Widget? childWidget) {
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              childWidget ?? const SizedBox(),
+              for (final artifactData in widget.data.value)
+                ModelBinding(
+                  model: artifactData,
+                  child: const Artifact(),
+                ),
+              ListenableBuilder(
+                listenable: Listenable.merge([
+                  draggingNotifier,
+                  hitDeleteNotifier,
+                ]),
                 builder: (
                   BuildContext context,
-                  DragHit hit,
-                  Widget? childWidget,
+                  Widget? _,
                 ) {
-                  return CustomPaint(
-                    size: Size(constraints.maxWidth, constraints.maxHeight),
-                    painter: DragLinesPainter(hit: hit),
+                  if (draggingNotifier.value == false) {
+                    return const SizedBox();
+                  }
+                  return Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.all(12),
+                      decoration: const BoxDecoration(
+                        color: Colors.black12,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.delete,
+                        color: hitDeleteNotifier.value
+                            ? AppPalette.red
+                            : AppPalette.white,
+                      ),
+                    ),
                   );
                 },
-              );
-            },
-          ),
-          ModelBinding<ArtifactData>(
-            model: TextArtifact(
-              range: DurationRange(start: Duration.zero, end: Duration.zero),
-              text: 'My Text',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
               ),
-              readOutLoad: false,
-            ),
-            child: const Artifact(),
-          ),
-        ],
+            ],
+          );
+        },
+        child: LayoutBuilder(
+          builder: (
+            BuildContext context,
+            BoxConstraints constraints,
+          ) {
+            return ValueListenableBuilder(
+              valueListenable: hitNotifier,
+              builder: (
+                BuildContext context,
+                DragHit hit,
+                Widget? childWidget,
+              ) {
+                return CustomPaint(
+                  size: Size(constraints.maxWidth, constraints.maxHeight),
+                  painter: DragLinesPainter(hit: hit),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
