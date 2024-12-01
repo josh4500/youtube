@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/screens/create/widgets/editor/artifacts/artifact.dart';
+import 'package:youtube_clone/presentation/screens/create/widgets/editor/elements/element.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../notifications/editor_notification.dart';
@@ -15,7 +15,7 @@ class _EditorTextInputState extends State<EditorTextInput> {
   final FocusNode focusNode = FocusNode();
   final textController = TextEditingController();
   final ValueNotifier<TextStyle> styleNotifier = ValueNotifier(
-    const TextStyle(),
+    const TextStyle(fontWeight: FontWeight.w700),
   );
   final ValueNotifier<TextAlign> textAlignNotifier = ValueNotifier(
     TextAlign.center,
@@ -64,8 +64,8 @@ class _EditorTextInputState extends State<EditorTextInput> {
                   focusNode.unfocus();
 
                   if (textController.text.isNotEmpty) {
-                    CreateArtifactNotification(
-                      artifact: TextArtifact(
+                    CreateElementNotification(
+                      element: TextElement(
                         text: textController.text,
                         textAlign: textAlignNotifier.value,
                         style: styleNotifier.value,
@@ -118,31 +118,37 @@ class _EditorTextInputState extends State<EditorTextInput> {
                 ),
               ),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 24.0),
-                  child: ListenableBuilder(
-                    listenable: Listenable.merge([
-                      styleNotifier,
-                      textAlignNotifier,
-                    ]),
-                    builder: (
-                      BuildContext context,
-                      Widget? _,
-                    ) {
-                      final style = styleNotifier.value;
-                      final textAlign = textAlignNotifier.value;
-                      return TextField(
-                        style: style,
-                        focusNode: focusNode,
-                        controller: textController,
-                        textAlign: textAlign,
-                        cursorColor: Colors.white,
-                        maxLines: null,
-                        decoration: const InputDecoration.collapsed(
-                          hintText: '',
-                        ),
-                      );
-                    },
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: focusNode.requestFocus,
+                  child: Container(
+                    height: double.infinity,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.only(right: 24.0),
+                    child: ListenableBuilder(
+                      listenable: Listenable.merge([
+                        styleNotifier,
+                        textAlignNotifier,
+                      ]),
+                      builder: (
+                        BuildContext context,
+                        Widget? _,
+                      ) {
+                        final style = styleNotifier.value;
+                        final textAlign = textAlignNotifier.value;
+                        return TextField(
+                          style: style,
+                          focusNode: focusNode,
+                          controller: textController,
+                          textAlign: textAlign,
+                          cursorColor: Colors.white,
+                          maxLines: null,
+                          decoration: const InputDecoration.collapsed(
+                            hintText: '',
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),

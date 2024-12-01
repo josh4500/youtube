@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -12,8 +11,8 @@ class DurationRange {
   final Duration end;
 }
 
-abstract class ArtifactData {
-  ArtifactData({
+abstract class VideoElementData {
+  VideoElementData({
     this.range = const DurationRange(start: Duration.zero, end: Duration.zero),
     this.alignment,
   });
@@ -22,40 +21,40 @@ abstract class ArtifactData {
   final FractionalOffset? alignment;
 }
 
-enum TextArtifactDecoration {
+enum TextElementDecoration {
   normal,
   bordered,
   background,
   transparentBackground,
 }
 
-class TextArtifact extends ArtifactData {
-  TextArtifact({
+class TextElement extends VideoElementData {
+  TextElement({
     super.range,
     super.alignment,
     required this.text,
     required this.textAlign,
     required this.style,
     required this.readOutLoad,
-    this.decoration = TextArtifactDecoration.normal,
+    this.decoration = TextElementDecoration.normal,
   }) : assert(text.trim().isNotEmpty, 'Text cannot be empty');
 
   final String text;
   final TextAlign textAlign;
   final TextStyle style;
   final bool readOutLoad;
-  final TextArtifactDecoration decoration;
+  final TextElementDecoration decoration;
 
-  TextArtifact copyWith({
+  TextElement copyWith({
     String? text,
     TextAlign? textAlign,
     TextStyle? style,
     bool? readOutLoad,
     DurationRange? range,
     FractionalOffset? alignment,
-    TextArtifactDecoration? decoration,
+    TextElementDecoration? decoration,
   }) {
-    return TextArtifact(
+    return TextElement(
       range: range ?? this.range,
       alignment: alignment ?? this.alignment,
       text: text ?? this.text,
@@ -69,7 +68,7 @@ class TextArtifact extends ArtifactData {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is TextArtifact &&
+      other is TextElement &&
           runtimeType == other.runtimeType &&
           text == other.text &&
           textAlign == other.textAlign &&
@@ -137,14 +136,14 @@ class DragHit {
       hitYCenter.hashCode;
 }
 
-class Artifact extends StatefulWidget {
-  const Artifact({super.key});
+class VideoElement extends StatefulWidget {
+  const VideoElement({super.key});
 
   @override
-  State<Artifact> createState() => _ArtifactState();
+  State<VideoElement> createState() => _VideoElementState();
 }
 
-class _ArtifactState extends State<Artifact> {
+class _VideoElementState extends State<VideoElement> {
   final GlobalKey itemKey = GlobalKey();
   final alignmentNotifier = ValueNotifier(FractionalOffset.center);
 
@@ -174,11 +173,11 @@ class _ArtifactState extends State<Artifact> {
     final maxHeight = constraints.maxHeight;
     DragHitNotification(
       hit: DragHit(),
-      hitDelete: position.dy - maxHeight <= 6 &&
-          (position.dx - 56 - maxWidth / 2).abs() <= 6,
+      hitDelete: maxHeight - position.dy <= 56 &&
+          (position.dx - maxWidth / 2).abs() <= 56 / 2,
     ).dispatch(context);
-    ModelBinding.update<ArtifactData>(context, (state) {
-      final update = (state as TextArtifact).copyWith(
+    ModelBinding.update<VideoElementData>(context, (state) {
+      final update = (state as TextElement).copyWith(
         alignment: alignmentNotifier.value,
       );
 
@@ -219,14 +218,14 @@ class _ArtifactState extends State<Artifact> {
         hitYCenter: (position.dy - maxHeight / 2).abs() <= 6,
       ),
       dragging: true,
-      hitDelete: position.dy - maxHeight <= 56 &&
-          (position.dx - maxWidth / 2).abs() <= 6,
+      hitDelete: maxHeight - position.dy <= 56 &&
+          (position.dx - maxWidth / 2).abs() <= 56 / 2,
     ).dispatch(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final data = context.provide<ArtifactData>();
+    final data = context.provide<VideoElementData>();
     return LayoutBuilder(
       builder: (
         BuildContext context,
@@ -248,10 +247,10 @@ class _ArtifactState extends State<Artifact> {
                 child: childWidget,
               );
             },
-            child: _ArtifactItem(
+            child: _VideoElementItem(
               key: itemKey,
               child: switch (data) {
-                TextArtifact _ => const _TextArtifactWidget(),
+                TextElement _ => const _TextElementWidget(),
                 _ => const Placeholder(),
               },
             ),
@@ -262,28 +261,28 @@ class _ArtifactState extends State<Artifact> {
   }
 }
 
-class _ArtifactItem extends StatelessWidget {
-  const _ArtifactItem({super.key, required this.child});
+class _VideoElementItem extends StatelessWidget {
+  const _VideoElementItem({super.key, required this.child});
   final Widget child;
 
   @override
   Widget build(BuildContext context) => child;
 }
 
-class _TextArtifactWidget extends StatefulWidget {
-  const _TextArtifactWidget();
+class _TextElementWidget extends StatefulWidget {
+  const _TextElementWidget();
 
   @override
-  State<_TextArtifactWidget> createState() => _TextArtifactWidgetState();
+  State<_TextElementWidget> createState() => _TextElementWidgetState();
 }
 
-class _TextArtifactWidgetState extends State<_TextArtifactWidget> {
+class _TextElementWidgetState extends State<_TextElementWidget> {
   final call = CallOutLink(
     offset: const Offset(0, 70),
   );
   @override
   Widget build(BuildContext context) {
-    final data = context.provide<ArtifactData>() as TextArtifact;
+    final data = context.provide<VideoElementData>() as TextElement;
 
     return GestureDetector(
       onTap: call.controller.show,

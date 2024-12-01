@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_clone/presentation/screens/create/widgets/editor/artifacts/artifact.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'widgets/add_music_button.dart';
 import 'widgets/create_close_button.dart';
-import 'widgets/editor/editor_artifact.dart';
 import 'widgets/editor/editor_effects.dart';
+import 'widgets/editor/editor_elements.dart';
 import 'widgets/editor/editor_nav_buttons.dart';
 import 'widgets/editor/editor_sticker_selector.dart';
 import 'widgets/editor/editor_text_input.dart';
 import 'widgets/editor/editor_timeline.dart';
 import 'widgets/editor/editor_voiceover_recorder.dart';
+import 'widgets/editor/elements/element.dart';
 import 'widgets/filter_selector.dart';
 import 'widgets/notifications/editor_notification.dart';
 import 'widgets/video_effect_options.dart';
@@ -36,7 +36,7 @@ class _EditorScreenState extends State<EditorScreen>
   );
   final ValueNotifier<double> hideNavButtons = ValueNotifier<double>(1);
   final ValueNotifier<bool> hideEditorEffects = ValueNotifier<bool>(false);
-  final artifactsNotifier = ValueNotifier<List<ArtifactData>>([]);
+  final elementsNotifier = ValueNotifier<List<VideoElementData>>([]);
 
   @override
   void initState() {
@@ -47,7 +47,7 @@ class _EditorScreenState extends State<EditorScreen>
   @override
   void dispose() {
     effectsController.removeStatusListener(effectStatusListener);
-    artifactsNotifier.dispose();
+    elementsNotifier.dispose();
     textEditorController.dispose();
     hideNavButtons.dispose();
     hideEditorEffects.dispose();
@@ -164,14 +164,16 @@ class _EditorScreenState extends State<EditorScreen>
       _openTimeline();
     } else if (notification is CloseTimelineNotification) {
       _closeTimeline();
-    } else if (notification is CreateArtifactNotification) {
-      if (notification.artifact is TextArtifact) {
-        artifactsNotifier.value = [
-          ...artifactsNotifier.value,
-          notification.artifact,
+    } else if (notification is CreateElementNotification) {
+      if (notification.element is TextElement) {
+        elementsNotifier.value = [
+          ...elementsNotifier.value,
+          notification.element,
         ];
         _closeTextEditor();
       }
+    } else if (notification is DeleteElementNotification) {
+      elementsNotifier.value = [];
     }
     return true;
   }
@@ -217,7 +219,7 @@ class _EditorScreenState extends State<EditorScreen>
                           animation: ReverseAnimation(
                             textEditorController,
                           ),
-                          child: EditorArtifact(data: artifactsNotifier),
+                          child: EditorElements(data: elementsNotifier),
                         ),
                         AnimatedVisibility(
                           animation: textEditorController,

@@ -3,17 +3,17 @@ import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/theme/styles/app_color.dart';
 
 import '../notifications/editor_notification.dart';
-import 'artifacts/artifact.dart';
+import 'elements/element.dart';
 
-class EditorArtifact extends StatefulWidget {
-  const EditorArtifact({super.key, required this.data});
-  final ValueNotifier<List<ArtifactData>> data;
+class EditorElements extends StatefulWidget {
+  const EditorElements({super.key, required this.data});
+  final ValueNotifier<List<VideoElementData>> data;
 
   @override
-  State<EditorArtifact> createState() => _EditorArtifactState();
+  State<EditorElements> createState() => _EditorElementsState();
 }
 
-class _EditorArtifactState extends State<EditorArtifact> {
+class _EditorElementsState extends State<EditorElements> {
   final hitNotifier = ValueNotifier(DragHit());
   final ValueNotifier<bool> draggingNotifier = ValueNotifier(false);
   final ValueNotifier<bool> hitDeleteNotifier = ValueNotifier(false);
@@ -31,7 +31,7 @@ class _EditorArtifactState extends State<EditorArtifact> {
       hitDeleteNotifier.value = notification.hitDelete;
 
       if (notification.hitDelete && !notification.dragging) {
-        // TODO(josh4500): Handle delete
+        DeleteElementNotification().dispatch(context);
         hitDeleteNotifier.value = false;
       }
       return true;
@@ -50,10 +50,10 @@ class _EditorArtifactState extends State<EditorArtifact> {
             fit: StackFit.expand,
             children: [
               childWidget ?? const SizedBox(),
-              for (final artifactData in widget.data.value)
+              for (final elementData in widget.data.value)
                 ModelBinding(
-                  model: artifactData,
-                  child: const Artifact(),
+                  model: elementData,
+                  child: const VideoElement(),
                 ),
               ListenableBuilder(
                 listenable: Listenable.merge([
@@ -69,18 +69,23 @@ class _EditorArtifactState extends State<EditorArtifact> {
                   }
                   return Align(
                     alignment: Alignment.bottomCenter,
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.all(12),
-                      decoration: const BoxDecoration(
-                        color: Colors.black12,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.delete,
-                        color: hitDeleteNotifier.value
-                            ? AppPalette.red
-                            : AppPalette.white,
+                    child: Transform.scale(
+                      scale: hitDeleteNotifier.value ? 1.13 : 1,
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: hitDeleteNotifier.value
+                              ? Colors.black26
+                              : Colors.black12,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.delete,
+                          color: hitDeleteNotifier.value
+                              ? AppPalette.red
+                              : AppPalette.white,
+                        ),
                       ),
                     ),
                   );
