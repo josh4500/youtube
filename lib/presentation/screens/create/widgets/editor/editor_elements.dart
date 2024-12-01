@@ -49,12 +49,44 @@ class _EditorElementsState extends State<EditorElements> {
           return Stack(
             fit: StackFit.expand,
             children: [
-              childWidget ?? const SizedBox(),
-              for (final elementData in widget.data.value)
-                ModelBinding(
-                  model: elementData,
-                  child: const VideoElement(),
-                ),
+              LayoutBuilder(
+                builder: (
+                  BuildContext context,
+                  BoxConstraints constraints,
+                ) {
+                  return ValueListenableBuilder(
+                    valueListenable: hitNotifier,
+                    builder: (
+                      BuildContext context,
+                      DragHit hit,
+                      Widget? childWidget,
+                    ) {
+                      return CustomPaint(
+                        size: Size(constraints.maxWidth, constraints.maxHeight),
+                        painter: DragLinesPainter(hit: hit),
+                      );
+                    },
+                  );
+                },
+              ),
+              ListenableBuilder(
+                listenable: widget.data,
+                builder: (
+                  BuildContext context,
+                  Widget? childWidget,
+                ) {
+                  return Stack(
+                    children: [
+                      for (int i = 0; i < widget.data.value.length; i++)
+                        ModelBinding(
+                          key: ValueKey(widget.data.value[i].id),
+                          model: widget.data.value[i],
+                          child: const VideoElement(),
+                        ),
+                    ],
+                  );
+                },
+              ),
               ListenableBuilder(
                 listenable: Listenable.merge([
                   draggingNotifier,
@@ -76,15 +108,13 @@ class _EditorElementsState extends State<EditorElements> {
                         margin: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: hitDeleteNotifier.value
-                              ? Colors.black26
+                              ? AppPalette.red
                               : Colors.black12,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.delete,
-                          color: hitDeleteNotifier.value
-                              ? AppPalette.red
-                              : AppPalette.white,
+                          color: AppPalette.white,
                         ),
                       ),
                     ),
@@ -94,26 +124,6 @@ class _EditorElementsState extends State<EditorElements> {
             ],
           );
         },
-        child: LayoutBuilder(
-          builder: (
-            BuildContext context,
-            BoxConstraints constraints,
-          ) {
-            return ValueListenableBuilder(
-              valueListenable: hitNotifier,
-              builder: (
-                BuildContext context,
-                DragHit hit,
-                Widget? childWidget,
-              ) {
-                return CustomPaint(
-                  size: Size(constraints.maxWidth, constraints.maxHeight),
-                  painter: DragLinesPainter(hit: hit),
-                );
-              },
-            );
-          },
-        ),
       ),
     );
   }
@@ -127,7 +137,7 @@ class DragLinesPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.green
-      ..strokeWidth = 2
+      ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
     const double spacing = 12.0;
     // Draw lines based on the drag position

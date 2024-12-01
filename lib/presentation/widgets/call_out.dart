@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
-class CallOut extends StatelessWidget {
+class CallOut extends StatefulWidget {
   const CallOut({
     super.key,
-    this.alignment = Alignment.topCenter,
+    this.alignment = Alignment.bottomCenter,
     this.link,
     this.controller,
     this.buildContent,
@@ -25,16 +25,63 @@ class CallOut extends StatelessWidget {
   final Widget child;
 
   @override
+  State<CallOut> createState() => _CallOutState();
+}
+
+class _CallOutState extends State<CallOut> {
+  final key = GlobalKey();
+  Size? childSize;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateChildSize();
+    });
+  }
+
+  void _updateChildSize() {
+    final context = key.currentContext;
+    if (context != null) {
+      childSize = context.size;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final callOutLink = link ?? context.provide<CallOutLink>();
-    final effectiveController = controller ?? callOutLink.controller;
+    final callOutLink = widget.link ?? context.provide<CallOutLink>();
+    final effectiveController = widget.controller ?? callOutLink.controller;
+
     return OverlayPortal(
       controller: effectiveController,
       overlayChildBuilder: (BuildContext context) {
+        // Default offset in case child size is unavailable
+        Offset calculatedOffset = Offset.zero;
+
+        if (childSize != null) {
+          // Calculate offset based on alignment
+          switch (widget.alignment) {
+            case Alignment.topCenter:
+              calculatedOffset = Offset(0, -childSize!.height + 24);
+              break;
+            case Alignment.bottomCenter:
+              calculatedOffset = Offset(0, childSize!.height + 24);
+              break;
+            case Alignment.centerLeft:
+              calculatedOffset = Offset(-childSize!.width, 0);
+              break;
+            case Alignment.centerRight:
+              calculatedOffset = Offset(childSize!.width, 0);
+              break;
+            default:
+              calculatedOffset = Offset.zero;
+          }
+        }
+        print((childSize, calculatedOffset));
+
         return CompositedTransformFollower(
           link: callOutLink.link,
-          // TODO(josh4500): Calculate offset base on triangle position
-          offset: callOutLink.offset + const Offset(0, 12),
+          offset: calculatedOffset,
           targetAnchor: Alignment.center,
           followerAnchor: Alignment.center,
           child: Material(
@@ -47,18 +94,18 @@ class CallOut extends StatelessWidget {
                 alignment: AlignmentDirectional.center,
                 child: CustomPaint(
                   painter: TrianglePainter(
-                    alignment: alignment,
+                    alignment: widget.alignment,
                     color: context.theme.colorScheme.surface,
                   ),
                   child: Container(
-                    padding: padding,
+                    padding: widget.padding,
                     decoration: BoxDecoration(
                       color: context.theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: buildContent?.call(context) ??
+                    child: widget.buildContent?.call(context) ??
                         Text(
-                          text ?? '',
+                          widget.text ?? '',
                           style: TextStyle(
                             color: context.theme.colorScheme.inverseSurface,
                           ),
@@ -71,14 +118,15 @@ class CallOut extends StatelessWidget {
         );
       },
       child: Builder(
+        key: key,
         builder: (context) {
-          if (useChildAsTarget) {
+          if (widget.useChildAsTarget) {
             return CompositedTransformTarget(
               link: callOutLink.link,
-              child: child,
+              child: widget.child,
             );
           }
-          return child;
+          return widget.child;
         },
       ),
     );
@@ -86,12 +134,10 @@ class CallOut extends StatelessWidget {
 }
 
 class CallOutLink {
-  CallOutLink({this.offset = Offset.zero});
   final controller = OverlayPortalController();
   void show() => controller.show();
   void hide() => controller.hide();
   bool get isShowing => controller.isShowing;
-  final Offset offset;
   final LayerLink link = LayerLink();
 }
 
@@ -113,37 +159,40 @@ class TrianglePainter extends CustomPainter {
     const double triangleHeight = 12;
     const double triangleHalfWidth = 12;
 
-    // Calculate the x-position based on the alignment
-    double xOffset = (alignment.x + 1) * 0.5 * size.width;
-
-    // Clamp xOffset to ensure the triangle stays within the bounds
-    xOffset = xOffset.clamp(triangleHalfWidth, size.width - triangleHalfWidth);
-
-    // Calculate the yOffset based on the alignment
-    final bool isUpsideDown = alignment.y > 0;
-
     final Path path = Path();
 
-    if (isUpsideDown) {
-      // Draw the triangle pointing upwards (upside down)
+    if (alignment == Alignment.topCenter) {
+      // Arrow at the bottom center of the child
       path.moveTo(
-        xOffset - triangleHalfWidth,
+        size.width / 2 - triangleHalfWidth,
         size.height,
-      ); // Bottom left point
-      path.lineTo(xOffset, size.height + triangleHeight); // Top point
+      ); // Bottom left
+      path.lineTo(size.width / 2, size.height + triangleHeight); // Tip
       path.lineTo(
-        xOffset + triangleHalfWidth,
+        size.width / 2 + triangleHalfWidth,
         size.height,
-      ); // Bottom right point
-    } else {
-      // Draw the triangle pointing downwards (normal)
-      path.moveTo(xOffset - triangleHalfWidth, 0); // Top left point
-      path.lineTo(xOffset, -triangleHeight); // Bottom point
-      path.lineTo(xOffset + triangleHalfWidth, 0); // Top right point
+      ); // Bottom right
+    } else if (alignment == Alignment.bottomCenter) {
+      // Arrow at the top center of the child
+      path.moveTo(size.width / 2 - triangleHalfWidth, 0); // Top left
+      path.lineTo(size.width / 2, -triangleHeight); // Tip
+      path.lineTo(size.width / 2 + triangleHalfWidth, 0); // Top right
+    } else if (alignment == Alignment.centerLeft) {
+      // Arrow at the center right of the child
+      path.moveTo(size.width, size.height / 2 - triangleHalfWidth); // Right top
+      path.lineTo(size.width + triangleHeight, size.height / 2); // Tip
+      path.lineTo(
+        size.width,
+        size.height / 2 + triangleHalfWidth,
+      ); // Right bottom
+    } else if (alignment == Alignment.centerRight) {
+      // Arrow at the center left of the child
+      path.moveTo(0, size.height / 2 - triangleHalfWidth); // Left top
+      path.lineTo(-triangleHeight, size.height / 2); // Tip
+      path.lineTo(0, size.height / 2 + triangleHalfWidth); // Left bottom
     }
 
     path.close();
-
     canvas.drawPath(path, paint);
   }
 

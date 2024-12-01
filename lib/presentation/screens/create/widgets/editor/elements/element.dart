@@ -15,8 +15,10 @@ abstract class VideoElementData {
   VideoElementData({
     this.range = const DurationRange(start: Duration.zero, end: Duration.zero),
     this.alignment,
-  });
+    int? id,
+  }) : id = id ?? DateTime.now().microsecondsSinceEpoch;
 
+  final int id;
   final DurationRange range;
   final FractionalOffset? alignment;
 }
@@ -31,6 +33,7 @@ enum TextElementDecoration {
 class TextElement extends VideoElementData {
   TextElement({
     super.range,
+    super.id,
     super.alignment,
     required this.text,
     required this.textAlign,
@@ -55,6 +58,7 @@ class TextElement extends VideoElementData {
     TextElementDecoration? decoration,
   }) {
     return TextElement(
+      id: id,
       range: range ?? this.range,
       alignment: alignment ?? this.alignment,
       text: text ?? this.text,
@@ -83,6 +87,11 @@ class TextElement extends VideoElementData {
       style.hashCode ^
       readOutLoad.hashCode ^
       decoration.hashCode;
+
+  @override
+  String toString() {
+    return 'TextElement{text: $text}';
+  }
 }
 
 class DragHitNotification extends EditorNotification {
@@ -146,16 +155,15 @@ class VideoElement extends StatefulWidget {
 class _VideoElementState extends State<VideoElement> {
   final GlobalKey itemKey = GlobalKey();
   final alignmentNotifier = ValueNotifier(FractionalOffset.center);
-
-  Size get itemSize {
-    return itemKey.currentContext!.size!;
-  }
-
   Offset panStartOffset = Offset.zero;
 
-  Offset get itemOffset {
-    return (itemKey.currentContext!.findRenderObject()! as RenderBox)
-        .globalToLocal(Offset.zero);
+  @override
+  void didUpdateWidget(covariant VideoElement oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final data = context.provide<VideoElementData>();
+    if (data.alignment != null) {
+      alignmentNotifier.value = data.alignment!;
+    }
   }
 
   @override
@@ -171,18 +179,23 @@ class _VideoElementState extends State<VideoElement> {
     final position = details.globalPosition;
     final maxWidth = constraints.maxWidth;
     final maxHeight = constraints.maxHeight;
+    final hitDelete = maxHeight - position.dy <= 56 &&
+        (position.dx - maxWidth / 2).abs() <= 56 / 2;
     DragHitNotification(
       hit: DragHit(),
-      hitDelete: maxHeight - position.dy <= 56 &&
-          (position.dx - maxWidth / 2).abs() <= 56 / 2,
+      hitDelete: hitDelete,
     ).dispatch(context);
-    ModelBinding.update<VideoElementData>(context, (state) {
-      final update = (state as TextElement).copyWith(
+
+    if (!hitDelete) {
+      final data = context.provide<VideoElementData>();
+      final VideoElementData updatedElement;
+      // TODO(josh4500): Check for type
+      updatedElement = (data as TextElement).copyWith(
         alignment: alignmentNotifier.value,
       );
 
-      return update;
-    });
+      UpdateElementNotification(element: updatedElement).dispatch(context);
+    }
   }
 
   void handlePanStart(
@@ -190,6 +203,11 @@ class _VideoElementState extends State<VideoElement> {
     BoxConstraints constraints,
   ) {
     panStartOffset = details.localPosition;
+    final data = context.provide<VideoElementData>();
+    UpdateElementNotification(
+      element: data,
+      swapToLast: true,
+    ).dispatch(context);
   }
 
   void handlePanUpdate(
@@ -205,15 +223,12 @@ class _VideoElementState extends State<VideoElement> {
       position.dy / maxHeight,
     );
 
-    final offset = itemOffset;
-
-    // TODO(josh4500): Switch dragging item to top
     DragHitNotification(
       hit: DragHit(
         hitTop: position.dy.abs() <= 24,
-        hitLeft: offset.dx.abs() <= 24,
-        hitRight: offset.dx.abs() + itemSize.width >= maxWidth - 24,
-        hitBottom: position.dy + itemSize.height >= maxHeight - 24,
+        hitLeft: position.dx.abs() <= 24,
+        hitRight: position.dx.abs() >= maxWidth - 24,
+        hitBottom: position.dy >= maxHeight - 24,
         hitXCenter: (position.dx - maxWidth / 2).abs() <= 6,
         hitYCenter: (position.dy - maxHeight / 2).abs() <= 6,
       ),
@@ -231,22 +246,22 @@ class _VideoElementState extends State<VideoElement> {
         BuildContext context,
         BoxConstraints constraints,
       ) {
-        return GestureDetector(
-          onPanStart: (details) => handlePanStart(details, constraints),
-          onPanEnd: (details) => handlePanEnd(details, constraints),
-          onPanUpdate: (details) => handlePanUpdate(details, constraints),
-          child: ValueListenableBuilder(
-            valueListenable: alignmentNotifier,
-            builder: (
-              BuildContext context,
-              Alignment alignment,
-              Widget? childWidget,
-            ) {
-              return Align(
-                alignment: alignment,
-                child: childWidget,
-              );
-            },
+        return ValueListenableBuilder(
+          valueListenable: alignmentNotifier,
+          builder: (
+            BuildContext context,
+            Alignment alignment,
+            Widget? childWidget,
+          ) {
+            return Align(
+              alignment: alignment,
+              child: childWidget,
+            );
+          },
+          child: GestureDetector(
+            onPanStart: (details) => handlePanStart(details, constraints),
+            onPanEnd: (details) => handlePanEnd(details, constraints),
+            onPanUpdate: (details) => handlePanUpdate(details, constraints),
             child: _VideoElementItem(
               key: itemKey,
               child: switch (data) {
@@ -277,62 +292,60 @@ class _TextElementWidget extends StatefulWidget {
 }
 
 class _TextElementWidgetState extends State<_TextElementWidget> {
-  final call = CallOutLink(
-    offset: const Offset(0, 70),
-  );
+  final call = CallOutLink();
   @override
   Widget build(BuildContext context) {
     final data = context.provide<VideoElementData>() as TextElement;
 
     return GestureDetector(
       onTap: call.controller.show,
-      child: CallOut(
-        link: call,
-        padding: EdgeInsets.zero,
-        buildContent: (BuildContext context) {
-          return SizedBox(
-            width: 100,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                InkWell(
-                  onTap: () {},
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Edit',
-                      style: TextStyle(color: Colors.black),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: CallOut(
+          link: call,
+          padding: EdgeInsets.zero,
+          buildContent: (BuildContext context) {
+            return SizedBox(
+              width: 100,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  InkWell(
+                    onTap: () {},
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'Edit',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   ),
-                ),
-                const Divider(height: 0, color: Colors.black),
-                InkWell(
-                  onTap: () {},
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Timing',
-                      style: TextStyle(color: Colors.black),
+                  const Divider(height: 0, color: Colors.black),
+                  InkWell(
+                    onTap: () {},
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'Timing',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   ),
-                ),
-                const Divider(height: 0, color: Colors.black),
-                InkWell(
-                  onTap: () {},
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Add Voice',
-                      style: TextStyle(color: Colors.black),
+                  const Divider(height: 0, color: Colors.black),
+                  InkWell(
+                    onTap: () {},
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'Add Voice',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
+                ],
+              ),
+            );
+          },
           child: Text(
             data.text,
             style: data.style,

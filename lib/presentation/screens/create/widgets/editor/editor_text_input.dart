@@ -66,13 +66,15 @@ class _EditorTextInputState extends State<EditorTextInput> {
                   if (textController.text.isNotEmpty) {
                     CreateElementNotification(
                       element: TextElement(
-                        text: textController.text,
+                        text: textController.text.trim(),
                         textAlign: textAlignNotifier.value,
                         style: styleNotifier.value,
                         readOutLoad: false,
                       ),
                     ).dispatch(context);
                     textController.clear();
+                  } else {
+                    CloseEditorTextNotification().dispatch(context);
                   }
                 },
                 child: const Text(
@@ -92,8 +94,8 @@ class _EditorTextInputState extends State<EditorTextInput> {
                 quarterTurns: 3,
                 child: SliderTheme(
                   data: const SliderThemeData(
-                    activeTrackColor: Colors.white,
-                    inactiveTrackColor: Colors.white,
+                    activeTrackColor: Colors.white24,
+                    inactiveTrackColor: Colors.white24,
                     thumbColor: Colors.white,
                     trackHeight: 1,
                     overlayColor: Colors.white10,
@@ -106,8 +108,8 @@ class _EditorTextInputState extends State<EditorTextInput> {
                       Widget? _,
                     ) {
                       return Slider(
-                        value: style.fontSize ?? 14,
-                        min: 14,
+                        value: style.fontSize ?? 24,
+                        min: 24,
                         max: 100,
                         onChanged: (double value) {
                           styleNotifier.value = style.copyWith(fontSize: value);
@@ -141,7 +143,7 @@ class _EditorTextInputState extends State<EditorTextInput> {
                           focusNode: focusNode,
                           controller: textController,
                           textAlign: textAlign,
-                          cursorColor: Colors.white,
+                          cursorColor: style.color ?? Colors.white,
                           maxLines: null,
                           decoration: const InputDecoration.collapsed(
                             hintText: '',

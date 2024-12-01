@@ -194,9 +194,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   );
   Timer? countdownTimer;
 
-  final CallOutLink callOutLink = CallOutLink(
-    offset: const Offset(0, 52),
-  );
+  final CallOutLink callOutLink = CallOutLink();
 
   final ValueNotifier<bool> hideEffectsNotifier = ValueNotifier<bool>(false);
 

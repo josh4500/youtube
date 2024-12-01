@@ -62,7 +62,7 @@ class CommentTile extends StatefulWidget {
 }
 
 class _CommentTileState extends State<CommentTile> {
-  final callOutLink = CallOutLink(offset: const Offset(0, 32));
+  final callOutLink = CallOutLink();
 
   @override
   Widget build(BuildContext context) {

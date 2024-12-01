@@ -164,16 +164,43 @@ class _EditorScreenState extends State<EditorScreen>
       _openTimeline();
     } else if (notification is CloseTimelineNotification) {
       _closeTimeline();
+    } else if (notification is CloseEditorTextNotification) {
+      _closeTextEditor();
     } else if (notification is CreateElementNotification) {
       if (notification.element is TextElement) {
+        _closeTextEditor();
+      }
+      elementsNotifier.value = [
+        ...elementsNotifier.value,
+        notification.element,
+      ];
+    } else if (notification is UpdateElementNotification) {
+      assert(elementsNotifier.value.isNotEmpty, 'Cannot update empty Elements');
+      // Do a swap of location
+      if (notification.swapToLast) {
+        final last = elementsNotifier.value.last;
+        if (notification.element.id != last.id) {
+          elementsNotifier.value.removeWhere(
+            (element) => element.id == notification.element.id,
+          );
+          elementsNotifier.value = [
+            ...elementsNotifier.value,
+            notification.element,
+          ];
+        }
+      } else {
+        elementsNotifier.value.removeWhere(
+          (element) => element.id == notification.element.id,
+        );
         elementsNotifier.value = [
           ...elementsNotifier.value,
           notification.element,
         ];
-        _closeTextEditor();
       }
     } else if (notification is DeleteElementNotification) {
-      elementsNotifier.value = [];
+      final oldElements = elementsNotifier.value;
+      oldElements.removeLast();
+      elementsNotifier.value = [...oldElements];
     }
     return true;
   }
@@ -198,7 +225,7 @@ class _EditorScreenState extends State<EditorScreen>
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: Container(
-                                  color: Colors.white54,
+                                  color: Colors.white10,
                                 ),
                               ),
                             ),
