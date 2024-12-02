@@ -74,7 +74,7 @@ class _EditorTextInputState extends State<EditorTextInput> {
                     ).dispatch(context);
                     textController.clear();
                   } else {
-                    CloseEditorTextNotification().dispatch(context);
+                    CloseElementEditortNotification().dispatch(context);
                   }
                 },
                 child: const Text(

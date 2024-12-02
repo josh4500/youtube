@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/core.dart';
+import 'package:youtube_clone/infrastructure/services/media/media_discovery.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -7,6 +10,7 @@ import 'widgets/create_close_button.dart';
 import 'widgets/editor/editor_effects.dart';
 import 'widgets/editor/editor_elements.dart';
 import 'widgets/editor/editor_nav_buttons.dart';
+import 'widgets/editor/editor_sticker_input.dart';
 import 'widgets/editor/editor_sticker_selector.dart';
 import 'widgets/editor/editor_text_input.dart';
 import 'widgets/editor/editor_timeline.dart';
@@ -37,6 +41,10 @@ class _EditorScreenState extends State<EditorScreen>
   final ValueNotifier<double> hideNavButtons = ValueNotifier<double>(1);
   final ValueNotifier<bool> hideTopButtons = ValueNotifier<bool>(false);
   final ValueNotifier<bool> hideEditorEffects = ValueNotifier<bool>(false);
+  final ValueNotifier<(Type, StickerElement?)?> stickerEditorData =
+      ValueNotifier(
+    null,
+  );
   final elementsNotifier = ValueNotifier<List<VideoElementData>>([]);
 
   @override
@@ -48,6 +56,7 @@ class _EditorScreenState extends State<EditorScreen>
   @override
   void dispose() {
     effectsController.removeStatusListener(effectStatusListener);
+    stickerEditorData.dispose();
     elementsNotifier.dispose();
     textEditorController.dispose();
     hideTopButtons.dispose();
@@ -113,6 +122,42 @@ class _EditorScreenState extends State<EditorScreen>
     hideNavButtons.value = 1;
   }
 
+  Future<void> _openStickerEditor([Type? elementType]) async {
+    if (elementType != null) {
+      assert(
+        elementType == QaStickerElement ||
+            elementType == AddYStickerElement ||
+            elementType == PollStickerElement,
+        'Must be a StickerElement',
+      );
+
+      final previousStickerElement = elementsNotifier.value.firstWhereOrNull(
+        (element) => element is StickerElement,
+      ) as StickerElement?;
+
+      if (previousStickerElement != null) {
+        final oldElements = elementsNotifier.value;
+        oldElements.removeWhere(
+          (element) => element is StickerElement,
+        );
+        elementsNotifier.value = [...oldElements];
+      }
+
+      hideTopButtons.value = true;
+      hideNavButtons.value = 0;
+      hideEditorEffects.value = true;
+      stickerEditorData.value = (elementType, previousStickerElement);
+    }
+  }
+
+  Future<void> _closeStickerEditor() async {
+    stickerEditorData.value = null;
+
+    hideTopButtons.value = false;
+    hideNavButtons.value = 1;
+    hideEditorEffects.value = false;
+  }
+
   Future<void> _showFilterSelector() async {
     _futureHideShowNavButtons(
       () async {
@@ -148,15 +193,21 @@ class _EditorScreenState extends State<EditorScreen>
   Future<void> _showStickerSelector() async {
     _futureHideShowNavButtons(
       () async {
-        await showModalBottomSheet(
+        final result = await showModalBottomSheet<Type>(
           context: context,
           isDismissible: false,
           backgroundColor: Colors.transparent,
           barrierColor: Colors.transparent,
           builder: (BuildContext context) {
-            return const EditorStickerSelector();
+            return ModelBinding<StickerElement?>(
+              model: elementsNotifier.value.firstWhereOrNull(
+                (element) => element is StickerElement,
+              ) as StickerElement?,
+              child: const EditorStickerSelector(),
+            );
           },
         );
+        _openStickerEditor(result);
       },
     );
   }
@@ -166,16 +217,31 @@ class _EditorScreenState extends State<EditorScreen>
       _openTimeline();
     } else if (notification is CloseTimelineNotification) {
       _closeTimeline();
-    } else if (notification is CloseEditorTextNotification) {
+    } else if (notification is CloseElementEditortNotification) {
       _closeTextEditor();
+      _closeStickerEditor();
     } else if (notification is CreateElementNotification) {
-      if (notification.element is TextElement) {
-        _closeTextEditor();
+      _closeTextEditor();
+      _closeStickerEditor();
+
+      bool add = true;
+      if (notification.element is StickerElement) {
+        final type = notification.element.runtimeType;
+        final previousStickerElement = elementsNotifier.value.firstWhereOrNull(
+          (element) => element.runtimeType == type,
+        );
+        if (previousStickerElement != null) {
+          add = false;
+        }
       }
-      elementsNotifier.value = [
-        ...elementsNotifier.value,
-        notification.element,
-      ];
+
+      if (add) {
+        // Add element to list
+        elementsNotifier.value = [
+          ...elementsNotifier.value,
+          notification.element,
+        ];
+      }
     } else if (notification is UpdateElementNotification) {
       assert(elementsNotifier.value.isNotEmpty, 'Cannot update empty Elements');
       // Do a swap of location
@@ -212,6 +278,11 @@ class _EditorScreenState extends State<EditorScreen>
       final oldElements = elementsNotifier.value;
       oldElements.removeLast();
       elementsNotifier.value = [...oldElements];
+
+      // Receiving this notification means user ends dragging
+      hideTopButtons.value = false;
+      hideNavButtons.value = 1;
+      hideEditorEffects.value = false;
     }
     return true;
   }
@@ -262,6 +333,19 @@ class _EditorScreenState extends State<EditorScreen>
                         AnimatedVisibility(
                           animation: textEditorController,
                           child: const EditorTextInput(),
+                        ),
+                        ListenableBuilder(
+                          listenable: stickerEditorData,
+                          builder: (BuildContext context, Widget? _) {
+                            final data = stickerEditorData.value;
+                            return ModelBinding(
+                              model: stickerEditorData.value,
+                              child: AnimatedValuedVisibility(
+                                visible: data != null,
+                                child: const EditorStickerInput(),
+                              ),
+                            );
+                          },
                         ),
                         AnimatedVisibility(
                           animation: ReverseAnimation(

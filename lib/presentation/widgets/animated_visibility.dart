@@ -20,7 +20,7 @@ class AnimatedVisibility extends StatelessWidget {
       builder: (BuildContext context, Widget? childWidget) {
         return Visibility(
           visible: animation.value != 0,
-          maintainState: true,
+          maintainState: keepSize,
           maintainAnimation: keepSize,
           maintainSize: keepSize,
           child: Align(
@@ -46,6 +46,7 @@ class AnimatedValuedVisibility extends StatefulWidget {
     this.duration,
     this.child,
   });
+
   final Alignment alignment;
   final Curve? curve;
   final bool visible;

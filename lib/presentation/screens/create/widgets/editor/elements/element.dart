@@ -3,6 +3,7 @@ import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../notifications/editor_notification.dart';
+import 'sticker_scaffold.dart';
 
 class DurationRange {
   const DurationRange({required this.start, required this.end});
@@ -91,6 +92,96 @@ class TextElement extends VideoElementData {
   @override
   String toString() {
     return 'TextElement{text: $text}';
+  }
+}
+
+class StickerElement extends VideoElementData {
+  StickerElement({
+    super.range,
+    super.alignment,
+    super.id,
+    required this.color,
+  });
+
+  final Color color;
+}
+
+class QaStickerElement extends StickerElement {
+  QaStickerElement({
+    super.range,
+    super.alignment,
+    super.id,
+    required this.text,
+    required super.color,
+  });
+
+  final String text;
+
+  QaStickerElement copyWith({
+    String? text,
+    Color? color,
+    FractionalOffset? alignment,
+  }) {
+    return QaStickerElement(
+      id: id,
+      text: text ?? this.text,
+      color: color ?? this.color,
+      alignment: alignment ?? this.alignment,
+    );
+  }
+}
+
+class AddYStickerElement extends StickerElement {
+  AddYStickerElement({
+    super.range,
+    super.alignment,
+    super.id,
+    required this.prompt,
+    required super.color,
+  });
+
+  final String prompt;
+
+  AddYStickerElement copyWith({
+    String? prompt,
+    Color? color,
+    FractionalOffset? alignment,
+  }) {
+    return AddYStickerElement(
+      id: id,
+      prompt: prompt ?? this.prompt,
+      color: color ?? this.color,
+      alignment: alignment ?? this.alignment,
+    );
+  }
+}
+
+class PollStickerElement extends StickerElement {
+  PollStickerElement({
+    super.range,
+    super.alignment,
+    super.id,
+    required this.options,
+    required this.question,
+    required super.color,
+  });
+
+  final String question;
+  final List<String> options;
+
+  PollStickerElement copyWith({
+    Color? color,
+    List<String>? options,
+    FractionalOffset? alignment,
+    String? question,
+  }) {
+    return PollStickerElement(
+      id: id,
+      options: options ?? this.options,
+      question: question ?? this.question,
+      color: color ?? this.color,
+      alignment: alignment ?? this.alignment,
+    );
   }
 }
 
@@ -189,10 +280,23 @@ class _VideoElementState extends State<VideoElement> {
     if (!hitDelete) {
       final data = context.provide<VideoElementData>();
       final VideoElementData updatedElement;
-      // TODO(josh4500): Check for type
-      updatedElement = (data as TextElement).copyWith(
-        alignment: alignmentNotifier.value,
-      );
+      if (data is TextElement) {
+        updatedElement = data.copyWith(
+          alignment: alignmentNotifier.value,
+        );
+      } else if (data is QaStickerElement) {
+        updatedElement = data.copyWith(
+          alignment: alignmentNotifier.value,
+        );
+      } else if (data is AddYStickerElement) {
+        updatedElement = data.copyWith(
+          alignment: alignmentNotifier.value,
+        );
+      } else {
+        updatedElement = (data as PollStickerElement).copyWith(
+          alignment: alignmentNotifier.value,
+        );
+      }
 
       UpdateElementNotification(element: updatedElement).dispatch(context);
     }
@@ -240,7 +344,7 @@ class _VideoElementState extends State<VideoElement> {
 
   @override
   Widget build(BuildContext context) {
-    final data = context.provide<VideoElementData>();
+    final element = context.provide<VideoElementData>();
     return LayoutBuilder(
       builder: (
         BuildContext context,
@@ -264,9 +368,21 @@ class _VideoElementState extends State<VideoElement> {
             onPanUpdate: (details) => handlePanUpdate(details, constraints),
             child: _VideoElementItem(
               key: itemKey,
-              child: switch (data) {
+              child: switch (element) {
                 TextElement _ => const _TextElementWidget(),
-                _ => const Placeholder(),
+                QaStickerElement _ => const StickerScaffold(
+                    type: QaStickerElement,
+                    child: _QaElementWidget(),
+                  ),
+                AddYStickerElement _ => const StickerScaffold(
+                    type: AddYStickerElement,
+                    child: _AddYElementWidget(),
+                  ),
+                PollStickerElement _ => const StickerScaffold(
+                    type: PollStickerElement,
+                    child: _PollElementWidget(),
+                  ),
+                _ => const SizedBox(),
               },
             ),
           ),
@@ -282,6 +398,86 @@ class _VideoElementItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => child;
+}
+
+class _QaElementWidget extends StatelessWidget {
+  const _QaElementWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    final element = context.provide<VideoElementData>() as QaStickerElement;
+    return Text(
+      element.text,
+      style: const TextStyle(
+        fontSize: 18,
+        color: Colors.black,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+}
+
+class _AddYElementWidget extends StatelessWidget {
+  const _AddYElementWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    final element = context.provide<VideoElementData>() as AddYStickerElement;
+    return Text(
+      element.prompt,
+      style: const TextStyle(
+        fontSize: 18,
+        color: Colors.black,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+}
+
+class _PollElementWidget extends StatelessWidget {
+  const _PollElementWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    final element = context.provide<VideoElementData>() as PollStickerElement;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (element.question.isNotEmpty) ...[
+          Text(
+            element.question,
+            style: const TextStyle(
+              fontSize: 18,
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+        ...List.generate(
+          element.options.length,
+          (int index) => Container(
+            padding: const EdgeInsets.all(8),
+            margin: const EdgeInsets.only(bottom: 8),
+            decoration: BoxDecoration(
+              color: Colors.black12,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: TextField(
+              decoration: InputDecoration.collapsed(
+                hintText: element.options[index],
+                hintStyle: const TextStyle(
+                  fontSize: 20,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _TextElementWidget extends StatefulWidget {

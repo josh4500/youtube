@@ -7,7 +7,7 @@ class OpenTimelineNotification extends EditorNotification {}
 
 class CloseTimelineNotification extends EditorNotification {}
 
-class CloseEditorTextNotification extends EditorNotification {}
+class CloseElementEditortNotification extends EditorNotification {}
 
 class CreateElementNotification extends EditorNotification {
   CreateElementNotification({required this.element});
