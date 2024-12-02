@@ -35,6 +35,7 @@ class _EditorScreenState extends State<EditorScreen>
     duration: Durations.short3,
   );
   final ValueNotifier<double> hideNavButtons = ValueNotifier<double>(1);
+  final ValueNotifier<bool> hideTopButtons = ValueNotifier<bool>(false);
   final ValueNotifier<bool> hideEditorEffects = ValueNotifier<bool>(false);
   final elementsNotifier = ValueNotifier<List<VideoElementData>>([]);
 
@@ -49,6 +50,7 @@ class _EditorScreenState extends State<EditorScreen>
     effectsController.removeStatusListener(effectStatusListener);
     elementsNotifier.dispose();
     textEditorController.dispose();
+    hideTopButtons.dispose();
     hideNavButtons.dispose();
     hideEditorEffects.dispose();
     timelineSizeAnimation.dispose();
@@ -188,7 +190,16 @@ class _EditorScreenState extends State<EditorScreen>
             notification.element,
           ];
         }
+        // Receiving this notification means user starts dragging
+        hideTopButtons.value = true;
+        hideNavButtons.value = 0;
+        hideEditorEffects.value = true;
       } else {
+        // Receiving this notification means user ends dragging
+        hideTopButtons.value = false;
+        hideNavButtons.value = 1;
+        hideEditorEffects.value = false;
+
         elementsNotifier.value.removeWhere(
           (element) => element.id == notification.element.id,
         );
@@ -258,18 +269,22 @@ class _EditorScreenState extends State<EditorScreen>
                           ),
                           child: Column(
                             children: [
-                              const Padding(
-                                padding: EdgeInsets.all(12.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CreateCloseButton(
-                                      icon: YTIcons.arrow_back_outlined,
-                                    ),
-                                    AddMusicButton(),
-                                    SizedBox(width: 48),
-                                  ],
+                              HiddenListenableWidget(
+                                listenable: hideTopButtons,
+                                hideCallback: () => hideTopButtons.value,
+                                child: const Padding(
+                                  padding: EdgeInsets.all(12.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      CreateCloseButton(
+                                        icon: YTIcons.arrow_back_outlined,
+                                      ),
+                                      AddMusicButton(),
+                                      SizedBox(width: 48),
+                                    ],
+                                  ),
                                 ),
                               ),
                               Expanded(

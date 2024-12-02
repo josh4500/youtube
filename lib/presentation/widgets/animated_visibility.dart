@@ -37,9 +37,8 @@ class AnimatedVisibility extends StatelessWidget {
   }
 }
 
-// TODO(josh4500): Refactor widget
-class ValuedVisibility extends StatefulWidget {
-  const ValuedVisibility({
+class AnimatedValuedVisibility extends StatefulWidget {
+  const AnimatedValuedVisibility({
     super.key,
     this.curve,
     this.alignment = Alignment.topLeft,
@@ -54,10 +53,11 @@ class ValuedVisibility extends StatefulWidget {
   final Widget? child;
 
   @override
-  State<ValuedVisibility> createState() => _ValuedVisibilityState();
+  State<AnimatedValuedVisibility> createState() =>
+      _AnimatedValuedVisibilityState();
 }
 
-class _ValuedVisibilityState extends State<ValuedVisibility>
+class _AnimatedValuedVisibilityState extends State<AnimatedValuedVisibility>
     with SingleTickerProviderStateMixin {
   late final _opacityController = AnimationController(
     vsync: this,
@@ -73,7 +73,7 @@ class _ValuedVisibilityState extends State<ValuedVisibility>
   }
 
   @override
-  void didUpdateWidget(ValuedVisibility oldWidget) {
+  void didUpdateWidget(AnimatedValuedVisibility oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.visible != widget.visible) {
       widget.visible

@@ -48,7 +48,7 @@ class PlayerLoadingIndicator extends ConsumerWidget {
           ),
         );
 
-        return ValuedVisibility(
+        return AnimatedValuedVisibility(
           curve: Curves.easeIn,
           duration: Durations.long3,
           alignment: Alignment.center,

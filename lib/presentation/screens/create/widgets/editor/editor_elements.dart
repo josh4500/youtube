@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/theme/styles/app_color.dart';
+import 'package:youtube_clone/presentation/widgets/animated_visibility.dart';
 
 import '../notifications/editor_notification.dart';
 import 'elements/element.dart';
@@ -69,19 +70,35 @@ class _EditorElementsState extends State<EditorElements> {
                   );
                 },
               ),
-              ListenableBuilder(
-                listenable: widget.data,
+              ValueListenableBuilder(
+                valueListenable: widget.data,
                 builder: (
                   BuildContext context,
+                  List<VideoElementData> elements,
                   Widget? childWidget,
                 ) {
                   return Stack(
                     children: [
-                      for (int i = 0; i < widget.data.value.length; i++)
-                        ModelBinding(
-                          key: ValueKey(widget.data.value[i].id),
-                          model: widget.data.value[i],
-                          child: const VideoElement(),
+                      for (int i = 0; i < elements.length; i++)
+                        ValueListenableBuilder(
+                          key: ValueKey(elements[i].id),
+                          valueListenable: draggingNotifier,
+                          builder: (
+                            BuildContext context,
+                            bool dragging,
+                            Widget? childWidget,
+                          ) {
+                            return Opacity(
+                              opacity: dragging && i != elements.length - 1
+                                  ? 0.2
+                                  : 1,
+                              child: childWidget,
+                            );
+                          },
+                          child: ModelBinding(
+                            model: widget.data.value[i],
+                            child: const VideoElement(),
+                          ),
                         ),
                     ],
                   );
@@ -96,10 +113,9 @@ class _EditorElementsState extends State<EditorElements> {
                   BuildContext context,
                   Widget? _,
                 ) {
-                  if (draggingNotifier.value == false) {
-                    return const SizedBox();
-                  }
-                  return Align(
+                  return AnimatedValuedVisibility(
+                    visible: draggingNotifier.value,
+                    duration: Durations.short3,
                     alignment: Alignment.bottomCenter,
                     child: Transform.scale(
                       scale: hitDeleteNotifier.value ? 1.13 : 1,
