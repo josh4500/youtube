@@ -306,7 +306,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
           for (final effect in _enabledCaptureEffects) {
             _onUpdateCaptureEffect(effect, true);
           }
-        } else {
           _showDraftDecision();
         }
       });
@@ -327,24 +326,23 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (currentTabIndex != CreateTab.shorts) return;
-
-    if (state == AppLifecycleState.inactive) {
-      _disposeCamera();
-      _handleFailedRecording();
-    } else if (state == AppLifecycleState.resumed) {
+    if (state == AppLifecycleState.resumed) {
       _initCamera();
       if (_hasFailedRecording) {
         _showErrorSnackbar('Last recording failed.');
       }
+    } else if (state == AppLifecycleState.inactive) {
+      _disposeCamera();
+      _handleFailedRecording();
     }
   }
 
   @override
   void onIndexChanged(int newIndex) {
-    if (newIndex != CreateTab.shorts.index) {
-      _disposeCamera();
-    } else if (newIndex == CreateTab.shorts.index) {
+    if (newIndex == CreateTab.shorts.index) {
       _initCamera();
+    } else {
+      _disposeCamera();
     }
   }
 
