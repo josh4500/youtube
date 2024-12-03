@@ -68,18 +68,20 @@ class _EditorScreenState extends State<EditorScreen>
   }
 
   Future<void> _futureHideShowNavButtons(
-    Future<void> Function() callback,
+    Future<bool> Function() callback,
   ) async {
     hideNavButtons.value = 0;
-    await Future.wait([
+    final result = await Future.wait([
       callback(),
       Future.delayed(
         Durations.medium1,
         () => hideEditorEffects.value = true,
       ),
     ]);
-    hideEditorEffects.value = false;
-    hideNavButtons.value = 1;
+    if (result.first) {
+      hideEditorEffects.value = false;
+      hideNavButtons.value = 1;
+    }
   }
 
   Future<void> _openTimeline() async {
@@ -172,6 +174,7 @@ class _EditorScreenState extends State<EditorScreen>
             return const FilterSelector(isEditing: true);
           },
         );
+        return true;
       },
     );
   }
@@ -188,6 +191,7 @@ class _EditorScreenState extends State<EditorScreen>
             return const EditorVoiceoverRecorder();
           },
         );
+        return true;
       },
     );
   }
@@ -210,6 +214,7 @@ class _EditorScreenState extends State<EditorScreen>
           },
         );
         _openStickerEditor(result);
+        return result == null;
       },
     );
   }

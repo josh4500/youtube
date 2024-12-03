@@ -88,39 +88,37 @@ class StickerScaffold extends StatelessWidget {
             ),
             if (type == QaStickerElement || type == AddYStickerElement)
               Positioned.fill(
+                top: -14,
                 child: Align(
                   alignment: Alignment.topCenter,
-                  child: Transform.translate(
-                    offset: const Offset(0, -14),
-                    child: Builder(
-                      builder: (context) {
-                        if (type == QaStickerElement) {
-                          return Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.white,
-                              ),
+                  child: Builder(
+                    builder: (context) {
+                      if (type == QaStickerElement) {
+                        return Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            border: Border.all(
                               color: Colors.white,
-                              shape: BoxShape.circle,
                             ),
-                            child: Icon(
-                              {
-                                QaStickerElement: YTIcons.feedbck_outlined,
-                                AddYStickerElement: YTIcons.camera_outlined,
-                              }[type],
-                              color: Colors.black,
-                              size: 20,
-                            ),
-                          );
-                        } else {
-                          return AccountAvatar(
-                            size: 28,
-                            border: Border.all(color: Colors.white),
-                          );
-                        }
-                      },
-                    ),
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            {
+                              QaStickerElement: YTIcons.feedbck_outlined,
+                              AddYStickerElement: YTIcons.camera_outlined,
+                            }[type],
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                        );
+                      } else {
+                        return AccountAvatar(
+                          size: 28,
+                          border: Border.all(color: Colors.white),
+                        );
+                      }
+                    },
                   ),
                 ),
               ),

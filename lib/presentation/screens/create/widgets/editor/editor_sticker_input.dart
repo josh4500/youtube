@@ -269,7 +269,6 @@ class MaxLinesTextInputFormatter extends TextInputFormatter {
     TextEditingValue newValue,
   ) {
     final textSpan = TextSpan(text: newValue.text, style: textStyle);
-
     final textPainter = TextPainter(
       text: textSpan,
       maxLines: maxLines,
@@ -279,10 +278,8 @@ class MaxLinesTextInputFormatter extends TextInputFormatter {
     final lineMetrics = textPainter.computeLineMetrics();
     final numLines = lineMetrics.length;
 
-    final reachLimit =
-        numLines >= maxLines && lineMetrics.last.width >= maxWidth - 18;
-
-    if (reachLimit) {
+    if (numLines > maxLines) return oldValue;
+    if (numLines == maxLines && lineMetrics.last.width >= maxWidth - 18) {
       return oldValue;
     }
 

@@ -465,6 +465,7 @@ class _QaElementWidget extends StatelessWidget {
     }
     return Text(
       element.text,
+      textAlign: TextAlign.center,
       style: const TextStyle(
         fontSize: 20,
         color: Colors.black,
@@ -485,6 +486,7 @@ class _AddYElementWidget extends StatelessWidget {
     }
     return Text(
       element.prompt,
+      textAlign: TextAlign.center,
       style: const TextStyle(
         fontSize: 20,
         color: Colors.black,
