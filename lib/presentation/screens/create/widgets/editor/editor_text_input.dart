@@ -254,22 +254,6 @@ class _EditorTextInputState extends State<EditorTextInput> {
                         Colors.amber,
                         Colors.amberAccent,
                         Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
-                        Colors.white,
                       ][index];
                       return GestureDetector(
                         onTap: () {
@@ -288,7 +272,7 @@ class _EditorTextInputState extends State<EditorTextInput> {
                         ),
                       );
                     },
-                    itemCount: 20,
+                    itemCount: 10,
                   ),
                 ),
               ),

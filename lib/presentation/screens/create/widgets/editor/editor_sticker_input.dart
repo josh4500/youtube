@@ -130,107 +130,130 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
           ),
           Column(
             children: [
-              StickerScaffold(
-                type: type,
-                child: Column(
-                  children: [
-                    ListenableBuilder(
-                      listenable: _controller,
-                      builder: (
-                        BuildContext context,
-                        Widget? _,
-                      ) {
-                        return Stack(
-                          children: [
-                            if (_controller.text.isEmpty)
-                              StickerContentPlaceholder(type: type),
-                            Visibility(
-                              visible: _controller.text.isNotEmpty,
-                              maintainState: true,
-                              maintainAnimation: true,
-                              maintainSize: true,
-                              maintainInteractivity: true,
-                              child: TextField(
-                                cursorWidth: 2.25,
-                                minLines: minLines,
-                                maxLines: maxLines,
-                                focusNode: _focusNode,
-                                controller: _controller,
-                                textAlign: type == PollStickerElement
-                                    ? TextAlign.start
-                                    : TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                inputFormatters: const [
-                                  MaxLinesTextInputFormatter(
-                                    maxLines: maxLines,
-                                    textStyle: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w600,
+              ValueListenableBuilder(
+                valueListenable: colorNotifier,
+                builder: (
+                  BuildContext context,
+                  Color color,
+                  Widget? _,
+                ) {
+                  return ModelBinding<Color>(
+                    model: color,
+                    child: StickerScaffold(
+                      type: type,
+                      child: Column(
+                        children: [
+                          ListenableBuilder(
+                            listenable: _controller,
+                            builder: (
+                              BuildContext context,
+                              Widget? _,
+                            ) {
+                              return Stack(
+                                children: [
+                                  if (_controller.text.isEmpty)
+                                    StickerContentPlaceholder(type: type),
+                                  Visibility(
+                                    visible: _controller.text.isNotEmpty,
+                                    maintainState: true,
+                                    maintainAnimation: true,
+                                    maintainSize: true,
+                                    maintainInteractivity: true,
+                                    child: TextField(
+                                      cursorWidth: 2.25,
+                                      minLines: minLines,
+                                      maxLines: maxLines,
+                                      focusNode: _focusNode,
+                                      controller: _controller,
+                                      cursorColor: Color.alphaBlend(
+                                        color.withOpacity(.1),
+                                        Colors.black,
+                                      ),
+                                      textAlign: type == PollStickerElement
+                                          ? TextAlign.start
+                                          : TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Color.alphaBlend(
+                                          color.withOpacity(.1),
+                                          Colors.black,
+                                        ),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      inputFormatters: const [
+                                        MaxLinesTextInputFormatter(
+                                          maxLines: maxLines,
+                                          textStyle: TextStyle(
+                                            fontSize: 20,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          maxWidth: 250 - 24,
+                                        ),
+                                      ],
+                                      decoration: InputDecoration.collapsed(
+                                        hintText: 'Ask a question',
+                                        hintStyle: TextStyle(
+                                          fontSize: 20,
+                                          color: Color.alphaBlend(
+                                            color.withOpacity(.3),
+                                            Colors.black,
+                                          ),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ),
-                                    maxWidth: 250 - 24,
                                   ),
                                 ],
-                                decoration: const InputDecoration.collapsed(
-                                  hintText: 'Ask a question',
-                                  hintStyle: TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.black26,
-                                    fontWeight: FontWeight.w600,
+                              );
+                            },
+                          ),
+                          if (type == PollStickerElement)
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 12),
+                                ...List.generate(
+                                  2,
+                                  (int index) => Container(
+                                    padding: const EdgeInsets.all(8),
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black12,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: TextField(
+                                      controller: optionControllers[index],
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black87,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      decoration: InputDecoration.collapsed(
+                                        hintText: ['Yes', 'No'][index],
+                                        hintStyle: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black38,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                    if (type == PollStickerElement)
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 12),
-                          ...List.generate(
-                            2,
-                            (int index) => Container(
-                              padding: const EdgeInsets.all(8),
-                              margin: const EdgeInsets.only(bottom: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.black12,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: TextField(
-                                controller: optionControllers[index],
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w600,
+                                const SizedBox(height: 4),
+                                const Text(
+                                  '0 vote',
+                                  style: TextStyle(
+                                      fontSize: 10, color: Colors.black),
                                 ),
-                                decoration: InputDecoration.collapsed(
-                                  hintText: ['Yes', 'No'][index],
-                                  hintStyle: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black38,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
+                              ],
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            '0 vote',
-                            style: TextStyle(fontSize: 10, color: Colors.black),
-                          ),
                         ],
                       ),
-                  ],
-                ),
+                    ),
+                  );
+                },
               ),
               ...[
                 const SizedBox(height: 12),
@@ -246,7 +269,42 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
               ],
             ],
           ),
-          const SizedBox(),
+          SizedBox(
+            height: 34,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (BuildContext context, int index) {
+                final color = [
+                  Colors.white,
+                  Colors.redAccent,
+                  Colors.blueAccent,
+                  Colors.yellowAccent,
+                  Colors.greenAccent,
+                  Colors.deepPurpleAccent,
+                  Colors.purpleAccent,
+                  Colors.purpleAccent,
+                  Colors.amberAccent,
+                  Colors.brown,
+                ][index];
+                return GestureDetector(
+                  onTap: () {
+                    colorNotifier.value = color;
+                  },
+                  child: Container(
+                    height: 24,
+                    width: 24,
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white),
+                    ),
+                  ),
+                );
+              },
+              itemCount: 10,
+            ),
+          ),
         ],
       ),
     );

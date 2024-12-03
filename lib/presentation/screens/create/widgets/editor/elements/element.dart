@@ -394,23 +394,33 @@ class _VideoElementState extends State<VideoElement> {
               element,
             ),
             onPanUpdate: (details) => handlePanUpdate(details, constraints),
-            child: _VideoElementItem(
-              key: itemKey,
-              child: switch (element) {
-                TextElement _ => const _TextElementWidget(),
-                QaStickerElement _ => const StickerScaffold(
-                    type: QaStickerElement,
-                    child: _QaElementWidget(),
-                  ),
-                AddYStickerElement _ => const StickerScaffold(
-                    type: AddYStickerElement,
-                    child: _AddYElementWidget(),
-                  ),
-                PollStickerElement _ => const StickerScaffold(
-                    type: PollStickerElement,
-                    child: _PollElementWidget(),
-                  ),
-                _ => const SizedBox(),
+            child: Builder(
+              builder: (BuildContext context) {
+                final child = _VideoElementItem(
+                  key: itemKey,
+                  child: switch (element) {
+                    TextElement _ => const _TextElementWidget(),
+                    QaStickerElement _ => const StickerScaffold(
+                        type: QaStickerElement,
+                        child: _QaElementWidget(),
+                      ),
+                    AddYStickerElement _ => const StickerScaffold(
+                        type: AddYStickerElement,
+                        child: _AddYElementWidget(),
+                      ),
+                    PollStickerElement _ => const StickerScaffold(
+                        type: PollStickerElement,
+                        child: _PollElementWidget(),
+                      ),
+                    _ => const SizedBox(),
+                  },
+                );
+
+                if (element is StickerElement) {
+                  return ModelBinding(model: element.color, child: child);
+                }
+
+                return child;
               },
             ),
           ),
@@ -435,6 +445,7 @@ class StickerContentPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = context.provide<Color>();
     return Align(
       alignment:
           type == PollStickerElement ? Alignment.centerLeft : Alignment.center,
@@ -444,9 +455,12 @@ class StickerContentPlaceholder extends StatelessWidget {
           AddYStickerElement: 'Add a prompt',
           PollStickerElement: 'Ask a question',
         }[type]!,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 20,
-          color: Colors.black54,
+          color: Color.alphaBlend(
+            color.withOpacity(.3),
+            Colors.black,
+          ),
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -466,9 +480,12 @@ class _QaElementWidget extends StatelessWidget {
     return Text(
       element.text,
       textAlign: TextAlign.center,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 20,
-        color: Colors.black,
+        color: Color.alphaBlend(
+          element.color.withOpacity(.1),
+          Colors.black,
+        ),
         fontWeight: FontWeight.w600,
       ),
     );
@@ -487,9 +504,12 @@ class _AddYElementWidget extends StatelessWidget {
     return Text(
       element.prompt,
       textAlign: TextAlign.center,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 20,
-        color: Colors.black,
+        color: Color.alphaBlend(
+          element.color.withOpacity(.1),
+          Colors.black,
+        ),
         fontWeight: FontWeight.w600,
       ),
     );
@@ -509,9 +529,12 @@ class _PollElementWidget extends StatelessWidget {
         if (element.question.isNotEmpty) ...[
           Text(
             element.question,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
-              color: Colors.black,
+              color: Color.alphaBlend(
+                element.color.withOpacity(.1),
+                Colors.black,
+              ),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -529,9 +552,12 @@ class _PollElementWidget extends StatelessWidget {
             ),
             child: Text(
               element.options[index],
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
-                color: Colors.black,
+                color: Color.alphaBlend(
+                  element.color.withOpacity(.1),
+                  Colors.black,
+                ),
                 fontWeight: FontWeight.w600,
               ),
             ),

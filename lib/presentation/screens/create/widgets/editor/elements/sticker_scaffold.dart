@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/theme/icon/y_t_icons_icons.dart';
+import 'package:youtube_clone/presentation/view_models/model_binding.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'element.dart';
@@ -15,6 +16,7 @@ class StickerScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color color = context.provide<Color>();
     return ConstrainedBox(
       constraints: const BoxConstraints(
         minWidth: 200,
@@ -27,7 +29,10 @@ class StickerScaffold extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Color.alphaBlend(
+                  color.withOpacity(.5),
+                  Colors.white,
+                ),
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Column(
@@ -45,34 +50,44 @@ class StickerScaffold extends StatelessWidget {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.5),
+                        color: Colors.black.withOpacity(0.08),
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: Builder(
                         builder: (context) {
                           if (type == QaStickerElement) {
-                            return const Text(
+                            return Text(
                               'Answer',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.black,
+                                color: Color.alphaBlend(
+                                  color.withOpacity(.1),
+                                  Colors.black,
+                                ),
                                 fontWeight: FontWeight.w600,
                               ),
                             );
                           } else {
-                            return const Row(
+                            return Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   YTIcons.camera_outlined,
                                   size: 16,
+                                  color: Color.alphaBlend(
+                                    color.withOpacity(.1),
+                                    Colors.black,
+                                  ),
                                 ),
-                                SizedBox(width: 4),
+                                const SizedBox(width: 4),
                                 Text(
                                   'Add yours',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.white,
+                                    color: Color.alphaBlend(
+                                      color.withOpacity(.1),
+                                      Colors.black,
+                                    ),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -98,9 +113,15 @@ class StickerScaffold extends StatelessWidget {
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: Colors.white,
+                              color: Color.alphaBlend(
+                                color.withOpacity(.3),
+                                Colors.white,
+                              ),
                             ),
-                            color: Colors.white,
+                            color: Color.alphaBlend(
+                              color.withOpacity(.85),
+                              Colors.black,
+                            ),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -108,7 +129,10 @@ class StickerScaffold extends StatelessWidget {
                               QaStickerElement: YTIcons.feedbck_outlined,
                               AddYStickerElement: YTIcons.camera_outlined,
                             }[type],
-                            color: Colors.black,
+                            color: Color.alphaBlend(
+                              color.withOpacity(.3),
+                              Colors.black,
+                            ),
                             size: 20,
                           ),
                         );
