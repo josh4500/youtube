@@ -20,75 +20,75 @@ class StickerScaffold extends StatelessWidget {
         minWidth: 200,
         maxWidth: 250,
       ),
-      child: IntrinsicHeight(
-        child: IntrinsicWidth(
-          child: Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (type == QaStickerElement || type == AddYStickerElement)
-                      const SizedBox(height: 4),
-                    child,
-                    if (type == QaStickerElement ||
-                        type == AddYStickerElement) ...[
-                      if (type == AddYStickerElement)
-                        const SizedBox(height: 24),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: Builder(
-                          builder: (context) {
-                            if (type == QaStickerElement) {
-                              return const Text(
-                                'Answer',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              );
-                            } else {
-                              return const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    YTIcons.camera_outlined,
-                                    size: 16,
-                                  ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Add yours',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+      child: IntrinsicWidth(
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
               ),
-              if (type == QaStickerElement || type == AddYStickerElement)
-                Align(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (type == QaStickerElement || type == AddYStickerElement)
+                    const SizedBox(height: 4),
+                  child,
+                  if (type == QaStickerElement ||
+                      type == AddYStickerElement) ...[
+                    if (type == AddYStickerElement) const SizedBox(height: 24),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Builder(
+                        builder: (context) {
+                          if (type == QaStickerElement) {
+                            return const Text(
+                              'Answer',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            );
+                          } else {
+                            return const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  YTIcons.camera_outlined,
+                                  size: 16,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Add yours',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (type == QaStickerElement || type == AddYStickerElement)
+              Positioned.fill(
+                child: Align(
                   alignment: Alignment.topCenter,
                   child: Transform.translate(
                     offset: const Offset(0, -14),
@@ -123,8 +123,8 @@ class StickerScaffold extends StatelessWidget {
                     ),
                   ),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
       ),
     );
