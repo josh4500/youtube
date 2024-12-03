@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/core.dart';
-import 'package:youtube_clone/infrastructure/services/media/media_discovery.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -41,11 +40,12 @@ class _EditorScreenState extends State<EditorScreen>
   final ValueNotifier<double> hideNavButtons = ValueNotifier<double>(1);
   final ValueNotifier<bool> hideTopButtons = ValueNotifier<bool>(false);
   final ValueNotifier<bool> hideEditorEffects = ValueNotifier<bool>(false);
-  final ValueNotifier<(Type, StickerElement?)?> stickerEditorData =
+  final ValueNotifier<(Type, StickerElement?)?> _stickerElementNotifier =
       ValueNotifier(
     null,
   );
   final elementsNotifier = ValueNotifier<List<VideoElementData>>([]);
+  final ValueNotifier<TextElement?> _textElementNotifier = ValueNotifier(null);
 
   @override
   void initState() {
@@ -56,7 +56,8 @@ class _EditorScreenState extends State<EditorScreen>
   @override
   void dispose() {
     effectsController.removeStatusListener(effectStatusListener);
-    stickerEditorData.dispose();
+    _stickerElementNotifier.dispose();
+    _textElementNotifier.dispose();
     elementsNotifier.dispose();
     textEditorController.dispose();
     hideTopButtons.dispose();
@@ -119,6 +120,7 @@ class _EditorScreenState extends State<EditorScreen>
 
   Future<void> _closeTextEditor() async {
     await textEditorController.reverse();
+    _textElementNotifier.value = null;
     hideNavButtons.value = 1;
   }
 
@@ -146,12 +148,12 @@ class _EditorScreenState extends State<EditorScreen>
       hideTopButtons.value = true;
       hideNavButtons.value = 0;
       hideEditorEffects.value = true;
-      stickerEditorData.value = (elementType, previousStickerElement);
+      _stickerElementNotifier.value = (elementType, previousStickerElement);
     }
   }
 
   Future<void> _closeStickerEditor() async {
-    stickerEditorData.value = null;
+    _stickerElementNotifier.value = null;
 
     hideTopButtons.value = false;
     hideNavButtons.value = 1;
@@ -217,7 +219,12 @@ class _EditorScreenState extends State<EditorScreen>
       _openTimeline();
     } else if (notification is CloseTimelineNotification) {
       _closeTimeline();
-    } else if (notification is CloseElementEditortNotification) {
+    } else if (notification is OpenTextEditorNotification) {
+      _textElementNotifier.value = notification.element;
+      _openTextEditor();
+    } else if (notification is OpenStickerEditorNotification) {
+      _openStickerEditor(notification.type);
+    } else if (notification is CloseElementEditorNotification) {
       _closeTextEditor();
       _closeStickerEditor();
     } else if (notification is CreateElementNotification) {
@@ -225,14 +232,18 @@ class _EditorScreenState extends State<EditorScreen>
       _closeStickerEditor();
 
       bool add = true;
+      final previousStickerElement = elementsNotifier.value.firstWhereOrNull(
+        (element) => element is StickerElement,
+      );
+
       if (notification.element is StickerElement) {
-        final type = notification.element.runtimeType;
-        final previousStickerElement = elementsNotifier.value.firstWhereOrNull(
-          (element) => element.runtimeType == type,
-        );
         if (previousStickerElement != null) {
           add = false;
         }
+      } else if (previousStickerElement != null) {
+        elementsNotifier.value.removeWhere(
+          (element) => element is StickerElement,
+        );
       }
 
       if (add) {
@@ -240,6 +251,7 @@ class _EditorScreenState extends State<EditorScreen>
         elementsNotifier.value = [
           ...elementsNotifier.value,
           notification.element,
+          if (previousStickerElement != null) previousStickerElement,
         ];
       }
     } else if (notification is UpdateElementNotification) {
@@ -256,6 +268,7 @@ class _EditorScreenState extends State<EditorScreen>
             notification.element,
           ];
         }
+
         // Receiving this notification means user starts dragging
         hideTopButtons.value = true;
         hideNavButtons.value = 0;
@@ -266,17 +279,31 @@ class _EditorScreenState extends State<EditorScreen>
         hideNavButtons.value = 1;
         hideEditorEffects.value = false;
 
+        final StickerElement? stickerElement;
+        if (notification.element is! StickerElement) {
+          stickerElement = elementsNotifier.value.firstWhereOrNull(
+            (element) => element is StickerElement,
+          ) as StickerElement?;
+        } else {
+          stickerElement = null;
+        }
         elementsNotifier.value.removeWhere(
-          (element) => element.id == notification.element.id,
+          (element) =>
+              element.id == notification.element.id ||
+              (element is StickerElement),
         );
+
         elementsNotifier.value = [
           ...elementsNotifier.value,
           notification.element,
+          if (stickerElement != null) stickerElement,
         ];
       }
     } else if (notification is DeleteElementNotification) {
       final oldElements = elementsNotifier.value;
-      oldElements.removeLast();
+      oldElements.removeWhere(
+        (element) => element.id == notification.elementId,
+      );
       elementsNotifier.value = [...oldElements];
 
       // Receiving this notification means user ends dragging
@@ -328,20 +355,34 @@ class _EditorScreenState extends State<EditorScreen>
                           animation: ReverseAnimation(
                             textEditorController,
                           ),
-                          child: EditorElements(data: elementsNotifier),
-                        ),
-                        AnimatedVisibility(
-                          animation: textEditorController,
-                          child: const EditorTextInput(),
+                          child: ModelBinding(
+                            model: elementsNotifier,
+                            child: const EditorElements(),
+                          ),
                         ),
                         ListenableBuilder(
-                          listenable: stickerEditorData,
+                          listenable: _textElementNotifier,
                           builder: (BuildContext context, Widget? _) {
-                            final data = stickerEditorData.value;
-                            return ModelBinding(
-                              model: stickerEditorData.value,
-                              child: AnimatedValuedVisibility(
-                                visible: data != null,
+                            return AnimatedVisibility(
+                              animation: textEditorController,
+                              keepAlive: true,
+                              child: ModelBinding<TextElement?>(
+                                model: _textElementNotifier.value,
+                                child: const EditorTextInput(),
+                              ),
+                            );
+                          },
+                        ),
+                        ListenableBuilder(
+                          listenable: _stickerElementNotifier,
+                          builder: (BuildContext context, Widget? _) {
+                            final data = _stickerElementNotifier.value;
+                            return AnimatedValuedVisibility(
+                              visible: data != null,
+                              keepState: false,
+                              duration: Durations.short2,
+                              child: ModelBinding(
+                                model: data,
                                 child: const EditorStickerInput(),
                               ),
                             );
@@ -394,7 +435,7 @@ class _EditorScreenState extends State<EditorScreen>
                   ),
                   const SizedBox(height: 72),
                   AnimatedVisibility(
-                    keepSize: true,
+                    keepAlive: true,
                     animation: Animation.fromValueListenable(
                       hideNavButtons,
                     ),

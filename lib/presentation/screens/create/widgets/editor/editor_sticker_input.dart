@@ -16,17 +16,36 @@ class EditorStickerInput extends StatefulWidget {
 class _EditorStickerInputState extends State<EditorStickerInput> {
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _option1Controller = TextEditingController();
+  final TextEditingController _option2Controller = TextEditingController();
   final ValueNotifier<Color> colorNotifier = ValueNotifier<Color>(Colors.white);
   static const int minLines = 1;
   static const int maxLines = 3;
+  List<TextEditingController> get optionControllers => [
+        _option1Controller,
+        _option2Controller,
+      ];
+
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final (type, element) = context.provide<(Type, StickerElement?)?>()!;
+    if (element is QaStickerElement && type == QaStickerElement) {
+      _controller.text = element.text;
+    } else if (element is AddYStickerElement && type == AddYStickerElement) {
+      _controller.text = element.prompt;
+    } else if (element is PollStickerElement && type == PollStickerElement) {
+      _controller.text = element.question;
+      _option1Controller.text = element.options.first;
+      _option2Controller.text = element.options.last;
+    }
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _option1Controller.dispose();
+    _option2Controller.dispose();
     _focusNode.dispose();
     colorNotifier.dispose();
     super.dispose();
@@ -34,7 +53,8 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
 
   @override
   Widget build(BuildContext context) {
-    final stickerData = context.provide<(Type, StickerElement?)?>()!;
+    final (type, stickerElement) = context.provide<(Type, StickerElement?)?>()!;
+    final alignment = stickerElement?.alignment ?? FractionalOffset.center;
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
@@ -47,31 +67,50 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
               child: GestureDetector(
                 onTap: () {
                   _focusNode.unfocus();
+
                   final StickerElement element;
-                  if (stickerData.$1 == QaStickerElement) {
+                  if (type == QaStickerElement) {
                     element = QaStickerElement(
+                      id: stickerElement is QaStickerElement
+                          ? stickerElement.id
+                          : null,
                       text: _controller.text.trim(),
                       color: colorNotifier.value,
+                      alignment: stickerElement is QaStickerElement
+                          ? alignment
+                          : FractionalOffset.center,
                     );
-                  } else if (stickerData.$1 == AddYStickerElement) {
+                  } else if (type == AddYStickerElement) {
                     element = AddYStickerElement(
+                      id: stickerElement is AddYStickerElement
+                          ? stickerElement.id
+                          : null,
                       prompt: _controller.text.trim(),
                       color: colorNotifier.value,
+                      alignment: stickerElement is AddYStickerElement
+                          ? alignment
+                          : FractionalOffset.center,
                     );
                   } else {
                     element = PollStickerElement(
+                      id: stickerElement is PollStickerElement
+                          ? stickerElement.id
+                          : null,
                       question: _controller.text.trim(),
-                      options: ['Yes', 'No'],
+                      options: [
+                        _option1Controller.text.trim(),
+                        _option2Controller.text.trim(),
+                      ],
                       color: colorNotifier.value,
+                      alignment: stickerElement is PollStickerElement
+                          ? alignment
+                          : FractionalOffset.center,
                     );
                   }
-                  if (_controller.text.isNotEmpty) {
-                    CreateElementNotification(
-                      element: element,
-                    ).dispatch(context);
-                  } else {
-                    CloseElementEditortNotification().dispatch(context);
-                  }
+
+                  CreateElementNotification(
+                    element: element,
+                  ).dispatch(context);
                 },
                 child: const Text(
                   'DONE',
@@ -85,7 +124,7 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
           Column(
             children: [
               StickerScaffold(
-                type: stickerData.$1,
+                type: type,
                 child: Column(
                   children: [
                     ListenableBuilder(
@@ -97,23 +136,7 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
                         return Stack(
                           children: [
                             if (_controller.text.isEmpty)
-                              Align(
-                                alignment: stickerData.$1 == PollStickerElement
-                                    ? Alignment.centerLeft
-                                    : Alignment.center,
-                                child: Text(
-                                  {
-                                    QaStickerElement: 'Ask a question',
-                                    AddYStickerElement: 'Add a prompt',
-                                    PollStickerElement: 'Ask a question',
-                                  }[stickerData.$1]!,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.black54,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
+                              StickerContentPlaceholder(type: type),
                             Visibility(
                               visible: _controller.text.isNotEmpty,
                               maintainState: true,
@@ -126,7 +149,7 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
                                 maxLines: maxLines,
                                 focusNode: _focusNode,
                                 controller: _controller,
-                                textAlign: stickerData.$1 == PollStickerElement
+                                textAlign: type == PollStickerElement
                                     ? TextAlign.start
                                     : TextAlign.center,
                                 style: const TextStyle(
@@ -159,9 +182,10 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
                         );
                       },
                     ),
-                    if (stickerData.$1 == PollStickerElement)
+                    if (type == PollStickerElement)
                       Column(
                         mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 12),
                           ...List.generate(
@@ -174,16 +198,27 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: TextField(
+                                controller: optionControllers[index],
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.w600,
+                                ),
                                 decoration: InputDecoration.collapsed(
                                   hintText: ['Yes', 'No'][index],
                                   hintStyle: const TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 16,
                                     color: Colors.black38,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),
                             ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            '0 vote',
+                            style: TextStyle(fontSize: 10, color: Colors.black),
                           ),
                         ],
                       ),
@@ -198,7 +233,7 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
                     AddYStickerElement:
                         'Viewers can respond with their own Short',
                     PollStickerElement: 'Viewers can vote on a poll option',
-                  }[stickerData.$1]!,
+                  }[type]!,
                   style: const TextStyle(fontSize: 11),
                 ),
               ],

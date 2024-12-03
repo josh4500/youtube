@@ -7,8 +7,7 @@ import '../notifications/editor_notification.dart';
 import 'elements/element.dart';
 
 class EditorElements extends StatefulWidget {
-  const EditorElements({super.key, required this.data});
-  final ValueNotifier<List<VideoElementData>> data;
+  const EditorElements({super.key});
 
   @override
   State<EditorElements> createState() => _EditorElementsState();
@@ -30,11 +29,6 @@ class _EditorElementsState extends State<EditorElements> {
       hitNotifier.value = notification.hit;
       draggingNotifier.value = notification.dragging;
       hitDeleteNotifier.value = notification.hitDelete;
-
-      if (notification.hitDelete && !notification.dragging) {
-        DeleteElementNotification().dispatch(context);
-        hitDeleteNotifier.value = false;
-      }
       return true;
     }
     return false;
@@ -42,10 +36,12 @@ class _EditorElementsState extends State<EditorElements> {
 
   @override
   Widget build(BuildContext context) {
+    final elementsNotifier =
+        context.provide<ValueNotifier<List<VideoElementData>>>();
     return NotificationListener<EditorNotification>(
       onNotification: handleEditorNotification,
       child: ListenableBuilder(
-        listenable: widget.data,
+        listenable: elementsNotifier,
         builder: (BuildContext context, Widget? childWidget) {
           return Stack(
             fit: StackFit.expand,
@@ -71,7 +67,7 @@ class _EditorElementsState extends State<EditorElements> {
                 },
               ),
               ValueListenableBuilder(
-                valueListenable: widget.data,
+                valueListenable: elementsNotifier,
                 builder: (
                   BuildContext context,
                   List<VideoElementData> elements,
@@ -96,7 +92,7 @@ class _EditorElementsState extends State<EditorElements> {
                             );
                           },
                           child: ModelBinding(
-                            model: widget.data.value[i],
+                            model: elementsNotifier.value[i],
                             child: const VideoElement(),
                           ),
                         ),
@@ -155,12 +151,12 @@ class DragLinesPainter extends CustomPainter {
       ..color = Colors.green
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
-    const double spacing = 12.0;
+    const double spacing = 14.0;
     // Draw lines based on the drag position
     if (hit.hitTop) {
       canvas.drawLine(
-        const Offset(0, spacing),
-        Offset(size.width - spacing, spacing),
+        const Offset(0, spacing * 4),
+        Offset(size.width, spacing * 4),
         paint,
       );
     }
@@ -183,8 +179,8 @@ class DragLinesPainter extends CustomPainter {
     if (hit.hitBottom) {
       // Bottom
       canvas.drawLine(
-        Offset(0, size.height - spacing),
-        Offset(size.width, size.height - spacing),
+        Offset(0, size.height - spacing * 4),
+        Offset(size.width, size.height - spacing * 4),
         paint,
       );
     }

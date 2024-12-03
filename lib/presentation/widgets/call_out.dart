@@ -77,7 +77,6 @@ class _CallOutState extends State<CallOut> {
               calculatedOffset = Offset.zero;
           }
         }
-        print((childSize, calculatedOffset));
 
         return CompositedTransformFollower(
           link: callOutLink.link,
@@ -88,7 +87,6 @@ class _CallOutState extends State<CallOut> {
             type: MaterialType.transparency,
             child: TapRegion(
               groupId: CallOut,
-              onTapInside: (_) => effectiveController.hide(),
               onTapOutside: (_) => effectiveController.hide(),
               child: Align(
                 alignment: AlignmentDirectional.center,

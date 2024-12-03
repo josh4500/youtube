@@ -5,14 +5,17 @@ class AnimatedVisibility extends StatelessWidget {
     super.key,
     required this.animation,
     this.alignment = Alignment.topLeft,
-    this.keepSize = false,
+    this.keepAlive = false,
+    this.keepState = true,
     this.child,
   });
 
   final Animation<double> animation;
   final Alignment alignment;
-  final bool keepSize;
+  final bool keepAlive;
+  final bool keepState;
   final Widget? child;
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -20,9 +23,9 @@ class AnimatedVisibility extends StatelessWidget {
       builder: (BuildContext context, Widget? childWidget) {
         return Visibility(
           visible: animation.value != 0,
-          maintainState: keepSize,
-          maintainAnimation: keepSize,
-          maintainSize: keepSize,
+          maintainState: keepState,
+          maintainAnimation: keepAlive,
+          maintainSize: keepAlive,
           child: Align(
             alignment: alignment,
             child: Opacity(
@@ -43,6 +46,7 @@ class AnimatedValuedVisibility extends StatefulWidget {
     this.curve,
     this.alignment = Alignment.topLeft,
     this.visible = true,
+    this.keepState = true,
     this.duration,
     this.child,
   });
@@ -52,6 +56,7 @@ class AnimatedValuedVisibility extends StatefulWidget {
   final bool visible;
   final Duration? duration;
   final Widget? child;
+  final bool keepState;
 
   @override
   State<AnimatedValuedVisibility> createState() =>
@@ -90,6 +95,7 @@ class _AnimatedValuedVisibilityState extends State<AnimatedValuedVisibility>
         parent: _opacityController,
         curve: widget.curve ?? Curves.linear,
       ),
+      keepState: widget.keepState,
       alignment: widget.alignment,
       child: widget.child,
     );

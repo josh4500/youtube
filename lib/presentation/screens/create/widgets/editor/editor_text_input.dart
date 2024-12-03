@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/screens/create/provider/index_notifier.dart';
 import 'package:youtube_clone/presentation/screens/create/widgets/editor/elements/element.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
@@ -13,25 +15,38 @@ class EditorTextInput extends StatefulWidget {
 
 class _EditorTextInputState extends State<EditorTextInput> {
   final FocusNode focusNode = FocusNode();
-  final textController = TextEditingController();
-  final ValueNotifier<TextStyle> styleNotifier = ValueNotifier(
+  final _controller = TextEditingController();
+  final ValueNotifier<TextStyle> _styleNotifier = ValueNotifier(
     const TextStyle(fontWeight: FontWeight.w700),
   );
-  final ValueNotifier<TextAlign> textAlignNotifier = ValueNotifier(
+  final ValueNotifier<TextAlign> _textAlignNotifier = ValueNotifier(
     TextAlign.center,
   );
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final element = context.provide<TextElement?>();
+    if (element != null) {
+      _controller.text = element.text;
+      _styleNotifier.value = element.style;
+      _textAlignNotifier.value = element.textAlign;
+    }
+  }
+
+  @override
   void dispose() {
     focusNode.dispose();
-    styleNotifier.dispose();
-    textAlignNotifier.dispose();
-    textController.dispose();
+    _styleNotifier.dispose();
+    _textAlignNotifier.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final element = context.provide<TextElement?>();
+
     return Column(
       children: [
         Padding(
@@ -62,19 +77,37 @@ class _EditorTextInputState extends State<EditorTextInput> {
               GestureDetector(
                 onTap: () {
                   focusNode.unfocus();
+                  print(element);
+                  if (_controller.text.isNotEmpty) {
+                    if (element == null) {
+                      CreateElementNotification(
+                        element: TextElement(
+                          text: _controller.text.trim(),
+                          textAlign: _textAlignNotifier.value,
+                          style: _styleNotifier.value,
+                          readOutLoad: false,
+                        ),
+                      ).dispatch(context);
+                    } else {
+                      UpdateElementNotification(
+                        element: element.copyWith(
+                          text: _controller.text.trim(),
+                          textAlign: _textAlignNotifier.value,
+                          style: _styleNotifier.value,
+                          readOutLoad: false,
+                        ),
+                      ).dispatch(context);
+                      CloseElementEditorNotification().dispatch(context);
+                    }
 
-                  if (textController.text.isNotEmpty) {
-                    CreateElementNotification(
-                      element: TextElement(
-                        text: textController.text.trim(),
-                        textAlign: textAlignNotifier.value,
-                        style: styleNotifier.value,
-                        readOutLoad: false,
-                      ),
-                    ).dispatch(context);
-                    textController.clear();
+                    _controller.clear();
                   } else {
-                    CloseElementEditortNotification().dispatch(context);
+                    if (element != null) {
+                      DeleteElementNotification(
+                        elementId: element.id,
+                      ).dispatch(context);
+                    }
+                    CloseElementEditorNotification().dispatch(context);
                   }
                 },
                 child: const Text(
@@ -101,7 +134,7 @@ class _EditorTextInputState extends State<EditorTextInput> {
                     overlayColor: Colors.white10,
                   ),
                   child: ValueListenableBuilder(
-                    valueListenable: styleNotifier,
+                    valueListenable: _styleNotifier,
                     builder: (
                       BuildContext context,
                       TextStyle style,
@@ -112,7 +145,8 @@ class _EditorTextInputState extends State<EditorTextInput> {
                         min: 24,
                         max: 100,
                         onChanged: (double value) {
-                          styleNotifier.value = style.copyWith(fontSize: value);
+                          _styleNotifier.value =
+                              style.copyWith(fontSize: value);
                         },
                       );
                     },
@@ -129,19 +163,19 @@ class _EditorTextInputState extends State<EditorTextInput> {
                     padding: const EdgeInsets.only(right: 24.0),
                     child: ListenableBuilder(
                       listenable: Listenable.merge([
-                        styleNotifier,
-                        textAlignNotifier,
+                        _styleNotifier,
+                        _textAlignNotifier,
                       ]),
                       builder: (
                         BuildContext context,
                         Widget? _,
                       ) {
-                        final style = styleNotifier.value;
-                        final textAlign = textAlignNotifier.value;
+                        final style = _styleNotifier.value;
+                        final textAlign = _textAlignNotifier.value;
                         return TextField(
                           style: style,
                           focusNode: focusNode,
-                          controller: textController,
+                          controller: _controller,
                           textAlign: textAlign,
                           cursorColor: style.color ?? Colors.white,
                           maxLines: null,
@@ -163,21 +197,21 @@ class _EditorTextInputState extends State<EditorTextInput> {
             children: [
               GestureDetector(
                 onTap: () {
-                  final index = textAlignNotifier.value.index;
+                  final index = _textAlignNotifier.value.index;
                   if (index == TextAlign.values.length - 1) {
-                    textAlignNotifier.value = TextAlign.values.first;
+                    _textAlignNotifier.value = TextAlign.values.first;
                   } else {
                     final nextTextAlign = TextAlign.values[index + 1];
                     if (nextTextAlign == TextAlign.start ||
                         nextTextAlign == TextAlign.end) {
-                      textAlignNotifier.value = TextAlign.values.first;
+                      _textAlignNotifier.value = TextAlign.values.first;
                     } else {
-                      textAlignNotifier.value = TextAlign.values[index + 1];
+                      _textAlignNotifier.value = TextAlign.values[index + 1];
                     }
                   }
                 },
                 child: ValueListenableBuilder(
-                  valueListenable: textAlignNotifier,
+                  valueListenable: _textAlignNotifier,
                   builder: (
                     BuildContext context,
                     TextAlign textAlign,
@@ -241,8 +275,8 @@ class _EditorTextInputState extends State<EditorTextInput> {
                       ][index];
                       return GestureDetector(
                         onTap: () {
-                          styleNotifier.value =
-                              styleNotifier.value.copyWith(color: color);
+                          _styleNotifier.value =
+                              _styleNotifier.value.copyWith(color: color);
                         },
                         child: Container(
                           height: 28,

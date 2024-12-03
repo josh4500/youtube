@@ -105,7 +105,7 @@ class StickerScaffold extends StatelessWidget {
                             ),
                             child: Icon(
                               {
-                                QaStickerElement: Icons.question_mark,
+                                QaStickerElement: YTIcons.feedbck_outlined,
                                 AddYStickerElement: YTIcons.camera_outlined,
                               }[type],
                               color: Colors.black,

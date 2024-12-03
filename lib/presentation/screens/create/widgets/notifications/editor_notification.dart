@@ -7,7 +7,19 @@ class OpenTimelineNotification extends EditorNotification {}
 
 class CloseTimelineNotification extends EditorNotification {}
 
-class CloseElementEditortNotification extends EditorNotification {}
+class OpenTextEditorNotification extends EditorNotification {
+  OpenTextEditorNotification({required this.element});
+
+  final TextElement element;
+}
+
+class OpenStickerEditorNotification extends EditorNotification {
+  OpenStickerEditorNotification({required this.type});
+
+  final Type type;
+}
+
+class CloseElementEditorNotification extends EditorNotification {}
 
 class CreateElementNotification extends EditorNotification {
   CreateElementNotification({required this.element});
@@ -26,5 +38,7 @@ class UpdateElementNotification extends EditorNotification {
 }
 
 class DeleteElementNotification extends EditorNotification {
-  DeleteElementNotification();
+  DeleteElementNotification({required this.elementId});
+
+  final int elementId;
 }
