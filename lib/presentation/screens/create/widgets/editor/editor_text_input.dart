@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/models.dart';
-import 'package:youtube_clone/presentation/screens/create/provider/index_notifier.dart';
-import 'package:youtube_clone/presentation/screens/create/widgets/editor/elements/element.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../notifications/editor_notification.dart';
+import 'elements/element.dart';
 
 class EditorTextInput extends StatefulWidget {
   const EditorTextInput({super.key});
@@ -77,7 +76,6 @@ class _EditorTextInputState extends State<EditorTextInput> {
               GestureDetector(
                 onTap: () {
                   focusNode.unfocus();
-                  print(element);
                   if (_controller.text.isNotEmpty) {
                     if (element == null) {
                       CreateElementNotification(

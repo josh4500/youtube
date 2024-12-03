@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:youtube_clone/presentation/models.dart';
@@ -5,6 +6,8 @@ import 'package:youtube_clone/presentation/models.dart';
 import '../notifications/editor_notification.dart';
 import 'elements/element.dart';
 import 'elements/sticker_scaffold.dart';
+
+const List<String> kDefaultOptions = ['Yes', 'No'];
 
 class EditorStickerInput extends StatefulWidget {
   const EditorStickerInput({super.key});
@@ -36,8 +39,10 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
       _controller.text = element.prompt;
     } else if (element is PollStickerElement && type == PollStickerElement) {
       _controller.text = element.question;
-      _option1Controller.text = element.options.first;
-      _option2Controller.text = element.options.last;
+      if (!listEquals(kDefaultOptions, element.options)) {
+        _option1Controller.text = element.options.first;
+        _option2Controller.text = element.options.last;
+      }
     }
   }
 
@@ -92,14 +97,16 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
                           : FractionalOffset.center,
                     );
                   } else {
+                    final one = _option1Controller.text.trim();
+                    final two = _option2Controller.text.trim();
                     element = PollStickerElement(
                       id: stickerElement is PollStickerElement
                           ? stickerElement.id
                           : null,
                       question: _controller.text.trim(),
                       options: [
-                        _option1Controller.text.trim(),
-                        _option2Controller.text.trim(),
+                        if (one.isNotEmpty) one else 'Yes',
+                        if (two.isNotEmpty) two else 'No',
                       ],
                       color: colorNotifier.value,
                       alignment: stickerElement is PollStickerElement

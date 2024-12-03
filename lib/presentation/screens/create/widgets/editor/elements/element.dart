@@ -518,20 +518,19 @@ class _PollElementWidget extends StatelessWidget {
         ...List.generate(
           element.options.length,
           (int index) => Container(
+            width: double.infinity,
             padding: const EdgeInsets.all(8),
             margin: const EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
               color: Colors.black12,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: TextField(
-              decoration: InputDecoration.collapsed(
-                hintText: element.options[index],
-                hintStyle: const TextStyle(
-                  fontSize: 20,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                ),
+            child: Text(
+              element.options[index],
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),

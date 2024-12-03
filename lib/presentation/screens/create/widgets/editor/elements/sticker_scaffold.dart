@@ -33,7 +33,8 @@ class StickerScaffold extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const SizedBox(height: 4),
+                    if (type == QaStickerElement || type == AddYStickerElement)
+                      const SizedBox(height: 4),
                     child,
                     if (type == QaStickerElement ||
                         type == AddYStickerElement) ...[
