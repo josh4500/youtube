@@ -80,6 +80,7 @@ class _EditorVoiceoverRecorderState
   Future<void> _startRecording() async {
     final dir = FileSystemService.instance.cacheDirectory;
     if (dir != null && await recorder.hasPermission()) {
+      dragProgressNotifier.value = true;
       // await recorder.start(
       //   const RecordConfig(),
       //   path: '${dir.path}/1',
@@ -126,6 +127,7 @@ class _EditorVoiceoverRecorderState
 
   Future<void> _stopRecording() async {
     // recorder.stop();
+    dragProgressNotifier.value = false;
     ref.read(currentVoiceRecordingProvider.notifier).stopRecording();
     final recording = ref.read(currentVoiceRecordingProvider);
     ref.read(voiceOverStateProvider.notifier).addRecording(recording);
@@ -138,6 +140,7 @@ class _EditorVoiceoverRecorderState
   }
 
   void handleTap(TapDownDetails details, BoxConstraints constraints) {
+    if (recordingNotifier.value) return;
     final value = (details.localPosition.dx / constraints.maxWidth).clamp(
       0.0,
       1.0,
@@ -147,6 +150,8 @@ class _EditorVoiceoverRecorderState
   }
 
   void handleDragUpdate(DragUpdateDetails details, BoxConstraints constraints) {
+    if (recordingNotifier.value) return;
+
     // TODO(josh4500): Update player position/duration
     final value = (details.localPosition.dx / constraints.maxWidth).clamp(
       0.0,
@@ -271,19 +276,25 @@ class _EditorVoiceoverRecorderState
               },
             ),
             const SizedBox(height: 8),
-            ValueListenableBuilder(
-              valueListenable: dragProgressNotifier,
+            ListenableBuilder(
+              listenable: Listenable.merge([
+                dragProgressNotifier,
+                enabledRecordNotifier,
+              ]),
               builder: (
                 BuildContext context,
-                bool dragging,
                 Widget? _,
               ) {
+                final dragging = dragProgressNotifier.value;
+                final enabledRecord = enabledRecordNotifier.value;
                 return AnimatedValuedVisibility(
                   visible: !dragging,
                   alignment: Alignment.center,
                   keepAlive: true,
-                  child: const Text(
-                    'Tap or hold to record audio',
+                  child: Text(
+                    enabledRecord
+                        ? 'Tap or hold to record audio'
+                        : 'Tap undo to delete recorded audio',
                     style: TextStyle(fontSize: 12),
                   ),
                 );
