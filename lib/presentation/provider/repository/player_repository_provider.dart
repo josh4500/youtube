@@ -56,7 +56,7 @@ final playerOverlayStateProvider = Provider(
 );
 
 @Riverpod(keepAlive: true, dependencies: [])
-PlayerRepository playerRepository(PlayerRepositoryRef ref) {
+PlayerRepository playerRepository(Ref ref) {
   return PlayerRepository(ref: ref);
 }
 

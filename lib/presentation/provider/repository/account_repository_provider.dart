@@ -9,7 +9,7 @@ import '../state/auth_state_provider.dart';
 part 'account_repository_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-AccountRepository accountRepository(AccountRepositoryRef ref) {
+AccountRepository accountRepository(Ref ref) {
   return AccountRepository(ref: ref);
 }
 
