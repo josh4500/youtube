@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../editor/element.dart' show TextElement, VideoElementData;
+import '../editor/element.dart' show TextElement, ElementData;
 
 abstract class EditorNotification extends Notification {}
 
@@ -25,7 +25,7 @@ class CloseElementEditorNotification extends EditorNotification {}
 class CreateElementNotification extends EditorNotification {
   CreateElementNotification({required this.element});
 
-  final VideoElementData element;
+  final ElementData element;
 }
 
 class UpdateElementNotification extends EditorNotification {
@@ -35,7 +35,7 @@ class UpdateElementNotification extends EditorNotification {
   });
 
   final bool swapToLast;
-  final VideoElementData element;
+  final ElementData element;
 }
 
 class DeleteElementNotification extends EditorNotification {

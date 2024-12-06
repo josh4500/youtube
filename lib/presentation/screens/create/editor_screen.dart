@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/screens/create/provider/voice_over_state.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -44,7 +46,7 @@ class _EditorScreenState extends State<EditorScreen>
       ValueNotifier(
     null,
   );
-  final elementsNotifier = ValueNotifier<List<VideoElementData>>([]);
+  final elementsNotifier = ValueNotifier<List<ElementData>>([]);
   final ValueNotifier<TextElement?> _textElementNotifier = ValueNotifier(null);
 
   @override
@@ -75,12 +77,17 @@ class _EditorScreenState extends State<EditorScreen>
       callback(),
       Future.delayed(
         Durations.medium1,
-        () => hideEditorEffects.value = true,
+        () {
+          hideTopButtons.value = true;
+          hideEditorEffects.value = true;
+          return true;
+        },
       ),
     ]);
     if (result.first) {
       hideEditorEffects.value = false;
       hideNavButtons.value = 1;
+      hideTopButtons.value = false;
     }
   }
 
@@ -135,7 +142,7 @@ class _EditorScreenState extends State<EditorScreen>
     );
 
     final previousStickerElement = elementsNotifier.value.firstWhereOrNull(
-      (VideoElementData element) => element is StickerElement,
+      (ElementData element) => element is StickerElement,
     ) as StickerElement?;
 
     if (previousStickerElement != null) {
@@ -394,9 +401,15 @@ class _EditorScreenState extends State<EditorScreen>
                           ),
                           child: Column(
                             children: [
-                              HiddenListenableWidget(
-                                listenable: hideTopButtons,
-                                hideCallback: () => hideTopButtons.value,
+                              ValueListenableBuilder(
+                                valueListenable: hideTopButtons,
+                                builder: (context, _, Widget? childWidget) {
+                                  return AnimatedValuedVisibility(
+                                    visible: !hideTopButtons.value,
+                                    keepAlive: true,
+                                    child: childWidget,
+                                  );
+                                },
                                 child: const Padding(
                                   padding: EdgeInsets.all(12.0),
                                   child: Row(
@@ -407,7 +420,7 @@ class _EditorScreenState extends State<EditorScreen>
                                         icon: YTIcons.arrow_back_outlined,
                                       ),
                                       AddMusicButton(),
-                                      SizedBox(width: 48),
+                                      VoiceoverSettings(),
                                     ],
                                   ),
                                 ),
@@ -460,5 +473,23 @@ class _EditorScreenState extends State<EditorScreen>
         ),
       ),
     );
+  }
+}
+
+class VoiceoverSettings extends ConsumerWidget {
+  const VoiceoverSettings({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(voiceOverStateProvider);
+    if (state.recordings.isNotEmpty) {
+      return CustomInkWell(
+        onTap: () {},
+        padding: const EdgeInsets.all(8),
+        splashFactory: NoSplash.splashFactory,
+        child: Icon(YTIcons.tune_outlined),
+      );
+    }
+    return SizedBox(width: 48);
   }
 }

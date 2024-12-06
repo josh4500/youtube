@@ -37,7 +37,7 @@ class _EditorElementsState extends State<EditorElements> {
   @override
   Widget build(BuildContext context) {
     final elementsNotifier =
-        context.provide<ValueNotifier<List<VideoElementData>>>();
+        context.provide<ValueNotifier<List<ElementData>>>();
     return NotificationListener<EditorNotification>(
       onNotification: handleEditorNotification,
       child: ListenableBuilder(
@@ -46,23 +46,15 @@ class _EditorElementsState extends State<EditorElements> {
           return Stack(
             fit: StackFit.expand,
             children: [
-              LayoutBuilder(
+              ValueListenableBuilder(
+                valueListenable: hitNotifier,
                 builder: (
                   BuildContext context,
-                  BoxConstraints constraints,
+                  DragHit hit,
+                  Widget? childWidget,
                 ) {
-                  return ValueListenableBuilder(
-                    valueListenable: hitNotifier,
-                    builder: (
-                      BuildContext context,
-                      DragHit hit,
-                      Widget? childWidget,
-                    ) {
-                      return CustomPaint(
-                        size: Size(constraints.maxWidth, constraints.maxHeight),
-                        painter: DragLinesPainter(hit: hit),
-                      );
-                    },
+                  return CustomPaint(
+                    painter: DragLinesPainter(hit: hit),
                   );
                 },
               ),
@@ -70,7 +62,7 @@ class _EditorElementsState extends State<EditorElements> {
                 valueListenable: elementsNotifier,
                 builder: (
                   BuildContext context,
-                  List<VideoElementData> elements,
+                  List<ElementData> elements,
                   Widget? childWidget,
                 ) {
                   return Stack(
@@ -91,7 +83,7 @@ class _EditorElementsState extends State<EditorElements> {
                               child: childWidget,
                             );
                           },
-                          child: ModelBinding(
+                          child: ModelBinding<ElementData>(
                             model: elementsNotifier.value[i],
                             child: const VideoElement(),
                           ),

@@ -41,7 +41,18 @@ class _EditorVoiceoverRecorderState
     Alignment.centerLeft,
   );
 
+  /// Start position of voice recording range
   Duration _startDuration = Duration.zero;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final recordings = ref.read(voiceOverStateProvider).recordings;
+    if (recordings.isNotEmpty) {
+      _setProgressValue(0);
+      _setStartDuration(0);
+    }
+  }
 
   @override
   void dispose() {
@@ -50,6 +61,31 @@ class _EditorVoiceoverRecorderState
     recordingNotifier.dispose();
     controller.dispose();
     super.dispose();
+  }
+
+  void handleUndo() {
+    ref.read(voiceOverStateProvider.notifier).undo();
+    _onUnRedo();
+  }
+
+  void handleRedo() {
+    ref.read(voiceOverStateProvider.notifier).redo();
+    _onUnRedo();
+  }
+
+  void _onUnRedo() {
+    final state = ref.read(voiceOverStateProvider);
+    if (state.recordings.isNotEmpty) {
+      final tDuration = state.recordDuration.inMilliseconds;
+      final latestRecording = state.recordings.last as VoiceRecording;
+      final value = latestRecording.range.end.inMilliseconds / tDuration;
+      _setProgressValue(value);
+      _startDuration = latestRecording.range.end;
+    } else {
+      _setProgressValue(0);
+      _startDuration = Duration.zero;
+      enabledRecordNotifier.value = true;
+    }
   }
 
   void handleLongPressEndRecord(LongPressEndDetails details) {
@@ -86,9 +122,6 @@ class _EditorVoiceoverRecorderState
       //   path: '${dir.path}/1',
       // );
 
-      // if (_startDuration > Duration.zero) {
-      //   _startDuration += Duration(seconds: 1);
-      // }
       ref.read(currentVoiceRecordingProvider.notifier).startRecording(
         _startDuration, // TODO(josh4500): Pass where to start
         (VoiceRecording recording) {
@@ -99,7 +132,7 @@ class _EditorVoiceoverRecorderState
           final value = _startDuration.inMilliseconds / tDuration;
           _setProgressValue(value);
 
-          final nextEndDuration = _startDuration + Duration(milliseconds: 100);
+          final nextEndDuration = _startDuration + Duration(milliseconds: 80);
           bool autoStop = false;
           autoStop = nextEndDuration >= voiceRecording.recordDuration;
 
@@ -147,6 +180,15 @@ class _EditorVoiceoverRecorderState
     );
     _setProgressValue(value);
     _setStartDuration(value);
+  }
+
+  void handleDragEnd(DragEndDetails details) {
+    dragProgressNotifier.value = false;
+    // TODO(josh4500): Set player position
+  }
+
+  void handleDragStart(DragStartDetails details) {
+    dragProgressNotifier.value = true;
   }
 
   void handleDragUpdate(DragUpdateDetails details, BoxConstraints constraints) {
@@ -240,18 +282,12 @@ class _EditorVoiceoverRecorderState
                     details,
                     constraints,
                   ),
-                  onHorizontalDragStart: (DragStartDetails details) {
-                    dragProgressNotifier.value = true;
-                    // TODO(josh4500): Set DurationRange
-                  },
+                  onHorizontalDragStart: handleDragStart,
                   onHorizontalDragUpdate: (details) => handleDragUpdate(
                     details,
                     constraints,
                   ),
-                  onHorizontalDragEnd: (DragEndDetails details) {
-                    dragProgressNotifier.value = false;
-                    // TODO(josh4500): Set DurationRange
-                  },
+                  onHorizontalDragEnd: handleDragEnd,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       vertical: 4.0,
@@ -308,7 +344,11 @@ class _EditorVoiceoverRecorderState
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Consumer(
-                      builder: (context, ref, child) {
+                      builder: (
+                        BuildContext context,
+                        WidgetRef ref,
+                        Widget? _,
+                      ) {
                         final state = ref.watch(voiceOverStateProvider);
                         return ListenableBuilder(
                           listenable: Listenable.merge(
@@ -323,8 +363,8 @@ class _EditorVoiceoverRecorderState
                                 onTap: handleUndo,
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white10,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.03),
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Icon(
@@ -391,7 +431,11 @@ class _EditorVoiceoverRecorderState
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Consumer(
-                      builder: (context, ref, child) {
+                      builder: (
+                        BuildContext context,
+                        WidgetRef ref,
+                        Widget? _,
+                      ) {
                         final state = ref.watch(voiceOverStateProvider);
                         return ListenableBuilder(
                           listenable: recordingNotifier,
@@ -404,8 +448,8 @@ class _EditorVoiceoverRecorderState
                                 onTap: handleRedo,
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white10,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.03),
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Icon(
@@ -430,38 +474,6 @@ class _EditorVoiceoverRecorderState
         ),
       ),
     );
-  }
-
-  void handleUndo() {
-    ref.read(voiceOverStateProvider.notifier).undo();
-    final state = ref.read(voiceOverStateProvider);
-    if (state.canUndo) {
-      final tDuration = state.recordDuration.inMilliseconds;
-      final latestRecording = state.recordings.last as VoiceRecording;
-      final value = latestRecording.range.end.inMilliseconds / tDuration;
-      _setProgressValue(value);
-      _startDuration = latestRecording.range.end;
-    } else {
-      _setProgressValue(0);
-      _startDuration = Duration.zero;
-      enabledRecordNotifier.value = true;
-    }
-  }
-
-  // TODO(josh4500): Seems similar to handleUndo
-  void handleRedo() {
-    ref.read(voiceOverStateProvider.notifier).redo();
-    final state = ref.read(voiceOverStateProvider);
-    if (state.canUndo) {
-      final tDuration = state.recordDuration.inMilliseconds;
-      final latestRecording = state.recordings.last as VoiceRecording;
-      final value = latestRecording.range.end.inMilliseconds / tDuration;
-      _setProgressValue(value);
-      _startDuration = latestRecording.range.end;
-    } else {
-      _setProgressValue(0);
-      _startDuration = Duration.zero;
-    }
   }
 }
 

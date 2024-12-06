@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/screens/create/provider/short_recording_state.dart';
 
 part 'voice_over_state.g.dart';
 
@@ -7,8 +8,9 @@ part 'voice_over_state.g.dart';
 class VoiceOverState extends _$VoiceOverState {
   @override
   RecordingState build() {
+    final shortsRecordingState = ref.read(shortRecordingProvider);
     return RecordingState<VoiceRecording>(
-      recordDuration: const Duration(seconds: 15),
+      recordDuration: shortsRecordingState.duration,
     );
   }
 

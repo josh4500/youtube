@@ -5,8 +5,8 @@ import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../notifications/editor_notification.dart';
 
-abstract class VideoElementData {
-  VideoElementData({
+abstract class ElementData {
+  ElementData({
     this.range = DurationRange.zero,
     this.alignment = FractionalOffset.center,
     int? id,
@@ -19,7 +19,7 @@ abstract class VideoElementData {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is VideoElementData &&
+      other is ElementData &&
           runtimeType == other.runtimeType &&
           id == other.id;
 
@@ -34,7 +34,7 @@ enum TextElementDecoration {
   transparentBackground,
 }
 
-class TextElement extends VideoElementData {
+class TextElement extends ElementData {
   TextElement({
     super.range,
     super.id,
@@ -85,7 +85,7 @@ class TextElement extends VideoElementData {
   int get hashCode => super.hashCode ^ id.hashCode;
 }
 
-class StickerElement extends VideoElementData {
+class StickerElement extends ElementData {
   StickerElement({
     super.range,
     super.alignment,
@@ -241,14 +241,14 @@ class _VideoElementState extends State<VideoElement> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final element = context.provide<VideoElementData>();
+    final element = context.provide<ElementData>();
     alignmentNotifier.value = element.alignment;
   }
 
   @override
   void didUpdateWidget(covariant VideoElement oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final element = context.provide<VideoElementData>();
+    final element = context.provide<ElementData>();
     alignmentNotifier.value = element.alignment;
   }
 
@@ -261,7 +261,7 @@ class _VideoElementState extends State<VideoElement> {
   void handlePanEnd(
     DragEndDetails details,
     BoxConstraints constraints,
-    VideoElementData element,
+    ElementData element,
   ) {
     final position = details.globalPosition;
     final maxWidth = constraints.maxWidth;
@@ -274,7 +274,7 @@ class _VideoElementState extends State<VideoElement> {
     ).dispatch(context);
 
     if (!hitDelete) {
-      final VideoElementData updatedElement;
+      final ElementData updatedElement;
       if (element is TextElement) {
         updatedElement = element.copyWith(
           alignment: alignmentNotifier.value,
@@ -302,7 +302,7 @@ class _VideoElementState extends State<VideoElement> {
   void handlePanStart(
     DragStartDetails details,
     BoxConstraints constraints,
-    VideoElementData element,
+    ElementData element,
   ) {
     panStartOffset = details.localPosition;
     UpdateElementNotification(
@@ -354,7 +354,7 @@ class _VideoElementState extends State<VideoElement> {
 
   @override
   Widget build(BuildContext context) {
-    final element = context.provide<VideoElementData>();
+    final element = context.provide<ElementData>();
     return LayoutBuilder(
       builder: (
         BuildContext context,
@@ -473,7 +473,7 @@ class _QaElementWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final element = context.provide<VideoElementData>() as QaStickerElement;
+    final element = context.provide<ElementData>() as QaStickerElement;
     if (element.text.isEmpty) {
       return const StickerContentPlaceholder(type: QaStickerElement);
     }
@@ -499,7 +499,7 @@ class _AddYElementWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final element = context.provide<VideoElementData>() as AddYStickerElement;
+    final element = context.provide<ElementData>() as AddYStickerElement;
     if (element.prompt.isEmpty) {
       return const StickerContentPlaceholder(type: QaStickerElement);
     }
@@ -525,7 +525,7 @@ class _PollElementWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final element = context.provide<VideoElementData>() as PollStickerElement;
+    final element = context.provide<ElementData>() as PollStickerElement;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -595,7 +595,7 @@ class _TextElementWidgetState extends State<_TextElementWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final element = context.provide<VideoElementData>() as TextElement;
+    final element = context.provide<ElementData>() as TextElement;
 
     return GestureDetector(
       onTap: callOutLink.show,
