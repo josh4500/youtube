@@ -3,7 +3,7 @@ import 'package:youtube_clone/presentation/themes.dart';
 
 import '../constants/assets.dart';
 
-class ImageFromAsset {
+abstract class ImageFromAsset {
   static final Widget ytPAccessIcon = ClipRRect(
     borderRadius: BorderRadius.circular(2),
     child: Image.asset(
@@ -66,5 +66,37 @@ class ImageFromAsset {
     fit: BoxFit.contain,
     height: 60,
     width: 60,
+  );
+
+  static final Widget textOption = Image.asset(
+    AssetsPath.textOption,
+    fit: BoxFit.contain,
+    height: 24,
+    width: 24,
+  );
+
+  static final Widget textBackgroundIcon = Image.asset(
+    AssetsPath.textBackground,
+    fit: BoxFit.contain,
+    height: 24,
+    width: 24,
+  );
+  static final Widget textBorderedIcon = Image.asset(
+    AssetsPath.textBordered,
+    fit: BoxFit.contain,
+    height: 24,
+    width: 24,
+  );
+  static final Widget textNormalIcon = Image.asset(
+    AssetsPath.textNormal,
+    fit: BoxFit.contain,
+    height: 24,
+    width: 24,
+  );
+  static final Widget textTransparentIcon = Image.asset(
+    AssetsPath.textTransparent,
+    fit: BoxFit.contain,
+    height: 24,
+    width: 24,
   );
 }

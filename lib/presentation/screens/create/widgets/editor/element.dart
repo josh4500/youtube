@@ -1,20 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../../notifications/editor_notification.dart';
-import 'sticker_scaffold.dart';
-
-class DurationRange {
-  const DurationRange({required this.start, required this.end});
-
-  final Duration start;
-  final Duration end;
-}
+import '../notifications/editor_notification.dart';
 
 abstract class VideoElementData {
   VideoElementData({
-    this.range = const DurationRange(start: Duration.zero, end: Duration.zero),
+    this.range = DurationRange.zero,
     this.alignment = FractionalOffset.center,
     int? id,
   }) : id = id ?? DateTime.now().microsecondsSinceEpoch;
@@ -322,7 +315,7 @@ class _VideoElementState extends State<VideoElement> {
     DragUpdateDetails details,
     BoxConstraints constraints,
   ) {
-    final lPosition = details.localPosition;
+    // final lPosition = details.localPosition;
     final gPosition = details.globalPosition;
     final maxWidth = constraints.maxWidth;
     final maxHeight = constraints.maxHeight;
@@ -332,18 +325,20 @@ class _VideoElementState extends State<VideoElement> {
       offset.dx + details.delta.dx / maxWidth,
       offset.dy + details.delta.dy / maxHeight,
     );
-    // hitTop: gPosition.dy.abs() <= 24,
-    // hitLeft: gPosition.dx.abs() <= 24,
-    // hitRight: gPosition.dx.abs() >= maxWidth - 24,
-    // hitBottom: gPosition.dy >= maxHeight - 24,
-    // hitXCenter: (gPosition.dx - maxWidth / 2).abs() <= 6,
-    // hitYCenter: (gPosition.dy - maxHeight / 2).abs() <= 6,
+
     DragHitNotification(
       hit: DragHit(
-        hitTop: gPosition.dy - panStartOffset.dy <= 56,
-        hitLeft: gPosition.dx - panStartOffset.dx <= 24,
-        hitRight: maxWidth + 24 - gPosition.dx - lPosition.dx <= 24,
-        hitBottom: maxHeight - gPosition.dy - panStartOffset.dy <= 56,
+        // hitTop: gPosition.dy - panStartOffset.dy <= 56,
+        // hitLeft: gPosition.dx - panStartOffset.dx <= 24,
+        // hitRight: maxWidth + 24 - gPosition.dx - lPosition.dx <= 24,
+        // hitBottom: maxHeight - gPosition.dy - panStartOffset.dy <= 56,
+        // hitXCenter: (gPosition.dx - maxWidth / 2).abs() <= 6,
+        // hitYCenter: (gPosition.dy - maxHeight / 2).abs() <= 6,
+
+        hitTop: gPosition.dy.abs() <= 24,
+        hitLeft: gPosition.dx.abs() <= 24,
+        hitRight: gPosition.dx.abs() >= maxWidth - 24,
+        hitBottom: gPosition.dy >= maxHeight - 24,
         hitXCenter: (gPosition.dx - maxWidth / 2).abs() <= 6,
         hitYCenter: (gPosition.dy - maxHeight / 2).abs() <= 6,
       ),
@@ -417,7 +412,10 @@ class _VideoElementState extends State<VideoElement> {
                 );
 
                 if (element is StickerElement) {
-                  return ModelBinding(model: element.color, child: child);
+                  return ModelBinding<Color>(
+                    model: element.color,
+                    child: child,
+                  );
                 }
 
                 return child;
@@ -457,10 +455,12 @@ class StickerContentPlaceholder extends StatelessWidget {
         }[type]!,
         style: TextStyle(
           fontSize: 20,
-          color: Color.alphaBlend(
-            color.withOpacity(.3),
-            Colors.black,
-          ),
+          color: color == Colors.black
+              ? Colors.white24
+              : Color.alphaBlend(
+                  color.withOpacity(.3),
+                  Colors.black,
+                ),
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -482,10 +482,12 @@ class _QaElementWidget extends StatelessWidget {
       textAlign: TextAlign.center,
       style: TextStyle(
         fontSize: 20,
-        color: Color.alphaBlend(
-          element.color.withOpacity(.1),
-          Colors.black,
-        ),
+        color: element.color == Colors.black
+            ? Colors.white
+            : Color.alphaBlend(
+                element.color.withOpacity(.1),
+                Colors.black,
+              ),
         fontWeight: FontWeight.w600,
       ),
     );
@@ -506,10 +508,12 @@ class _AddYElementWidget extends StatelessWidget {
       textAlign: TextAlign.center,
       style: TextStyle(
         fontSize: 20,
-        color: Color.alphaBlend(
-          element.color.withOpacity(.1),
-          Colors.black,
-        ),
+        color: element.color == Colors.black
+            ? Colors.white
+            : Color.alphaBlend(
+                element.color.withOpacity(.1),
+                Colors.black,
+              ),
         fontWeight: FontWeight.w600,
       ),
     );
@@ -531,10 +535,12 @@ class _PollElementWidget extends StatelessWidget {
             element.question,
             style: TextStyle(
               fontSize: 18,
-              color: Color.alphaBlend(
-                element.color.withOpacity(.1),
-                Colors.black,
-              ),
+              color: element.color == Colors.black
+                  ? Colors.white
+                  : Color.alphaBlend(
+                      element.color.withOpacity(.1),
+                      Colors.black,
+                    ),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -547,17 +553,21 @@ class _PollElementWidget extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             margin: const EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
-              color: Colors.black12,
+              color: element.color == Colors.black
+                  ? Colors.white12
+                  : Colors.black12,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               element.options[index],
               style: TextStyle(
                 fontSize: 16,
-                color: Color.alphaBlend(
-                  element.color.withOpacity(.1),
-                  Colors.black,
-                ),
+                color: element.color == Colors.black
+                    ? Colors.white
+                    : Color.alphaBlend(
+                        element.color.withOpacity(.1),
+                        Colors.black,
+                      ),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -596,7 +606,7 @@ class _TextElementWidgetState extends State<_TextElementWidget> {
           padding: EdgeInsets.zero,
           buildContent: (BuildContext context) {
             return SizedBox(
-              width: 100,
+              width: 128.w,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -608,10 +618,27 @@ class _TextElementWidgetState extends State<_TextElementWidget> {
                       ).dispatch(context);
                     },
                     child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'Edit',
-                        style: TextStyle(color: Colors.black),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8.0,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            YTIcons.audio_track_outlined,
+                            color: Colors.black,
+                            size: 14,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'EDIT',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -622,10 +649,27 @@ class _TextElementWidgetState extends State<_TextElementWidget> {
                       OpenTimelineNotification().dispatch(context);
                     },
                     child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'Timing',
-                        style: TextStyle(color: Colors.black),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8.0,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            YTIcons.timeline,
+                            color: Colors.black,
+                            size: 14,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'TIMING',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -638,10 +682,27 @@ class _TextElementWidgetState extends State<_TextElementWidget> {
                       ).dispatch(context);
                     },
                     child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'Add Voice',
-                        style: TextStyle(color: Colors.black),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8.0,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            YTIcons.audio_track_outlined,
+                            color: Colors.black,
+                            size: 14,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'ADD VOICE',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -654,6 +715,220 @@ class _TextElementWidgetState extends State<_TextElementWidget> {
             style: element.style,
             textAlign: element.textAlign,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class StickerScaffold extends StatelessWidget {
+  const StickerScaffold({
+    super.key,
+    required this.child,
+    required this.type,
+  }) : assert(
+          type == QaStickerElement ||
+              type == AddYStickerElement ||
+              type == PollStickerElement,
+          'Must be a StickerElement type',
+        );
+
+  final Widget child;
+  final Type type;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color color = context.provide<Color>();
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minWidth: 200,
+        maxWidth: 250,
+      ),
+      child: IntrinsicWidth(
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color == Colors.black
+                    ? color
+                    : Color.alphaBlend(
+                        color.withOpacity(.5),
+                        Colors.white,
+                      ),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (type == QaStickerElement || type == AddYStickerElement)
+                    const SizedBox(height: 4),
+                  child,
+                  if (type == QaStickerElement ||
+                      type == AddYStickerElement) ...[
+                    if (type == AddYStickerElement) ...[
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 24,
+                        width: (3 * 14) + (24 - 14),
+                        child: Center(
+                          child: Stack(
+                            children: List.generate(
+                              3,
+                              (int index) {
+                                return Positioned(
+                                  right: index * 14.0,
+                                  child: Container(
+                                    width: 24,
+                                    height: 24,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: Color.alphaBlend(
+                                        color.withOpacity(.5),
+                                        Color(0xFFAAAAAA),
+                                      ),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Color.alphaBlend(
+                                          color.withOpacity(.5),
+                                          Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    child: index == 2
+                                        ? Icon(
+                                            Icons.person,
+                                            size: 14,
+                                            color: color == Colors.black
+                                                ? color
+                                                : Color.alphaBlend(
+                                                    color.withOpacity(.5),
+                                                    Colors.white,
+                                                  ),
+                                          )
+                                        : null,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: color == Colors.black
+                            ? Colors.white10
+                            : Colors.black.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Builder(
+                        builder: (context) {
+                          if (type == QaStickerElement) {
+                            return Text(
+                              'Answer',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: color == Colors.black
+                                    ? Colors.white
+                                    : Color.alphaBlend(
+                                        color.withOpacity(.1),
+                                        Colors.black,
+                                      ),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            );
+                          } else {
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  YTIcons.camera_outlined,
+                                  size: 16,
+                                  color: color == Colors.black
+                                      ? Colors.white
+                                      : Color.alphaBlend(
+                                          color.withOpacity(.1),
+                                          Colors.black,
+                                        ),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Add yours',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: color == Colors.black
+                                        ? Colors.white
+                                        : Color.alphaBlend(
+                                            color.withOpacity(.1),
+                                            Colors.black,
+                                          ),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (type == QaStickerElement || type == AddYStickerElement)
+              Positioned.fill(
+                top: -14,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Builder(
+                    builder: (context) {
+                      if (type == QaStickerElement) {
+                        return Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Color.alphaBlend(
+                                color.withOpacity(.3),
+                                Colors.white,
+                              ),
+                            ),
+                            color: color == Colors.black
+                                ? Colors.white54
+                                : Color.alphaBlend(
+                                    color.withOpacity(.85),
+                                    Colors.black,
+                                  ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            {
+                              QaStickerElement: YTIcons.feedbck_outlined,
+                              AddYStickerElement: YTIcons.camera_outlined,
+                            }[type],
+                            color: Color.alphaBlend(
+                              color.withOpacity(.3),
+                              Colors.black,
+                            ),
+                            size: 20,
+                          ),
+                        );
+                      } else {
+                        return AccountAvatar(
+                          size: 28,
+                          border: Border.all(color: Colors.white),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );

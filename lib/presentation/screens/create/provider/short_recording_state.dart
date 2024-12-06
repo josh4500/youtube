@@ -6,15 +6,15 @@ part 'short_recording_state.g.dart';
 
 @riverpod
 class ShortRecording extends _$ShortRecording {
-  final _cachedState = ReadWriteValue<ShortRecordingState?>(
+  final _cachedState = ReadWriteValue<RecordingState?>(
     'shorts_recording_cache',
     null,
-    InMemoryCache<ShortRecordingState>('shorts_cache'),
+    InMemoryCache<RecordingState>('shorts_cache'),
   );
 
   @override
-  ShortRecordingState build() {
-    return ShortRecordingState(
+  RecordingState build() {
+    return RecordingState<VideoRecording>(
       recordDuration: const Duration(seconds: 15),
     );
   }
@@ -34,8 +34,8 @@ class ShortRecording extends _$ShortRecording {
     state = state.redo();
   }
 
-  void addRecording(Recording timeline) {
-    state = state.addTimeline(timeline);
+  void addRecording(VideoRecording recording) {
+    state = state.addRecording(recording);
   }
 
   void updateRecordDuration(Duration duration) {

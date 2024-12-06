@@ -51,13 +51,13 @@ class CaptureRecordingControl extends StatelessWidget {
           Expanded(
             child: Consumer(
               builder: (BuildContext context, WidgetRef ref, Widget? _) {
-                final timelineState = ref.watch(shortRecordingProvider);
+                final recordingState = ref.watch(shortRecordingProvider);
                 return Row(
                   children: [
-                    if (timelineState.hasRecordings)
+                    if (recordingState.canUndo)
                       GestureDetector(
                         onTap: () {
-                          if (timelineState.hasOneRecording) {
+                          if (recordingState.hasOneRecording) {
                             CreateNotification(hideNavigator: false)
                                 .dispatch(context);
                           }
@@ -75,10 +75,10 @@ class CaptureRecordingControl extends StatelessWidget {
                     else
                       SizedBox(width: 38.w),
                     const Spacer(),
-                    if (timelineState.hasUndidRecording)
+                    if (recordingState.canRedo)
                       GestureDetector(
                         onTap: () {
-                          if (timelineState.hasUndidRecording) {
+                          if (recordingState.canRedo) {
                             CreateNotification(hideNavigator: true)
                                 .dispatch(context);
                           }
@@ -96,9 +96,9 @@ class CaptureRecordingControl extends StatelessWidget {
                     else
                       SizedBox(width: 38.w),
                     SizedBox(width: 36.w),
-                    if (timelineState.hasRecordings)
+                    if (recordingState.canUndo)
                       _CompleteButton(
-                        isPublishable: timelineState.isPublishable,
+                        isPublishable: recordingState.isPublishable,
                       )
                     else
                       SizedBox(width: 38.w),

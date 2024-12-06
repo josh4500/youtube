@@ -47,6 +47,7 @@ class AnimatedValuedVisibility extends StatefulWidget {
     this.alignment = Alignment.topLeft,
     this.visible = true,
     this.keepState = true,
+    this.keepAlive = false,
     this.duration,
     this.child,
   });
@@ -56,7 +57,7 @@ class AnimatedValuedVisibility extends StatefulWidget {
   final bool visible;
   final Duration? duration;
   final Widget? child;
-  final bool keepState;
+  final bool keepState, keepAlive;
 
   @override
   State<AnimatedValuedVisibility> createState() =>
@@ -95,6 +96,7 @@ class _AnimatedValuedVisibilityState extends State<AnimatedValuedVisibility>
         parent: _opacityController,
         curve: widget.curve ?? Curves.linear,
       ),
+      keepAlive: widget.keepAlive,
       keepState: widget.keepState,
       alignment: widget.alignment,
       child: widget.child,

@@ -10,3 +10,5 @@ export 'infrastructure/services/internet_connectivity/internet_connectivity.dart
 
 export 'infrastructure/services/media/media.dart';
 export 'infrastructure/services/media/media_discovery.dart';
+
+export 'infrastructure/services/storage/file_system.dart';

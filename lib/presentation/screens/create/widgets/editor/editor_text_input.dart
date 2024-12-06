@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../notifications/editor_notification.dart';
-import 'elements/element.dart';
+import 'element.dart';
 
 class EditorTextInput extends StatefulWidget {
   const EditorTextInput({super.key});
@@ -16,10 +17,17 @@ class _EditorTextInputState extends State<EditorTextInput> {
   final FocusNode focusNode = FocusNode();
   final _controller = TextEditingController();
   final ValueNotifier<TextStyle> _styleNotifier = ValueNotifier(
-    const TextStyle(fontWeight: FontWeight.w700),
+    const TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w700,
+    ),
   );
   final ValueNotifier<TextAlign> _textAlignNotifier = ValueNotifier(
     TextAlign.center,
+  );
+  final ValueNotifier<TextElementDecoration> _textDecorationNotifier =
+      ValueNotifier(
+    TextElementDecoration.normal,
   );
 
   @override
@@ -83,6 +91,7 @@ class _EditorTextInputState extends State<EditorTextInput> {
                           text: _controller.text.trim(),
                           textAlign: _textAlignNotifier.value,
                           style: _styleNotifier.value,
+                          decoration: _textDecorationNotifier.value,
                           readOutLoad: false,
                         ),
                       ).dispatch(context);
@@ -139,12 +148,13 @@ class _EditorTextInputState extends State<EditorTextInput> {
                       Widget? _,
                     ) {
                       return Slider(
-                        value: style.fontSize ?? 24,
-                        min: 24,
+                        value: style.fontSize ?? 14,
+                        min: 12,
                         max: 100,
                         onChanged: (double value) {
-                          _styleNotifier.value =
-                              style.copyWith(fontSize: value);
+                          _styleNotifier.value = style.copyWith(
+                            fontSize: value,
+                          );
                         },
                       );
                     },
@@ -204,7 +214,7 @@ class _EditorTextInputState extends State<EditorTextInput> {
                         nextTextAlign == TextAlign.end) {
                       _textAlignNotifier.value = TextAlign.values.first;
                     } else {
-                      _textAlignNotifier.value = TextAlign.values[index + 1];
+                      _textAlignNotifier.value = nextTextAlign;
                     }
                   }
                 },
@@ -229,7 +239,38 @@ class _EditorTextInputState extends State<EditorTextInput> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Icon(Icons.sort_by_alpha),
+              GestureDetector(
+                onTap: () {
+                  final index = _textDecorationNotifier.value.index;
+                  if (index == TextElementDecoration.values.length - 1) {
+                    _textDecorationNotifier.value =
+                        TextElementDecoration.values.first;
+                  } else {
+                    final nextDecoration =
+                        TextElementDecoration.values[index + 1];
+                    _textDecorationNotifier.value = nextDecoration;
+                  }
+                },
+                child: ValueListenableBuilder(
+                  valueListenable: _textDecorationNotifier,
+                  builder: (
+                    BuildContext context,
+                    TextElementDecoration decoration,
+                    Widget? _,
+                  ) {
+                    return switch (decoration) {
+                      TextElementDecoration.normal =>
+                        ImageFromAsset.textNormalIcon,
+                      TextElementDecoration.bordered =>
+                        ImageFromAsset.textBorderedIcon,
+                      TextElementDecoration.background =>
+                        ImageFromAsset.textBackgroundIcon,
+                      TextElementDecoration.transparentBackground =>
+                        ImageFromAsset.textTransparentIcon,
+                    };
+                  },
+                ),
+              ),
               const SizedBox(width: 8),
               Container(
                 width: 1,
@@ -244,6 +285,8 @@ class _EditorTextInputState extends State<EditorTextInput> {
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (BuildContext context, int index) {
                       final color = [
+                        Colors.white,
+                        Colors.transparent,
                         Colors.red,
                         Colors.blue,
                         Colors.yellow,
@@ -253,21 +296,33 @@ class _EditorTextInputState extends State<EditorTextInput> {
                         Colors.purpleAccent,
                         Colors.amber,
                         Colors.amberAccent,
-                        Colors.white,
                       ][index];
                       return GestureDetector(
                         onTap: () {
-                          _styleNotifier.value =
-                              _styleNotifier.value.copyWith(color: color);
-                        },
-                        child: Container(
-                          height: 28,
-                          width: 28,
-                          margin: const EdgeInsets.only(right: 8),
-                          decoration: BoxDecoration(
+                          _styleNotifier.value = _styleNotifier.value.copyWith(
                             color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white),
+                          );
+                        },
+                        child: ListenableBuilder(
+                          listenable: _styleNotifier,
+                          builder: (BuildContext context, Widget? childWidget) {
+                            return AnimatedScale(
+                              scale: _styleNotifier.value.color == color
+                                  ? 1.13
+                                  : .9,
+                              duration: Durations.short2,
+                              child: childWidget,
+                            );
+                          },
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            margin: const EdgeInsets.only(right: 8),
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white),
+                            ),
                           ),
                         ),
                       );

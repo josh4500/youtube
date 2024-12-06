@@ -62,6 +62,7 @@ Future<void> setup() async {
     setupSystemUITheme(),
     setupSystemLocale(),
     InternetConnectivity.instance.initialize(),
+    FileSystemService.instance.init(),
   ]);
 
   // Initialize services and repository depending on the environment

@@ -14,7 +14,7 @@ import 'widgets/editor/editor_sticker_selector.dart';
 import 'widgets/editor/editor_text_input.dart';
 import 'widgets/editor/editor_timeline.dart';
 import 'widgets/editor/editor_voiceover_recorder.dart';
-import 'widgets/editor/elements/element.dart';
+import 'widgets/editor/element.dart';
 import 'widgets/filter_selector.dart';
 import 'widgets/notifications/editor_notification.dart';
 import 'widgets/video_effect_options.dart';
@@ -126,32 +126,30 @@ class _EditorScreenState extends State<EditorScreen>
     hideNavButtons.value = 1;
   }
 
-  Future<void> _openStickerEditor([Type? elementType]) async {
-    if (elementType != null) {
-      assert(
-        elementType == QaStickerElement ||
-            elementType == AddYStickerElement ||
-            elementType == PollStickerElement,
-        'Must be a StickerElement',
-      );
+  Future<void> _openStickerEditor(Type elementType) async {
+    assert(
+      elementType == QaStickerElement ||
+          elementType == AddYStickerElement ||
+          elementType == PollStickerElement,
+      'Must be a StickerElement type',
+    );
 
-      final previousStickerElement = elementsNotifier.value.firstWhereOrNull(
+    final previousStickerElement = elementsNotifier.value.firstWhereOrNull(
+      (VideoElementData element) => element is StickerElement,
+    ) as StickerElement?;
+
+    if (previousStickerElement != null) {
+      final oldElements = elementsNotifier.value;
+      oldElements.removeWhere(
         (element) => element is StickerElement,
-      ) as StickerElement?;
-
-      if (previousStickerElement != null) {
-        final oldElements = elementsNotifier.value;
-        oldElements.removeWhere(
-          (element) => element is StickerElement,
-        );
-        elementsNotifier.value = [...oldElements];
-      }
-
-      hideTopButtons.value = true;
-      hideNavButtons.value = 0;
-      hideEditorEffects.value = true;
-      _stickerElementNotifier.value = (elementType, previousStickerElement);
+      );
+      elementsNotifier.value = [...oldElements];
     }
+
+    hideTopButtons.value = true;
+    hideNavButtons.value = 0;
+    hideEditorEffects.value = true;
+    _stickerElementNotifier.value = (elementType, previousStickerElement);
   }
 
   Future<void> _closeStickerEditor() async {
@@ -167,7 +165,6 @@ class _EditorScreenState extends State<EditorScreen>
       () async {
         await showModalBottomSheet(
           context: context,
-          isDismissible: false,
           backgroundColor: Colors.transparent,
           barrierColor: Colors.transparent,
           builder: (BuildContext context) {
@@ -184,7 +181,6 @@ class _EditorScreenState extends State<EditorScreen>
       () async {
         await showModalBottomSheet(
           context: context,
-          isDismissible: false,
           backgroundColor: Colors.transparent,
           barrierColor: Colors.transparent,
           builder: (BuildContext context) {
@@ -201,7 +197,6 @@ class _EditorScreenState extends State<EditorScreen>
       () async {
         final result = await showModalBottomSheet<Type>(
           context: context,
-          isDismissible: false,
           backgroundColor: Colors.transparent,
           barrierColor: Colors.transparent,
           builder: (BuildContext context) {
@@ -213,7 +208,7 @@ class _EditorScreenState extends State<EditorScreen>
             );
           },
         );
-        _openStickerEditor(result);
+        if (result != null) _openStickerEditor(result);
         return result == null;
       },
     );
@@ -348,9 +343,9 @@ class _EditorScreenState extends State<EditorScreen>
                               child: SizeTransition(
                                 axisAlignment: -1,
                                 sizeFactor: timelineSizeAnimation,
-                                child: const SizedBox(
+                                child: SizedBox(
                                   width: double.infinity,
-                                  height: 384 - 134,
+                                  height: (384 - 134).h,
                                 ),
                               ),
                             ),
@@ -453,8 +448,8 @@ class _EditorScreenState extends State<EditorScreen>
                 child: SizeTransition(
                   axisAlignment: -1,
                   sizeFactor: timelineSizeAnimation,
-                  child: const SizedBox(
-                    height: 384,
+                  child: SizedBox(
+                    height: 384.h,
                     width: double.infinity,
                     child: EditorTimeline(),
                   ),

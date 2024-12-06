@@ -17,7 +17,7 @@ class CreateProgress extends ConsumerWidget {
         final currentRecording = ref.watch(currentRecordingProvider);
         final double value = shortRecording.getProgress(currentRecording);
         return CustomPaint(
-          foregroundPainter: _TimelineSeparator(
+          foregroundPainter: _RecordingSeparator(
             progressList: shortRecording.getEndPositions(),
           ),
           child: ClipRRect(
@@ -35,8 +35,8 @@ class CreateProgress extends ConsumerWidget {
   }
 }
 
-class _TimelineSeparator extends CustomPainter {
-  _TimelineSeparator({required this.progressList});
+class _RecordingSeparator extends CustomPainter {
+  _RecordingSeparator({required this.progressList});
 
   final List<double> progressList;
   static const double strokeWidth = 2.5;
@@ -57,6 +57,6 @@ class _TimelineSeparator extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_TimelineSeparator oldDelegate) =>
+  bool shouldRepaint(_RecordingSeparator oldDelegate) =>
       oldDelegate.progressList != progressList;
 }

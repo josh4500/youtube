@@ -51,4 +51,14 @@ abstract class AssetsPath {
       '${_imagePrefix}account_incognito_108.png';
   static String accountIncognito144 =
       '${_imagePrefix}account_incognito_144.png';
+
+  static const String textBackground =
+      '${_iconPrefix}text_artifact_background_decoration.webp';
+  static const String textBordered =
+      '${_iconPrefix}text_artifact_bordered_decoration.webp';
+  static const String textNormal =
+      '${_iconPrefix}text_artifact_normal_decoration.webp';
+  static const String textTransparent =
+      '${_iconPrefix}text_artifact_transparent_background_decoration.webp';
+  static const String textOption = '${_iconPrefix}text_option.webp';
 }

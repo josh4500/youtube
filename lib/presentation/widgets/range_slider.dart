@@ -124,6 +124,11 @@ class RangeValue {
       end: end ?? this.end,
     );
   }
+
+  @override
+  String toString() {
+    return 'RangeValue{start: $start, end: $end}';
+  }
 }
 
 class RangeSliderPainter extends CustomPainter {

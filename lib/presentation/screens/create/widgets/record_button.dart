@@ -11,10 +11,12 @@ class RecordDragButton extends StatelessWidget {
     required this.animation,
     required this.isRecording,
     this.isDragging = false,
+    this.enabled = true,
   });
   final Animation animation;
   final bool isRecording;
   final bool isDragging;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,8 @@ class RecordDragButton extends StatelessWidget {
           foregroundPainter: CircledButton(
             sizeFactor: animation.value,
             scale: isDragging ? 1.35 : 1.15,
-            color: isRecording ? const Color(0xFFFF0000) : Colors.white,
+            color: (isRecording ? const Color(0xFFFF0000) : Colors.white)
+                .withOpacity(enabled ? 1 : .5),
           ),
         );
       },
@@ -100,8 +103,12 @@ class CircledButton extends CustomPainter {
 }
 
 class RecordButton extends StatelessWidget {
-  const RecordButton({super.key, this.isRecording = false});
-
+  const RecordButton({
+    super.key,
+    this.isRecording = false,
+    this.enabled = true,
+  });
+  final bool enabled;
   final bool isRecording;
 
   @override
@@ -112,7 +119,7 @@ class RecordButton extends StatelessWidget {
       width: isRecording ? kRecordInnerButtonSize / 2 : kRecordInnerButtonSize,
       height: isRecording ? kRecordInnerButtonSize / 2 : kRecordInnerButtonSize,
       decoration: BoxDecoration(
-        color: const Color(0xFFFF0000),
+        color: enabled ? const Color(0xFFFF0000) : const Color(0x55FF0000),
         borderRadius: BorderRadius.circular(
           isRecording ? 4 : kRecordInnerButtonSize,
         ),

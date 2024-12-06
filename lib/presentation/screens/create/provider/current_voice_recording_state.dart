@@ -3,25 +3,22 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:youtube_clone/presentation/models.dart';
 
-part 'current_recording_state.g.dart';
+part 'current_voice_recording_state.g.dart';
 
 @riverpod
-class CurrentRecording extends _$CurrentRecording {
+class CurrentVoiceRecording extends _$CurrentVoiceRecording {
   Timer? _recordingTimer;
 
   @override
-  VideoRecording build() {
-    return VideoRecording();
+  VoiceRecording build() {
+    return VoiceRecording(range: DurationRange.zero);
   }
 
-  void addSound(ExtraSound sound) {
-    // Logic for adding sound
-  }
-
-  void updateSpeed(double speed) => state = state.copyWith(speed: speed);
-
-  void startRecording(void Function(VideoRecording recording) callback) {
-    _clear();
+  void startRecording(
+    Duration start,
+    void Function(VoiceRecording recording) callback,
+  ) {
+    _clear(start);
     assert(
       state.state != RecordCaptureState.recording,
       'Stop current recording.',
@@ -47,13 +44,13 @@ class CurrentRecording extends _$CurrentRecording {
     state = state.copyWith(state: RecordCaptureState.stopped);
   }
 
-  void clear() {
-    _clear();
-  }
-
-  void _clear() {
+  void _clear([Duration? start]) {
     // Start a new recording
     // Copies old speed to new recording
-    state = VideoRecording(speed: state.speed);
+    state = VoiceRecording(
+      range: start != null
+          ? DurationRange(start: start, end: start)
+          : DurationRange.zero,
+    );
   }
 }

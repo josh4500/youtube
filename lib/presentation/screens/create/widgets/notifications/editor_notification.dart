@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:youtube_clone/presentation/screens/create/widgets/editor/elements/element.dart';
+
+import '../editor/element.dart' show TextElement, VideoElementData;
 
 abstract class EditorNotification extends Notification {}
 

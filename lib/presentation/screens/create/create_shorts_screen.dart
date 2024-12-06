@@ -390,7 +390,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     }
 
     final shortsRecording = ref.read(shortRecordingProvider);
-    if (shortsRecording.hasRecordings) {
+    if (shortsRecording.recordings.isNotEmpty) {
       // Note: Using current screen context
       void showNavigator() {
         CreateNotification(hideNavigator: false).dispatch(context);
@@ -466,8 +466,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     _onUpdateCaptureEffect(effect, isAdded);
 
-    if ([CaptureEffect.flip, CaptureEffect.speed, CaptureEffect.timer]
-        .contains(effect)) {
+    if ([
+      CaptureEffect.flip,
+      CaptureEffect.speed,
+      CaptureEffect.timer,
+      CaptureEffect.filter,
+    ].contains(effect)) {
       isAdded
           ? _enabledCaptureEffects.add(effect)
           : _enabledCaptureEffects.remove(effect);
@@ -663,7 +667,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     countdownTimer?.cancel();
     countdownTimer = null;
     ref.read(shortRecordingProvider.notifier).updateCountdownStoppage(null);
-    if (!ref.read(shortRecordingProvider).hasRecordings) {
+    if (!ref.read(shortRecordingProvider).canUndo) {
       CreateNotification(hideNavigator: false).dispatch(context);
     }
   }
@@ -680,7 +684,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     ref
         .read(currentRecordingProvider.notifier)
-        .startRecording((Recording recording) {
+        .startRecording((VideoRecording recording) {
       final shortsRecording = ref.read(shortRecordingProvider);
       final totalDuration = shortsRecording.duration + recording.duration;
       final countdownStoppage = shortsRecording.countdownStoppage;
@@ -730,12 +734,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     }
   }
 
-  Future<void> _stopRecording([bool addTimeline = true]) async {
+  Future<void> _stopRecording([bool addRecording = true]) async {
     // final XFile xFile = await controller!.stopVideoRecording();
     // xFile.saveTo('path');
     ref.read(currentRecordingProvider.notifier).stopRecording();
-    if (addTimeline) {
-      final Recording recording = ref.read(currentRecordingProvider);
+    if (addRecording) {
+      final VideoRecording recording = ref.read(currentRecordingProvider);
       ref.read(shortRecordingProvider.notifier).addRecording(recording);
     }
   }
@@ -956,7 +960,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     } else if (notification is ShowControlsNotification) {
       _controlHidden = false;
       hideController.reverse();
-      if (!ref.read(shortRecordingProvider).hasRecordings) {
+      if (!ref.read(shortRecordingProvider).canUndo) {
         CreateNotification(hideNavigator: false).dispatch(context);
       }
     } else if (notification is ShowControlsMessageNotification) {
@@ -971,7 +975,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       CreateNotification(hideNavigator: true).dispatch(context);
     } else if (notification is StopCountdownNotification) {
       countdownHidden.value = true;
-      if (!ref.read(shortRecordingProvider).hasRecordings) {
+      if (!ref.read(shortRecordingProvider).canUndo) {
         CreateNotification(hideNavigator: false).dispatch(context);
       }
     } else if (notification is InitCameraNotification) {

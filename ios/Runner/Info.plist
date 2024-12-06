@@ -53,5 +53,7 @@
 		<string>In order to access your photo library</string>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSMicrophoneUsageDescription</key>
+        <string>YouTube clone will like to record audio</string>
 	</dict>
 </plist>

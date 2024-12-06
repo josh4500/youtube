@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/models.dart';
-import 'package:youtube_clone/presentation/provider/repository/account_repository_provider.dart';
-import 'package:youtube_clone/presentation/screens/create/widgets/editor/elements/element.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 import 'package:youtube_clone/presentation/widgets/sheet_drag_indicator.dart';
+
+import 'element.dart';
 
 class EditorStickerSelector extends StatelessWidget {
   const EditorStickerSelector({super.key});
@@ -147,7 +147,7 @@ class EditorStickerSelector extends StatelessWidget {
                     child: Stack(
                       children: [
                         Container(
-                          height: 72,
+                          height: 72.h,
                           margin: const EdgeInsets.symmetric(
                             horizontal: 24,
                             vertical: 10,

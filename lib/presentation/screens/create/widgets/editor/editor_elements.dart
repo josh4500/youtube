@@ -4,7 +4,7 @@ import 'package:youtube_clone/presentation/theme/styles/app_color.dart';
 import 'package:youtube_clone/presentation/widgets/animated_visibility.dart';
 
 import '../notifications/editor_notification.dart';
-import 'elements/element.dart';
+import 'element.dart';
 
 class EditorElements extends StatefulWidget {
   const EditorElements({super.key});
