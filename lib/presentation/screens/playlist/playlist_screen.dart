@@ -221,7 +221,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                 (BuildContext context, int index) {
                   return Slidable(
                     key: ValueKey(index),
-                    maxOffset: 0.3,
+                    sizeRatio: 0.3,
                     sharedSlidableState: _slidableState,
                     items: const <SlidableItem>[
                       SlidableItem(icon: Icon(Icons.delete)),

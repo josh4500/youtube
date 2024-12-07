@@ -308,7 +308,7 @@ class HistoryVideo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Slidable(
       key: ValueKey(index),
-      maxOffset: 0.3,
+      sizeRatio: 0.3,
       sharedSlidableState: sharedSlidableState,
       items: <SlidableItem>[
         SlidableItem(

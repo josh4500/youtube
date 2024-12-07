@@ -4,9 +4,15 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 class CreateCloseButton extends StatelessWidget {
-  const CreateCloseButton({super.key, this.icon, this.onPopInvoked});
+  const CreateCloseButton({
+    super.key,
+    this.icon,
+    this.onPopInvoked,
+    this.color,
+  });
   final bool Function()? onPopInvoked;
   final IconData? icon;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +26,8 @@ class CreateCloseButton extends StatelessWidget {
       splashFactory: NoSplash.splashFactory,
       child: Container(
         padding: const EdgeInsets.all(10),
-        decoration: const BoxDecoration(
-          color: Colors.black38,
+        decoration: BoxDecoration(
+          color: color ?? Colors.black38,
           shape: BoxShape.circle,
         ),
         child: Icon(

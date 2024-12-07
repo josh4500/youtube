@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
+import 'package:youtube_clone/infrastructure.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/screens/create/widgets/create_close_button.dart';
+import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'provider/short_recording_state.dart';
@@ -21,15 +24,96 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
     false,
   );
 
+  final _rangeHistory = ValueNotifier<List<RangeValue>>([]);
+  final _rangeUndidHistory = ValueNotifier<List<RangeValue>>([]);
   final _progressNotifier = ValueNotifier<Alignment>(
+    Alignment.centerLeft,
+  );
+
+  // TODO(josh4500): Rename
+  double _trimTime = 0.0;
+  final _trimExpandNotifier = ValueNotifier<bool>(false);
+  final _trimRangeNotifier = ValueNotifier<RangeValue>(
+    RangeValue.zero,
+  );
+  final _trimProgressNotifier = ValueNotifier<Alignment>(
     Alignment.centerLeft,
   );
 
   @override
   void dispose() {
     _progressNotifier.dispose();
+    _trimExpandNotifier.dispose();
+    _trimRangeNotifier.dispose();
+    _trimProgressNotifier.dispose();
     _trimmingNotifier.dispose();
     super.dispose();
+  }
+
+  void onTapThumbnail(Recording recording) {
+    _trimTime = recording.duration.inMilliseconds / 1000;
+    _trimRangeNotifier.value = const RangeValue(start: 0, end: 1);
+    _trimmingNotifier.value = true;
+  }
+
+  void handleDragUpdate(DragUpdateDetails details, BoxConstraints constraints) {
+    final value = details.localPosition.dx / constraints.maxWidth;
+    _setProgress(value);
+  }
+
+  void _setProgress(double value) {
+    _progressNotifier.value = Alignment(
+      value.clamp(0, 1).normalizeRange(-1, 1),
+      0,
+    );
+  }
+
+  bool handleTrimmerNotification(
+    TrimmerNotification notification,
+    BoxConstraints constraints,
+  ) {
+    if (notification is TrimmerDragUpdateNotification) {
+      final position = notification.position;
+      final range = notification.range;
+      // TODO(josh4500): Instead of "kTrimmerPadding / constraints.maxWidth", check if padding
+      // around InterimProgressIndicator works
+      if (position != TrimDragPosition.none) {
+        _trimProgressNotifier.value = Alignment(
+          (position.isLeft
+                  ? range.start + kTrimmerPadding / constraints.maxWidth
+                  : range.end - kTrimmerPadding / constraints.maxWidth)
+              .normalizeRange(-1, 1),
+          0,
+        );
+      } else {
+        _trimProgressNotifier.value = Alignment(
+          (notification.details.localPosition.dx / constraints.maxWidth)
+              .clamp(
+                range.start + kTrimmerPadding / constraints.maxWidth,
+                range.end - kTrimmerPadding / constraints.maxWidth,
+              )
+              .normalizeRange(-1, 1),
+          0,
+        );
+      }
+      _trimRangeNotifier.value = notification.range;
+    } else if (notification is TrimmerLongPressNotification) {
+      final position = notification.position;
+      final range = notification.range;
+      _trimProgressNotifier.value = Alignment(
+        (position.isLeft
+                ? range.start + kTrimmerPadding / constraints.maxWidth
+                : range.end - kTrimmerPadding / constraints.maxWidth)
+            .normalizeRange(-1, 1),
+        0,
+      );
+      _trimExpandNotifier.value = true;
+      _trimRangeNotifier.value = notification.range;
+    } else if (notification is TrimmerEndNotification) {
+      _trimRangeNotifier.value = notification.range;
+      _trimExpandNotifier.value = false;
+    }
+    return true;
   }
 
   @override
@@ -37,10 +121,41 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
     return SafeArea(
       child: Material(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Padding(
               padding: EdgeInsets.all(12.0),
               child: CreateProgress(),
+            ),
+            // TODO(josh4500): Only show while still recording
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 4.0,
+                horizontal: 12,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const CreateCloseButton(
+                    color: Colors.white10,
+                  ),
+                  CustomInkWell(
+                    borderRadius: BorderRadius.circular(24),
+                    splashFactory: NoSplash.splashFactory,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: Colors.white10,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        YTIcons.delete_outlined,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const Expanded(
               child: Padding(
@@ -62,6 +177,131 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
                 ),
               ),
             ),
+            LayoutBuilder(
+              builder: (
+                BuildContext context,
+                BoxConstraints constraints,
+              ) {
+                return ValueListenableBuilder(
+                  valueListenable: _trimmingNotifier,
+                  builder: (
+                    BuildContext context,
+                    bool trimming,
+                    Widget? _,
+                  ) {
+                    if (trimming) {
+                      return Container(
+                        height: 64,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                        ),
+                        child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 4,
+                              ),
+                              child: Stack(
+                                children: [
+                                  const DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white24,
+                                    ),
+                                    child: SizedBox.expand(),
+                                  ),
+                                  NotificationListener<TrimmerNotification>(
+                                    onNotification: (notification) =>
+                                        handleTrimmerNotification(
+                                      notification,
+                                      constraints,
+                                    ),
+                                    child: const Trimmer(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            ValueListenableBuilder(
+                              valueListenable: _trimRangeNotifier,
+                              builder: (
+                                BuildContext context,
+                                RangeValue range,
+                                Widget? _,
+                              ) {
+                                return Align(
+                                  alignment: Alignment(
+                                    ((range.distance / 2) + range.start)
+                                        .normalizeRange(-1, 1),
+                                    0,
+                                  ),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '${(_trimTime * range.distance).toStringAsPrecision(2)}s',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            RepaintBoundary(
+                              child: InterimProgressIndicator(
+                                width: 6,
+                                alignment: _trimProgressNotifier,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                      ),
+                      child: GestureDetector(
+                        onHorizontalDragUpdate: (details) => handleDragUpdate(
+                          details,
+                          constraints,
+                        ),
+                        child: SizedBox(
+                          height: 56,
+                          child: Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 4,
+                                ),
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white10,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const SizedBox.expand(),
+                                ),
+                              ),
+                              RepaintBoundary(
+                                child: InterimProgressIndicator(
+                                  width: 6,
+                                  alignment: _progressNotifier,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
             ValueListenableBuilder(
               valueListenable: _trimmingNotifier,
               builder: (
@@ -69,119 +309,55 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
                 bool trimming,
                 Widget? _,
               ) {
-                if (trimming) {
-                  return const Padding(
-                    padding: EdgeInsets.all(24.0),
-                    child: Trimmer(),
-                  );
-                }
-                return Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8.0,
-                        horizontal: 12,
-                      ),
-                      child: SizedBox(
-                        height: 56,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                          ),
-                          child: LayoutBuilder(
+                if (trimming) return const SizedBox();
+                return ScrollConfiguration(
+                  behavior: const NoScrollGlowBehavior(),
+                  child: LayoutBuilder(
+                    builder: (
+                      BuildContext context,
+                      BoxConstraints constraints,
+                    ) {
+                      return SizedBox(
+                        height: 80,
+                        width: constraints.maxWidth,
+                        child: Center(
+                          child: Consumer(
                             builder: (
                               BuildContext context,
-                              BoxConstraints constraints,
+                              WidgetRef ref,
+                              Widget? _,
                             ) {
-                              return GestureDetector(
-                                onHorizontalDragUpdate:
-                                    (DragUpdateDetails details) {
-                                  final value = details.localPosition.dx /
-                                      constraints.maxWidth;
-                                  _progressNotifier.value = Alignment(
-                                    value.normalizeRange(-1, 1),
-                                    0,
+                              final state = ref.watch(
+                                shortRecordingProvider,
+                              );
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4.0,
+                                  horizontal: 8,
+                                ),
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (
+                                  BuildContext context,
+                                  int index,
+                                ) {
+                                  final recording = state.recordings[index];
+                                  return GestureDetector(
+                                    onTap: () => onTapThumbnail(recording),
+                                    child: _RecordingThumbnail(
+                                      key: GlobalObjectKey(index),
+                                      recording: recording,
+                                    ),
                                   );
                                 },
-                                child: Stack(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 4.0,
-                                      ),
-                                      child: DecoratedBox(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white10,
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: const SizedBox.expand(),
-                                      ),
-                                    ),
-                                    InterimProgressIndicator(
-                                      width: 6,
-                                      alignment: _progressNotifier,
-                                    ),
-                                  ],
-                                ),
+                                itemCount: state.recordings.length,
                               );
                             },
                           ),
                         ),
-                      ),
-                    ),
-                    ScrollConfiguration(
-                      behavior: const NoScrollGlowBehavior(),
-                      child: LayoutBuilder(
-                        builder: (
-                          BuildContext context,
-                          BoxConstraints constraints,
-                        ) {
-                          return SizedBox(
-                            height: 80,
-                            width: constraints.maxWidth,
-                            child: Center(
-                              child: Consumer(
-                                builder: (
-                                  BuildContext context,
-                                  WidgetRef ref,
-                                  Widget? _,
-                                ) {
-                                  final state = ref.watch(
-                                    shortRecordingProvider,
-                                  );
-                                  return ListView.builder(
-                                    shrinkWrap: true,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 4.0,
-                                      horizontal: 8,
-                                    ),
-                                    scrollDirection: Axis.horizontal,
-                                    itemBuilder: (
-                                      BuildContext context,
-                                      int index,
-                                    ) {
-                                      final recording = state.recordings[index];
-                                      return GestureDetector(
-                                        onTap: () {
-                                          _trimmingNotifier.value = true;
-                                        },
-                                        child: _RecordingThumbnail(
-                                          key: GlobalObjectKey(index),
-                                          recording: recording,
-                                        ),
-                                      );
-                                    },
-                                    itemCount: state.recordings.length,
-                                  );
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                      );
+                    },
+                  ),
                 );
               },
             ),
@@ -192,8 +368,8 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
               ),
               child: Row(
                 children: [
-                  Expanded(
-                    child: ValueListenableBuilder(
+                  ...[
+                    ValueListenableBuilder(
                       valueListenable: _trimmingNotifier,
                       builder: (
                         BuildContext context,
@@ -204,10 +380,43 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
                           trimming
                               ? 'Adjust the length of the clip'
                               : 'Tap thumbnail to edit',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                          ),
                         );
                       },
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                  ],
+                  ...[
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(
+                        color: Colors.white10,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        YTIcons.undo_arrow,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(
+                        color: Colors.white10,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        YTIcons.redo_arrow,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                  ],
+                  const Spacer(),
                   const SizedBox(width: 8),
                   FilledButton.icon(
                     onPressed: () {

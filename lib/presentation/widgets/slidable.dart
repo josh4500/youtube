@@ -48,7 +48,7 @@ class Slidable extends StatefulWidget {
     super.key,
     this.sharedSlidableState,
     this.backgroundColor = Colors.white10,
-    this.maxOffset = 0.5,
+    this.sizeRatio = 0.5,
     this.extraOffset = 0.1,
     this.duration = const Duration(milliseconds: 900),
     this.reverseDuration = const Duration(milliseconds: 250),
@@ -70,9 +70,9 @@ class Slidable extends StatefulWidget {
 
   final List<SlidableItem> items;
 
-  /// The maximum offset the child can be slid in the specified direction as a percentage
-  /// of the parent's size. Defaults to 0.5 (50%).
-  final double maxOffset;
+  /// The maximum size the items children can be slid to, in the specified direction
+  /// as a percentage of the parent's size. Defaults to 0.5 (50%).
+  final double sizeRatio;
 
   final double extraOffset;
 
@@ -145,7 +145,7 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
   @override
   void didUpdateWidget(covariant Slidable oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.maxOffset != widget.maxOffset ||
+    if (oldWidget.sizeRatio != widget.sizeRatio ||
         oldWidget.direction != widget.direction) {
       _animation = _createAnimationValue();
     }
@@ -175,7 +175,7 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
   Animation<Offset> _createAnimationValue() {
     return Tween<Offset>(
       begin: Offset.zero,
-      end: _getEndOffset(widget.maxOffset),
+      end: _getEndOffset(widget.sizeRatio),
     ).animate(
       CurvedAnimation(
         parent: _slideController,
@@ -207,12 +207,12 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
     if (widget.direction.isHorizontal) {
       return widget.direction.isLeft ? -offset.dx : offset.dx;
     } else {
-      return offset.dy;
+      return widget.direction.isDown ? -offset.dy : offset.dy;
     }
   }
 
   /// Gets the size relevant to the sliding direction based on the constraints.
-  double _getDirectionSie(BoxConstraints constraint) {
+  double _getDirectionSize(BoxConstraints constraint) {
     if (widget.direction.isHorizontal) {
       return constraint.maxWidth;
     } else {
@@ -242,7 +242,7 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
     _slideController.value = clampDouble(
       _slideController.value +
           (_getDirectionOffset(details.delta) /
-              (_getDirectionSie(constraints) * widget.maxOffset)),
+              (_getDirectionSize(constraints) * widget.sizeRatio)),
       0,
       1,
     );
@@ -251,7 +251,7 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
       _extraSlideController.value = clampDouble(
         _extraSlideController.value +
             (_getDirectionOffset(details.delta) /
-                (_getDirectionSie(constraints) * widget.maxOffset)),
+                (_getDirectionSize(constraints) * widget.sizeRatio)),
         0,
         1,
       );
@@ -273,7 +273,7 @@ class _SlidableState extends State<Slidable> with TickerProviderStateMixin {
                     flipAxisDirection(widget.direction),
                   ),
                   child: SizedBox(
-                    width: constraints.maxWidth * widget.maxOffset,
+                    width: constraints.maxWidth * widget.sizeRatio,
                     child: Row(
                       children: List<Widget>.generate(
                         widget.items.length,

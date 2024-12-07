@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 
 import 'range_slider.dart';
 
+const double kTrimmerPadding = 12.0;
+
 enum TrimDragPosition {
   left,
-  right;
+  right,
+  none;
 
   bool get isLeft => this == TrimDragPosition.left;
   bool get isRight => this == TrimDragPosition.right;
@@ -15,14 +18,27 @@ enum TrimDragPosition {
 
 abstract class TrimmerNotification extends Notification {}
 
-class TrimmerRangeUpdateNotification extends TrimmerNotification {
-  TrimmerRangeUpdateNotification({required this.range});
+class TrimmerLongPressNotification extends TrimmerNotification {
+  TrimmerLongPressNotification({required this.position, required this.range});
 
+  final TrimDragPosition position;
   final RangeValue range;
 }
 
-class TrimmerLongPressNotification extends TrimmerNotification {
-  TrimmerLongPressNotification({required this.position, required this.range});
+class TrimmerDragUpdateNotification extends TrimmerNotification {
+  TrimmerDragUpdateNotification({
+    required this.position,
+    required this.range,
+    required this.details,
+  });
+
+  final TrimDragPosition position;
+  final RangeValue range;
+  final DragUpdateDetails details;
+}
+
+class TrimmerEndNotification extends TrimmerNotification {
+  TrimmerEndNotification({required this.position, required this.range});
 
   final TrimDragPosition position;
   final RangeValue range;
@@ -36,12 +52,12 @@ class Trimmer extends StatefulWidget {
 }
 
 class _TrimmerState extends State<Trimmer> {
-  final ValueNotifier<RangeValue> rangeNotifier = ValueNotifier(
+  final ValueNotifier<RangeValue> _rangeNotifier = ValueNotifier(
     const RangeValue(start: 0, end: 1),
   );
 
   bool _releaseLongPress = true;
-  TrimDragPosition? _dragPosition;
+  TrimDragPosition _dragPosition = TrimDragPosition.none;
   double _longPressPosition = 0;
   Timer? _longPressTimer;
 
@@ -57,27 +73,30 @@ class _TrimmerState extends State<Trimmer> {
     double maxWidth = 0,
     double xPosition = 0,
   }) {
-    if (_dragPosition == null) {
+    if (_dragPosition == TrimDragPosition.none) {
       return;
     }
-    final range = rangeNotifier.value;
+    final range = _rangeNotifier.value;
     final add = 24 / maxWidth;
 
     if (_releaseLongPress &&
-        xPosition < _longPressPosition + 12 &&
-        xPosition > _longPressPosition - 12) {
+        xPosition < _longPressPosition + kTrimmerPadding &&
+        xPosition > _longPressPosition - kTrimmerPadding) {
       _longPressPosition = xPosition;
       _longPressTimer?.cancel();
       _longPressTimer = Timer(
-        kLongPressTimeout,
+        kLongPressTimeout * 2,
         () {
-          if (_dragPosition != null) {
+          if (_dragPosition != TrimDragPosition.none) {
             _releaseLongPress = false;
 
-            TrimmerLongPressNotification(
-              position: _dragPosition!,
-              range: range,
-            ).dispatch(context);
+            if (xPosition < _longPressPosition + kTrimmerPadding &&
+                xPosition > _longPressPosition - kTrimmerPadding) {
+              TrimmerLongPressNotification(
+                position: _dragPosition,
+                range: range,
+              ).dispatch(context);
+            }
           }
         },
       );
@@ -85,96 +104,93 @@ class _TrimmerState extends State<Trimmer> {
       _longPressPosition = xPosition;
     }
 
-    rangeNotifier.value = range.copyWith(
-      start: _dragPosition!.isLeft && range.start + xDelta + add < range.end
+    _rangeNotifier.value = range.copyWith(
+      start: _dragPosition.isLeft && range.start + xDelta + add < range.end
           ? (range.start + xDelta).clamp(0, 1)
           : null,
-      end: _dragPosition!.isRight && range.end + xDelta - add > range.start
+      end: _dragPosition.isRight && range.end + xDelta - add > range.start
           ? (range.end + xDelta).clamp(0, 1)
           : null,
     );
-    TrimmerRangeUpdateNotification(
-      range: rangeNotifier.value,
-    ).dispatch(context);
   }
 
   void _onPressDragEnd() {
-    _dragPosition = null;
+    _dragPosition = TrimDragPosition.none;
     _longPressTimer?.cancel();
     _longPressTimer = null;
     _releaseLongPress = true;
+    TrimmerEndNotification(
+      position: _dragPosition,
+      range: _rangeNotifier.value,
+    ).dispatch(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white10,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          return GestureDetector(
-            onLongPressDown: (LongPressDownDetails details) {
-              final range = rangeNotifier.value;
-              final maxWidth = constraints.maxWidth;
-              final xPosition = details.localPosition.dx;
-              if (xPosition <= (maxWidth * range.start) + 12) {
-                _dragPosition = TrimDragPosition.left;
-                TrimmerLongPressNotification(
-                  position: _dragPosition!,
-                  range: range,
-                ).dispatch(context);
-              } else if (xPosition >= (maxWidth * range.end) - 12) {
-                _dragPosition = TrimDragPosition.right;
-                TrimmerLongPressNotification(
-                  position: _dragPosition!,
-                  range: range,
-                ).dispatch(context);
-              }
-            },
-            onHorizontalDragStart: (DragStartDetails details) {
-              final range = rangeNotifier.value;
-              final maxWidth = constraints.maxWidth;
-              final xPosition = details.localPosition.dx;
-              if (xPosition <= (maxWidth * range.start) + 12) {
-                _dragPosition = TrimDragPosition.left;
-              } else if (xPosition >= (maxWidth * range.end) - 12) {
-                _dragPosition = TrimDragPosition.right;
-              }
-            },
-            onLongPressEnd: (_) => _onPressDragEnd(),
-            onHorizontalDragEnd: (_) => _onPressDragEnd(),
-            onLongPressMoveUpdate: (details) {
-              _onDragMoveUpdate(
-                xDelta: (details.localPosition.dx - _longPressPosition) /
-                    constraints.maxWidth,
-                xPosition: details.localPosition.dx,
-                maxWidth: constraints.maxWidth,
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return GestureDetector(
+          onLongPressDown: (LongPressDownDetails details) {
+            final range = _rangeNotifier.value;
+            final maxWidth = constraints.maxWidth;
+            final xPosition = details.localPosition.dx;
+            if (xPosition <= (maxWidth * range.start) + kTrimmerPadding) {
+              _dragPosition = TrimDragPosition.left;
+              TrimmerLongPressNotification(
+                position: _dragPosition,
+                range: range,
+              ).dispatch(context);
+            } else if (xPosition >= (maxWidth * range.end) - kTrimmerPadding) {
+              _dragPosition = TrimDragPosition.right;
+              TrimmerLongPressNotification(
+                position: _dragPosition,
+                range: range,
+              ).dispatch(context);
+            }
+          },
+          onHorizontalDragStart: (DragStartDetails details) {
+            final range = _rangeNotifier.value;
+            final maxWidth = constraints.maxWidth;
+            final xPosition = details.localPosition.dx;
+            if (xPosition <= (maxWidth * range.start) + kTrimmerPadding) {
+              _dragPosition = TrimDragPosition.left;
+            } else if (xPosition >= (maxWidth * range.end) - kTrimmerPadding) {
+              _dragPosition = TrimDragPosition.right;
+            }
+          },
+          onLongPressEnd: (_) => _onPressDragEnd(),
+          onHorizontalDragEnd: (_) => _onPressDragEnd(),
+          onLongPressMoveUpdate: (details) {
+            _onDragMoveUpdate(
+              xDelta: (details.localPosition.dx - _longPressPosition) /
+                  constraints.maxWidth,
+              xPosition: details.localPosition.dx,
+              maxWidth: constraints.maxWidth,
+            );
+          },
+          onHorizontalDragUpdate: (DragUpdateDetails details) {
+            _onDragMoveUpdate(
+              xDelta: details.delta.dx / constraints.maxWidth,
+              xPosition: details.localPosition.dx,
+              maxWidth: constraints.maxWidth,
+            );
+            TrimmerDragUpdateNotification(
+              position: _dragPosition,
+              range: _rangeNotifier.value,
+              details: details,
+            ).dispatch(context);
+          },
+          child: ValueListenableBuilder(
+            valueListenable: _rangeNotifier,
+            builder: (BuildContext context, RangeValue range, Widget? _) {
+              return CustomPaint(
+                size: Size.infinite,
+                painter: TrimmerPainter(range: range),
               );
             },
-            onHorizontalDragUpdate: (DragUpdateDetails details) {
-              _onDragMoveUpdate(
-                xDelta: details.delta.dx / constraints.maxWidth,
-                xPosition: details.localPosition.dx,
-                maxWidth: constraints.maxWidth,
-              );
-            },
-            child: ValueListenableBuilder(
-              valueListenable: rangeNotifier,
-              builder: (BuildContext context, RangeValue range, Widget? _) {
-                return SizedBox(
-                  height: 56,
-                  width: double.infinity,
-                  child: CustomPaint(
-                    painter: TrimmerPainter(range: range),
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -182,37 +198,119 @@ class _TrimmerState extends State<Trimmer> {
 class TrimmerPainter extends CustomPainter {
   const TrimmerPainter({this.range = RangeValue.zero});
   final RangeValue range;
+
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
       ..color = Colors.white
-      ..strokeWidth = 2.5;
+      ..strokeWidth = 4;
+
+    canvas.saveLayer(Rect.largest, Paint());
+
+    // Overlay color
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(range.start * size.width, 0, 12, size.height),
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        Radius.zero,
+      ),
+      Paint()..color = Colors.black54,
+    );
+
+    // Clear space
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(
+          range.start * size.width + kTrimmerPadding,
+          2.5,
+          ((range.end - range.start) * size.width) - kTrimmerPadding * 1.5,
+          size.height - 2.5,
+        ),
+        Radius.zero,
+      ),
+      Paint()
+        ..color = Colors.transparent
+        ..blendMode = BlendMode.clear,
+    );
+
+    // Start range
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(
+          range.start * size.width,
+          0,
+          kTrimmerPadding,
+          size.height,
+        ),
         const Radius.circular(4),
       ),
       paint,
     );
-    canvas.drawLine(
-      Offset(range.start * size.width + 6, 0),
-      Offset(range.end * size.width - 6, 0),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(range.start * size.width + 6, size.height),
-      Offset(range.end * size.width - 6, size.height),
-      paint,
-    );
+    // End range
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH((range.end * size.width) - 12, 0, 12, size.height),
+        Rect.fromLTWH(
+          (range.end * size.width) - kTrimmerPadding,
+          0,
+          kTrimmerPadding,
+          size.height,
+        ),
         const Radius.circular(4),
       ),
       paint,
     );
+
+    // Top border line
+    canvas.drawLine(
+      Offset(range.start * size.width + 6, 2),
+      Offset(range.end * size.width - 6, 2),
+      paint,
+    );
+    // Bottom border line
+    canvas.drawLine(
+      Offset(
+        range.start * size.width + kTrimmerPadding / 2,
+        size.height - 2,
+      ),
+      Offset(
+        range.end * size.width - kTrimmerPadding / 2,
+        size.height - 2,
+      ),
+      paint,
+    );
+
+    // Start ranger marker
+    canvas.drawLine(
+      Offset(
+        range.start * size.width + kTrimmerPadding / 2,
+        kTrimmerPadding,
+      ),
+      Offset(
+        range.start * size.width + kTrimmerPadding / 2,
+        size.height - kTrimmerPadding,
+      ),
+      Paint()
+        ..color = Colors.black
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = 2,
+    );
+    // End ranger marker
+    canvas.drawLine(
+      Offset(
+        range.end * size.width - kTrimmerPadding / 2,
+        kTrimmerPadding,
+      ),
+      Offset(
+        range.end * size.width - kTrimmerPadding / 2,
+        size.height - kTrimmerPadding,
+      ),
+      Paint()
+        ..color = Colors.black
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = 2,
+    );
+    canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(TrimmerPainter oldDelegate) => oldDelegate.range != range;
 }
