@@ -24,6 +24,8 @@ class InitCameraNotification extends CaptureNotification {}
 
 class DisposeCameraNotification extends CaptureNotification {}
 
+class CompleteNotification extends CaptureNotification {}
+
 class UpdateStopTimerNotification extends CaptureNotification {
   UpdateStopTimerNotification({this.duration});
 

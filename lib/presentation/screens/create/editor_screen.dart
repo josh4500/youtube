@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/screens/create/provider/voice_over_state.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -112,7 +113,7 @@ class _EditorScreenState extends State<EditorScreen>
       case EditorEffect.text:
         _openTextEditor();
       case EditorEffect.trim:
-      // TODO: Handle this case.
+        _openTrimmerScreen();
       case EditorEffect.filter:
         _showFilterSelector();
       case EditorEffect.voiceOver:
@@ -131,6 +132,10 @@ class _EditorScreenState extends State<EditorScreen>
     await textEditorController.reverse();
     _textElementNotifier.value = null;
     hideNavButtons.value = 1;
+  }
+
+  Future<void> _openTrimmerScreen() async {
+    await context.goto(AppRoutes.shortsTrimmer);
   }
 
   Future<void> _openStickerEditor(Type elementType) async {
@@ -464,7 +469,7 @@ class _EditorScreenState extends State<EditorScreen>
                   child: SizedBox(
                     height: 384.h,
                     width: double.infinity,
-                    child: EditorTimeline(),
+                    child: const EditorTimeline(),
                   ),
                 ),
               ),
@@ -487,9 +492,9 @@ class VoiceoverSettings extends ConsumerWidget {
         onTap: () {},
         padding: const EdgeInsets.all(8),
         splashFactory: NoSplash.splashFactory,
-        child: Icon(YTIcons.tune_outlined),
+        child: const Icon(YTIcons.tune_outlined),
       );
     }
-    return SizedBox(width: 48);
+    return const SizedBox(width: 48);
   }
 }

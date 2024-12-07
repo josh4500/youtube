@@ -97,6 +97,8 @@ export 'widgets/slides_indicator.dart';
 
 export 'widgets/text_widgets/icon_span.dart';
 
+export 'widgets/trimmer.dart';
+
 export 'widgets/viewable/context/viewable_image_context.dart';
 export 'widgets/viewable/context/viewable_slides_context.dart';
 export 'widgets/viewable/context/viewable_video_context.dart';

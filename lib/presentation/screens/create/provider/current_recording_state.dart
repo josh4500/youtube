@@ -11,7 +11,7 @@ class CurrentRecording extends _$CurrentRecording {
 
   @override
   VideoRecording build() {
-    return VideoRecording();
+    return const VideoRecording();
   }
 
   void addSound(ExtraSound sound) {

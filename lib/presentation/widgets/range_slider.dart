@@ -103,7 +103,7 @@ class RangeValue {
 
   final double start;
   final double end;
-
+  static const RangeValue zero = RangeValue(start: 0, end: 0);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

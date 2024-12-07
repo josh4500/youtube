@@ -14,8 +14,8 @@ class ShortRecording extends _$ShortRecording {
 
   @override
   RecordingState build() {
-    return RecordingState<VideoRecording>(
-      recordDuration: const Duration(seconds: 15),
+    return const RecordingState<VideoRecording>(
+      recordDuration: Duration(seconds: 15),
     );
   }
 

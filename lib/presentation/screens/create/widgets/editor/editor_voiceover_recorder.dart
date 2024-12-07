@@ -37,7 +37,8 @@ class _EditorVoiceoverRecorderState
     vsync: this,
     duration: const Duration(milliseconds: 900),
   );
-  final ValueNotifier<Alignment> progress = ValueNotifier<Alignment>(
+  final ValueNotifier<Alignment> _progressIndicatorNotifier =
+      ValueNotifier<Alignment>(
     Alignment.centerLeft,
   );
 
@@ -56,7 +57,7 @@ class _EditorVoiceoverRecorderState
 
   @override
   void dispose() {
-    progress.dispose();
+    _progressIndicatorNotifier.dispose();
     recorder.dispose();
     recordingNotifier.dispose();
     controller.dispose();
@@ -132,7 +133,8 @@ class _EditorVoiceoverRecorderState
           final value = _startDuration.inMilliseconds / tDuration;
           _setProgressValue(value);
 
-          final nextEndDuration = _startDuration + Duration(milliseconds: 80);
+          final nextEndDuration =
+              _startDuration + const Duration(milliseconds: 80);
           bool autoStop = false;
           autoStop = nextEndDuration >= voiceRecording.recordDuration;
 
@@ -204,7 +206,8 @@ class _EditorVoiceoverRecorderState
   }
 
   void _setProgressValue(double value) {
-    progress.value = Alignment(value.normalizeRange(-1, 1), 0);
+    _progressIndicatorNotifier.value =
+        Alignment(value.normalizeRange(-1, 1), 0);
   }
 
   /// [value] is progress value
@@ -297,12 +300,12 @@ class _EditorVoiceoverRecorderState
                       height: 48,
                       child: Stack(
                         children: [
-                          RepaintBoundary(
-                            child: const VoiceRecordingProgress(),
+                          const RepaintBoundary(
+                            child: VoiceRecordingProgress(),
                           ),
                           InterimProgressIndicator(
                             width: 6,
-                            alignment: progress,
+                            alignment: _progressIndicatorNotifier,
                           ),
                         ],
                       ),
@@ -331,7 +334,7 @@ class _EditorVoiceoverRecorderState
                     enabledRecord
                         ? 'Tap or hold to record audio'
                         : 'Tap undo to delete recorded audio',
-                    style: TextStyle(fontSize: 12),
+                    style: const TextStyle(fontSize: 12),
                   ),
                 );
               },
@@ -514,7 +517,7 @@ class VoiceRecordingProgress extends ConsumerWidget {
             color: Colors.white10,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: SizedBox.expand(),
+          child: const SizedBox.expand(),
         ),
       ),
     );

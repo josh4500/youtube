@@ -178,6 +178,11 @@ abstract class AppRoutes {
     path: 'shorts-editor',
   );
 
+  static final RouteInfo shortsTrimmer = RouteInfo(
+    name: 'shorts-trimmer',
+    path: 'shorts-trimmer',
+  );
+
   ///
   ///
   /// Comments

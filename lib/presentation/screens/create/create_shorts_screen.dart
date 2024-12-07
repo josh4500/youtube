@@ -36,6 +36,7 @@ import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -454,6 +455,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       case CaptureEffect.flash:
         isAdded ? setFlashMode(FlashMode.torch) : setFlashMode(FlashMode.off);
       case CaptureEffect.trim:
+        _openTrimmer();
     }
   }
 
@@ -471,6 +473,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       CaptureEffect.speed,
       CaptureEffect.timer,
       CaptureEffect.filter,
+      CaptureEffect.trim,
     ].contains(effect)) {
       isAdded
           ? _enabledCaptureEffects.add(effect)
@@ -735,6 +738,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   }
 
   Future<void> _stopRecording([bool addRecording = true]) async {
+    // TODO(josh4500): Recording should be paused instead, creating a
+    // single file. bool value should
     // final XFile xFile = await controller!.stopVideoRecording();
     // xFile.saveTo('path');
     ref.read(currentRecordingProvider.notifier).stopRecording();
@@ -952,6 +957,23 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     }
   }
 
+  FutureOr<T> _waitCamera<T>(FutureOr<T> Function() callback) async {
+    _disposeCamera();
+    _preventInitDispose = true;
+    final value = await callback();
+    _preventInitDispose = false;
+    _initCamera();
+    return value;
+  }
+
+  Future<void> _openTrimmer() async {
+    _waitCamera(() async => context.goto(AppRoutes.shortsTrimmer));
+  }
+
+  Future<void> _proceedToEdit() async {
+    _waitCamera(() async => context.goto(AppRoutes.shortsEditor));
+  }
+
   bool handleCaptureNotification(CaptureNotification notification) {
     if (notification is HideControlsNotification) {
       _controlHidden = true;
@@ -984,6 +1006,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     } else if (notification is DisposeCameraNotification) {
       _disposeCamera();
       _preventInitDispose = true;
+    } else if (notification is CompleteNotification) {
+      _proceedToEdit();
     }
     return true;
   }

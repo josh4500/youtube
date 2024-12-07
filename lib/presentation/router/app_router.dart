@@ -518,6 +518,15 @@ class AppRouter {
               );
             },
           ),
+          GoRoute(
+            name: AppRoutes.shortsTrimmer.name,
+            path: AppRoutes.shortsTrimmer.path,
+            pageBuilder: (BuildContext context, GoRouterState state) {
+              return const NoTransitionPage(
+                child: TrimmerScreen(),
+              );
+            },
+          ),
         ],
       ),
       GoRoute(

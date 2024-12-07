@@ -119,7 +119,7 @@ class _VideoPlaylistSheetState extends State<VideoPlaylistSheet> {
             return Slidable(
               key: ValueKey(index),
               sharedSlidableState: _slidableState,
-              maxOffset: .3,
+              sizeRatio: .3,
               items: const [
                 SlidableItem(
                   icon: Icon(YTIcons.hide_outlined),

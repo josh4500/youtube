@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
-import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../provider/media_album_state.dart';
@@ -114,9 +113,7 @@ class CaptureRecordingControl extends StatelessWidget {
 }
 
 class _CompleteButton extends StatelessWidget {
-  const _CompleteButton({
-    required this.isPublishable,
-  });
+  const _CompleteButton({required this.isPublishable});
 
   final bool isPublishable;
 
@@ -125,11 +122,7 @@ class _CompleteButton extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         if (isPublishable) {
-          DisposeCameraNotification().dispatch(context);
-          await context.goto(AppRoutes.shortsEditor);
-          if (context.mounted) {
-            InitCameraNotification().dispatch(context);
-          }
+          CompleteNotification().dispatch(context);
         }
       },
       child: Container(

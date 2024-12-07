@@ -52,6 +52,7 @@ export 'screens/create/create_screen.dart';
 export 'screens/create/create_shorts_screen.dart';
 export 'screens/create/create_video_screen.dart';
 export 'screens/create/editor_screen.dart';
+export 'screens/create/trimmer_screen.dart';
 
 // Home
 export 'screens/feed/fashion_and_beauty_screen.dart';

@@ -786,7 +786,7 @@ class StickerScaffold extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       color: Color.alphaBlend(
                                         color.withOpacity(.5),
-                                        Color(0xFFAAAAAA),
+                                        const Color(0xFFAAAAAA),
                                       ),
                                       shape: BoxShape.circle,
                                       border: Border.all(
