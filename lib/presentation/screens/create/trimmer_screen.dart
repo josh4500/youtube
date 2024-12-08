@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
-import 'package:youtube_clone/infrastructure.dart';
 import 'package:youtube_clone/presentation/models.dart';
-import 'package:youtube_clone/presentation/screens/create/widgets/create_close_button.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'provider/short_recording_state.dart';
+import 'widgets/create_close_button.dart';
 import 'widgets/create_progress.dart';
 import 'widgets/editor/editor_timeline.dart';
 
@@ -24,8 +24,6 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
     false,
   );
 
-  final _rangeHistory = ValueNotifier<List<RangeValue>>([]);
-  final _rangeUndidHistory = ValueNotifier<List<RangeValue>>([]);
   final _progressNotifier = ValueNotifier<Alignment>(
     Alignment.centerLeft,
   );
@@ -75,23 +73,16 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
     if (notification is TrimmerDragUpdateNotification) {
       final position = notification.position;
       final range = notification.range;
-      // TODO(josh4500): Instead of "kTrimmerPadding / constraints.maxWidth", check if padding
-      // around InterimProgressIndicator works
+
       if (position != TrimDragPosition.none) {
         _trimProgressNotifier.value = Alignment(
-          (position.isLeft
-                  ? range.start + kTrimmerPadding / constraints.maxWidth
-                  : range.end - kTrimmerPadding / constraints.maxWidth)
-              .normalizeRange(-1, 1),
+          (position.isLeft ? range.start : range.end).normalizeRange(-1, 1),
           0,
         );
       } else {
         _trimProgressNotifier.value = Alignment(
-          (notification.details.localPosition.dx / constraints.maxWidth)
-              .clamp(
-                range.start + kTrimmerPadding / constraints.maxWidth,
-                range.end - kTrimmerPadding / constraints.maxWidth,
-              )
+          (notification.details.xPosition / notification.details.width)
+              .clamp(range.start, range.end)
               .normalizeRange(-1, 1),
           0,
         );
@@ -101,10 +92,7 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
       final position = notification.position;
       final range = notification.range;
       _trimProgressNotifier.value = Alignment(
-        (position.isLeft
-                ? range.start + kTrimmerPadding / constraints.maxWidth
-                : range.end - kTrimmerPadding / constraints.maxWidth)
-            .normalizeRange(-1, 1),
+        (position.isLeft ? range.start : range.end).normalizeRange(-1, 1),
         0,
       );
       _trimExpandNotifier.value = true;
@@ -190,74 +178,86 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
                     Widget? _,
                   ) {
                     if (trimming) {
-                      return Container(
+                      return SizedBox(
                         height: 64,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                        ),
-                        child: Stack(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                                horizontal: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24.0,
+                          ),
+                          child: Stack(
+                            children: [
+                              ValueListenableBuilder(
+                                valueListenable: _trimExpandNotifier,
+                                builder: (
+                                  BuildContext context,
+                                  bool expand,
+                                  Widget? childWidget,
+                                ) {
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 8,
+                                      horizontal: expand ? 0 : 4,
+                                    ),
+                                    child: childWidget,
+                                  );
+                                },
+                                child:
+                                    NotificationListener<TrimmerNotification>(
+                                  onNotification: (notification) =>
+                                      handleTrimmerNotification(
+                                    notification,
+                                    constraints,
+                                  ),
+                                  child: const Trimmer(
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white24,
+                                      ),
+                                      child: SizedBox.expand(),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              child: Stack(
-                                children: [
-                                  const DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white24,
+                              ValueListenableBuilder(
+                                valueListenable: _trimRangeNotifier,
+                                builder: (
+                                  BuildContext context,
+                                  RangeValue range,
+                                  Widget? _,
+                                ) {
+                                  return Align(
+                                    alignment: Alignment(
+                                      ((range.distance / 2) + range.start)
+                                          .normalizeRange(-1, 1),
+                                      0,
                                     ),
-                                    child: SizedBox.expand(),
-                                  ),
-                                  NotificationListener<TrimmerNotification>(
-                                    onNotification: (notification) =>
-                                        handleTrimmerNotification(
-                                      notification,
-                                      constraints,
-                                    ),
-                                    child: const Trimmer(),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            ValueListenableBuilder(
-                              valueListenable: _trimRangeNotifier,
-                              builder: (
-                                BuildContext context,
-                                RangeValue range,
-                                Widget? _,
-                              ) {
-                                return Align(
-                                  alignment: Alignment(
-                                    ((range.distance / 2) + range.start)
-                                        .normalizeRange(-1, 1),
-                                    0,
-                                  ),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      '${(_trimTime * range.distance).toStringAsPrecision(2)}s',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        '${(_trimTime * range.distance).toStringAsPrecision(2)}s',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                            RepaintBoundary(
-                              child: InterimProgressIndicator(
-                                width: 6,
-                                alignment: _trimProgressNotifier,
+                                  );
+                                },
                               ),
-                            ),
-                          ],
+                              // TODO(josh4500): Make indicator be placed in after and before
+                              // Range's start and end respectively
+                              RepaintBoundary(
+                                child: InterimProgressIndicator(
+                                  width: 6,
+                                  alignment: _trimProgressNotifier,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     }

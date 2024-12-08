@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-
-import 'range_slider.dart';
+import 'package:youtube_clone/core.dart';
 
 const double kTrimmerPadding = 12.0;
 
@@ -14,6 +13,18 @@ enum TrimDragPosition {
 
   bool get isLeft => this == TrimDragPosition.left;
   bool get isRight => this == TrimDragPosition.right;
+}
+
+class TrimDragDetails {
+  TrimDragDetails({
+    required this.width,
+    required this.xPosition,
+    required this.xDelta,
+  });
+
+  final double width;
+  final double xPosition;
+  final double xDelta;
 }
 
 abstract class TrimmerNotification extends Notification {}
@@ -34,7 +45,7 @@ class TrimmerDragUpdateNotification extends TrimmerNotification {
 
   final TrimDragPosition position;
   final RangeValue range;
-  final DragUpdateDetails details;
+  final TrimDragDetails details;
 }
 
 class TrimmerEndNotification extends TrimmerNotification {
@@ -45,7 +56,9 @@ class TrimmerEndNotification extends TrimmerNotification {
 }
 
 class Trimmer extends StatefulWidget {
-  const Trimmer({super.key});
+  const Trimmer({super.key, this.child});
+
+  final Widget? child;
 
   @override
   State<Trimmer> createState() => _TrimmerState();
@@ -130,7 +143,7 @@ class _TrimmerState extends State<Trimmer> {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return GestureDetector(
-          onLongPressDown: (LongPressDownDetails details) {
+          onLongPressStart: (LongPressStartDetails details) {
             final range = _rangeNotifier.value;
             final maxWidth = constraints.maxWidth;
             final xPosition = details.localPosition.dx;
@@ -152,21 +165,39 @@ class _TrimmerState extends State<Trimmer> {
             final range = _rangeNotifier.value;
             final maxWidth = constraints.maxWidth;
             final xPosition = details.localPosition.dx;
-            if (xPosition <= (maxWidth * range.start) + kTrimmerPadding) {
+
+            // Offset where trim drag is detected
+            const d = kTrimmerPadding * 1.5;
+            if (xPosition <= (maxWidth * range.start) + d) {
               _dragPosition = TrimDragPosition.left;
-            } else if (xPosition >= (maxWidth * range.end) - kTrimmerPadding) {
+            } else if (xPosition >= (maxWidth * range.end) - d) {
               _dragPosition = TrimDragPosition.right;
+            } else {
+              _dragPosition = TrimDragPosition.none;
             }
           },
           onLongPressEnd: (_) => _onPressDragEnd(),
           onHorizontalDragEnd: (_) => _onPressDragEnd(),
-          onLongPressMoveUpdate: (details) {
+          onLongPressMoveUpdate: (LongPressMoveUpdateDetails details) {
             _onDragMoveUpdate(
               xDelta: (details.localPosition.dx - _longPressPosition) /
                   constraints.maxWidth,
               xPosition: details.localPosition.dx,
               maxWidth: constraints.maxWidth,
             );
+            TrimmerDragUpdateNotification(
+              position: _dragPosition,
+              range: _rangeNotifier.value,
+              details: TrimDragDetails(
+                xDelta: (details.localPosition.dx - _longPressPosition) /
+                    constraints.maxWidth,
+                width: constraints.maxWidth,
+                xPosition: details.localPosition.dx.clamp(
+                  0,
+                  constraints.maxWidth,
+                ),
+              ),
+            ).dispatch(context);
           },
           onHorizontalDragUpdate: (DragUpdateDetails details) {
             _onDragMoveUpdate(
@@ -177,17 +208,29 @@ class _TrimmerState extends State<Trimmer> {
             TrimmerDragUpdateNotification(
               position: _dragPosition,
               range: _rangeNotifier.value,
-              details: details,
+              details: TrimDragDetails(
+                xDelta: details.delta.dx,
+                width: constraints.maxWidth,
+                xPosition: details.localPosition.dx,
+              ),
             ).dispatch(context);
           },
           child: ValueListenableBuilder(
             valueListenable: _rangeNotifier,
-            builder: (BuildContext context, RangeValue range, Widget? _) {
-              return CustomPaint(
-                size: Size.infinite,
-                painter: TrimmerPainter(range: range),
+            builder: (
+              BuildContext context,
+              RangeValue range,
+              Widget? childWidget,
+            ) {
+              return SizedBox.fromSize(
+                size: Size(constraints.maxWidth, double.infinity),
+                child: CustomPaint(
+                  foregroundPainter: TrimmerPainter(range: range),
+                  child: childWidget,
+                ),
               );
             },
+            child: widget.child,
           ),
         );
       },
