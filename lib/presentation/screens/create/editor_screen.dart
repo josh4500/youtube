@@ -209,6 +209,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen>
             return const EditorVoiceoverRecorder();
           },
         );
+        _updateEditState();
         return true;
       },
     );
@@ -276,6 +277,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen>
           if (previousStickerElement != null) previousStickerElement,
         ];
       }
+      _updateEditState();
     } else if (notification is UpdateElementNotification) {
       assert(
         _elementsNotifier.value.isNotEmpty,
@@ -323,6 +325,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen>
           notification.element,
           if (stickerElement != null) stickerElement,
         ];
+        _updateEditState();
       }
     } else if (notification is DeleteElementNotification) {
       final oldElements = _elementsNotifier.value;
@@ -330,7 +333,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen>
         (element) => element.id == notification.elementId,
       );
       _elementsNotifier.value = [...oldElements];
-
+      _updateEditState();
       // Receiving this notification means user ends dragging
       hideTopButtons.value = false;
       hideNavButtons.value = 1;

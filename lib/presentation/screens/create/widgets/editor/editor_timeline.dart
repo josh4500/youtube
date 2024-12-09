@@ -93,9 +93,7 @@ class _EditorTimelineState extends State<EditorTimeline> {
                     ),
                     child: ListView.builder(
                       reverse: true,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 0.0,
-                      ),
+                      padding: EdgeInsets.zero,
                       itemBuilder: (BuildContext context, int index) {
                         if (index == 0) {
                           return Container(
