@@ -95,6 +95,58 @@ class ModelBinding<T> extends StatefulWidget {
         .performAction(action);
   }
 
+  static Widget withNotifier<T>({
+    required ValueNotifier<T> notifier,
+    required Widget Function(
+      BuildContext context,
+      T value,
+      Widget? child,
+    ) builder,
+    required Widget child,
+  }) {
+    return ValueListenableBuilder(
+      valueListenable: notifier,
+      builder: (
+        BuildContext context,
+        T value,
+        Widget? childWidget,
+      ) {
+        return ModelBinding<T>(
+          model: value,
+          child: childWidget!,
+        );
+      },
+      child: child,
+    );
+  }
+
+  static Widget withNotifierSelector<T extends Listenable, S>({
+    required T notifier,
+    required S Function(T notifier) selector,
+    required Widget Function(
+      BuildContext context,
+      S value,
+      Widget? child,
+    ) builder,
+    required Widget child,
+  }) {
+    return NotifierSelector(
+      notifier: notifier,
+      selector: selector,
+      builder: (
+        BuildContext context,
+        S value,
+        Widget? childWidget,
+      ) {
+        return ModelBinding<S>(
+          model: value,
+          child: childWidget!,
+        );
+      },
+      child: child,
+    );
+  }
+
   @override
   State<ModelBinding<T>> createState() => _ModelBindingState<T>();
 }
@@ -135,6 +187,63 @@ class _ModelBindingState<T> extends State<ModelBinding<T>> {
   @override
   Widget build(BuildContext context) {
     return _ModelBindingScope<T>(state: this, child: widget.child);
+  }
+}
+
+class NotifierSelector<T extends Listenable, S> extends StatefulWidget {
+  const NotifierSelector({
+    super.key,
+    required this.notifier,
+    required this.selector,
+    required this.builder,
+    this.child,
+  });
+
+  final T notifier;
+  final S Function(T notifier) selector;
+  final Widget Function(BuildContext context, S value, Widget? child) builder;
+  final Widget? child;
+
+  @override
+  State<NotifierSelector<T, S>> createState() => _NotifierSelectorState<T, S>();
+}
+
+class _NotifierSelectorState<T extends Listenable, S>
+    extends State<NotifierSelector<T, S>> {
+  late S currentState;
+  @override
+  void initState() {
+    super.initState();
+    currentState = widget.selector(widget.notifier);
+    widget.notifier.addListener(_listener);
+  }
+
+  @override
+  void didUpdateWidget(covariant NotifierSelector<T, S> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.notifier != widget.notifier) {
+      oldWidget.notifier.removeListener(_listener);
+      widget.notifier.addListener(_listener);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.notifier.removeListener(_listener);
+    super.dispose();
+  }
+
+  void _listener() {
+    final newState = widget.selector(widget.notifier);
+    if (newState != currentState) {
+      currentState = newState;
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(context, currentState, widget.child);
   }
 }
 

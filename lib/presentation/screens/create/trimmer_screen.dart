@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/screens/create/provider/shorts_create_state.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -12,37 +12,35 @@ import 'widgets/create_close_button.dart';
 import 'widgets/create_progress.dart';
 import 'widgets/editor/editor_timeline.dart';
 
-class TrimmerScreen extends StatefulWidget {
+class TrimmerScreen extends ConsumerStatefulWidget {
   const TrimmerScreen({super.key});
 
   @override
-  State<TrimmerScreen> createState() => _TrimmerScreenState();
+  ConsumerState<TrimmerScreen> createState() => _TrimmerScreenState();
 }
 
-class _TrimmerScreenState extends State<TrimmerScreen> {
+class _TrimmerScreenState extends ConsumerState<TrimmerScreen> {
   final ValueNotifier<bool> _trimmingNotifier = ValueNotifier<bool>(
     false,
   );
-
+  final ValueNotifier<int> _selectedRecording = ValueNotifier<int>(0);
   final _progressNotifier = ValueNotifier<Alignment>(
     Alignment.centerLeft,
   );
 
   // TODO(josh4500): Rename
   double _trimTime = 0.0;
+  final TrimController _trimHistoryController = TrimController();
   final _trimExpandNotifier = ValueNotifier<bool>(false);
-  final _trimRangeNotifier = ValueNotifier<RangeValue>(
-    RangeValue.zero,
-  );
   final _trimProgressNotifier = ValueNotifier<Alignment>(
     Alignment.centerLeft,
   );
 
   @override
   void dispose() {
+    _trimHistoryController.dispose();
     _progressNotifier.dispose();
     _trimExpandNotifier.dispose();
-    _trimRangeNotifier.dispose();
     _trimProgressNotifier.dispose();
     _trimmingNotifier.dispose();
     super.dispose();
@@ -50,7 +48,6 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
 
   void onTapThumbnail(Recording recording) {
     _trimTime = recording.duration.inMilliseconds / 1000;
-    _trimRangeNotifier.value = const RangeValue(start: 0, end: 1);
     _trimmingNotifier.value = true;
   }
 
@@ -64,6 +61,41 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
       value.clamp(0, 1).normalizeRange(-1, 1),
       0,
     );
+
+    final shortsRecordingState = ref.read(shortRecordingProvider);
+    final recordings = shortsRecordingState.recordings;
+    final tDuration = shortsRecordingState.duration;
+
+    if (recordings.isNotEmpty) {
+      final currentTime = value * tDuration.inSeconds;
+      double elapsed = 0;
+
+      for (int i = 0; i <= shortsRecordingState.recordings.length; i++) {
+        final recording = shortsRecordingState.recordings[i];
+        elapsed += recording.duration.inSeconds;
+        if (currentTime <= elapsed) {
+          _selectedRecording.value = i;
+          break;
+        }
+      }
+    }
+  }
+
+  void _setTrimProgress(double value) {
+    _trimProgressNotifier.value = Alignment(
+      value.normalizeRange(-1, 1),
+      0,
+    );
+  }
+
+  void _undoTrim() {
+    _trimHistoryController.undo();
+    _setTrimProgress(_trimHistoryController.current.start);
+  }
+
+  void _redoTrim() {
+    _trimHistoryController.redo();
+    _setTrimProgress(_trimHistoryController.current.start);
   }
 
   bool handleTrimmerNotification(
@@ -75,30 +107,19 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
       final range = notification.range;
 
       if (position != TrimDragPosition.none) {
-        _trimProgressNotifier.value = Alignment(
-          (position.isLeft ? range.start : range.end).normalizeRange(-1, 1),
-          0,
-        );
+        _setTrimProgress(position.isLeft ? range.start : range.end);
       } else {
-        _trimProgressNotifier.value = Alignment(
+        _setTrimProgress(
           (notification.details.xPosition / notification.details.width)
-              .clamp(range.start, range.end)
-              .normalizeRange(-1, 1),
-          0,
+              .clamp(range.start, range.end),
         );
       }
-      _trimRangeNotifier.value = notification.range;
     } else if (notification is TrimmerLongPressNotification) {
       final position = notification.position;
       final range = notification.range;
-      _trimProgressNotifier.value = Alignment(
-        (position.isLeft ? range.start : range.end).normalizeRange(-1, 1),
-        0,
-      );
+      _setTrimProgress(position.isLeft ? range.start : range.end);
       _trimExpandNotifier.value = true;
-      _trimRangeNotifier.value = notification.range;
     } else if (notification is TrimmerEndNotification) {
-      _trimRangeNotifier.value = notification.range;
       _trimExpandNotifier.value = false;
     }
     return true;
@@ -115,35 +136,53 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
               padding: EdgeInsets.all(12.0),
               child: CreateProgress(),
             ),
-            // TODO(josh4500): Only show while still recording
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 4.0,
-                horizontal: 12,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const CreateCloseButton(
-                    color: Colors.white10,
+            Consumer(
+              builder: (
+                BuildContext context,
+                WidgetRef ref,
+                Widget? _,
+              ) {
+                final isEditing = ref.watch(
+                  shortsCreateProvider.select(
+                    (state) => state.isEditing,
                   ),
-                  CustomInkWell(
-                    borderRadius: BorderRadius.circular(24),
-                    splashFactory: NoSplash.splashFactory,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
+                );
+                if (isEditing) {
+                  return const SizedBox();
+                }
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4.0,
+                    horizontal: 12,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const CreateCloseButton(
                         color: Colors.white10,
-                        shape: BoxShape.circle,
+                        highlightColor: Colors.white38,
                       ),
-                      child: const Icon(
-                        YTIcons.delete_outlined,
-                        color: Colors.white,
+                      NotifierSelector(
+                        notifier: _trimHistoryController,
+                        selector: (state) => state.canUndo || state.canRedo,
+                        builder: (
+                          BuildContext context,
+                          bool canDelete,
+                          Widget? _,
+                        ) {
+                          if (!canDelete) return const SizedBox();
+                          return _DeleteTrimButton(
+                            onTap: () {
+                              _trimmingNotifier.value = false;
+                              _trimHistoryController.clear();
+                            },
+                          );
+                        },
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
             const Expanded(
               child: Padding(
@@ -186,6 +225,14 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
                           ),
                           child: Stack(
                             children: [
+                              // TODO(josh4500): Make indicator be placed in after and before
+                              // Range's start and end respectively
+                              RepaintBoundary(
+                                child: InterimProgressIndicator(
+                                  width: 6,
+                                  alignment: _trimProgressNotifier,
+                                ),
+                              ),
                               ValueListenableBuilder(
                                 valueListenable: _trimExpandNotifier,
                                 builder: (
@@ -208,8 +255,9 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
                                     notification,
                                     constraints,
                                   ),
-                                  child: const Trimmer(
-                                    child: DecoratedBox(
+                                  child: Trimmer(
+                                    controller: _trimHistoryController,
+                                    child: const DecoratedBox(
                                       decoration: BoxDecoration(
                                         color: Colors.white24,
                                       ),
@@ -218,13 +266,13 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
                                   ),
                                 ),
                               ),
-                              ValueListenableBuilder(
-                                valueListenable: _trimRangeNotifier,
+                              ListenableBuilder(
+                                listenable: _trimHistoryController,
                                 builder: (
                                   BuildContext context,
-                                  RangeValue range,
                                   Widget? _,
                                 ) {
+                                  final range = _trimHistoryController.current;
                                   return Align(
                                     alignment: Alignment(
                                       ((range.distance / 2) + range.start)
@@ -247,14 +295,6 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
                                     ),
                                   );
                                 },
-                              ),
-                              // TODO(josh4500): Make indicator be placed in after and before
-                              // Range's start and end respectively
-                              RepaintBoundary(
-                                child: InterimProgressIndicator(
-                                  width: 6,
-                                  alignment: _trimProgressNotifier,
-                                ),
                               ),
                             ],
                           ),
@@ -318,7 +358,7 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
                       BoxConstraints constraints,
                     ) {
                       return SizedBox(
-                        height: 80,
+                        height: 56,
                         width: constraints.maxWidth,
                         child: Center(
                           child: Consumer(
@@ -344,9 +384,19 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
                                   final recording = state.recordings[index];
                                   return GestureDetector(
                                     onTap: () => onTapThumbnail(recording),
-                                    child: _RecordingThumbnail(
-                                      key: GlobalObjectKey(index),
-                                      recording: recording,
+                                    child: ValueListenableBuilder(
+                                      valueListenable: _selectedRecording,
+                                      builder: (
+                                        BuildContext context,
+                                        int selected,
+                                        Widget? _,
+                                      ) {
+                                        return _RecordingThumbnail(
+                                          key: GlobalObjectKey(index),
+                                          recording: recording,
+                                          selected: selected == index,
+                                        );
+                                      },
                                     ),
                                   );
                                 },
@@ -389,33 +439,89 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
                     ),
                     const SizedBox(width: 8),
                   ],
-                  ...[
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: const BoxDecoration(
-                        color: Colors.white10,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        YTIcons.undo_arrow,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: const BoxDecoration(
-                        color: Colors.white10,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        YTIcons.redo_arrow,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                    ),
-                  ],
+                  Consumer(
+                    builder: (
+                      BuildContext context,
+                      WidgetRef ref,
+                      Widget? _,
+                    ) {
+                      final isEditing = ref.watch(
+                        shortsCreateProvider.select(
+                          (state) => state.isEditing,
+                        ),
+                      );
+                      if (isEditing) {
+                        return const SizedBox();
+                      }
+                      return ListenableBuilder(
+                        listenable: _trimmingNotifier,
+                        builder: (
+                          BuildContext context,
+                          Widget? _,
+                        ) {
+                          if (!_trimmingNotifier.value) {
+                            return const SizedBox();
+                          }
+                          return NotifierSelector(
+                            notifier: _trimHistoryController,
+                            selector: (state) => (
+                              _trimHistoryController.canUndo,
+                              _trimHistoryController.canRedo
+                            ),
+                            builder: (
+                              BuildContext context,
+                              (bool, bool) state,
+                              Widget? _,
+                            ) {
+                              return Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: _undoTrim,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: state.$1
+                                            ? Colors.white10
+                                            : Colors.white.withOpacity(0.01),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        YTIcons.undo_arrow,
+                                        color: state.$1
+                                            ? Colors.white
+                                            : Colors.white24,
+                                        size: 22,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  GestureDetector(
+                                    onTap: _redoTrim,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: state.$2
+                                            ? Colors.white10
+                                            : Colors.white.withOpacity(0.01),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        YTIcons.redo_arrow,
+                                        color: state.$2
+                                            ? Colors.white
+                                            : Colors.white24,
+                                        size: 22,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
                   const Spacer(),
                   const SizedBox(width: 8),
                   FilledButton.icon(
@@ -423,6 +529,7 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
                       if (_trimmingNotifier.value) {
                         // TODO(josh4500): Process edits
                         _trimmingNotifier.value = false;
+                        _trimHistoryController.clear();
                       } else {
                         // TODO(josh4500): Process edits
                         context.pop();
@@ -451,9 +558,39 @@ class _TrimmerScreenState extends State<TrimmerScreen> {
   }
 }
 
-class _RecordingThumbnail extends StatelessWidget {
-  const _RecordingThumbnail({super.key, required this.recording});
+class _DeleteTrimButton extends StatelessWidget {
+  const _DeleteTrimButton({required this.onTap});
 
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomInkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      splashFactory: NoSplash.splashFactory,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: const BoxDecoration(
+          color: Colors.white10,
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(
+          YTIcons.delete_outlined,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+}
+
+class _RecordingThumbnail extends StatelessWidget {
+  const _RecordingThumbnail({
+    super.key,
+    this.selected = false,
+    required this.recording,
+  });
+  final bool selected;
   final Recording recording;
 
   @override
@@ -469,22 +606,31 @@ class _RecordingThumbnail extends StatelessWidget {
                 color: Colors.white10,
                 borderRadius: BorderRadius.circular(8),
               ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            (recording.duration.inMilliseconds / 1000).toStringAsFixed(1),
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Text(
+                  (recording.duration.inMilliseconds / 1000).toStringAsFixed(1),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    shadows: <BoxShadow>[
+                      BoxShadow(
+                        color: Colors.black26,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 4),
           Container(
             width: 4,
             height: 4,
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: selected ? Colors.white : Colors.transparent,
               shape: BoxShape.circle,
             ),
           ),

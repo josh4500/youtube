@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -46,6 +47,16 @@ class TextElement extends ElementData {
     this.decoration = TextElementDecoration.normal,
   }) : assert(text.trim().isNotEmpty, 'Text cannot be empty');
 
+  factory TextElement.fromMap(Map<String, dynamic> map) {
+    return TextElement(
+      text: map['text'] as String,
+      textAlign: map['textAlign'] as TextAlign,
+      style: map['style'] as TextStyle,
+      readOutLoad: map['readOutLoad'] as bool,
+      decoration: map['decoration'] as TextElementDecoration,
+    );
+  }
+
   final String text;
   final TextAlign textAlign;
   final TextStyle style;
@@ -83,6 +94,16 @@ class TextElement extends ElementData {
 
   @override
   int get hashCode => super.hashCode ^ id.hashCode;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'text': text,
+      'textAlign': textAlign,
+      'style': style,
+      'readOutLoad': readOutLoad,
+      'decoration': decoration,
+    };
+  }
 }
 
 class StickerElement extends ElementData {

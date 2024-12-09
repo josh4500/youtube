@@ -7,12 +7,13 @@ class CreateCloseButton extends StatelessWidget {
   const CreateCloseButton({
     super.key,
     this.icon,
+    this.highlightColor,
     this.onPopInvoked,
     this.color,
   });
   final bool Function()? onPopInvoked;
   final IconData? icon;
-  final Color? color;
+  final Color? highlightColor, color;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +24,7 @@ class CreateCloseButton extends StatelessWidget {
         if (shouldPop) context.pop();
       },
       borderRadius: BorderRadius.circular(24),
+      highlightColor: highlightColor,
       splashFactory: NoSplash.splashFactory,
       child: Container(
         padding: const EdgeInsets.all(10),

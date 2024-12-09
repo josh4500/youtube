@@ -75,6 +75,13 @@ abstract class ImageFromAsset {
     width: 24,
   );
 
+  static final Widget textOption14 = Image.asset(
+    AssetsPath.textOption,
+    fit: BoxFit.contain,
+    height: 14,
+    width: 14,
+  );
+
   static final Widget textBackgroundIcon = Image.asset(
     AssetsPath.textBackground,
     fit: BoxFit.contain,

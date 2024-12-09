@@ -1,38 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:youtube_clone/core.dart';
 
 enum RecordCaptureState {
   idle,
   recording,
   paused,
   stopped,
-}
-
-class DurationRange {
-  const DurationRange({required this.start, required this.end});
-  static const DurationRange zero = DurationRange(
-    start: Duration.zero,
-    end: Duration.zero,
-  );
-
-  final Duration start;
-  final Duration end;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is DurationRange &&
-          runtimeType == other.runtimeType &&
-          start == other.start &&
-          end == other.end;
-
-  @override
-  int get hashCode => start.hashCode ^ end.hashCode;
-}
-
-extension DurationExt on Duration {
-  bool isBetween(DurationRange range) {
-    return range.start <= this && this <= range.end;
-  }
 }
 
 abstract class Recording {

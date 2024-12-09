@@ -11,4 +11,4 @@ export 'core/error_handling/reporter_client.dart';
 export 'core/extensions.dart';
 export 'core/platform_info.dart';
 export 'core/utils/animate.dart';
-export 'core/utils/range_value.dart';
+export 'core/utils/range.dart';

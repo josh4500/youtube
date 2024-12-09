@@ -19,6 +19,7 @@ class _EditorTextInputState extends State<EditorTextInput> {
   final ValueNotifier<TextStyle> _styleNotifier = ValueNotifier(
     const TextStyle(
       fontSize: 14,
+      color: Colors.white,
       fontWeight: FontWeight.w700,
     ),
   );

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
-import 'package:youtube_clone/presentation/themes.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../notifications/editor_notification.dart';
+import 'element.dart';
 
 class EditorTimeline extends StatefulWidget {
   const EditorTimeline({super.key});
@@ -24,6 +25,7 @@ class _EditorTimelineState extends State<EditorTimeline> {
 
   @override
   Widget build(BuildContext context) {
+    final elements = context.provide<List<TextElement>>();
     return ColoredBox(
       color: const Color(0xFF212121),
       child: Column(
@@ -77,7 +79,7 @@ class _EditorTimelineState extends State<EditorTimeline> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
+                horizontal: 12.0,
               ),
               child: Stack(
                 children: [
@@ -92,7 +94,7 @@ class _EditorTimelineState extends State<EditorTimeline> {
                     child: ListView.builder(
                       reverse: true,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0,
+                        horizontal: 0.0,
                       ),
                       itemBuilder: (BuildContext context, int index) {
                         if (index == 0) {
@@ -104,20 +106,39 @@ class _EditorTimelineState extends State<EditorTimeline> {
                               shape: BoxShape.circle,
                             ),
                             alignment: Alignment.center,
-                            child: ImageFromAsset.textOption,
+                            child: ImageFromAsset.textOption14,
                           );
                         }
-                        return Container(
-                          height: 52.h,
-                          margin: const EdgeInsets.only(
+                        final element = elements[index - 1];
+                        return Padding(
+                          padding: const EdgeInsets.only(
                             top: 6,
                             bottom: 4,
                           ),
-                          width: double.infinity,
-                          color: Colors.white,
+                          child: SizedBox(
+                            height: 32,
+                            child: Trimmer(
+                              borderLines: false,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 20,
+                                ),
+                                width: double.infinity,
+                                color: element.style.color ?? Colors.white,
+                                child: Text(
+                                  element.text,
+                                  overflow: TextOverflow.clip,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         );
                       },
-                      itemCount: 1,
+                      itemCount: elements.length + 1,
                     ),
                   ),
                 ],

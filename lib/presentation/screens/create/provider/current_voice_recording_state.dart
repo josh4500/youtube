@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/presentation/models.dart';
 
 part 'current_voice_recording_state.g.dart';

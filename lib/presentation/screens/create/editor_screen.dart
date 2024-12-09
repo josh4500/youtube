@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/screens/create/provider/shorts_create_state.dart';
 import 'package:youtube_clone/presentation/screens/create/provider/voice_over_state.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -22,14 +23,14 @@ import 'widgets/filter_selector.dart';
 import 'widgets/notifications/editor_notification.dart';
 import 'widgets/video_effect_options.dart';
 
-class EditorScreen extends StatefulWidget {
+class EditorScreen extends ConsumerStatefulWidget {
   const EditorScreen({super.key});
 
   @override
-  State<EditorScreen> createState() => _EditorScreenState();
+  ConsumerState<EditorScreen> createState() => _EditorScreenState();
 }
 
-class _EditorScreenState extends State<EditorScreen>
+class _EditorScreenState extends ConsumerState<EditorScreen>
     with TickerProviderStateMixin {
   final effectsController = EffectController();
   late final AnimationController timelineSizeAnimation = AnimationController(
@@ -47,7 +48,7 @@ class _EditorScreenState extends State<EditorScreen>
       ValueNotifier(
     null,
   );
-  final elementsNotifier = ValueNotifier<List<ElementData>>([]);
+  final _elementsNotifier = ValueNotifier<List<ElementData>>([]);
   final ValueNotifier<TextElement?> _textElementNotifier = ValueNotifier(null);
 
   @override
@@ -61,13 +62,22 @@ class _EditorScreenState extends State<EditorScreen>
     effectsController.removeStatusListener(effectStatusListener);
     _stickerElementNotifier.dispose();
     _textElementNotifier.dispose();
-    elementsNotifier.dispose();
+    _elementsNotifier.dispose();
     textEditorController.dispose();
     hideTopButtons.dispose();
     hideNavButtons.dispose();
     hideEditorEffects.dispose();
     timelineSizeAnimation.dispose();
     super.dispose();
+  }
+
+  void _updateEditState() {
+    final voiceRecording =
+        ref.read(voiceOverStateProvider) as RecordingState<VideoRecording>;
+    ref.read(shortsCreateProvider.notifier).updateEditState(
+          voiceRecording: voiceRecording,
+          elements: _elementsNotifier.value,
+        );
   }
 
   Future<void> _futureHideShowNavButtons(
@@ -146,16 +156,16 @@ class _EditorScreenState extends State<EditorScreen>
       'Must be a StickerElement type',
     );
 
-    final previousStickerElement = elementsNotifier.value.firstWhereOrNull(
+    final previousStickerElement = _elementsNotifier.value.firstWhereOrNull(
       (ElementData element) => element is StickerElement,
     ) as StickerElement?;
 
     if (previousStickerElement != null) {
-      final oldElements = elementsNotifier.value;
+      final oldElements = _elementsNotifier.value;
       oldElements.removeWhere(
         (element) => element is StickerElement,
       );
-      elementsNotifier.value = [...oldElements];
+      _elementsNotifier.value = [...oldElements];
     }
 
     hideTopButtons.value = true;
@@ -213,7 +223,7 @@ class _EditorScreenState extends State<EditorScreen>
           barrierColor: Colors.transparent,
           builder: (BuildContext context) {
             return ModelBinding<StickerElement?>(
-              model: elementsNotifier.value.firstWhereOrNull(
+              model: _elementsNotifier.value.firstWhereOrNull(
                 (element) => element is StickerElement,
               ) as StickerElement?,
               child: const EditorStickerSelector(),
@@ -244,7 +254,7 @@ class _EditorScreenState extends State<EditorScreen>
       _closeStickerEditor();
 
       bool add = true;
-      final previousStickerElement = elementsNotifier.value.firstWhereOrNull(
+      final previousStickerElement = _elementsNotifier.value.firstWhereOrNull(
         (element) => element is StickerElement,
       );
 
@@ -253,30 +263,33 @@ class _EditorScreenState extends State<EditorScreen>
           add = false;
         }
       } else if (previousStickerElement != null) {
-        elementsNotifier.value.removeWhere(
+        _elementsNotifier.value.removeWhere(
           (element) => element is StickerElement,
         );
       }
 
       if (add) {
         // Add element to list
-        elementsNotifier.value = [
-          ...elementsNotifier.value,
+        _elementsNotifier.value = [
+          ..._elementsNotifier.value,
           notification.element,
           if (previousStickerElement != null) previousStickerElement,
         ];
       }
     } else if (notification is UpdateElementNotification) {
-      assert(elementsNotifier.value.isNotEmpty, 'Cannot update empty Elements');
+      assert(
+        _elementsNotifier.value.isNotEmpty,
+        'Cannot update empty Elements',
+      );
       // Do a swap of location
       if (notification.swapToLast) {
-        final last = elementsNotifier.value.last;
+        final last = _elementsNotifier.value.last;
         if (notification.element.id != last.id) {
-          elementsNotifier.value.removeWhere(
+          _elementsNotifier.value.removeWhere(
             (element) => element.id == notification.element.id,
           );
-          elementsNotifier.value = [
-            ...elementsNotifier.value,
+          _elementsNotifier.value = [
+            ..._elementsNotifier.value,
             notification.element,
           ];
         }
@@ -293,30 +306,30 @@ class _EditorScreenState extends State<EditorScreen>
 
         final StickerElement? stickerElement;
         if (notification.element is! StickerElement) {
-          stickerElement = elementsNotifier.value.firstWhereOrNull(
+          stickerElement = _elementsNotifier.value.firstWhereOrNull(
             (element) => element is StickerElement,
           ) as StickerElement?;
         } else {
           stickerElement = null;
         }
-        elementsNotifier.value.removeWhere(
+        _elementsNotifier.value.removeWhere(
           (element) =>
               element.id == notification.element.id ||
               (element is StickerElement),
         );
 
-        elementsNotifier.value = [
-          ...elementsNotifier.value,
+        _elementsNotifier.value = [
+          ..._elementsNotifier.value,
           notification.element,
           if (stickerElement != null) stickerElement,
         ];
       }
     } else if (notification is DeleteElementNotification) {
-      final oldElements = elementsNotifier.value;
+      final oldElements = _elementsNotifier.value;
       oldElements.removeWhere(
         (element) => element.id == notification.elementId,
       );
-      elementsNotifier.value = [...oldElements];
+      _elementsNotifier.value = [...oldElements];
 
       // Receiving this notification means user ends dragging
       hideTopButtons.value = false;
@@ -368,7 +381,7 @@ class _EditorScreenState extends State<EditorScreen>
                             textEditorController,
                           ),
                           child: ModelBinding(
-                            model: elementsNotifier,
+                            model: _elementsNotifier,
                             child: const EditorElements(),
                           ),
                         ),
@@ -463,13 +476,26 @@ class _EditorScreenState extends State<EditorScreen>
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: SizeTransition(
-                  axisAlignment: -1,
-                  sizeFactor: timelineSizeAnimation,
-                  child: SizedBox(
-                    height: 384.h,
-                    width: double.infinity,
-                    child: const EditorTimeline(),
+                child: ModelBinding.withNotifierSelector(
+                  notifier: _elementsNotifier,
+                  selector: (elements) {
+                    return elements.value.whereType<TextElement>().toList();
+                  },
+                  builder: (
+                    BuildContext _,
+                    List<TextElement> __,
+                    Widget? childWidget,
+                  ) {
+                    return childWidget!;
+                  },
+                  child: SizeTransition(
+                    axisAlignment: -1,
+                    sizeFactor: timelineSizeAnimation,
+                    child: SizedBox(
+                      height: 384.h,
+                      width: double.infinity,
+                      child: const EditorTimeline(),
+                    ),
                   ),
                 ),
               ),

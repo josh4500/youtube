@@ -43,6 +43,7 @@ import 'package:youtube_clone/presentation/widgets.dart';
 import 'provider/current_recording_state.dart';
 import 'provider/index_notifier.dart';
 import 'provider/short_recording_state.dart';
+import 'provider/shorts_create_state.dart';
 import 'widgets/add_music_button.dart';
 import 'widgets/capture/capture_draft_decision.dart';
 import 'widgets/capture/capture_effects.dart';
@@ -675,6 +676,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     }
   }
 
+  void _updateRecordState() {
+    ref.read(shortsCreateProvider.notifier).updateRecordState(
+          ref.read(shortRecordingProvider) as RecordingState<VideoRecording>,
+        );
+  }
+
   Future<void> _startRecording() async {
     final CameraController? cameraController = controller;
     if (cameraController == null || !cameraController.value.isInitialized) {
@@ -746,6 +753,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     if (addRecording) {
       final VideoRecording recording = ref.read(currentRecordingProvider);
       ref.read(shortRecordingProvider.notifier).addRecording(recording);
+      _updateRecordState();
     }
   }
 
@@ -967,11 +975,15 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   }
 
   Future<void> _openTrimmer() async {
-    _waitCamera(() async => context.goto(AppRoutes.shortsTrimmer));
+    await _waitCamera(
+      () async => context.goto(AppRoutes.shortsTrimmer),
+    );
   }
 
   Future<void> _proceedToEdit() async {
-    _waitCamera(() async => context.goto(AppRoutes.shortsEditor));
+    ref.watch(shortsCreateProvider.notifier).setEditing(true);
+    await _waitCamera(() async => context.goto(AppRoutes.shortsEditor));
+    ref.watch(shortsCreateProvider.notifier).setEditing(false);
   }
 
   bool handleCaptureNotification(CaptureNotification notification) {
