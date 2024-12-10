@@ -8,20 +8,20 @@ typedef StateUpdater<T> = T Function(T current);
 class _ModelBindingScope<T> extends InheritedWidget {
   const _ModelBindingScope({
     super.key,
-    required this.state,
+    required this.model,
     required super.child,
   });
 
   /// Holds a reference to the `_ModelBindingState`, where the model data
   /// and its update methods are managed.
-  final _ModelBindingState<T> state;
+  final T model;
 
   /// Determines whether widgets that depend on `_ModelBindingScope` should
   /// rebuild when `bindingState` changes. It compares the `currentModel` of
   /// the old and new state instances.
   @override
   bool updateShouldNotify(_ModelBindingScope oldWidget) {
-    return oldWidget.state.currentModel != state.currentModel;
+    return oldWidget.model != model;
   }
 }
 
@@ -63,26 +63,23 @@ class ModelBinding<T> extends StatefulWidget {
   /// `_ModelBindingScope` ancestor widget.
   static T of<T>(BuildContext context) {
     return context
-        .findAncestorWidgetOfExactType<_ModelBindingScope<T>>()!
-        .state
-        .currentModel;
+        .dependOnInheritedWidgetOfExactType<_ModelBindingScope<T>>()!
+        .model;
   }
 
   /// Similar to `of`, but returns `null` if `_ModelBindingScope` is not found
   /// in the ancestor hierarchy, allowing for nullable access.
   static T? maybeOf<T>(BuildContext context) {
     return context
-        .findAncestorWidgetOfExactType<_ModelBindingScope<T>>()
-        ?.state
-        .currentModel;
+        .dependOnInheritedWidgetOfExactType<_ModelBindingScope<T>>()
+        ?.model;
   }
 
   /// Updates the model value by finding the nearest `_ModelBindingScope` and
   /// calling `updateModelValue` with the new value.
   static void update<T>(BuildContext context, StateUpdater<T> updater) {
     context
-        .findAncestorWidgetOfExactType<_ModelBindingScope<T>>()!
-        .state
+        .findAncestorStateOfType<_ModelBindingState<T>>()!
         .updateModelValue(updater);
   }
 
@@ -90,8 +87,7 @@ class ModelBinding<T> extends StatefulWidget {
   /// within the nearest `_ModelBindingScope`.
   static void performAction<T>(BuildContext context, Type action) {
     context
-        .findAncestorWidgetOfExactType<_ModelBindingScope<T>>()!
-        .state
+        .findAncestorStateOfType<_ModelBindingState<T>>()!
         .performAction(action);
   }
 
@@ -164,8 +160,8 @@ class _ModelBindingState<T> extends State<ModelBinding<T>> {
 
   @override
   void didUpdateWidget(covariant ModelBinding<T> oldWidget) {
-    currentModel = widget.model;
     super.didUpdateWidget(oldWidget);
+    currentModel = widget.model;
   }
 
   /// Updates the model value if it has changed and triggers `onUpdate` callback
@@ -186,7 +182,7 @@ class _ModelBindingState<T> extends State<ModelBinding<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return _ModelBindingScope<T>(state: this, child: widget.child);
+    return _ModelBindingScope<T>(model: currentModel, child: widget.child);
   }
 }
 
@@ -223,6 +219,7 @@ class _NotifierSelectorState<T extends Listenable, S>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.notifier != widget.notifier) {
       oldWidget.notifier.removeListener(_listener);
+      currentState = widget.selector(widget.notifier);
       widget.notifier.addListener(_listener);
     }
   }
@@ -234,6 +231,9 @@ class _NotifierSelectorState<T extends Listenable, S>
   }
 
   void _listener() {
+    if (!mounted) {
+      return;
+    }
     final newState = widget.selector(widget.notifier);
     if (newState != currentState) {
       currentState = newState;

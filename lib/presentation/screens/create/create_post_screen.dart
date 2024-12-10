@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/screens/create/provider/index_notifier.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -14,7 +16,8 @@ class CreatePostScreen extends StatefulWidget {
   State<CreatePostScreen> createState() => _CreatePostScreenState();
 }
 
-class _CreatePostScreenState extends State<CreatePostScreen> {
+class _CreatePostScreenState extends State<CreatePostScreen>
+    with TabIndexListenerMixin {
   final GlobalKey textfieldKey = GlobalKey();
   final TextEditingController postTextController = TextEditingController();
   final FocusNode postTextFocusNode = FocusNode();
@@ -40,6 +43,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       // } else {
       //   CreateNotification(collapseNavigator: true);
       // }
+    }
+  }
+
+  @override
+  void onIndexChanged(int newIndex) {
+    if (newIndex != CreateTab.post.index) {
+      postTextFocusNode.unfocus();
     }
   }
 
@@ -194,9 +204,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                           return SizedBox(
                             height: math.max(
                               0,
-                              // TODO(josh4500): Where does value 84 comes from? (Possibly caused by flutter)
-                              // See https://github.com/flutter/flutter/issues/96520
-                              MediaQuery.viewInsetsOf(context).bottom - 84,
+                              MediaQuery.viewInsetsOf(context).bottom - 88,
                             ),
                           );
                         },

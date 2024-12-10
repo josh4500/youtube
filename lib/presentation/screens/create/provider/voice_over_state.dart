@@ -7,9 +7,9 @@ part 'voice_over_state.g.dart';
 @riverpod
 class VoiceOverState extends _$VoiceOverState {
   @override
-  RecordingState build() {
+  RecordingState<VoiceRecording> build() {
     final shortsRecordingState = ref.read(shortRecordingProvider);
-    return RecordingState<VoiceRecording>(
+    return RecordingState(
       recordDuration: shortsRecordingState.duration,
     );
   }
@@ -28,5 +28,11 @@ class VoiceOverState extends _$VoiceOverState {
 
   void clear() {
     state = state.clear();
+  }
+
+  void restore(RecordingState<VoiceRecording>? recordingState) {
+    if (recordingState != null) {
+      state = recordingState;
+    }
   }
 }

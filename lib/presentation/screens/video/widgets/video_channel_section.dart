@@ -120,6 +120,7 @@ class _VideoChannelSubscriptionButtonState
         fontWeight: FontWeight.w500,
       ),
     );
+    // ignore: dead_code
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {

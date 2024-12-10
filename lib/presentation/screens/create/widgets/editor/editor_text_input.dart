@@ -54,7 +54,6 @@ class _EditorTextInputState extends State<EditorTextInput> {
   @override
   Widget build(BuildContext context) {
     final element = context.provide<TextElement?>();
-
     return Column(
       children: [
         Padding(

@@ -124,7 +124,7 @@ class RecordingState<T extends Recording> {
   bool get hasOneRecording => recordings.length == 1;
 
   /// Copy with method to return a new instance of the state with updated properties
-  RecordingState copyWith({
+  RecordingState<T> copyWith({
     Duration? recordDuration,
     Duration? countdownStoppage,
     List<T>? recordings,
@@ -144,7 +144,7 @@ class RecordingState<T extends Recording> {
     );
   }
 
-  RecordingState addRecording(T recording) {
+  RecordingState<T> addRecording(T recording) {
     final updatedRecordings = [...recordings, recording];
     return copyWith(
       recordings: updatedRecordings,
@@ -152,7 +152,7 @@ class RecordingState<T extends Recording> {
     );
   }
 
-  RecordingState redo() {
+  RecordingState<T> redo() {
     if (removedRecordings.isNotEmpty) {
       final lastRemoved = removedRecordings.last;
       final updatedRecordings = [...recordings, lastRemoved];
@@ -166,7 +166,7 @@ class RecordingState<T extends Recording> {
     return this;
   }
 
-  RecordingState undo() {
+  RecordingState<T> undo() {
     if (recordings.isNotEmpty) {
       final lastRecording = recordings.last;
       final updatedRecordings = List<T>.from(recordings)..removeLast();
@@ -179,11 +179,11 @@ class RecordingState<T extends Recording> {
     return this;
   }
 
-  RecordingState updateRecordDuration(Duration duration) {
+  RecordingState<T> updateRecordDuration(Duration duration) {
     return copyWith(recordDuration: duration);
   }
 
-  RecordingState updateCountdownStoppage(Duration? duration) {
+  RecordingState<T> updateCountdownStoppage(Duration? duration) {
     return RecordingState(
       recordDuration: recordDuration,
       countdownStoppage: duration,
@@ -256,7 +256,7 @@ class RecordingState<T extends Recording> {
       recordings.hashCode ^
       removedRecordings.hashCode;
 
-  RecordingState clear() {
+  RecordingState<T> clear() {
     return copyWith(
       recordDuration: recordDuration,
       removedRecordings: [],

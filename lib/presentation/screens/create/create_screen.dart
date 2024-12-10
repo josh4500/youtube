@@ -66,9 +66,10 @@ class _CreateScreenState extends State<CreateScreen>
   Widget build(BuildContext context) {
     return Theme(
       data: AppTheme.dark,
-      child: Material(
-        child: SafeArea(
-          child: Column(
+      child: SafeArea(
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          body: Column(
             children: [
               Expanded(
                 child: NotificationListener<CreateNotification>(

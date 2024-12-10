@@ -18,14 +18,17 @@ abstract class ElementData {
   final FractionalOffset alignment;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ElementData &&
-          runtimeType == other.runtimeType &&
-          id == other.id;
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is ElementData &&
+            runtimeType == other.runtimeType &&
+            id == other.id &&
+            range == other.range &&
+            alignment == other.alignment;
+  }
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode => id.hashCode ^ range.hashCode ^ alignment.hashCode;
 }
 
 enum TextElementDecoration {
@@ -84,17 +87,6 @@ class TextElement extends ElementData {
     );
   }
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      super == other &&
-          other is TextElement &&
-          runtimeType == other.runtimeType &&
-          id == other.id;
-
-  @override
-  int get hashCode => super.hashCode ^ id.hashCode;
-
   Map<String, dynamic> toMap() {
     return {
       'text': text,
@@ -104,6 +96,27 @@ class TextElement extends ElementData {
       'decoration': decoration,
     };
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      super == other &&
+          other is TextElement &&
+          runtimeType == other.runtimeType &&
+          text == other.text &&
+          textAlign == other.textAlign &&
+          style == other.style &&
+          readOutLoad == other.readOutLoad &&
+          decoration == other.decoration;
+
+  @override
+  int get hashCode =>
+      super.hashCode ^
+      text.hashCode ^
+      textAlign.hashCode ^
+      style.hashCode ^
+      readOutLoad.hashCode ^
+      decoration.hashCode;
 }
 
 class StickerElement extends ElementData {
@@ -247,14 +260,14 @@ class DragHit {
       hitYCenter.hashCode;
 }
 
-class VideoElement extends StatefulWidget {
-  const VideoElement({super.key});
+class ElementWidget extends StatefulWidget {
+  const ElementWidget({super.key});
 
   @override
-  State<VideoElement> createState() => _VideoElementState();
+  State<ElementWidget> createState() => _ElementWidgetState();
 }
 
-class _VideoElementState extends State<VideoElement> {
+class _ElementWidgetState extends State<ElementWidget> {
   final GlobalKey itemKey = GlobalKey();
   final alignmentNotifier = ValueNotifier(FractionalOffset.center);
   Offset panStartOffset = Offset.zero;
@@ -267,7 +280,7 @@ class _VideoElementState extends State<VideoElement> {
   }
 
   @override
-  void didUpdateWidget(covariant VideoElement oldWidget) {
+  void didUpdateWidget(covariant ElementWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     final element = context.provide<ElementData>();
     alignmentNotifier.value = element.alignment;

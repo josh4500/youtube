@@ -59,6 +59,7 @@ import 'widgets/create_progress.dart';
 import 'widgets/filter_selector.dart';
 import 'widgets/notifications/capture_notification.dart';
 import 'widgets/notifications/create_notification.dart';
+import 'widgets/pre_exit_options_sheet.dart';
 import 'widgets/record_button.dart';
 import 'widgets/video_effect_options.dart';
 
@@ -331,6 +332,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     if (state == AppLifecycleState.resumed) {
       _initCamera();
       if (_hasFailedRecording) {
+        _hasFailedRecording = false;
         _showErrorSnackbar('Last recording failed.');
       }
     } else if (state == AppLifecycleState.inactive) {
@@ -393,22 +395,37 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     final shortsRecording = ref.read(shortRecordingProvider);
     if (shortsRecording.recordings.isNotEmpty) {
-      // Note: Using current screen context
-      void showNavigator() {
-        CreateNotification(hideNavigator: false).dispatch(context);
-      }
-
-      showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.transparent,
-        useRootNavigator: true,
-        builder: (BuildContext context) {
-          return PreExitCaptureOptionsSheet(
-            exit: context.pop,
-            showNavigator: showNavigator,
-          );
-        },
-      );
+      showPreExitSheet(
+        context,
+        items: [
+          PreExitEntry(
+            label: 'Delete',
+            icon: const Icon(YTIcons.delete_outlined),
+            action: PreExitAction.discard,
+            onTap: () {
+              ref.read(currentRecordingProvider.notifier).clear();
+              ref.read(shortRecordingProvider.notifier).clear();
+              CreateNotification(hideNavigator: false).dispatch(context);
+            },
+          ),
+          PreExitEntry(
+            label: 'Save and Exit',
+            icon: const RotatedBox(
+              quarterTurns: -2,
+              child: Icon(YTIcons.exit_outlined),
+            ),
+            action: PreExitAction.save,
+            onTap: () async {
+              CreateNotification(hideNavigator: false).dispatch(context);
+              ref.read(shortRecordingProvider.notifier).save();
+            },
+          ),
+        ],
+      ).then((PreExitAction? action) {
+        if (action != null && action == PreExitAction.save && mounted) {
+          context.pop();
+        }
+      });
 
       return false;
     }
@@ -641,7 +658,14 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     );
   }
 
+  bool _guardCamera() {
+    final CameraController? cameraController = controller;
+    return cameraController == null || !cameraController.value.isInitialized;
+  }
+
   void _startCountdown(int countdownSeconds) {
+    if (_guardCamera()) return;
+
     countdownHidden.value = false;
     this.countdownSeconds.value = countdownSeconds;
     CreateNotification(hideNavigator: true).dispatch(context);
@@ -678,15 +702,12 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   void _updateRecordState() {
     ref.read(shortsCreateProvider.notifier).updateRecordState(
-          ref.read(shortRecordingProvider) as RecordingState<VideoRecording>,
+          ref.read(shortRecordingProvider),
         );
   }
 
   Future<void> _startRecording() async {
-    final CameraController? cameraController = controller;
-    if (cameraController == null || !cameraController.value.isInitialized) {
-      return;
-    }
+    if (_guardCamera()) return;
 
     // await cameraController.startVideoRecording(
     //   onAvailable: (CameraImage cameraImage) {},
@@ -807,6 +828,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     // Start or Stop recording
     isRecording ? _startRecording() : _stopRecording();
 
+    if (_guardCamera()) return;
+
     disableDragMode = isRecording;
     recordingNotifier.value = isRecording;
     isRecording
@@ -820,6 +843,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     if (disableDragMode || _guardRecording) return;
 
     _startRecording();
+
+    if (_guardCamera()) return;
 
     dragRecordNotifier.value = true;
     recordingNotifier.value = true;
@@ -981,9 +1006,9 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   }
 
   Future<void> _proceedToEdit() async {
-    ref.watch(shortsCreateProvider.notifier).setEditing(true);
+    ref.read(shortsCreateProvider.notifier).setEditing(true);
     await _waitCamera(() async => context.goto(AppRoutes.shortsEditor));
-    ref.watch(shortsCreateProvider.notifier).setEditing(false);
+    ref.read(shortsCreateProvider.notifier).setEditing(false);
   }
 
   bool handleCaptureNotification(CaptureNotification notification) {
@@ -1030,7 +1055,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
       begin: .9,
       end: 1,
     ).animate(hideSpeedController);
-
+    // TODO(josh4500): Remove
+    ref.watch(shortsCreateProvider);
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: _onPopInvokedWithResult,
@@ -1385,72 +1411,6 @@ class ControlMessageEvent extends StatelessWidget {
         fontSize: 36,
         color: Colors.white60,
         fontWeight: FontWeight.w500,
-      ),
-    );
-  }
-}
-
-class PreExitCaptureOptionsSheet extends ConsumerWidget {
-  const PreExitCaptureOptionsSheet({
-    super.key,
-    required this.exit,
-    required this.showNavigator,
-  });
-
-  final VoidCallback exit;
-  final VoidCallback showNavigator;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Material(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(YTIcons.delete_outlined),
-            title: const Text('Delete'),
-            titleTextStyle: const TextStyle(fontSize: 12.5),
-            hoverColor: Colors.white24,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-            ),
-            onTap: () {
-              ref.read(currentRecordingProvider.notifier).clear();
-              ref.read(shortRecordingProvider.notifier).clear();
-
-              context.pop();
-              showNavigator();
-            },
-          ),
-          ListTile(
-            leading: const RotatedBox(
-              quarterTurns: -2,
-              child: Icon(YTIcons.exit_outlined),
-            ),
-            title: const Text('Save and Exit'),
-            titleTextStyle: const TextStyle(fontSize: 12.5),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-            ),
-            hoverColor: Colors.white24,
-            onTap: () async {
-              ref.read(shortRecordingProvider.notifier).save();
-              context.pop();
-              exit();
-            },
-          ),
-          const Divider(height: 0),
-          ListTile(
-            leading: const Icon(YTIcons.close_outlined),
-            title: const Text('Cancel'),
-            titleTextStyle: const TextStyle(fontSize: 12.5),
-            hoverColor: Colors.white24,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-            ),
-            onTap: context.pop,
-          ),
-        ],
       ),
     );
   }

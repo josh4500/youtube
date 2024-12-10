@@ -79,7 +79,7 @@ class _EditorVoiceoverRecorderState
     final state = ref.read(voiceOverStateProvider);
     if (state.recordings.isNotEmpty) {
       final tDuration = state.recordDuration.inMilliseconds;
-      final latestRecording = state.recordings.last as VoiceRecording;
+      final latestRecording = state.recordings.last;
       final value = latestRecording.range.end.inMilliseconds / tDuration;
       _setProgressValue(value);
       _startDuration = latestRecording.range.end;
@@ -141,8 +141,6 @@ class _EditorVoiceoverRecorderState
 
           if (!autoStop) {
             for (final recoding in voiceRecording.recordings) {
-              recoding as VoiceRecording;
-
               if (nextEndDuration >= recoding.range.start &&
                   nextEndDuration < recoding.range.end) {
                 autoStop = true;
@@ -223,7 +221,6 @@ class _EditorVoiceoverRecorderState
     }
 
     for (final recoding in state.recordings) {
-      recoding as VoiceRecording;
       if (_startDuration.isBetween(recoding.range)) {
         enableRecord = false;
         break;

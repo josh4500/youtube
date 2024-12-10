@@ -19,6 +19,11 @@ class _EditorElementsState extends State<EditorElements> {
   final ValueNotifier<bool> hitDeleteNotifier = ValueNotifier(false);
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     hitNotifier.dispose();
     super.dispose();
@@ -36,98 +41,81 @@ class _EditorElementsState extends State<EditorElements> {
 
   @override
   Widget build(BuildContext context) {
-    final elementsNotifier =
-        context.provide<ValueNotifier<List<ElementData>>>();
+    final elements = context.provide<List<ElementData>>();
     return NotificationListener<EditorNotification>(
       onNotification: handleEditorNotification,
-      child: ListenableBuilder(
-        listenable: elementsNotifier,
-        builder: (BuildContext context, Widget? childWidget) {
-          return Stack(
-            fit: StackFit.expand,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ValueListenableBuilder(
+            valueListenable: hitNotifier,
+            builder: (
+              BuildContext context,
+              DragHit hit,
+              Widget? childWidget,
+            ) {
+              return CustomPaint(
+                painter: DragLinesPainter(hit: hit),
+              );
+            },
+          ),
+          Stack(
             children: [
-              ValueListenableBuilder(
-                valueListenable: hitNotifier,
-                builder: (
-                  BuildContext context,
-                  DragHit hit,
-                  Widget? childWidget,
-                ) {
-                  return CustomPaint(
-                    painter: DragLinesPainter(hit: hit),
-                  );
-                },
-              ),
-              ValueListenableBuilder(
-                valueListenable: elementsNotifier,
-                builder: (
-                  BuildContext context,
-                  List<ElementData> elements,
-                  Widget? childWidget,
-                ) {
-                  return Stack(
-                    children: [
-                      for (int i = 0; i < elements.length; i++)
-                        ValueListenableBuilder(
-                          key: ValueKey(elements[i].id),
-                          valueListenable: draggingNotifier,
-                          builder: (
-                            BuildContext context,
-                            bool dragging,
-                            Widget? childWidget,
-                          ) {
-                            return Opacity(
-                              opacity: dragging && i != elements.length - 1
-                                  ? 0.2
-                                  : 1,
-                              child: childWidget,
-                            );
-                          },
-                          child: ModelBinding<ElementData>(
-                            model: elementsNotifier.value[i],
-                            child: const VideoElement(),
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
-              ListenableBuilder(
-                listenable: Listenable.merge([
-                  draggingNotifier,
-                  hitDeleteNotifier,
-                ]),
-                builder: (
-                  BuildContext context,
-                  Widget? _,
-                ) {
-                  return AnimatedValuedVisibility(
-                    visible: draggingNotifier.value,
-                    duration: Durations.short3,
-                    alignment: Alignment.bottomCenter,
-                    child: Transform.scale(
-                      scale: hitDeleteNotifier.value ? 1.13 : 1,
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        margin: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: hitDeleteNotifier.value
-                              ? AppPalette.red
-                              : Colors.black12,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.delete,
-                          color: AppPalette.white,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+              for (int i = 0; i < elements.length; i++)
+                ValueListenableBuilder(
+                  key: ValueKey(elements[i].id),
+                  valueListenable: draggingNotifier,
+                  builder: (
+                    BuildContext context,
+                    bool dragging,
+                    Widget? childWidget,
+                  ) {
+                    return Opacity(
+                      opacity: dragging && i != elements.length - 1 ? 0.2 : 1,
+                      child: childWidget,
+                    );
+                  },
+                  child: ModelBinding<ElementData>(
+                    model: elements[i],
+                    child: const ElementWidget(),
+                  ),
+                ),
             ],
-          );
-        },
+          ),
+          ListenableBuilder(
+            listenable: Listenable.merge([
+              draggingNotifier,
+              hitDeleteNotifier,
+            ]),
+            builder: (
+              BuildContext context,
+              Widget? _,
+            ) {
+              return AnimatedValuedVisibility(
+                visible: draggingNotifier.value,
+                duration: Durations.short3,
+                alignment: Alignment.bottomCenter,
+                child: Transform.scale(
+                  scale: hitDeleteNotifier.value ? 1.13 : 1,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: hitDeleteNotifier.value
+                          ? AppPalette.red
+                          : Colors.black12,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.delete,
+                      color: AppPalette.white,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

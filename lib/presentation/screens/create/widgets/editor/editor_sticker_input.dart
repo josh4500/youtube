@@ -33,7 +33,11 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final (type, element) = context.provide<(Type, StickerElement?)?>()!;
+    final editingStickerElement = context.provide<(Type, StickerElement?)?>();
+    if (editingStickerElement == null) {
+      return;
+    }
+    final (type, element) = editingStickerElement;
     if (element is QaStickerElement && type == QaStickerElement) {
       _controller.text = element.text;
     } else if (element is AddYStickerElement && type == AddYStickerElement) {
@@ -62,7 +66,11 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
 
   @override
   Widget build(BuildContext context) {
-    final (type, stickerElement) = context.provide<(Type, StickerElement?)?>()!;
+    final editingStickerElement = context.provide<(Type, StickerElement?)?>();
+    if (editingStickerElement == null) {
+      return const SizedBox();
+    }
+    final (type, stickerElement) = editingStickerElement;
     final alignment = stickerElement?.alignment ?? FractionalOffset.center;
     return ColoredBox(
       color: Colors.black54,

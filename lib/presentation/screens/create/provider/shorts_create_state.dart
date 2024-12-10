@@ -24,12 +24,13 @@ class ShortsCreate extends _$ShortsCreate {
   void updateEditState({
     VideoFilter filter = VideoFilter.none,
     List<ElementData> elements = const <ElementData>[],
-    RecordingState<VideoRecording>? voiceRecording,
+    RecordingState<VoiceRecording>? voiceRecording,
   }) {
     assert(
       state.isEditing,
       'isEditState != true. Must be editing to update Edit state',
     );
+
     state = state.copyWith(
       editingState: ShortsEditState(
         filter: filter,
@@ -87,6 +88,11 @@ class ShortsCreateState {
   @override
   int get hashCode =>
       isEditing.hashCode ^ recordingState.hashCode ^ editingState.hashCode;
+
+  @override
+  String toString() {
+    return 'ShortsCreateState{isEditing: $isEditing, recordingState: $recordingState, editingState: $editingState, drafts: $drafts}';
+  }
 }
 
 class ShortsRecordState {
@@ -104,10 +110,10 @@ class ShortsEditState {
 
   final VideoFilter filter;
   final List<ElementData> elements;
-  final RecordingState<VideoRecording>? voiceRecording;
+  final RecordingState<VoiceRecording>? voiceRecording;
 
   bool get isEmpty =>
-      filter == VideoFilter.none ||
-      voiceRecording?.recordings.isEmpty == true ||
+      filter == VideoFilter.none &&
+      voiceRecording?.recordings.isEmpty == true &&
       elements.isEmpty == true;
 }
