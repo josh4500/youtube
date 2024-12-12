@@ -25,7 +25,7 @@ class SlidesIndicator extends StatelessWidget {
           decoration: BoxDecoration(
             color: currentPage == index
                 ? context.theme.colorScheme.surface
-                : context.theme.colorScheme.surface.withOpacity(.1),
+                : context.theme.colorScheme.surface.withValues(alpha: .1),
             shape: BoxShape.circle,
           ),
         );

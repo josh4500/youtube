@@ -83,7 +83,7 @@ abstract final class AppStyle {
   static final BrightnessPair<CustomActionButtonStyle> customActionButtonStyle =
       BrightnessPair<CustomActionButtonStyle>(
     light: CustomActionButtonStyle(
-      backgroundColor: Colors.black.withOpacity(0.05),
+      backgroundColor: Colors.black.withValues(alpha: 0.05),
       borderRadius: BorderRadius.circular(32),
     ),
     dark: CustomActionButtonStyle(
@@ -94,7 +94,7 @@ abstract final class AppStyle {
   static final BrightnessPair<CustomActionChipStyle> customActionChipStyle =
       BrightnessPair<CustomActionChipStyle>(
     light: CustomActionChipStyle(
-      backgroundColor: Colors.black.withOpacity(0.05),
+      backgroundColor: Colors.black.withValues(alpha: 0.05),
       borderRadius: BorderRadius.circular(32),
     ),
     dark: CustomActionChipStyle(

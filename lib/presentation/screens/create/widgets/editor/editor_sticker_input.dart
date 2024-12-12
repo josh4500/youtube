@@ -182,7 +182,7 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
                                         cursorColor: color == Colors.black
                                             ? Colors.white
                                             : Color.alphaBlend(
-                                                color.withOpacity(.1),
+                                                color.withValues(alpha: .1),
                                                 Colors.black,
                                               ),
                                         textAlign: type == PollStickerElement
@@ -195,7 +195,7 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
                                           color: color == Colors.black
                                               ? Colors.white
                                               : Color.alphaBlend(
-                                                  color.withOpacity(.1),
+                                                  color.withValues(alpha: .1),
                                                   Colors.black,
                                                 ),
                                           fontWeight: FontWeight.w600,
@@ -216,7 +216,7 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
                                           hintStyle: TextStyle(
                                             fontSize: 20,
                                             color: Color.alphaBlend(
-                                              color.withOpacity(.3),
+                                              color.withValues(alpha: .3),
                                               Colors.black,
                                             ),
                                             fontWeight: FontWeight.w600,
@@ -253,7 +253,7 @@ class _EditorStickerInputState extends State<EditorStickerInput> {
                                         cursorColor: color == Colors.black
                                             ? Colors.white
                                             : Color.alphaBlend(
-                                                color.withOpacity(.1),
+                                                color.withValues(alpha: .1),
                                                 Colors.black,
                                               ),
                                         textCapitalization:

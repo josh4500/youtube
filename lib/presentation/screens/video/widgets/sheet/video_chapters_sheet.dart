@@ -127,7 +127,9 @@ class ChapterTile extends StatelessWidget {
                           horizontal: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: context.theme.primaryColor.withOpacity(0.2),
+                          color: context.theme.primaryColor.withValues(
+                            alpha: 0.2,
+                          ),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(

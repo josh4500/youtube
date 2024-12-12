@@ -113,9 +113,9 @@ class _VideoThanksSheetState extends State<VideoThanksSheet> {
                             return Container(
                               padding: const EdgeInsets.all(12.0),
                               decoration: BoxDecoration(
-                                color: AppPalette.thanksVariants[index]
-                                    .withOpacity(
-                                  .1,
+                                color:
+                                    AppPalette.thanksVariants[index].withValues(
+                                  alpha: .1,
                                 ),
                                 border:
                                     Border.all(color: context.theme.hintColor),

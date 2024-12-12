@@ -78,7 +78,7 @@ class HomeFeedHistoryOff extends StatelessWidget {
             decoration: BoxDecoration(
               color: context.theme.brightness.isLight
                   ? context.theme.colorScheme.inverseSurface
-                  : context.theme.colorScheme.surface.withOpacity(.075),
+                  : context.theme.colorScheme.surface.withValues(alpha: .075),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 if (context.theme.brightness.isLight)
@@ -151,7 +151,7 @@ class HomeFeedHistoryOff extends StatelessWidget {
                     const SizedBox(height: 10),
                     CustomActionButton(
                       title: S.current.updateSetting,
-                      backgroundColor: Colors.white.withOpacity(0.08),
+                      backgroundColor: Colors.white.withValues(alpha: 0.08),
                       padding: const EdgeInsets.symmetric(
                         vertical: 10,
                         horizontal: 12,

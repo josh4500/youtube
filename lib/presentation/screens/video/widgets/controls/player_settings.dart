@@ -34,7 +34,7 @@ class CustomSwitch extends StatelessWidget {
       decoration: BoxDecoration(
         color: selected
             ? context.theme.colorScheme.surface
-            : context.theme.colorScheme.surface.withOpacity(.2),
+            : context.theme.colorScheme.surface.withValues(alpha: .2),
         borderRadius: BorderRadius.circular(64),
       ),
       child: Align(
@@ -43,7 +43,9 @@ class CustomSwitch extends StatelessWidget {
           width: thumbSize,
           height: thumbSize,
           decoration: BoxDecoration(
-            color: context.theme.colorScheme.inverseSurface.withOpacity(.9),
+            color: context.theme.colorScheme.inverseSurface.withValues(
+              alpha: .9,
+            ),
             borderRadius: BorderRadius.circular(64),
           ),
         ),

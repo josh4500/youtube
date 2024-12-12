@@ -73,7 +73,7 @@ class _CommentTileState extends State<CommentTile> {
         isThanks ? AppPalette.thanksVariants[1] : widget.backgroundColor)();
     return Material(
       // type: MaterialType.transparency,
-      color: bgColor?.withOpacity(.1) ?? Colors.transparent,
+      color: bgColor?.withValues(alpha: .1) ?? Colors.transparent,
       child: Column(
         children: <Widget>[
           TappableArea(

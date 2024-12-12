@@ -54,7 +54,7 @@ abstract final class AppTheme {
       secondary: Color(0xFF065DD0),
       outlineVariant: Colors.white,
     ),
-    highlightColor: Colors.black.withOpacity(.05),
+    highlightColor: Colors.black.withValues(alpha: .05),
     focusColor: Colors.black26,
     scrollbarTheme: const ScrollbarThemeData(
       interactive: true,

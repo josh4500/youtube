@@ -29,7 +29,7 @@ class RecordDragButton extends StatelessWidget {
             sizeFactor: animation.value,
             scale: isDragging ? 1.35 : 1.15,
             color: (isRecording ? const Color(0xFFFF0000) : Colors.white)
-                .withOpacity(enabled ? 1 : .5),
+                .withValues(alpha: enabled ? 1 : .5),
           ),
         );
       },

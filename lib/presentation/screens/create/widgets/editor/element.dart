@@ -489,12 +489,9 @@ class StickerContentPlaceholder extends StatelessWidget {
         }[type]!,
         style: TextStyle(
           fontSize: 20,
-          color: color == Colors.black
-              ? Colors.white24
-              : Color.alphaBlend(
-                  color.withOpacity(.3),
-                  Colors.black,
-                ),
+          color: color != Colors.black
+              ? Color.alphaBlend(color.withValues(alpha: .3), Colors.black)
+              : Colors.white24,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -519,7 +516,7 @@ class _QaElementWidget extends StatelessWidget {
         color: element.color == Colors.black
             ? Colors.white
             : Color.alphaBlend(
-                element.color.withOpacity(.1),
+                element.color.withValues(alpha: .1),
                 Colors.black,
               ),
         fontWeight: FontWeight.w600,
@@ -545,7 +542,7 @@ class _AddYElementWidget extends StatelessWidget {
         color: element.color == Colors.black
             ? Colors.white
             : Color.alphaBlend(
-                element.color.withOpacity(.1),
+                element.color.withValues(alpha: .1),
                 Colors.black,
               ),
         fontWeight: FontWeight.w600,
@@ -569,12 +566,12 @@ class _PollElementWidget extends StatelessWidget {
             element.question,
             style: TextStyle(
               fontSize: 18,
-              color: element.color == Colors.black
-                  ? Colors.white
-                  : Color.alphaBlend(
-                      element.color.withOpacity(.1),
+              color: element.color != Colors.black
+                  ? Color.alphaBlend(
+                      element.color.withValues(alpha: .1),
                       Colors.black,
-                    ),
+                    )
+                  : Colors.white,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -596,12 +593,12 @@ class _PollElementWidget extends StatelessWidget {
               element.options[index],
               style: TextStyle(
                 fontSize: 16,
-                color: element.color == Colors.black
-                    ? Colors.white
-                    : Color.alphaBlend(
-                        element.color.withOpacity(.1),
+                color: element.color != Colors.black
+                    ? Color.alphaBlend(
+                        element.color.withValues(alpha: .1),
                         Colors.black,
-                      ),
+                      )
+                    : Colors.white,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -785,12 +782,12 @@ class StickerScaffold extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color == Colors.black
-                    ? color
-                    : Color.alphaBlend(
-                        color.withOpacity(.5),
+                color: color != Colors.black
+                    ? Color.alphaBlend(
+                        color.withValues(alpha: .5),
                         Colors.white,
-                      ),
+                      )
+                    : color,
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Column(
@@ -819,13 +816,13 @@ class StickerScaffold extends StatelessWidget {
                                     alignment: Alignment.center,
                                     decoration: BoxDecoration(
                                       color: Color.alphaBlend(
-                                        color.withOpacity(.5),
+                                        color.withValues(alpha: .5),
                                         const Color(0xFFAAAAAA),
                                       ),
                                       shape: BoxShape.circle,
                                       border: Border.all(
                                         color: Color.alphaBlend(
-                                          color.withOpacity(.5),
+                                          color.withValues(alpha: .5),
                                           Colors.white,
                                         ),
                                       ),
@@ -834,12 +831,12 @@ class StickerScaffold extends StatelessWidget {
                                         ? Icon(
                                             Icons.person,
                                             size: 14,
-                                            color: color == Colors.black
-                                                ? color
-                                                : Color.alphaBlend(
-                                                    color.withOpacity(.5),
+                                            color: color != Colors.black
+                                                ? Color.alphaBlend(
+                                                    color.withValues(alpha: .5),
                                                     Colors.white,
-                                                  ),
+                                                  )
+                                                : color,
                                           )
                                         : null,
                                   ),
@@ -858,7 +855,7 @@ class StickerScaffold extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: color == Colors.black
                             ? Colors.white10
-                            : Colors.black.withOpacity(0.08),
+                            : Colors.black.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: Builder(
@@ -871,7 +868,7 @@ class StickerScaffold extends StatelessWidget {
                                 color: color == Colors.black
                                     ? Colors.white
                                     : Color.alphaBlend(
-                                        color.withOpacity(.1),
+                                        color.withValues(alpha: .1),
                                         Colors.black,
                                       ),
                                 fontWeight: FontWeight.w600,
@@ -887,7 +884,7 @@ class StickerScaffold extends StatelessWidget {
                                   color: color == Colors.black
                                       ? Colors.white
                                       : Color.alphaBlend(
-                                          color.withOpacity(.1),
+                                          color.withValues(alpha: .1),
                                           Colors.black,
                                         ),
                                 ),
@@ -899,7 +896,7 @@ class StickerScaffold extends StatelessWidget {
                                     color: color == Colors.black
                                         ? Colors.white
                                         : Color.alphaBlend(
-                                            color.withOpacity(.1),
+                                            color.withValues(alpha: .1),
                                             Colors.black,
                                           ),
                                     fontWeight: FontWeight.w600,
@@ -928,16 +925,16 @@ class StickerScaffold extends StatelessWidget {
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: Color.alphaBlend(
-                                color.withOpacity(.3),
+                                color.withValues(alpha: .3),
                                 Colors.white,
                               ),
                             ),
-                            color: color == Colors.black
-                                ? Colors.white54
-                                : Color.alphaBlend(
-                                    color.withOpacity(.85),
+                            color: color != Colors.black
+                                ? Color.alphaBlend(
+                                    color.withValues(alpha: .85),
                                     Colors.black,
-                                  ),
+                                  )
+                                : Colors.white54,
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -946,7 +943,7 @@ class StickerScaffold extends StatelessWidget {
                               AddYStickerElement: YTIcons.camera_outlined,
                             }[type],
                             color: Color.alphaBlend(
-                              color.withOpacity(.3),
+                              color.withValues(alpha: .3),
                               Colors.black,
                             ),
                             size: 20,

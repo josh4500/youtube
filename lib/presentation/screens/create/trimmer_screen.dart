@@ -482,7 +482,8 @@ class _TrimmerScreenState extends ConsumerState<TrimmerScreen> {
                                       decoration: BoxDecoration(
                                         color: state.$1
                                             ? Colors.white10
-                                            : Colors.white.withOpacity(0.01),
+                                            : Colors.white
+                                                .withValues(alpha: 0.01),
                                         shape: BoxShape.circle,
                                       ),
                                       child: Icon(
@@ -502,7 +503,8 @@ class _TrimmerScreenState extends ConsumerState<TrimmerScreen> {
                                       decoration: BoxDecoration(
                                         color: state.$2
                                             ? Colors.white10
-                                            : Colors.white.withOpacity(0.01),
+                                            : Colors.white
+                                                .withValues(alpha: 0.01),
                                         shape: BoxShape.circle,
                                       ),
                                       child: Icon(

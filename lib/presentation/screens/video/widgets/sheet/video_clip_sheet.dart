@@ -230,9 +230,9 @@ class _VideoClipSheetState extends State<VideoClipSheet> {
                         '$length/140',
                         style: TextStyle(
                           fontSize: 12,
-                          color: length > 140
-                              ? Colors.red.withOpacity(.5)
-                              : context.theme.hintColor,
+                          color: length <= 140
+                              ? context.theme.hintColor
+                              : Colors.red.withValues(alpha: .5),
                         ),
                       );
                     },
@@ -269,7 +269,8 @@ class _VideoClipSheetState extends State<VideoClipSheet> {
                         horizontal: 16,
                       ),
                       backgroundColor: length == 0
-                          ? context.theme.colorScheme.surface.withOpacity(.5)
+                          ? context.theme.colorScheme.surface
+                              .withValues(alpha: .5)
                           : context.theme.primaryColor,
                       textStyle: TextStyle(
                         fontSize: 14,

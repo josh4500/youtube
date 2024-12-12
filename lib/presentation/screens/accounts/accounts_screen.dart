@@ -247,7 +247,7 @@ class UnAuthenticatedAccountScreen extends StatelessWidget {
           Icon(
             Icons.folder,
             size: 120,
-            color: context.theme.colorScheme.surface.withOpacity(.54),
+            color: context.theme.colorScheme.surface.withValues(alpha: .54),
           ),
           const SizedBox(height: 48),
           const Text(

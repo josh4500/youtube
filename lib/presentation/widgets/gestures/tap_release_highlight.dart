@@ -33,7 +33,7 @@ class TapReleaseHighlight extends InkHighlight {
     );
 
     _alphaAnimation =
-        IntTween(begin: color.alpha, end: 0).animate(_animationController)
+        IntTween(begin: color.a.toInt(), end: 0).animate(_animationController)
           ..addListener(() {
             controller.markNeedsPaint();
           })

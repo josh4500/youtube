@@ -338,7 +338,7 @@ class TranscriptTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
             decoration: BoxDecoration(
-              color: context.theme.primaryColor.withOpacity(0.1),
+              color: context.theme.primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(

@@ -341,7 +341,9 @@ class UnAuthenticatedSubscriptionScreen extends StatelessWidget {
           Icon(
             Icons.subscriptions_sharp,
             size: 120,
-            color: context.theme.colorScheme.surface.withOpacity(.54),
+            color: context.theme.colorScheme.surface.withValues(
+              alpha: .54,
+            ),
           ),
           const SizedBox(height: 48),
           const Text(

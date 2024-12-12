@@ -156,7 +156,7 @@ class EditorStickerSelector extends StatelessWidget {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
-                            color: Colors.white.withOpacity(.05),
+                            color: Colors.white.withValues(alpha: .05),
                           ),
                           child: Text(
                             ['Q&A', 'Add yours', 'Poll'][index],

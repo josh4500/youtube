@@ -54,7 +54,7 @@ class VideoPlaylistSection extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 color: context.theme.colorScheme.surface
-                                    .withOpacity(.38),
+                                    .withValues(alpha: .38),
                               ),
                             ),
                           ],

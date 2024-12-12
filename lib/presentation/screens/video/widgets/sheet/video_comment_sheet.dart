@@ -113,10 +113,10 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(.1),
+                                  color: Colors.red.withValues(alpha: .1),
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(
-                                    color: Colors.red.withOpacity(.5),
+                                    color: Colors.red.withValues(alpha: .5),
                                   ),
                                 ),
                                 child: const AccountAvatar(size: 36),
