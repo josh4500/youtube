@@ -28,28 +28,22 @@ class RangeSelector extends StatefulWidget {
 
 class _RangeSelectorState<T> extends State<RangeSelector>
     with SingleTickerProviderStateMixin {
-  late final AnimationController controller;
-  late final alignmentNotifier = ValueNotifier<Alignment>(
-    Alignment(
+  late final AnimationNotifier<Alignment> alignmentNotifier =
+      AnimationNotifier<Alignment>(
+    value: Alignment(
       ((widget.initialIndex ?? widget.itemCount ~/ 2) / (itemCount - 1))
           .normalizeRange(-1, 1),
       0,
     ),
+    vsync: this,
+    curve: Curves.linearToEaseOut,
+    duration: const Duration(milliseconds: 250),
   );
   late final indexNotifier = ValueNotifier<int>(
     widget.initialIndex ?? widget.itemCount ~/ 2,
   );
 
   int get itemCount => widget.itemCount;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 250),
-    );
-  }
 
   @override
   void didUpdateWidget(RangeSelector oldWidget) {
@@ -63,7 +57,6 @@ class _RangeSelectorState<T> extends State<RangeSelector>
   void dispose() {
     alignmentNotifier.dispose();
     indexNotifier.dispose();
-    controller.dispose();
     super.dispose();
   }
 
@@ -77,11 +70,9 @@ class _RangeSelectorState<T> extends State<RangeSelector>
     final value = _getIndexFromPosition(position, width);
 
     _updateSelected(value);
-    await animateAlignmentNotifier(
-      notifier: alignmentNotifier,
-      controller: controller,
-      value: Alignment((value / (itemCount - 1)).normalizeRange(-1, 1), 0),
-      curve: Curves.linearToEaseOut,
+    alignmentNotifier.start(
+      end: Alignment((value / (itemCount - 1)).normalizeRange(-1, 1), 0),
+      createTween: (begin, end) => AlignmentTween(begin: begin, end: end),
     );
   }
 

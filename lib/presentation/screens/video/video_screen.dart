@@ -142,17 +142,15 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     end: ui.Offset.zero,
   ).animate(_playlistOffsetController);
 
-  late final _playerAddedHeightAnimationController = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 125),
-  );
-  late final _playerAddedHeightNotifier = ValueNotifier<double>(
-    ui.clampDouble(
+  late final _playerAddedHeightNotifier = AnimationNotifier<double>(
+    value: ui.clampDouble(
       (screenHeight * (1 - kAvgVideoViewPortHeight)) -
           (screenHeight * (1 - playerHeightToScreenRatio)),
       minAdditionalHeight,
       maxAdditionalHeight,
     ),
+    vsync: this,
+    duration: const Duration(milliseconds: 125),
   );
 
   late final _playerMarginNotifier = ValueNotifier<double>(0);
@@ -161,21 +159,22 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     vsync: this,
     duration: const Duration(milliseconds: 125),
   );
-  late final _screenHeightNotifier = ValueNotifier<double>(
-    kMinVideoViewPortWidthPortrait,
-  );
-  late final _screenWidthAnimationController = AnimationController(
+  late final _screenHeightNotifier = AnimationNotifier<double>(
+    value: kMinVideoViewPortWidthPortrait,
     vsync: this,
     duration: const Duration(milliseconds: 125),
   );
-  late final _screenWidthNotifier = ValueNotifier<double>(1);
 
-  late final _playerWidthAnimationController = AnimationController(
+  late final _screenWidthNotifier = AnimationNotifier<double>(
+    value: 1,
     vsync: this,
     duration: const Duration(milliseconds: 125),
   );
-  late final _playerWidthNotifier = ValueNotifier<double>(
-    kMinVideoViewPortWidthPortrait,
+
+  late final _playerWidthNotifier = AnimationNotifier<double>(
+    value: kMinVideoViewPortWidthPortrait,
+    vsync: this,
+    duration: const Duration(milliseconds: 125),
   );
 
   late final _playerHeightNotifier = ValueNotifier<double>(
@@ -621,10 +620,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _detailsScrollController.dispose();
     _detailsOpacityController.dispose();
 
-    _playerWidthAnimationController.dispose();
-    _screenWidthAnimationController.dispose();
     _screenHeightAnimationController.dispose();
-    _playerAddedHeightAnimationController.dispose();
 
     _playerWidthNotifier.dispose();
     _screenHeightNotifier.dispose();
@@ -700,41 +696,25 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   Future<void> _animateScreenHeight(double to) async {
     if (_screenHeightNotifier.value != to) {
-      await animateDoubleNotifier(
-        notifier: _screenHeightNotifier,
-        controller: _screenHeightAnimationController,
-        value: to,
-      );
+      _screenHeightNotifier.start(end: to);
     }
   }
 
   Future<void> _animateScreenWidth(double to) async {
     if (_screenWidthNotifier.value != to) {
-      await animateDoubleNotifier(
-        notifier: _screenWidthNotifier,
-        controller: _screenWidthAnimationController,
-        value: to,
-      );
+      _screenWidthNotifier.start(end: to);
     }
   }
 
   Future<void> _animatePlayerWidth(double to) async {
     if (_playerWidthNotifier.value != to) {
-      await animateDoubleNotifier(
-        notifier: _playerWidthNotifier,
-        controller: _playerWidthAnimationController,
-        value: to,
-      );
+      _playerWidthNotifier.start(end: to);
     }
   }
 
   Future<void> _animateAdditionalHeight(double to) async {
     if (_playerAddedHeightNotifier.value != to) {
-      await animateDoubleNotifier(
-        notifier: _playerAddedHeightNotifier,
-        controller: _playerAddedHeightAnimationController,
-        value: to,
-      );
+      _playerAddedHeightNotifier.start(end: to);
     }
   }
 
@@ -1731,8 +1711,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     );
 
     final miniPlayer = SlideTransition(
-      position: Animation.fromValueListenable(
-        _screenWidthNotifier,
+      position: _screenWidthNotifier.toAnimation(
         transformer: (incomingValue) {
           // TODO(josh4500): Avoid explicit value
           return orientation.isLandscape ? incomingValue.normalize(0.6, 1) : 0;

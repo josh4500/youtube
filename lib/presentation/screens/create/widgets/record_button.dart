@@ -115,7 +115,7 @@ class RecordButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 150),
-      margin: EdgeInsets.all(isRecording ? 12 : 0),
+      margin: EdgeInsets.all(isRecording ? kRecordInnerButtonSize / 4 : 0),
       width: isRecording ? kRecordInnerButtonSize / 2 : kRecordInnerButtonSize,
       height: isRecording ? kRecordInnerButtonSize / 2 : kRecordInnerButtonSize,
       decoration: BoxDecoration(

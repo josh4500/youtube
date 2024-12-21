@@ -190,7 +190,7 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
 
   @override
   Widget build(BuildContext context) {
-    const EdgeInsets itemVerticalMargin = EdgeInsets.symmetric(vertical: 10);
+    const EdgeInsets itemVerticalMargin = EdgeInsets.symmetric(vertical: 6);
     const EdgeInsets labelVerticalMargin = EdgeInsets.symmetric(vertical: 13);
     const TextStyle labelTextStyle = TextStyle(
       fontSize: 15,
@@ -287,7 +287,10 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
             ),
           if (widget.items.isNotEmpty)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(
+                vertical: 8,
+                horizontal: 4,
+              ),
               decoration: BoxDecoration(
                 color: Colors.black45,
                 borderRadius: BorderRadius.circular(24),
@@ -327,13 +330,12 @@ class _VideoEffectOptionsState extends State<VideoEffectOptions>
                         turns: Tween(begin: 0.0, end: -.5)
                             .animate(animationController),
                         child: Container(
-                          padding: const EdgeInsets.all(2),
-                          margin: itemVerticalMargin,
+                          margin: itemVerticalMargin + const EdgeInsets.all(2),
                           decoration: const BoxDecoration(
                             color: Colors.white38,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(YTIcons.chevron_down, size: 20),
+                          child: const Icon(YTIcons.chevron_down, size: 24),
                         ),
                       ),
                     ),
@@ -418,6 +420,7 @@ class _EffectWidgetState extends State<EffectWidget>
       onTap: handleTap,
       margin: widget.margin,
       padding: const EdgeInsets.all(4),
+      backgroundColor: Colors.transparent,
       icon: Builder(
         builder: (BuildContext context) {
           if (widget.item.animation == EffectTapAnimation.rotate) {
@@ -433,7 +436,7 @@ class _EffectWidgetState extends State<EffectWidget>
                   child: childWidget,
                 );
               },
-              child: Icon(widget.item.icon, size: 18),
+              child: Icon(widget.item.icon, size: 24),
             );
           }
 
@@ -444,7 +447,7 @@ class _EffectWidgetState extends State<EffectWidget>
                 active
                     ? widget.item.activeIcon ?? widget.item.icon
                     : widget.item.icon,
-                size: 18,
+                size: 24,
               );
             },
           );

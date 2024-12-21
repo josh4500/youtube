@@ -160,15 +160,13 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   final recordingNotifier = ValueNotifier<bool>(false);
   final dragRecordNotifier = ValueNotifier<bool>(false);
   final dragZoomLevelNotifier = ValueNotifier<double>(0);
-  final recordOuterButtonPosition = ValueNotifier<Offset?>(null);
-  final recordInnerButtonPosition = ValueNotifier<Offset?>(null);
-  // Position controller
-  late final recordInnerButtonPController = AnimationController(
+  late final recordOuterButtonPosition = AnimationNotifier<Offset>(
+    value: Offset.zero,
     vsync: this,
     duration: const Duration(milliseconds: 200),
   );
-  // Position controller
-  late final recordOuterButtonPController = AnimationController(
+  late final recordInnerButtonPosition = AnimationNotifier<Offset>(
+    value: Offset.zero,
     vsync: this,
     duration: const Duration(milliseconds: 200),
   );
@@ -246,8 +244,6 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
     focusController.dispose();
     _doubleTapTimer?.cancel();
 
-    recordOuterButtonPController.dispose();
-    recordInnerButtonPController.dispose();
     recordOuterButtonController.dispose();
     recordingNotifier.dispose();
     dragRecordNotifier.dispose();
@@ -780,29 +776,21 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   void _resetButtonPositions(BoxConstraints? constraints) {
     if (constraints != null) {
-      animate<Offset>(
-        controller: recordOuterButtonPController,
-        begin: recordOuterButtonPosition.value!,
+      recordOuterButtonPosition.start(
+        begin: recordOuterButtonPosition.value,
         end: getOuterButtonInitPosition(constraints),
-        onAnimate: (value) {
-          if (!dragRecordNotifier.value) {
-            recordOuterButtonPosition.value = value;
-          }
-        },
+        updateWhen: (_) => !dragRecordNotifier.value,
       );
 
       if (!droppedButton) {
-        animate<Offset>(
-          controller: recordInnerButtonPController,
-          begin: recordInnerButtonPosition.value!,
+        recordInnerButtonPosition.start(
+          begin: recordInnerButtonPosition.value,
           end: getInnerButtonInitPosition(constraints),
-          onAnimate: (value) {
-            if (!droppedButton && !dragRecordNotifier.value) {
-              recordInnerButtonPosition.value = value;
-            }
+          updateWhen: (value) {
             if (value == getInnerButtonInitPosition(constraints)) {
               droppedButton = false;
             }
+            return !droppedButton && !dragRecordNotifier.value;
           },
         );
       } else {
@@ -812,8 +800,8 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
         droppedButton = false;
       }
     } else {
-      recordOuterButtonPosition.value = null;
-      recordInnerButtonPosition.value = null;
+      recordOuterButtonPosition.value = Offset.zero;
+      recordInnerButtonPosition.value = Offset.zero;
     }
 
     recordOuterButtonController.reverse();
@@ -885,15 +873,10 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     if (position.dy <= maxHeight * .8) {
       if (droppedButton == false) {
-        animate<Offset>(
-          controller: recordInnerButtonPController,
-          begin: recordInnerButtonPosition.value!,
+        recordInnerButtonPosition.start(
+          begin: recordInnerButtonPosition.value,
           end: getInnerButtonInitPosition(constraints),
-          onAnimate: (value) {
-            if (droppedButton) {
-              recordInnerButtonPosition.value = value;
-            }
-          },
+          updateWhen: (_) => droppedButton,
         );
       }
       droppedButton = true;
@@ -1126,16 +1109,18 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                             animation: focusController,
                           ),
                         ),
-                        ValueListenableBuilder(
-                          valueListenable: recordOuterButtonPosition,
+                        ListenableBuilder(
+                          listenable: recordOuterButtonPosition,
                           builder: (
                             BuildContext context,
-                            Offset? position,
                             Widget? childWidget,
                           ) {
-                            position ??= getOuterButtonInitPosition(
-                              constraints,
-                            );
+                            Offset? position = recordOuterButtonPosition.value;
+                            if (position == Offset.zero) {
+                              position = getOuterButtonInitPosition(
+                                constraints,
+                              );
+                            }
 
                             return Positioned(
                               top: position.dy,
@@ -1166,16 +1151,18 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
                             ),
                           ),
                         ),
-                        ValueListenableBuilder(
-                          valueListenable: recordInnerButtonPosition,
+                        ListenableBuilder(
+                          listenable: recordInnerButtonPosition,
                           builder: (
                             BuildContext context,
-                            Offset? position,
                             Widget? childWidget,
                           ) {
-                            position ??= getInnerButtonInitPosition(
-                              constraints,
-                            );
+                            Offset position = recordInnerButtonPosition.value;
+                            if (position == Offset.zero) {
+                              position = getInnerButtonInitPosition(
+                                constraints,
+                              );
+                            }
 
                             return Positioned(
                               top: position.dy,
