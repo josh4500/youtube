@@ -27,32 +27,31 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/screens/video/player_view_controller.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-class PlayerLoadingIndicator extends ConsumerWidget {
+class PlayerLoadingIndicator extends StatelessWidget {
   const PlayerLoadingIndicator({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final showBuffer = ref.watch(
-      playerViewStateProvider.select((state) => state.showBuffer),
-    );
-
-    return Consumer(
-      builder: (BuildContext context, WidgetRef ref, childWidget) {
-        final (isLoading, isBuffering) = ref.watch(
-          playerNotifierProvider.select(
-            (state) => (state.loading, state.buffering),
-          ),
-        );
-
+  Widget build(BuildContext context) {
+    return NotifierSelector(
+      notifier: context.provide<PlayerViewController>(),
+      selector: (state) {
+        return state.showBuffer &&
+            (state.playerState.loading || state.playerState.buffering);
+      },
+      builder: (
+        BuildContext context,
+        bool visible,
+        Widget? childWidget,
+      ) {
         return AnimatedValuedVisibility(
           curve: Curves.easeIn,
           duration: Durations.long3,
           alignment: Alignment.center,
-          visible: showBuffer && (isLoading || isBuffering),
+          visible: visible,
           child: const SizedBox.square(
             dimension: 56,
             child: CircularProgressIndicator(

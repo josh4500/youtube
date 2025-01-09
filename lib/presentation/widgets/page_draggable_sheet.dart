@@ -1,7 +1,9 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
@@ -12,10 +14,262 @@ import 'over_scroll_glow_behavior.dart';
 import 'persistent_header_delegate.dart';
 import 'sheet_drag_indicator.dart';
 
+const double kInitialSize = 0;
+const double kInitialOpacity = 1;
+
 typedef PageDraggableBuilder = Widget Function(
   BuildContext context,
   ScrollController? scrollController,
+  DraggableScrollableController? draggableScrollController,
 );
+
+class DraggableProperties {
+  DraggableProperties({this.initialHeight = .8})
+      : assert(
+          initialHeight >= 0 || initialHeight <= 1,
+          'initialHeight cannot be less than 0 or greater tha 1',
+        ),
+        snapSizes = [
+          0,
+          if (initialHeight > 0 && initialHeight < 1) initialHeight,
+          1,
+        ];
+
+  final List<double> snapSizes;
+  final double initialHeight;
+}
+
+class SlotKey {
+  SlotKey(this.value);
+
+  final Object value;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is SlotKey && value == other.value;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => 'SlotKey{value: $value}';
+}
+
+abstract class SlotEntry {}
+
+class SingleSlotEntry extends SlotEntry {
+  SingleSlotEntry({required this.entry});
+
+  final OverlayEntry entry;
+  void remove() => entry.remove();
+}
+
+class MultiSlotEntry extends SlotEntry {
+  MultiSlotEntry({required this.size, required this.groupKey});
+
+  final int size;
+  final SlotKey groupKey;
+  final Map<SlotKey, OverlayEntry> _slots = {};
+  final List<SlotKey> _slotOrder = [];
+
+  OverlayEntry? operator [](SlotKey key) => _slots[key];
+  bool get isEmpty => _slots.isEmpty;
+  bool exist(SlotKey? itemKey) => _slots.containsKey(itemKey);
+  void operator []=(SlotKey key, OverlayEntry entry) {
+    if (_slots.length >= size) {
+      final oldestKey = _slotOrder.removeAt(0);
+      _slots.remove(oldestKey)?.remove();
+    }
+    _slots[key] = entry;
+    _slotOrder.add(key);
+  }
+
+  void remove(SlotKey? key) {
+    if (key != null) {
+      _slots.remove(key)?.remove();
+      _slotOrder.remove(key);
+    }
+  }
+
+  void removeAll() {
+    _slots.forEach((_, value) => value.remove());
+    _slots.clear();
+    _slotOrder.clear();
+  }
+}
+
+class _History extends ChangeNotifier {
+  final _entryKeys = <SlotKey>[];
+  final _entries = <SlotKey, SlotEntry>{};
+  SlotKey? get _lastEntryKey => _entryKeys.isNotEmpty ? _entryKeys.last : null;
+
+  bool addDraggable(SlotKey key, SlotEntry entry) {
+    bool didAdd = false;
+    _entries.putIfAbsent(key, () {
+      didAdd = true;
+      _entryKeys.add(key);
+      return entry;
+    });
+    return didAdd;
+  }
+
+  void pop([SlotKey? key]) => _removeEntry(key ?? _lastEntryKey);
+
+  void addOrReplaceEntry(
+    SlotKey key,
+    SlotKey? itemKey,
+    int groupSize,
+    OverlayEntry Function() callback,
+  ) {
+    final existingEntry = _entries[key];
+    final isGroup = itemKey != null;
+
+    if (existingEntry != null) {
+      if (isGroup) {
+        if (existingEntry is SingleSlotEntry) {
+          existingEntry.remove();
+          _entries.remove(key);
+          _entryKeys.add(key);
+          _entries[key] = MultiSlotEntry(size: groupSize, groupKey: key);
+        }
+
+        final multiSlotEntry = _entries[key]! as MultiSlotEntry;
+        if (!multiSlotEntry.exist(itemKey)) {
+          multiSlotEntry[itemKey] = callback.call();
+        }
+      } else {
+        if (existingEntry is MultiSlotEntry) {
+          existingEntry.removeAll();
+          _entries.remove(key);
+          _entryKeys.add(key);
+          _entries[key] = SingleSlotEntry(entry: callback.call());
+        }
+      }
+    } else {
+      if (isGroup) {
+        _entryKeys.add(key);
+        _entries[key] = MultiSlotEntry(size: groupSize, groupKey: key);
+        final multiSlotEntry = _entries[key]! as MultiSlotEntry;
+        multiSlotEntry[itemKey] = callback.call();
+      } else {
+        _entryKeys.add(key);
+        _entries[key] = SingleSlotEntry(entry: callback.call());
+      }
+    }
+
+    notifyListeners();
+  }
+
+  void _removeEntry(SlotKey? key, {SlotKey? itemKey}) {
+    if (key == null) return; // Add null check
+
+    final slotEntry = _entries[key];
+    if (slotEntry != null) {
+      if (slotEntry is SingleSlotEntry) {
+        slotEntry.remove();
+        _entries.remove(key);
+        _entryKeys.remove(key); // Remove from key list
+      } else if (slotEntry is MultiSlotEntry) {
+        if (itemKey != null) {
+          slotEntry.remove(itemKey);
+          if (slotEntry.isEmpty) {
+            _entries.remove(key);
+            _entryKeys.remove(key);
+          }
+        } else {
+          slotEntry.removeAll();
+          _entries.remove(key);
+          _entryKeys.remove(key);
+        }
+      }
+      notifyListeners();
+    }
+  }
+
+  SlotEntry? retrieveSlotEntry(SlotKey slotKey) => _entries[slotKey];
+
+  @override
+  void dispose() {
+    _entries.clear();
+    _entryKeys.clear();
+    super.dispose();
+  }
+}
+
+class PageDraggableController extends ChangeNotifier {
+  PageDraggableController({this.initialHeight = 1}) {
+    if (kFlutterMemoryAllocationsEnabled) {
+      ChangeNotifier.maybeDispatchObjectCreation(this);
+    }
+    _dragController.addListener(_listener);
+  }
+
+  @override
+  void dispose() {
+    _dragController.removeListener(_listener);
+    _dragController.dispose();
+    super.dispose();
+  }
+
+  void _listener() {
+    _widthRatio = _dragController.size.normalize(0, initialHeight);
+    notifyListeners();
+  }
+
+  final _dragController = DraggableScrollableController();
+
+  final double initialHeight;
+
+  double get size => _dragController.size;
+
+  double _widthRatio = kInitialSize;
+  double get widthRatio => _widthRatio;
+
+  double _opacity = kInitialOpacity;
+  double get opacity => _opacity;
+
+  set size(double value) {
+    _dragController.jumpTo(value);
+  }
+
+  set widthRatio(double value) {
+    if (value != _widthRatio) {
+      _widthRatio = value.clamp(0.0, 1.0);
+      notifyListeners();
+    }
+  }
+
+  set opacity(double value) {
+    if (value != _opacity) {
+      _opacity = value.clamp(0.0, 1.0);
+      notifyListeners();
+    }
+  }
+
+  void open() {
+    _widthRatio = 1;
+    _opacity = 1;
+    _dragController.animateTo(
+      initialHeight,
+      duration: Durations.medium4,
+      curve: Curves.easeIn,
+    );
+    notifyListeners();
+  }
+
+  void close() {
+    widthRatio = 0;
+    _dragController.animateTo(
+      0,
+      duration: Durations.medium4,
+      curve: Curves.easeIn,
+    );
+  }
+}
+
+abstract class DragSheetNotification extends Notification {}
+
+class DragSheetCloseNotification extends DragSheetNotification {}
 
 class PageDraggableSheet extends StatefulWidget {
   const PageDraggableSheet({
@@ -25,7 +279,7 @@ class PageDraggableSheet extends StatefulWidget {
     this.dragDownDismiss = false,
     this.borderRadius = BorderRadius.zero,
     required this.controller,
-    required this.onClose,
+    this.onClose,
     required this.showDragIndicator,
     required this.draggableController,
     required this.contentBuilder,
@@ -46,7 +300,7 @@ class PageDraggableSheet extends StatefulWidget {
   final String? trailingTitle;
   final BorderRadius borderRadius;
   final ScrollController controller;
-  final VoidCallback onClose;
+  final VoidCallback? onClose;
   final bool showDragIndicator, showDivider, dragDismissible;
   final Widget Function(
     BuildContext context,
@@ -258,7 +512,8 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
         element.controller.close();
       }
     }
-    widget.onClose();
+    widget.onClose?.call();
+    DragSheetCloseNotification().dispatch(context);
   }
 
   @override
@@ -277,7 +532,7 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                 builder: (context, childWidget) {
                   final aValue = _dynamicTabHideAnimation.value;
                   final baseHeight =
-                      60.0 + (widget.subtitle?.preferredSize.height ?? 0);
+                      56.0 + (widget.subtitle?.preferredSize.height ?? 0);
                   const dynamicTabHeight = 44;
                   return SliverPersistentHeader(
                     pinned: true,
@@ -304,17 +559,17 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Flexible(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                              ),
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                alignment: Alignment.center,
-                                children: [
-                                  GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onTap: _onTapScrollHeader,
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: Alignment.center,
+                              children: [
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: _onTapScrollHeader,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0,
+                                    ),
                                     child: Row(
                                       children: [
                                         const SizedBox(width: 4),
@@ -343,25 +598,28 @@ class _PageDraggableSheetState extends State<PageDraggableSheet>
                                       ],
                                     ),
                                   ),
-                                  for (final overlayChild
-                                      in widget.overlayChildren)
-                                    Positioned.fill(
-                                      child: _OverlayChildTitle(
-                                        controller: overlayChild.controller,
-                                      ),
+                                ),
+                                for (final overlayChild
+                                    in widget.overlayChildren)
+                                  Positioned.fill(
+                                    child: _OverlayChildTitle(
+                                      controller: overlayChild.controller,
                                     ),
-                                ],
-                              ),
+                                  ),
+                              ],
                             ),
                           ),
                           Transform.translate(
-                            offset: const Offset(0, -8),
+                            offset: const Offset(-4, -8),
                             child: CustomInkWell(
                               onTap: _closeSheet,
                               padding: const EdgeInsets.all(8),
                               borderRadius: BorderRadius.circular(32),
                               splashFactory: NoSplash.splashFactory,
-                              child: const Icon(YTIcons.close_outlined),
+                              child: const Icon(
+                                YTIcons.close_outlined,
+                                size: 20,
+                              ),
                             ),
                           ),
                         ],
@@ -470,18 +728,20 @@ class _PageDraggableOverlayChildState extends State<PageDraggableOverlayChild>
       begin: const Offset(1, 0),
       end: Offset.zero,
     ).animate(controller);
-    widget.controller.addListener(() {
-      if (widget.controller.isOpened) {
-        controller.forward();
-      } else {
-        controller.reverse();
-      }
-    });
+    widget.controller.addListener(_listener);
+  }
+
+  void _listener() {
+    if (widget.controller.isOpened) {
+      controller.forward();
+    } else {
+      controller.reverse();
+    }
   }
 
   @override
   void dispose() {
-    // controller.dispose();
+    controller.removeListener(_listener);
     super.dispose();
   }
 
@@ -553,19 +813,21 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
       end: Offset.zero,
     ).animate(controller);
 
-    widget.controller.addListener(() {
-      if (widget.controller.isOpened) {
-        controller.forward();
-      } else {
-        controller.reverse();
-      }
-    });
+    widget.controller.addListener(_listener);
+  }
+
+  void _listener() {
+    if (widget.controller.isOpened) {
+      controller.forward();
+    } else {
+      controller.reverse();
+    }
   }
 
   @override
   void dispose() {
+    controller.removeListener(_listener);
     super.dispose();
-    controller.dispose();
   }
 
   @override
@@ -577,10 +839,11 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
         child: Material(
           child: Row(
             children: <Widget>[
+              const SizedBox(width: 12),
               IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(
-                  maxHeight: 28,
+                  maxHeight: 56,
                 ),
                 splashColor: Colors.transparent,
                 onPressed: widget.controller.close,
@@ -603,21 +866,190 @@ class _OverlayChildTitleState extends State<_OverlayChildTitle>
   }
 }
 
-// TODO(josh4500): Complete new API for Draggable
-// Tasks left
-// 1: Close using the controller
-// 2: Back button should close (using controller), which closes opened children
-//    (PageDraggableOverlayChild) consecutively.
-// 3: Change bottom opacity based on top sheet draggable size.
-// 4: Change horizontal size based on pointer event.
-// 5: Whether to pass or dynamic create the controller.
-// 6: Create grouped draggable which add or remove DraggableSheet entry based on max size of group.
-//
-//
+class DraggableSheet extends StatefulWidget {
+  const DraggableSheet({
+    super.key,
+    required this.controller,
+    required this.properties,
+    required this.builder,
+  });
+
+  final DraggableProperties properties;
+  final PageDraggableBuilder builder;
+  final PageDraggableController controller;
+
+  @override
+  State<DraggableSheet> createState() => _DraggableSheetState();
+}
+
+class _DraggableSheetState extends State<DraggableSheet>
+    with TickerProviderStateMixin {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.controller._dragController.animateTo(
+        widget.properties.initialHeight,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeInCubic,
+      );
+    });
+    widget.controller.addListener(_listener);
+  }
+
+  void _listener() {}
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_listener);
+    super.dispose();
+  }
+
+  bool _handleNotification(DragSheetNotification notification) {
+    if (notification is DragSheetCloseNotification) {
+      widget.controller.close();
+    }
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: NotificationListener<DragSheetNotification>(
+        onNotification: _handleNotification,
+        child: Builder(
+          builder: (BuildContext context) {
+            if (context.orientation.isLandscape) {
+              return LayoutBuilder(
+                builder: (
+                  BuildContext context,
+                  BoxConstraints constraints,
+                ) {
+                  return Listener(
+                    onPointerMove: (PointerMoveEvent event) {
+                      widget.controller.widthRatio =
+                          widget.controller.widthRatio +
+                              (-event.delta.dx / constraints.maxWidth * .4);
+                    },
+                    onPointerUp: (PointerUpEvent event) async {
+                      if (widget.controller.widthRatio >= 0.5) {
+                        // TODO(): Close the sheet
+                      } else {
+                        // TODO(): Open the sheet
+                      }
+                    },
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth * .4,
+                        ),
+                        child: NotifierSelector(
+                          notifier: widget.controller,
+                          selector: (state) => state.widthRatio,
+                          builder: (
+                            BuildContext context,
+                            double width,
+                            Widget? childWidget,
+                          ) {
+                            return SizeTransition(
+                              axis: Axis.horizontal,
+                              axisAlignment: -1,
+                              sizeFactor: AlwaysStoppedAnimation(width),
+                              child: childWidget,
+                            );
+                          },
+                          child: widget.builder(context, null, null),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+            return DraggableScrollableSheet(
+              snap: true,
+              minChildSize: 0,
+              snapSizes: widget.properties.snapSizes,
+              controller: widget.controller._dragController,
+              shouldCloseOnMinExtent: false,
+              initialChildSize: widget.properties.initialHeight,
+              snapAnimationDuration: Durations.medium4,
+              builder: (
+                BuildContext context,
+                ScrollController controller,
+              ) {
+                return Material(
+                  child: NotifierSelector(
+                    notifier: widget.controller,
+                    selector: (state) => state.opacity,
+                    builder: (
+                      BuildContext context,
+                      double opacity,
+                      Widget? childWidget,
+                    ) {
+                      return FadeTransition(
+                        opacity: AlwaysStoppedAnimation(opacity),
+                        child: childWidget,
+                      );
+                    },
+                    child: widget.builder(
+                      context,
+                      controller,
+                      widget.controller._dragController,
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class PageSizeNotifier extends ValueNotifier<double> {
+  PageSizeNotifier({double? value}) : super(value ?? 0);
+}
+
+mixin PageDraggableSizeListenerMixin<T extends StatefulWidget> on State<T> {
+  PageSizeNotifier? _pageSizeNotifier;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Assuming PageSizeNotifier is provided higher in the widget tree
+    final notifier = context.provide<PageSizeNotifier>();
+    if (notifier != _pageSizeNotifier) {
+      _pageSizeNotifier?.removeListener(_onPageSizeChange);
+      _pageSizeNotifier = notifier;
+      _pageSizeNotifier?.addListener(_onPageSizeChange);
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageSizeNotifier?.removeListener(_onPageSizeChange);
+    super.dispose();
+  }
+
+  void _onPageSizeChange() {
+    didChangePageDraggableSize(_pageSizeNotifier?.value ?? 0.0);
+  }
+
+  /// Called when the top most and last page draggable size changes
+  void didChangePageDraggableSize(double size);
+}
 
 class StackedPageDraggable extends StatefulWidget {
-  const StackedPageDraggable({super.key, required this.child});
+  const StackedPageDraggable({
+    super.key,
+    required this.child,
+    this.properties,
+  });
   final Widget child;
+  final DraggableProperties? properties;
 
   static _StackedPageDraggableState? _maybeOf(BuildContext context) {
     return context.findAncestorStateOfType<_StackedPageDraggableState>();
@@ -628,11 +1060,21 @@ class StackedPageDraggable extends StatefulWidget {
   }
 
   static void open(
-    BuildContext context,
-    Object key,
-    PageDraggableBuilder builder,
-  ) {
-    _of(context).openBottomSheet(key, builder);
+    BuildContext context, {
+    required Object key,
+    required PageDraggableBuilder builder,
+    Object? below,
+    int groupSize = 1,
+    Object? childKey,
+  }) {
+    _of(context).openBottomSheet(
+      key,
+      context,
+      builder,
+      below: below,
+      groupSize: groupSize,
+      childKey: childKey,
+    );
   }
 
   @override
@@ -640,155 +1082,149 @@ class StackedPageDraggable extends StatefulWidget {
 }
 
 class _StackedPageDraggableState extends State<StackedPageDraggable> {
+  final PageSizeNotifier _pageSizeNotifier = PageSizeNotifier();
   final _History _history = _History();
-  OverlayState get _overlayState => Overlay.of(context);
+  final List<SlotKey> _slotKeys = [];
+
+  SlotKey? get secondLastEntryKey {
+    if (_slotKeys.length > 1) {
+      return _slotKeys[_slotKeys.length - 2];
+    }
+    return null;
+  }
+
+  final Map<SlotKey, PageDraggableController> _pageDraggableControllers = {};
+  final GlobalKey<OverlayState> _overlayKey = GlobalKey<OverlayState>();
+  OverlayState get _overlayState => _overlayKey.currentState!;
 
   @override
   void dispose() {
     _history.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
-
-  void openBottomSheet(Object key, PageDraggableBuilder builder) {
-    final controller = DraggableScrollableController();
-
-    final newEntry = OverlayEntry(
-      builder: (BuildContext context) {
-        final properties = context.provide<DraggableProperties>();
-        return DraggableSheet(
-          builder: builder,
-          controller: controller,
-          snapSizes: properties.snapSizes,
-          initialHeight: properties.initialHeight,
-        );
-      },
-    );
-    final didAdd = _history.addDraggable(key, newEntry);
-    if (didAdd) {
-      _overlayState.insert(newEntry);
-    }
-  }
-}
-
-class DraggableProperties {
-  DraggableProperties({
-    required this.snapSizes,
-    required this.initialHeight,
-  }) : assert(
-          initialHeight >= 0 || initialHeight <= 1,
-          'initialHeight cannot be less than 0 or greater tha 1',
-        );
-
-  final List<double> snapSizes;
-  final double initialHeight;
-}
-
-class DraggableSheet extends StatefulWidget {
-  const DraggableSheet({
-    super.key,
-    required this.controller,
-    required this.snapSizes,
-    required this.builder,
-    required this.initialHeight,
-  });
-
-  final double initialHeight;
-  final List<double> snapSizes;
-  final PageDraggableBuilder builder;
-  final DraggableScrollableController controller;
-
-  @override
-  State<DraggableSheet> createState() => _DraggableSheetState();
-}
-
-class _DraggableSheetState extends State<DraggableSheet>
-    with TickerProviderStateMixin {
-  late final sizeController = AnimationController(
-    vsync: this,
-    value: 0,
-    duration: Durations.medium1,
-  );
-
-  late final opacityController = AnimationController(
-    vsync: this,
-    value: 0,
-    duration: Durations.medium1,
-  );
-
-  @override
-  void dispose() {
-    sizeController.dispose();
-    opacityController.dispose();
+    _pageDraggableControllers.forEach((key, value) {
+      value.removeListener(() => _onSheetChange(key));
+    });
+    _pageSizeNotifier.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return NotificationListener(
-      child: Builder(
-        builder: (context) {
-          if (context.orientation.isLandscape) {
-            return SizeTransition(
-              axis: Axis.horizontal,
-              axisAlignment: -1,
-              sizeFactor: CurvedAnimation(
-                parent: sizeController,
-                curve: Curves.bounceInOut,
-              ),
-              child: Listener(
-                child: widget.builder(context, null),
-              ),
-            );
-          }
-          return DraggableScrollableSheet(
-            snap: true,
-            minChildSize: 0,
-            snapSizes: widget.snapSizes,
-            controller: widget.controller,
-            shouldCloseOnMinExtent: false,
-            initialChildSize: widget.initialHeight,
-            snapAnimationDuration: Durations.medium4,
-            builder: (
-              BuildContext context,
-              ScrollController controller,
-            ) {
-              return Material(
-                child: FadeTransition(
-                  opacity: ReverseAnimation(opacityController),
-                  child: widget.builder(context, controller),
-                ),
-              );
-            },
+    return Overlay(
+      key: _overlayKey,
+      clipBehavior: Clip.none,
+      initialEntries: [
+        OverlayEntry(
+          canSizeOverlay: true,
+          builder: (BuildContext context) => ModelBinding(
+            model: _pageSizeNotifier,
+            child: widget.child,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void jumpTo(double size) {
+    _pageDraggableControllers.forEach((key, value) {
+      if (_slotKeys.contains(key)) {
+        value.size = size;
+        value.opacity = value.widthRatio.invertByOne;
+      }
+    });
+  }
+
+  void _onSheetChange(SlotKey sheetKey) {
+    _pageDraggableControllers.forEach((key, value) {
+      if (sheetKey != key &&
+          sheetKey != secondLastEntryKey &&
+          _pageDraggableControllers.containsKey(sheetKey)) {
+        if (secondLastEntryKey != null) {
+          _pageDraggableControllers[secondLastEntryKey]?.opacity =
+              _pageDraggableControllers[sheetKey]!.widthRatio.invertByOne;
+        }
+      }
+
+      if (_slotKeys.length == 1 && sheetKey == key) {
+        _pageSizeNotifier.value = value.size;
+      }
+
+      if (sheetKey == key) {
+        if (value.widthRatio <= 0) {
+          _slotKeys.remove(key);
+        } else if (!_slotKeys.contains(key)) {
+          _slotKeys.add(key);
+        }
+      }
+    });
+  }
+
+  void openBottomSheet(
+    Object key,
+    BuildContext context,
+    PageDraggableBuilder builder, {
+    Object? below,
+    int groupSize = 1,
+    Object? childKey,
+  }) {
+    assert(_overlayKey.currentState != null, 'Overlay State cannot be null');
+    final properties = widget.properties ?? DraggableProperties();
+
+    final isGroup = childKey != null && groupSize > 1;
+    final slotKey = SlotKey(key);
+    final itemKey = isGroup ? SlotKey(childKey) : null;
+
+    _slotKeys
+      ..remove(itemKey ?? slotKey)
+      ..add(itemKey ?? slotKey);
+
+    _pageDraggableControllers[itemKey ?? slotKey]?.open();
+
+    _history.addOrReplaceEntry(slotKey, itemKey, groupSize, () {
+      _pageDraggableControllers.remove(itemKey ?? slotKey)
+        ?..removeListener(() => _onSheetChange(itemKey ?? slotKey))
+        ..dispose();
+
+      final controller = PageDraggableController(
+        initialHeight: properties.initialHeight,
+      );
+      controller.addListener(() => _onSheetChange(slotKey));
+      _pageDraggableControllers[itemKey ?? slotKey] = controller;
+
+      final newEntry = OverlayEntry(
+        maintainState: true,
+        // canSizeOverlay: true,
+        builder: (BuildContext context) {
+          return DraggableSheet(
+            key: GlobalObjectKey(itemKey ?? slotKey),
+            builder: builder,
+            controller: controller,
+            properties: properties,
           );
         },
-      ),
-    );
+      );
+      final belowEntry = key != below && below != null
+          ? _history.retrieveSlotEntry(SlotKey(below))
+          : null;
+      _overlayState.insert(
+        newEntry,
+        below: belowEntry is SingleSlotEntry ? belowEntry.entry : null,
+      );
+      return newEntry;
+    });
+  }
+
+  bool pop() {
+    bool didPop = true;
+    if (_slotKeys.isNotEmpty) {
+      didPop = false;
+      _pageDraggableControllers[_slotKeys.last]?.close();
+    }
+    return didPop;
   }
 }
 
-class _History extends ChangeNotifier {
-  final _entryKeys = <Object?>[];
-  final _entries = <Object, OverlayEntry>{};
-
-  Object? get lastEntryKey => _entryKeys.isNotEmpty ? _entryKeys.last : null;
-  bool addDraggable(Object key, OverlayEntry entry) {
-    bool didAdd = false;
-
-    _entries.putIfAbsent(key, () {
-      didAdd = true;
-      _entryKeys.add(key);
-      return entry;
-    });
-
-    return didAdd;
-  }
-
-  void pop() => _removeDraggable(lastEntryKey);
-
-  void _removeDraggable(Object? key) {
-    _entries.remove(key)?.remove();
+extension StackPagePop on BuildContext {
+  bool stackPagePop() {
+    return StackedPageDraggable._of(this).pop();
   }
 }

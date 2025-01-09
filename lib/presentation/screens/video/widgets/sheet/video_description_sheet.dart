@@ -37,17 +37,11 @@ class VideoDescriptionSheet extends StatefulWidget {
     super.key,
     this.controller,
     this.dragDismissible = true,
-    required this.transcriptController,
-    required this.onPressClose,
     this.draggableController,
-    required this.initialHeight,
   });
 
   final ScrollController? controller;
   final bool dragDismissible;
-  final PageDraggableOverlayChildController transcriptController;
-  final VoidCallback onPressClose;
-  final double initialHeight;
   final DraggableScrollableController? draggableController;
 
   @override
@@ -55,24 +49,14 @@ class VideoDescriptionSheet extends StatefulWidget {
 }
 
 class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.draggableController?.animateTo(
-        widget.initialHeight,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInCubic,
-      );
-    });
-  }
-
+  final transcriptController = PageDraggableOverlayChildController(
+    title: 'Transcript',
+  );
   @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Description',
       controller: widget.controller ?? ScrollController(),
-      onClose: widget.onPressClose,
       dragDismissible: widget.dragDismissible,
       showDragIndicator: widget.dragDismissible,
       draggableController: widget.draggableController,
@@ -129,6 +113,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                 children: [
                   CustomActionChip(
                     title: '#SangitaMyaska',
+                    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                     margin: EdgeInsets.only(right: 8),
                     textStyle: TextStyle(
                       fontSize: 12,
@@ -137,6 +122,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                   ),
                   CustomActionChip(
                     title: '#Israel',
+                    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                     margin: EdgeInsets.only(right: 8),
                     textStyle: TextStyle(
                       fontSize: 12,
@@ -145,6 +131,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                   ),
                   CustomActionChip(
                     title: '#SouthAfrica',
+                    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                     margin: EdgeInsets.only(right: 8),
                     textStyle: TextStyle(
                       fontSize: 12,
@@ -194,7 +181,9 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                   alignment: Alignment.center,
                   padding: const EdgeInsets.all(12),
                   border: Border.all(color: Colors.white12),
-                  onTap: widget.transcriptController.open,
+                  onTap: transcriptController.open,
+                  backgroundColor: Colors.transparent,
+                  expanded: true,
                   textStyle: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -241,6 +230,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                         horizontal: 12,
                         vertical: 6,
                       ),
+                      backgroundColor: Colors.transparent,
                       border: Border.all(color: Colors.white12),
                       textStyle: const TextStyle(
                         fontSize: 14,
@@ -254,6 +244,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
                         Icons.account_box_outlined,
                       ),
                       alignment: Alignment.center,
+                      backgroundColor: Colors.transparent,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 6,
@@ -275,7 +266,7 @@ class _VideoDescriptionSheetState extends State<VideoDescriptionSheet> {
       baseHeight: 1 - kAvgVideoViewPortHeight,
       overlayChildren: [
         PageDraggableOverlayChild(
-          controller: widget.transcriptController,
+          controller: transcriptController,
           builder: (context, controller, physics) {
             return ListView.builder(
               physics: physics,

@@ -132,6 +132,7 @@ class VideoCommentGuidelines extends StatelessWidget {
                           const SizedBox(height: 8),
                           CustomActionChip(
                             title: 'Got it',
+                            expanded: true,
                             alignment: Alignment.center,
                             padding: const EdgeInsets.all(12),
                             backgroundColor: context.theme.primaryColor,

@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/screens.dart' show HomeMessenger;
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-class HomeViewableVideoContent extends ConsumerWidget {
-  const HomeViewableVideoContent({
-    super.key,
-  });
+class HomeViewableVideoContent extends StatelessWidget {
+  const HomeViewableVideoContent({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return ViewableVideoContent(
-      onTap: ref.read(playerRepositoryProvider).openPlayerScreen,
+      onTap: () => HomeMessenger.openPlayer(context),
       onMore: () {
         showDynamicSheet(
           context,

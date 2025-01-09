@@ -27,6 +27,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import 'package:flutter/widgets.dart';
 
+// TODO(josh4500): Fix issues with immutable
 class CustomScrollPhysics extends ScrollPhysics {
   CustomScrollPhysics({
     super.parent,
@@ -51,7 +52,6 @@ class CustomScrollPhysics extends ScrollPhysics {
     _canScroll
       ..remove(!value) // Removes opposite value if present
       ..add(value); // Adds new value
-    //print('First set with $value ${_booValue.value}');
   }
 
   bool get canScroll => _canScroll.contains(true);

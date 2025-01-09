@@ -102,6 +102,7 @@ export 'screens/subscriptions/subscriptions_screen.dart';
 
 // Video
 export 'screens/video/video_screen.dart';
+export 'screens/video/video_screen_fix.dart';
 
 // Watch on TV
 export 'screens/watch_on_tv/link_tv_screen.dart';

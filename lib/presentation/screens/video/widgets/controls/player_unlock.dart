@@ -1,26 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/provider/repository/player_repository_provider.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import 'player_notifications.dart';
 
-class PlayerUnlock extends ConsumerWidget {
+class PlayerUnlock extends StatelessWidget {
   const PlayerUnlock({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () async {
-        ref.read(playerRepositoryProvider).sendPlayerSignal(
-          [PlayerSignal.unlockScreen],
-        );
-        if (context.mounted) {
-          ExitFullscreenPlayerNotification().dispatch(context);
-        }
-      },
+      onTap: () => UnlockPlayerNotification().dispatch(context),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+        padding: const EdgeInsets.symmetric(
+          vertical: 6,
+          horizontal: 10,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),

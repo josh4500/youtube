@@ -52,10 +52,8 @@ import 'widgets/sheet/video_chapters_sheet.dart';
 import 'widgets/sheet/video_clip_sheet.dart';
 import 'widgets/sheet/video_comment_sheet.dart';
 import 'widgets/sheet/video_description_sheet.dart';
-import 'widgets/sheet/video_draggable_sheet.dart';
 import 'widgets/sheet/video_membership_sheet.dart';
 import 'widgets/sheet/video_playlist_sheet.dart';
-import 'widgets/sheet/video_side_sheet.dart';
 import 'widgets/sheet/video_thanks_sheet.dart';
 import 'widgets/video_details_section.dart';
 import 'widgets/video_playlist_section.dart';
@@ -74,7 +72,10 @@ class VideoScreen extends ConsumerStatefulWidget {
 }
 
 class _VideoScreenState extends ConsumerState<VideoScreen>
-    with TickerProviderStateMixin, WidgetsBindingObserver {
+    with
+        TickerProviderStateMixin,
+        WidgetsBindingObserver,
+        PageDraggableSizeListenerMixin {
   final GlobalKey _interactivePlayerKey = GlobalKey();
   VelocityTracker? _infoVelocityTracker;
   double _slideOffsetYValue = 0;
@@ -533,12 +534,11 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
     _view = View.maybeOf(context);
 
     _animatePlayerWidth(1);
     _animateScreenHeight(1);
-
-    super.didChangeDependencies();
   }
 
   @override
@@ -696,25 +696,25 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   Future<void> _animateScreenHeight(double to) async {
     if (_screenHeightNotifier.value != to) {
-      _screenHeightNotifier.start(end: to);
+      _screenHeightNotifier.animate(end: to);
     }
   }
 
   Future<void> _animateScreenWidth(double to) async {
     if (_screenWidthNotifier.value != to) {
-      _screenWidthNotifier.start(end: to);
+      _screenWidthNotifier.animate(end: to);
     }
   }
 
   Future<void> _animatePlayerWidth(double to) async {
     if (_playerWidthNotifier.value != to) {
-      _playerWidthNotifier.start(end: to);
+      _playerWidthNotifier.animate(end: to);
     }
   }
 
   Future<void> _animateAdditionalHeight(double to) async {
     if (_playerAddedHeightNotifier.value != to) {
-      _playerAddedHeightNotifier.start(end: to);
+      _playerAddedHeightNotifier.animate(end: to);
     }
   }
 
@@ -760,9 +760,9 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   /// Callback to show or hide feed screen navigation bar
   void _showHideNavigationBar(double value) {
-    ref.read(homeRepositoryProvider).updateNavBarPosition(
-          value.normalize(minPlayerHeightRatio, 1).invertByOne,
-        );
+    // ref.read(homeRepositoryProvider).updateNavBarPosition(
+    //       value.normalize(minPlayerHeightRatio, 1).invertByOne,
+    //     );
   }
 
   /// Callback to change Draggable heights when the Player height changes
@@ -1220,7 +1220,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     _viewController.value = 0;
   }
 
-  void _onDragPlayerStart(DragStartDetails details) {
+  void _onDragStartPlayer(DragStartDetails details) {
     if (_preventGestures || _isSeeking) return;
 
     // Hide controls
@@ -1229,7 +1229,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
 
   /// Handles drag updates for the player, determining the drag behavior based on
   /// it state.
-  void _onDragPlayer(DragUpdateDetails details) {
+  void _onDragUpdatePlayer(DragUpdateDetails details) {
     if (_preventGestures || _isSeeking) return;
 
     // If active zoom panning is in progress, update zoom panning and return
@@ -1259,7 +1259,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     }
   }
 
-  Future<void> _onDragPlayerEnd(DragEndDetails details) async {
+  Future<void> _onDragEndPlayer(DragEndDetails details) async {
     if (_preventGestures) return;
 
     _releasedPlayerPointer = true;
@@ -1316,12 +1316,6 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
       ]);
     }
 
-    // NOTE: Second call here is to ensure it reaches [maxAdditionalHeight]
-    // Screen takes time to show effects of [SystemUiMode.immersive]
-    await Future.delayed(
-      const Duration(milliseconds: 200),
-      () => _animateAdditionalHeight(maxAdditionalHeight),
-    );
     _hideGraphicsNotifier.value = false;
     _showControls();
   }
@@ -1410,36 +1404,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
     );
   }
 
-  Future<void> _openBottomSheet(VideoBottomSheet sheet) async {
-    // if (_openedDraggableState.contains(sheet) &&
-    //     context.orientation.isPortrait) {
-    //   return;
-    // }
-    _openedDraggableState.remove(sheet);
-    _openedDraggableState.add(sheet);
-    final bool wait = !_getSheetNotifier(sheet).value;
-    _getSheetNotifier(sheet).value = true;
-
-    if (!wait) {
-      _getSheetController(sheet).animateTo(
-        1 - playerHeightToScreenRatio,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInCubic,
-      );
-    }
-
-    if (context.orientation.isLandscape) {
-      _getSheetAnimationSize(sheet).forward();
-    }
-
-    ref.read(playerViewStateProvider.notifier).addState(
-          switch (sheet) {
-            VideoBottomSheet.chapter => ViewState.visibleChapters,
-            VideoBottomSheet.description => ViewState.visibleDescription,
-            _ => null,
-          },
-        );
-  }
+  Future<void> _openBottomSheet(VideoBottomSheet sheet) async {}
 
   void _closeBottomSheet(VideoBottomSheet sheet) {
     if (sheet == VideoBottomSheet.comment) {
@@ -1646,6 +1611,11 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
   }
 
   @override
+  void didChangePageDraggableSize(double size) {
+    // TODO: implement didChangePageDraggableSize
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Orientation orientation = context.orientation;
     final Axis layoutDirection =
@@ -1828,208 +1798,93 @@ class _VideoScreenState extends ConsumerState<VideoScreen>
         child: Material(
           color: Colors.transparent,
           type: MaterialType.transparency,
-          child: Stack(
-            alignment: Alignment.bottomCenter,
-            clipBehavior: Clip.none,
-            children: [
-              SlideTransition(
-                position: _playerSlideAnimation,
-                child: FadeTransition(
-                  opacity: _playerFadeAnimation,
-                  child: ListenableBuilder(
-                    listenable: Listenable.merge(
-                      [
-                        if (context.orientation.isLandscape)
-                          _screenWidthNotifier,
-                        _screenHeightNotifier,
-                      ],
-                    ),
-                    builder: (
-                      BuildContext context,
-                      Widget? screenWidget,
-                    ) {
-                      return SizedBox(
-                        width: context.orientation.isLandscape
-                            ? screenWidth * _screenWidthNotifier.value
-                            : null,
-                        height: screenHeight * _screenHeightNotifier.value,
-                        child: screenWidget,
-                      );
-                    },
-                    child: Flex(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      direction: layoutDirection,
-                      children: [
-                        Expanded(
-                          flex: orientation.isPortrait ? 0 : 1,
-                          child: FadeTransition(
-                            opacity: _playerOpacityAnimation,
-                            child: PlayerAnnotationsWrapper(
-                              hideGraphicsNotifier: _hideGraphicsNotifier,
-                              child: GestureDetector(
-                                onTap: _onTapPlayer,
-                                onVerticalDragStart: _onDragPlayerStart,
-                                onVerticalDragUpdate: _onDragPlayer,
-                                onVerticalDragEnd: _onDragPlayerEnd,
-                                behavior: HitTestBehavior.opaque,
-                                child: Material(
-                                  child: Stack(
+          child: SlideTransition(
+            position: _playerSlideAnimation,
+            child: FadeTransition(
+              opacity: _playerFadeAnimation,
+              child: ListenableBuilder(
+                listenable: Listenable.merge(
+                  [
+                    if (context.orientation.isLandscape) _screenWidthNotifier,
+                    _screenHeightNotifier,
+                  ],
+                ),
+                builder: (
+                  BuildContext context,
+                  Widget? screenWidget,
+                ) {
+                  return SizedBox(
+                    width: context.orientation.isLandscape
+                        ? screenWidth * _screenWidthNotifier.value
+                        : null,
+                    height: screenHeight * _screenHeightNotifier.value,
+                    child: screenWidget,
+                  );
+                },
+                child: Flex(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  direction: layoutDirection,
+                  children: [
+                    Expanded(
+                      flex: orientation.isPortrait ? 0 : 1,
+                      child: FadeTransition(
+                        opacity: _playerOpacityAnimation,
+                        child: PlayerAnnotationsWrapper(
+                          child: GestureDetector(
+                            onTap: _onTapPlayer,
+                            onVerticalDragStart: _onDragStartPlayer,
+                            onVerticalDragUpdate: _onDragUpdatePlayer,
+                            onVerticalDragEnd: _onDragEndPlayer,
+                            behavior: HitTestBehavior.opaque,
+                            child: Material(
+                              child: Stack(
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          mainPlayer,
-                                          Expanded(child: miniPlayer),
-                                        ],
-                                      ),
-                                      Positioned(
-                                        bottom: 0,
-                                        child: miniPlayerProgress,
-                                      ),
+                                      mainPlayer,
+                                      Expanded(child: miniPlayer),
                                     ],
                                   ),
-                                ),
+                                  Positioned(
+                                    bottom: 0,
+                                    child: miniPlayerProgress,
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ),
-                        if (orientation.isPortrait)
-                          Flexible(
-                            child: Material(
-                              child: Listener(
-                                onPointerDown: _onPointerDownOn,
-                                onPointerMove: _onPointerMove,
-                                onPointerUp: _onPointerUp,
-                                child: AnimatedBuilder(
-                                  animation: _detailsOpacityAnimation,
-                                  builder: (
-                                    BuildContext context,
-                                    Widget? childWidget,
-                                  ) {
-                                    return Opacity(
-                                      opacity: _detailsOpacityAnimation.value,
-                                      child: childWidget,
-                                    );
-                                  },
-                                  child: infoScrollview,
-                                ),
-                              ),
-                            ),
-                          )
-                        else ...[
-                          Stack(
-                            children: [
-                              for (final sheet in _sideSheet)
-                                PlayerSideSheet(
-                                  constraints: BoxConstraints(
-                                    maxWidth: screenWidth * .4,
-                                  ),
-                                  sizeFactor: _getSheetAnimationSize(sheet),
-                                  visibleListenable: _getSheetNotifier(sheet),
-                                ),
-                            ],
-                          ),
-                        ],
-                      ],
+                      ),
                     ),
-                  ),
+                    if (orientation.isPortrait)
+                      Flexible(
+                        child: Material(
+                          child: Listener(
+                            onPointerDown: _onPointerDownOn,
+                            onPointerMove: _onPointerMove,
+                            onPointerUp: _onPointerUp,
+                            child: AnimatedBuilder(
+                              animation: _detailsOpacityAnimation,
+                              builder: (
+                                BuildContext context,
+                                Widget? childWidget,
+                              ) {
+                                return Opacity(
+                                  opacity: _detailsOpacityAnimation.value,
+                                  child: childWidget,
+                                );
+                              },
+                              child: infoScrollview,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-              for (final sheet in _availableSheet)
-                VideoDraggableSheet(
-                  builder: (
-                    BuildContext context,
-                    ScrollController? controller,
-                  ) {
-                    final draggableController = _getSheetController(sheet);
-                    void closeSheet() => _closeBottomSheet(sheet);
-
-                    Widget childWidget;
-                    // Use key to preserve widget state across depth in widget tree
-                    if (sheet == VideoBottomSheet.comment) {
-                      childWidget = VideoCommentsSheet(
-                        key: GlobalObjectKey(sheet),
-                        controller: controller,
-                        replyController: _replyController,
-                        initialHeight: initialDraggableSnapSize,
-                        onPressClose: closeSheet,
-                        dragDismissible: orientation.isPortrait,
-                        draggableController: draggableController,
-                      );
-                    } else if (sheet == VideoBottomSheet.chapter) {
-                      childWidget = VideoChaptersSheet(
-                        key: GlobalObjectKey(sheet),
-                        controller: controller,
-                        initialHeight: initialDraggableSnapSize,
-                        onPressClose: closeSheet,
-                        draggableController: draggableController,
-                      );
-                    } else if (sheet == VideoBottomSheet.description) {
-                      childWidget = VideoDescriptionSheet(
-                        key: GlobalObjectKey(sheet),
-                        controller: controller,
-                        transcriptController: _transcriptController,
-                        initialHeight: initialDraggableSnapSize,
-                        dragDismissible: orientation.isPortrait,
-                        onPressClose: closeSheet,
-                        draggableController: draggableController,
-                      );
-                    } else if (sheet == VideoBottomSheet.playlist) {
-                      childWidget = VideoPlaylistSheet(
-                        key: GlobalObjectKey(sheet),
-                        controller: controller,
-                        initialHeight: initialDraggableSnapSize,
-                        onPressClose: closeSheet,
-                        draggableController: draggableController,
-                      );
-                    } else if (sheet == VideoBottomSheet.thanks) {
-                      return VideoThanksSheet(
-                        key: GlobalObjectKey(sheet),
-                        controller: controller,
-                        initialHeight: initialDraggableSnapSize,
-                        onPressClose: closeSheet,
-                        draggableController: draggableController,
-                      );
-                    } else if (sheet == VideoBottomSheet.membership) {
-                      return VideoMembershipSheet(
-                        key: GlobalObjectKey(sheet),
-                        controller: controller,
-                        initialHeight: initialDraggableSnapSize,
-                        onPressClose: closeSheet,
-                        draggableController: draggableController,
-                      );
-                    } else if (sheet == VideoBottomSheet.clip) {
-                      return VideoClipSheet(
-                        key: GlobalObjectKey(sheet),
-                        controller: controller,
-                        initialHeight: initialDraggableSnapSize,
-                        onPressClose: closeSheet,
-                        draggableController: draggableController,
-                      );
-                    } else {
-                      childWidget = const SizedBox();
-                    }
-
-                    if (orientation.isLandscape) {
-                      return PlayerSideSheet(
-                        constraints: BoxConstraints(
-                          maxWidth: screenWidth * .4,
-                        ),
-                        sizeFactor: _getSheetAnimationSize(sheet),
-                        visibleListenable: _getSheetNotifier(sheet),
-                        child: childWidget,
-                      );
-                    } else {
-                      return childWidget;
-                    }
-                  },
-                  controller: _getSheetController(sheet),
-                  opacity: _getSheetAnimationOpacity(sheet),
-                  visibleListenable: _getSheetNotifier(sheet),
-                  snapSizes: <double>[0.0, initialDraggableSnapSize],
-                ),
-            ],
+            ),
           ),
         ),
       ),

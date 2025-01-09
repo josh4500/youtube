@@ -45,9 +45,7 @@ class PlayerAutoplaySwitch extends ConsumerWidget {
         value: autoPlay,
         onChanged: (value) {
           ref.read(preferencesProvider.notifier).autoPlay = value;
-          ref.read(playerRepositoryProvider).sendPlayerSignal(
-            [PlayerSignal.showControls, PlayerSignal.autoplay],
-          );
+          // TODO: send message
         },
         activeColor: Colors.white,
         activeTrackColor: Colors.white30,

@@ -66,7 +66,6 @@ class PlaybackProgress extends StatefulWidget {
     this.color = const Color(0xFFFF0000),
     this.alignment = Alignment.bottomLeft,
     this.animation,
-    this.bufferAnimation,
     this.progress,
     this.start = Progress.zero,
     this.end = Duration.zero,
@@ -94,9 +93,6 @@ class PlaybackProgress extends StatefulWidget {
 
   /// Animation for the progress indicator (optional).
   final Animation<double?>? animation;
-
-  /// Animation for the buffer indicator color (optional).
-  final Animation<Color?>? bufferAnimation;
 
   /// Background color of the widget.
   final Color? backgroundColor;
@@ -148,6 +144,9 @@ class _PlaybackProgressState extends State<PlaybackProgress>
 
   Animation<double>? _thumbSizeAnimation;
 
+  /// Animation for the buffer indicator color (optional).
+  Animation<Color?>? bufferAnimation;
+
   /// Animation value for progress track
   Animation<Color?>? _trackColorAnimation;
 
@@ -175,12 +174,14 @@ class _PlaybackProgressState extends State<PlaybackProgress>
     );
 
     if (widget.animation != null) {
-      _thumbSizeAnimation = widget.animation!.drive(
-        Tween<double>(begin: _indicatorHeight, end: 14),
-      );
-      _trackColorAnimation = widget.animation!.drive(
-        ColorTween(begin: Colors.white70, end: widget.color),
-      );
+      // _thumbSizeAnimation = widget.animation?.drive(
+      //   Tween<double>(begin: _indicatorHeight, end: 14),
+      // );
+      // _trackColorAnimation = widget.animation!.drive(
+      //   ColorTween(begin: Colors.white70, end: widget.color),
+      // );
+
+      bufferAnimation;
     }
   }
 
@@ -231,7 +232,7 @@ class _PlaybackProgressState extends State<PlaybackProgress>
                     ? 0
                     : bufferValue,
                 minHeight: _indicatorHeight,
-                valueColor: widget.bufferAnimation,
+                valueColor: bufferAnimation,
                 backgroundColor: Colors.transparent,
               ),
             // Player position Indicator

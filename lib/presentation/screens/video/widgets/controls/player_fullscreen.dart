@@ -28,7 +28,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/screens/video/player_view_controller.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
 import 'player_control.dart';
@@ -39,38 +41,41 @@ class PlayerFullscreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO(josh4500): Check if Expanded mode is on
-    const bool isResizableExpandedMode = false;
-
-    final isExpanded = ref.watch(
-      playerViewStateProvider.select(
-        (state) => state.isExpanded,
-      ),
-    );
-    return OrientationBuilder(
-      builder: (BuildContext context, Orientation orientation) {
-        return PlayerControlButton(
-          onTap: () {
-            if (isResizableExpandedMode || isExpanded) {
-              if (isExpanded) {
-                ExitExpandPlayerNotification().dispatch(context);
-              } else {
-                EnterExpandPlayerNotification().dispatch(context);
-              }
-            } else {
-              if (context.orientation.isPortrait) {
-                EnterFullscreenPlayerNotification().dispatch(context);
-              } else {
-                ExitFullscreenPlayerNotification().dispatch(context);
-              }
-            }
-          },
-          backgroundColor: Colors.transparent,
-          horizontalPadding: 8,
-          builder: (context, _) {
-            return isExpanded || context.orientation.isLandscape
-                ? const Icon(YTIcons.exit_fullscreen_outlined)
-                : const Icon(YTIcons.fullscreen);
+    final controller = context.provide<PlayerViewController>();
+    return NotifierSelector(
+      notifier: controller,
+      selector: (controller) => controller.boxProp,
+      builder: (BuildContext context, PlayerBoxProp boxProp, Widget? child) {
+        final bool isExpanded = boxProp.isExpanded;
+        final bool isResizableExpandMode = boxProp.isResizableExpandMode;
+        return OrientationBuilder(
+          builder: (BuildContext context, Orientation orientation) {
+            return PlayerControlButton(
+              onTap: () {
+                if (isResizableExpandMode || isExpanded) {
+                  if (isExpanded) {
+                    ExitExpandPlayerNotification().dispatch(context);
+                  } else {
+                    EnterExpandPlayerNotification().dispatch(context);
+                  }
+                } else {
+                  if (context.orientation.isPortrait) {
+                    EnterFullscreenPlayerNotification().dispatch(context);
+                  } else {
+                    ExitFullscreenPlayerNotification().dispatch(context);
+                  }
+                }
+              },
+              backgroundColor: Colors.transparent,
+              horizontalPadding: 8,
+              builder: (context, _) {
+                return isExpanded || context.orientation.isLandscape
+                    ? const Icon(YTIcons.exit_fullscreen_outlined)
+                    : isResizableExpandMode
+                        ? const Icon(Icons.expand)
+                        : const Icon(YTIcons.fullscreen);
+              },
+            );
           },
         );
       },

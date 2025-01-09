@@ -27,23 +27,18 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
+import 'package:youtube_clone/presentation/constants/values.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
-
-import '../../../../constants.dart';
 
 class VideoThanksSheet extends StatefulWidget {
   const VideoThanksSheet({
     super.key,
     this.controller,
-    required this.onPressClose,
     this.draggableController,
-    required this.initialHeight,
   });
 
   final ScrollController? controller;
-  final VoidCallback onPressClose;
-  final double initialHeight;
   final DraggableScrollableController? draggableController;
 
   @override
@@ -53,17 +48,6 @@ class VideoThanksSheet extends StatefulWidget {
 class _VideoThanksSheetState extends State<VideoThanksSheet> {
   final thanksNotifier = ValueNotifier(0);
   final showMoreThanks = ValueNotifier(false);
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.draggableController?.animateTo(
-        widget.initialHeight,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInCubic,
-      );
-    });
-  }
 
   @override
   void dispose() {
@@ -77,7 +61,6 @@ class _VideoThanksSheetState extends State<VideoThanksSheet> {
     return PageDraggableSheet(
       title: 'Thanks Harris Craycraft',
       controller: widget.controller ?? ScrollController(),
-      onClose: widget.onPressClose,
       draggableController: widget.draggableController,
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(12),

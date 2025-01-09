@@ -11,7 +11,7 @@ class IndexNotifier<T extends Enum> extends ValueNotifier<T> {
 
 /// Listen to IndexNotifier for index changes
 ///
-/// Use [onIndexChanged] within state Tab widget. [IndexNotifier] must be provided
+/// Use [didTabIndexChanged] within state Tab widget. [IndexNotifier] must be provided
 /// through [ModelBinding]
 mixin TabIndexListenerMixin<T extends StatefulWidget> on State<T> {
   IndexNotifier? _indexNotifier;
@@ -22,7 +22,7 @@ mixin TabIndexListenerMixin<T extends StatefulWidget> on State<T> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Assuming IndexNotifier is provided higher in the widget tree
-    final notifier = ModelBinding.of<IndexNotifier>(context);
+    final notifier = context.provide<IndexNotifier>();
     if (notifier != _indexNotifier) {
       _indexNotifier?.removeListener(_onIndexChanged);
       _indexNotifier = notifier;
@@ -37,9 +37,9 @@ mixin TabIndexListenerMixin<T extends StatefulWidget> on State<T> {
   }
 
   void _onIndexChanged() {
-    onIndexChanged(_indexNotifier?.currentIndex ?? 0);
+    didTabIndexChanged(_indexNotifier?.currentIndex ?? 0);
   }
 
   /// Called when the Tab index changes
-  void onIndexChanged(int newIndex);
+  void didTabIndexChanged(int newIndex);
 }

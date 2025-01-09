@@ -7,7 +7,7 @@ double normalizeDouble(double value, double min, double max) {
 extension NormalizeDoubleExtension on num {
   /// Normalizes value to 0 - 1
   double normalize(double min, double max) {
-    return (this - min) / (max - min);
+    return ((this - min) / (max - min)).clamp(0, 1);
   }
 
   /// Normalizes between  0 - 1  to [min] - [max]

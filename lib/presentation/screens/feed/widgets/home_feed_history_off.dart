@@ -7,6 +7,7 @@ import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import '../../../providers.dart';
+import '../../homepage.dart';
 
 class HomeFeedHistoryOff extends StatelessWidget {
   const HomeFeedHistoryOff({super.key});
@@ -37,7 +38,7 @@ class HomeFeedHistoryOff extends StatelessWidget {
                         YTIcons.discover_outlined,
                         size: 20,
                       ),
-                      onTap: ref.read(homeRepositoryProvider).openDrawer,
+                      onTap: () => HomeMessenger.openDrawer(context),
                     );
                   },
                 ),

@@ -26,6 +26,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'package:media_kit/media_kit.dart';
+import 'package:rxdart/rxdart.dart';
+
 final class Progress {
   const Progress({required this.buffer, required this.position});
 
@@ -56,5 +59,16 @@ final class Progress {
       buffer: buffer ?? this.buffer,
       position: position ?? this.position,
     );
+  }
+}
+
+extension ProgressStreamExtension on PlayerStream {
+  Stream<Progress> get progress {
+    return Rx.combineLatest2(buffer, position, (a, b) {
+      return Progress(
+        buffer: a,
+        position: b,
+      );
+    }).asBroadcastStream();
   }
 }

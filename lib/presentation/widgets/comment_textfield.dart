@@ -72,7 +72,7 @@ class _CommentTextFieldState extends State<CommentTextField> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Container(
-                            height: 40,
+                            height: 38,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                             ),
@@ -92,13 +92,14 @@ class _CommentTextFieldState extends State<CommentTextField> {
                                 contentPadding: EdgeInsets.only(
                                   bottom: 8,
                                 ),
+                                border: InputBorder.none,
                                 focusedBorder: InputBorder.none,
                               ),
                               cursorColor: context.theme.primaryColor,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 4),
                         TappableArea(
                           onTap: () {},
                           padding: const EdgeInsets.all(8),

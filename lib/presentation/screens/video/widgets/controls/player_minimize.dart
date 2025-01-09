@@ -27,27 +27,20 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/provider/state/player_view_state_provider.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'player_notifications.dart';
 
-class PlayerMinimize extends ConsumerWidget {
+class PlayerMinimize extends StatelessWidget {
   const PlayerMinimize({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return AppbarAction(
       onTap: () {
-        final playerViewState = ref.read(playerViewStateProvider);
-        if (playerViewState.isExpanded) {
-          ExitExpandPlayerNotification().dispatch(context);
-          // MinimizePlayerNotification().dispatch(context);
-        } else {
-          MinimizePlayerNotification().dispatch(context);
-        }
+        MinimizePlayerNotification().dispatch(context);
       },
       icon: YTIcons.chevron_down,
     );

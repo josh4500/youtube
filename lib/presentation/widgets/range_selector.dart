@@ -70,7 +70,7 @@ class _RangeSelectorState<T> extends State<RangeSelector>
     final value = _getIndexFromPosition(position, width);
 
     _updateSelected(value);
-    alignmentNotifier.start(
+    alignmentNotifier.animate(
       end: Alignment((value / (itemCount - 1)).normalizeRange(-1, 1), 0),
       createTween: (begin, end) => AlignmentTween(begin: begin, end: end),
     );

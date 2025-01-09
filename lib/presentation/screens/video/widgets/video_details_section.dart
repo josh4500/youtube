@@ -20,68 +20,66 @@ class VideoDetailsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: CustomScrollView(
-        physics: physics,
-        controller: controller,
-        scrollBehavior: const NoScrollGlowBehavior(),
-        slivers: <Widget>[
-          const SliverToBoxAdapter(
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: <Widget>[
-                PlayerAmbient(),
-                Column(
-                  children: <Widget>[
-                    VideoDescriptionButton(),
-                    // VideoContext(),
-                    VideoChannelSection(),
-                    VideoChannelContext(),
-                    VideoActions(),
-                    VideoCommentSection(),
-                    SizedBox(height: 12),
-                  ],
-                ),
-              ],
-            ),
+    return CustomScrollView(
+      physics: physics,
+      controller: controller,
+      scrollBehavior: const NoScrollGlowBehavior(),
+      slivers: <Widget>[
+        const SliverToBoxAdapter(
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              PlayerAmbient(),
+              Column(
+                children: <Widget>[
+                  VideoDescriptionButton(),
+                  // VideoContext(),
+                  VideoChannelSection(),
+                  VideoChannelContext(),
+                  VideoActions(),
+                  VideoCommentSection(),
+                  SizedBox(height: 12),
+                ],
+              ),
+            ],
           ),
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: FadingSliverPersistentHeaderDelegate(
-              height: 48,
-              child: const Material(
-                child: Column(
-                  children: [
-                    Spacer(),
-                    SizedBox(
-                      height: 40,
-                      child: DynamicTab(
-                        initialIndex: 0,
-                        leadingWidth: 8,
-                        options: <String>[
-                          'All',
-                          'Something',
-                          'Related',
-                          'Recently uploaded',
-                          'Watched',
-                        ],
-                      ),
+        ),
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: FadingSliverPersistentHeaderDelegate(
+            height: 48,
+            child: const Material(
+              child: Column(
+                children: [
+                  Spacer(),
+                  SizedBox(
+                    height: 40,
+                    child: DynamicTab(
+                      initialIndex: 0,
+                      leadingWidth: 8,
+                      options: <String>[
+                        'All',
+                        'Something',
+                        'Related',
+                        'Recently uploaded',
+                        'Watched',
+                      ],
                     ),
-                    Spacer(),
-                    Divider(height: 0, thickness: 1),
-                  ],
-                ),
+                  ),
+                  Spacer(),
+                  Divider(height: 0, thickness: 1),
+                ],
               ),
             ),
           ),
-          const SliverToBoxAdapter(child: ViewableVideoContent()),
-          const SliverToBoxAdapter(child: ViewableVideoContent()),
-          const SliverToBoxAdapter(child: ViewableVideoContent()),
-          const SliverToBoxAdapter(child: ViewableVideoContent()),
-          const SliverToBoxAdapter(child: ViewableVideoContent()),
-          const SliverToBoxAdapter(child: ViewableVideoContent()),
-        ],
-      ),
+        ),
+        const SliverToBoxAdapter(child: ViewableVideoContent()),
+        const SliverToBoxAdapter(child: ViewableVideoContent()),
+        const SliverToBoxAdapter(child: ViewableVideoContent()),
+        const SliverToBoxAdapter(child: ViewableVideoContent()),
+        const SliverToBoxAdapter(child: ViewableVideoContent()),
+        const SliverToBoxAdapter(child: ViewableVideoContent()),
+      ],
     );
   }
 }

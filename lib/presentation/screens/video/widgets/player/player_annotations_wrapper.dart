@@ -32,7 +32,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/screens/video/player_view_controller.dart';
 import 'package:youtube_clone/presentation/theme/device_theme.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -43,13 +45,8 @@ import '../annotations/video_product.dart';
 import '../annotations/video_suggestion.dart';
 
 class PlayerAnnotationsWrapper extends StatefulWidget {
-  const PlayerAnnotationsWrapper({
-    super.key,
-    this.hideGraphicsNotifier,
-    required this.child,
-  });
+  const PlayerAnnotationsWrapper({super.key, required this.child});
   final Widget child;
-  final ValueNotifier<bool>? hideGraphicsNotifier;
 
   @override
   State<PlayerAnnotationsWrapper> createState() =>
@@ -58,29 +55,33 @@ class PlayerAnnotationsWrapper extends StatefulWidget {
 
 class _PlayerAnnotationsWrapperState extends State<PlayerAnnotationsWrapper> {
   final AnnotationsNotifier listenable = AnnotationsNotifier();
+  PlayerViewController? viewController;
 
   @override
-  void initState() {
-    super.initState();
-    if (widget.hideGraphicsNotifier?.value == true) {
-      listenable.pauseVisuals(notify: false);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    viewController?.removeListener(changeCallback);
+    viewController = context.provide<PlayerViewController>();
+    if (viewController != null) {
+      if (viewController?.isAnnotationsVisible == true) {
+        listenable.continueVisuals();
+      }
+      viewController?.addListener(changeCallback);
     }
-
-    widget.hideGraphicsNotifier?.addListener(changeCallback);
   }
 
   @override
   void dispose() {
-    widget.hideGraphicsNotifier?.removeListener(changeCallback);
+    viewController?.removeListener(changeCallback);
     listenable.dispose();
     super.dispose();
   }
 
   void changeCallback() {
-    if (widget.hideGraphicsNotifier?.value == true) {
-      listenable.pauseVisuals();
-    } else {
+    if (viewController?.isAnnotationsVisible == true) {
       listenable.continueVisuals();
+    } else {
+      listenable.pauseVisuals();
     }
   }
 
@@ -184,7 +185,7 @@ enum AlwaysShow {
   bool get isEnd => this == end;
 }
 
-class AnnotationVisibility extends ConsumerStatefulWidget {
+class AnnotationVisibility extends StatefulWidget {
   const AnnotationVisibility({
     super.key,
     this.showAt,
@@ -219,11 +220,10 @@ class AnnotationVisibility extends ConsumerStatefulWidget {
   final Widget child;
 
   @override
-  ConsumerState<AnnotationVisibility> createState() =>
-      _AnnotationVisibilityState();
+  State<AnnotationVisibility> createState() => _AnnotationVisibilityState();
 }
 
-class _AnnotationVisibilityState extends ConsumerState<AnnotationVisibility>
+class _AnnotationVisibilityState extends State<AnnotationVisibility>
     with TickerProviderStateMixin {
   /// Controller to animate opacity to visibility
   late final AnimationController visibilityController;
@@ -273,10 +273,14 @@ class _AnnotationVisibilityState extends ConsumerState<AnnotationVisibility>
     );
   }
 
+  PlayerViewController? viewController;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (ref.read(playerViewStateProvider).showControls) {
+    viewController = context.provide<PlayerViewController>();
+
+    if (viewController?.isControlsVisible == true) {
       controlVisibilityNotifier.value = false;
       if (widget.visibleControlAlignment != null) {
         alignmentController.forward();
@@ -288,31 +292,28 @@ class _AnnotationVisibilityState extends ConsumerState<AnnotationVisibility>
       }
     }
 
-    final playerRepo = ref.read(playerRepositoryProvider);
-    _playerSignalSubscription ??= playerRepo.playerSignalStream.listen(
-      (PlayerSignal event) {
-        if (context.mounted == false) return;
+    viewController?.addListener(() {
+      if (context.mounted == false) return;
 
-        if (event == PlayerSignal.showControls) {
-          controlVisibilityNotifier.value = false;
-          if (widget.visibleControlAlignment != null) {
-            alignmentController.forward();
-          }
-        } else if (event == PlayerSignal.hideControls) {
-          controlVisibilityNotifier.value =
-              !hiddenPermanently && !hiddenTemporary;
-
-          if (widget.visibleControlAlignment != null) {
-            alignmentController.reverse();
-          }
+      if (viewController!.isControlsVisible) {
+        controlVisibilityNotifier.value = false;
+        if (widget.visibleControlAlignment != null) {
+          alignmentController.forward();
         }
-      },
-    );
+      } else {
+        controlVisibilityNotifier.value =
+            !hiddenPermanently && !hiddenTemporary;
+
+        if (widget.visibleControlAlignment != null) {
+          alignmentController.reverse();
+        }
+      }
+    });
 
     if (widget.alwaysShow.isStart && !hiddenPermanently) {
       permanentTimer ??= Timer(widget.hideDuration, permanentHide);
     } else {
-      _videoDurationSubscription ??= playerRepo.positionStream.listen(
+      _videoDurationSubscription ??= viewController!.positionStream.listen(
         (Duration event) {
           if (context.mounted == false) return;
 
@@ -337,7 +338,7 @@ class _AnnotationVisibilityState extends ConsumerState<AnnotationVisibility>
   }
 
   void _showAnnotation() {
-    final isMinimized = ref.read(playerViewStateProvider).isMinimized;
+    final isMinimized = viewController!.boxProp.isMinimized;
     // Avoid showing when minimized
     controlVisibilityNotifier.value = !isMinimized;
 
@@ -349,12 +350,7 @@ class _AnnotationVisibilityState extends ConsumerState<AnnotationVisibility>
     if (showNotifier.value || hiddenPermanently) return;
 
     if (event >= const Duration(seconds: 53) && widget.alwaysShow.isEnd) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        ref.read(playerRepositoryProvider).sendPlayerSignal(
-          [PlayerSignal.hideControls, PlayerSignal.hidePlaybackProgress],
-        );
-        _showAnnotation();
-      });
+      Future.delayed(const Duration(milliseconds: 500), _showAnnotation);
     }
   }
 

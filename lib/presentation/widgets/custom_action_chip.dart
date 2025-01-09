@@ -120,7 +120,8 @@ class _CustomActionChipState extends State<CustomActionChip>
               borderRadius: widget.borderRadius ?? theme.borderRadius,
             ),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize:
+                  widget.expanded ? MainAxisSize.max : MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (widget.icon != null) ...[

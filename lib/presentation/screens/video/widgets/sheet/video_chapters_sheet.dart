@@ -8,14 +8,10 @@ class VideoChaptersSheet extends StatefulWidget {
   const VideoChaptersSheet({
     super.key,
     this.controller,
-    required this.onPressClose,
-    required this.draggableController,
-    required this.initialHeight,
+    this.draggableController,
   });
   final ScrollController? controller;
-  final VoidCallback onPressClose;
-  final double initialHeight;
-  final DraggableScrollableController draggableController;
+  final DraggableScrollableController? draggableController;
 
   @override
   State<VideoChaptersSheet> createState() => _VideoChaptersSheetState();
@@ -23,23 +19,10 @@ class VideoChaptersSheet extends StatefulWidget {
 
 class _VideoChaptersSheetState extends State<VideoChaptersSheet> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.draggableController.animateTo(
-        widget.initialHeight,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInCubic,
-      );
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Chapters',
       controller: widget.controller ?? ScrollController(),
-      onClose: widget.onPressClose,
       showDragIndicator: true,
       draggableController: widget.draggableController,
       borderRadius: const BorderRadius.only(
@@ -115,9 +98,9 @@ class ChapterTile extends StatelessWidget {
                           padding: EdgeInsets.symmetric(vertical: 4.0),
                           child: Row(
                             children: [
-                              Icon(Icons.reply_outlined, size: 32),
+                              Icon(YTIcons.reply_outlined, size: 32),
                               SizedBox(width: 18),
-                              Icon(Icons.repeat, size: 32),
+                              Icon(YTIcons.loop_outlined, size: 32),
                             ],
                           ),
                         ),

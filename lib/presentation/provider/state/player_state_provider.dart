@@ -19,6 +19,13 @@ class PlayerState {
     required this.ended,
   });
 
+  factory PlayerState.initial() => const PlayerState(
+        loading: true,
+        buffering: true,
+        playing: false,
+        ended: false,
+      );
+
   final bool loading;
   final bool buffering;
   final bool playing;

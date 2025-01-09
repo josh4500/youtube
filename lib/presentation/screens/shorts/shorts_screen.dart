@@ -29,7 +29,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/presentation/constants.dart';
-import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/screens.dart' show HomeMessenger;
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -139,10 +139,10 @@ class _ShortsScreenState extends ConsumerState<ShortsScreen> {
   void _scrollPhysicsCallback() {
     final double size = _draggableController.size;
     if (size > 0) {
-      ref.read(homeRepositoryProvider).lockNavBarPosition();
+      HomeMessenger.lockNavBarPosition(context);
       physics.canScroll = false;
     } else {
-      ref.read(homeRepositoryProvider).unlockNavBarPosition();
+      HomeMessenger.unlockNavBarPosition(context);
       physics.canScroll = true;
     }
   }

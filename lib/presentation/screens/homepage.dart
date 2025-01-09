@@ -25,42 +25,98 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/presentation/constants.dart';
+import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/provider/index_notifier.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
-import '../providers.dart';
-import '../screens.dart' show VideoScreen;
+import '../screens.dart' show VideoScreenFix;
 import '../widgets/home/home_drawer.dart';
 import '../widgets/home/home_navigation_bar.dart';
 
-class HomePage extends ConsumerWidget {
+abstract class HomeMessenger {
+  static void openDrawer(BuildContext context) {
+    context.findAncestorStateOfType<_HomePageState>()?.openDrawer();
+  }
+
+  static void closeDrawer(BuildContext context) {
+    context.findAncestorStateOfType<_HomePageState>()?.closeDrawer();
+  }
+
+  static void lockNavBarPosition(BuildContext context) {
+    context
+        .findAncestorStateOfType<_HomePageState>()
+        ?._bottomBarKey
+        .currentState
+        ?.lockNavBarPosition();
+  }
+
+  static void unlockNavBarPosition(BuildContext context) {
+    context
+        .findAncestorStateOfType<_HomePageState>()
+        ?._bottomBarKey
+        .currentState
+        ?.unlockNavBarPosition();
+  }
+
+  static void updateNavBarPosition(BuildContext context, double value) {
+    context
+        .findAncestorStateOfType<_HomePageState>()
+        ?._bottomBarKey
+        .currentState
+        ?.updateNavBarPosition(value);
+  }
+
+  static void openPlayer(BuildContext context) {
+    context.findAncestorStateOfType<_HomeOverlayWrapperState>()?.openPlayer();
+  }
+
+  static void closePlayer(BuildContext context) {
+    context.findAncestorStateOfType<_HomeOverlayWrapperState>()?.closePlayer();
+  }
+}
+
+class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.child});
   final StatefulNavigationShell child;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final scaffoldKey = ref.read(homeRepositoryProvider).scaffoldKey;
-    final overlayKey = ref.read(homeRepositoryProvider).overlayKey;
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _homeOverlayKey = GlobalKey<_HomeOverlayWrapperState>();
+  final _bottomBarKey = GlobalKey<HomeNavigatorBarState>();
+
+  void openDrawer() => _scaffoldKey.currentState?.openDrawer();
+  void closeDrawer() => _scaffoldKey.currentState?.closeDrawer();
+
+  @override
+  Widget build(BuildContext context) {
     return StackedPageDraggable(
       child: Scaffold(
-        key: scaffoldKey,
+        key: _scaffoldKey,
         drawerEnableOpenDragGesture: false,
         extendBody: true,
         drawer: const HomeDrawer(),
-        body: HomeOverlayWrapper(key: overlayKey, child: child),
+        body: HomeOverlayWrapper(
+          key: _homeOverlayKey,
+          child: widget.child,
+        ),
         bottomNavigationBar: HomeNavigatorBar(
-          selectedIndex: child.currentIndex,
+          key: _bottomBarKey,
+          selectedIndex: widget.child.currentIndex,
           onChangeIndex: (int index) {
-            child.goBranch(
+            widget.child.goBranch(
               index,
-              initialLocation: index == child.currentIndex,
+              initialLocation: index == widget.child.currentIndex,
             );
           },
         ),
@@ -69,63 +125,40 @@ class HomePage extends ConsumerWidget {
   }
 }
 
-class HomeOverlayWrapper extends ConsumerStatefulWidget {
+class HomeOverlayWrapper extends StatefulWidget {
   const HomeOverlayWrapper({super.key, required this.child});
 
   final StatefulNavigationShell child;
 
   @override
-  ConsumerState<HomeOverlayWrapper> createState() => HomeOverlayWrapperState();
+  State<HomeOverlayWrapper> createState() => _HomeOverlayWrapperState();
 }
 
-class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
+class _HomeOverlayWrapperState extends State<HomeOverlayWrapper>
     with TickerProviderStateMixin {
   final GlobalKey _videoScreenKey = GlobalKey();
-  late final AnimationController _overlayPlayerController;
-  late final Animation<Offset> _overlayPlayerAnimation;
 
   late final AnimationController _overlayDnotifController;
-  late final Animation<double> _overlayDnotifAnimation;
 
   bool _preventShowingExploreDownloads = true;
+  final IndexNotifier<HomeTab> _tabNotifier = IndexNotifier(HomeTab.feed);
+  final ValueNotifier<bool> _showPlayerNotifier = ValueNotifier<bool>(false);
 
   @override
   void initState() {
     super.initState();
-    _overlayPlayerController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-      reverseDuration: const Duration(milliseconds: 600),
-    );
-
-    _overlayPlayerAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _overlayPlayerController,
-        curve: Curves.easeOutCubic,
-        reverseCurve: Curves.easeInCubic,
-      ),
-    );
-
     _overlayDnotifController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
-    );
-
-    _overlayDnotifAnimation = CurvedAnimation(
-      parent: _overlayDnotifController,
-      curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeInCubic,
     );
 
     _resetExploreDownloadsPrevention();
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void dispose() {
+    _overlayDnotifController.dispose();
+    super.dispose();
   }
 
   @override
@@ -133,32 +166,15 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
     super.didUpdateWidget(oldWidget);
     final int index = widget.child.currentIndex;
 
+    _tabNotifier.value = HomeTab.values[index];
+
     if (oldWidget.child.currentIndex != widget.child.currentIndex) {
-      if (index == 1) {
-        _overlayPlayerController.reverse();
-
+      if (index == HomeTab.short.index) {
         AppTheme.setSystemOverlayStyle();
-      } else {
-        _overlayPlayerController.forward();
-
-        if (oldWidget.child.currentIndex == 1) {
-          AppTheme.setSystemOverlayStyle(context.theme.brightness);
-        }
+      } else if (oldWidget.child.currentIndex == HomeTab.short.index) {
+        AppTheme.setSystemOverlayStyle(context.theme.brightness);
       }
     }
-
-    Future<void>(() {
-      final bool isPlayerActive = ref.read(playerOverlayStateProvider);
-      if (oldWidget.child.currentIndex != widget.child.currentIndex) {
-        if (isPlayerActive && _overlayPlayerController.value != 1) {
-          if (index == 1 && ref.read(playerNotifierProvider).ended) {
-            ref.read(playerRepositoryProvider).minimize();
-          } else {
-            ref.read(playerRepositoryProvider).minimizeAndPauseVideo();
-          }
-        }
-      }
-    });
   }
 
   void showExploreDownloads() {
@@ -168,6 +184,14 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
   }
 
   void hideExploreDownloads() => _overlayDnotifController.reverse();
+
+  void openPlayer() {
+    _showPlayerNotifier.value = true;
+  }
+
+  Future<void> closePlayer() async {
+    _showPlayerNotifier.value = false;
+  }
 
   void onNoThanks() {
     _resetExploreDownloadsPrevention();
@@ -192,52 +216,55 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(playerOverlayStateProvider, (bool? previous, bool next) {
-      if (next) {
-        _overlayPlayerController.forward();
-      }
-    });
-
-    return SafeArea(
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          widget.child,
-          LayoutBuilder(
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        widget.child,
+        SafeArea(
+          child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Expanded(
-                    child: SlideTransition(
-                      position: _overlayPlayerAnimation,
-                      child: Consumer(
-                        builder: (
-                          BuildContext context,
-                          WidgetRef ref,
-                          Widget? childWidget,
-                        ) {
-                          final showPlayer = ref.watch(
-                            playerOverlayStateProvider,
-                          );
-                          return Visibility(
-                            visible: showPlayer,
-                            child: VideoScreen(
-                              key: _videoScreenKey,
+                  ValueListenableBuilder(
+                    valueListenable: _showPlayerNotifier,
+                    builder: (
+                      BuildContext context,
+                      bool showPlayer,
+                      Widget? childWidget,
+                    ) {
+                      return Visibility(
+                        visible: showPlayer,
+                        child: ModelBinding<IndexNotifier>(
+                          model: _tabNotifier,
+                          child: StackedPageDraggable(
+                            properties: DraggableProperties(
+                              initialHeight: 1 -
+                                  (kPlayerMinHeight /
+                                      math.max(
+                                        constraints.maxWidth,
+                                        constraints.maxHeight,
+                                      )),
+                            ),
+                            child: VideoScreenFix(
                               width: constraints.maxWidth,
                               height: constraints.maxHeight,
                             ),
-                          );
-                        },
-                      ),
-                    ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   Visibility(
                     visible: widget.child.currentIndex != 1,
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: SizeTransition(
-                        sizeFactor: _overlayDnotifAnimation,
+                        sizeFactor: CurvedAnimation(
+                          parent: _overlayDnotifController,
+                          curve: Curves.easeOutCubic,
+                          reverseCurve: Curves.easeInCubic,
+                        ),
                         child: ExploreDownloadsOverlay(
                           onNoThanks: onNoThanks,
                           onGotoDownloads: onGotoDownloads,
@@ -249,8 +276,8 @@ class HomeOverlayWrapperState extends ConsumerState<HomeOverlayWrapper>
               );
             },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

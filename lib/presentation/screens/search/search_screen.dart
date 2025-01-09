@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:youtube_clone/generated/l10n.dart';
 import 'package:youtube_clone/infrastructure.dart';
-import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/screens.dart' show HomeMessenger;
 import 'package:youtube_clone/presentation/screens/search/widgets/search_results.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
@@ -47,18 +47,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void _focusListenerCallback() {
     if (_focusNode.hasFocus) {
       _showSearchResultNotifier.value = false;
-      ref.read(homeRepositoryProvider).lockNavBarPosition();
+      HomeMessenger.lockNavBarPosition(context);
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     if (_showSearchResultNotifier.value == false) {
-      Future(() {
-        ref.read(homeRepositoryProvider).lockNavBarPosition();
-      });
+      HomeMessenger.lockNavBarPosition(context);
     }
   }
 
@@ -81,7 +78,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   void _onTapSearchField() {
     if (_focusNode.hasFocus) {
-      ref.read(homeRepositoryProvider).lockNavBarPosition();
+      HomeMessenger.lockNavBarPosition(context);
     }
   }
 
@@ -90,14 +87,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     if (added) {
       _screens.add(SearchResults(key: GlobalObjectKey(text)));
     }
-
-    Future.delayed(
-      const Duration(seconds: 2),
-      () {
-        _showSearchResultNotifier.value = true;
-        ref.read(homeRepositoryProvider).unlockNavBarPosition();
-      },
-    );
+    _showSearchResultNotifier.value = true;
+    HomeMessenger.unlockNavBarPosition(context);
   }
 
   void _onPressBack() {
@@ -106,7 +97,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
       _showSearchResultNotifier.value = true;
       _textController.text = _searchedTextHistory.last;
-      ref.read(homeRepositoryProvider).unlockNavBarPosition();
+      HomeMessenger.unlockNavBarPosition(context);
 
       return;
     }
@@ -118,12 +109,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       if (_searchedTextHistory.isNotEmpty) {
         _showSearchResultNotifier.value = true;
         _textController.text = _searchedTextHistory.last;
-        ref.read(homeRepositoryProvider).unlockNavBarPosition();
+        HomeMessenger.unlockNavBarPosition(context);
       }
     }
 
     if (_searchedTextHistory.isEmpty) {
-      ref.read(homeRepositoryProvider).unlockNavBarPosition();
+      HomeMessenger.unlockNavBarPosition(context);
       context.pop();
     }
   }

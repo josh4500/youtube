@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -8,7 +9,6 @@ import 'create_live_screen.dart';
 import 'create_post_screen.dart';
 import 'create_shorts_screen.dart';
 import 'create_video_screen.dart';
-import 'provider/index_notifier.dart';
 import 'widgets/notifications/create_notification.dart';
 
 class CreateScreen extends StatefulWidget {

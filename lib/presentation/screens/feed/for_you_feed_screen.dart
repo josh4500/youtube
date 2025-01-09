@@ -36,6 +36,7 @@ import 'package:youtube_clone/presentation/router/app_routes.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../homepage.dart';
 import 'widgets/home_feed_history_off.dart';
 import 'widgets/home_viewable_video_content.dart';
 
@@ -317,23 +318,19 @@ class DiscoverButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = context.theme.appStyles.dynamicTabStyle;
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: Consumer(
-        builder: (context, ref, child) {
-          return CustomActionChip(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-            ),
-            borderRadius: BorderRadius.circular(4),
-            backgroundColor: theme.unselectedColor,
-            icon: const Icon(YTIcons.discover_outlined),
-            onTap: () {
-              ref.read(homeRepositoryProvider).openDrawer();
-            },
-          );
-        },
-      ),
+    return Consumer(
+      builder: (context, ref, child) {
+        return CustomActionChip(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 6,
+          ),
+          borderRadius: BorderRadius.circular(4),
+          backgroundColor: theme.unselectedColor,
+          icon: const Icon(YTIcons.discover_outlined, size: 22),
+          onTap: () => HomeMessenger.openDrawer(context),
+        );
+      },
     );
   }
 }

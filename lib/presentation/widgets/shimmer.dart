@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/theme/app_theme.dart';
+import 'package:youtube_clone/presentation/widgets.dart';
 
 class Shimmer extends StatelessWidget {
   const Shimmer({

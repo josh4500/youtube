@@ -1,5 +1,7 @@
 // TODO(josh4500): Fix this
-const double kMiniPlayerHeight = 56;
+const double kMiniPlayerWidth = 125;
+const double kMiniPlayerHeight = 60;
+const double kPlayerMinHeight = 245;
 
 const double kMaxVideoViewPortHeight = 0.7;
 const double kAvgVideoViewPortHeight = 0.273;

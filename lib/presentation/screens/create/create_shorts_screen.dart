@@ -36,12 +36,12 @@ import 'package:go_router/go_router.dart';
 import 'package:youtube_clone/core.dart';
 import 'package:youtube_clone/core/utils/normalization.dart';
 import 'package:youtube_clone/presentation/models.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
 import 'provider/current_recording_state.dart';
-import 'provider/index_notifier.dart';
 import 'provider/short_recording_state.dart';
 import 'provider/shorts_create_state.dart';
 import 'widgets/add_music_button.dart';
@@ -338,7 +338,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
   }
 
   @override
-  void onIndexChanged(int newIndex) {
+  void didTabIndexChanged(int newIndex) {
     if (newIndex == CreateTab.shorts.index) {
       _initCamera();
     } else {
@@ -776,15 +776,13 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
   void _resetButtonPositions(BoxConstraints? constraints) {
     if (constraints != null) {
-      recordOuterButtonPosition.start(
-        begin: recordOuterButtonPosition.value,
+      recordOuterButtonPosition.animate(
         end: getOuterButtonInitPosition(constraints),
         updateWhen: (_) => !dragRecordNotifier.value,
       );
 
       if (!droppedButton) {
-        recordInnerButtonPosition.start(
-          begin: recordInnerButtonPosition.value,
+        recordInnerButtonPosition.animate(
           end: getInnerButtonInitPosition(constraints),
           updateWhen: (value) {
             if (value == getInnerButtonInitPosition(constraints)) {
@@ -873,7 +871,7 @@ class _CaptureShortsViewState extends ConsumerState<CaptureShortsView>
 
     if (position.dy <= maxHeight * .8) {
       if (droppedButton == false) {
-        recordInnerButtonPosition.start(
+        recordInnerButtonPosition.animate(
           begin: recordInnerButtonPosition.value,
           end: getInnerButtonInitPosition(constraints),
           updateWhen: (_) => droppedButton,

@@ -32,6 +32,8 @@ abstract class PlayerNotification extends Notification {}
 
 class MinimizePlayerNotification extends PlayerNotification {}
 
+class UnlockPlayerNotification extends PlayerNotification {}
+
 class RotatePlayerNotification extends PlayerNotification {}
 
 class EnterFullscreenPlayerNotification extends PlayerNotification {}
@@ -59,8 +61,20 @@ class Forward2xSpeedStartPlayerNotification
 
 class Forward2xSpeedEndPlayerNotification extends SeekEndPlayerNotification {}
 
-class SlideSeekStartPlayerNotification extends SeekStartPlayerNotification {}
+class SlideSeekStartPlayerNotification extends SeekStartPlayerNotification {
+  SlideSeekStartPlayerNotification({this.lockProgress = false});
 
-class SlideSeekUpdatePlayerNotification extends SeekUpdatePlayerNotification {}
+  final bool lockProgress;
+}
+
+class SlideSeekUpdatePlayerNotification extends SeekUpdatePlayerNotification {
+  SlideSeekUpdatePlayerNotification({
+    required this.duration,
+    required this.showRelease,
+  });
+
+  final Duration duration;
+  final bool showRelease;
+}
 
 class SlideSeekEndPlayerNotification extends SeekEndPlayerNotification {}

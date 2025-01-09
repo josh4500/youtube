@@ -35,6 +35,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/utils/duration.dart';
 import 'package:youtube_clone/presentation/models.dart';
 import 'package:youtube_clone/presentation/providers.dart';
+import 'package:youtube_clone/presentation/screens/video/player_view_controller.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -70,18 +71,11 @@ class PlayerOverlayControls extends ConsumerStatefulWidget {
 
 class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     with TickerProviderStateMixin {
-  // Timer instance
-  Timer? _controlHideTimer;
-  late final AnimationController _controlsVisibilityController;
-  late final Animation<double> _controlsAnimation;
+  late PlayerViewController viewController;
 
   late final AnimationController _slideFrameController;
 
   bool _controlsHidden = true;
-
-  /// Flag to prevents control gestures
-  ///   - Double tap
-  bool _preventCommonControlGestures = false;
 
   /// Flag to track whether the long press has started
   bool _startedOnLongPress = false;
@@ -99,98 +93,13 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   final ValueNotifier<String> _latestControlMessage = ValueNotifier<String>('');
   Timer? _controlMessageTimer;
 
-  /// Notifier for showing/hiding playback progress
-  final _showPlaybackProgress = ValueNotifier<double>(1);
-
-  /// Animation controllers and animations for buffering and progress
-  late final AnimationController _bufferController;
-  late final AnimationController _progressController;
-  late final Animation<double> _progressAnimation;
-  late final Animation<Color?> _bufferAnimation;
-
-  /// Latest duration of the playback
-  Duration? _lastDuration;
-
-  /// Upper bound value for sliding seek duration.
-  ///
-  /// Sends a vibration when user slides over this value
-  Duration? _upperboundSlideDuration;
-
-  /// Upper bound value for sliding seek duration
-  ///
-  /// Sends a vibration when user slides over this value
-  Duration? _lowerboundSlideDuration;
-
-  late final AnimationController _seekDurationIndicatorController;
-  late final Animation<double> _seekDurationIndicatorAnimation;
-
-  late final AnimationController _seekIndicatorController;
-  late final Animation<double> _seekIndicatorAnimation;
-
-  final _seekIndicatorNotifier = ValueNotifier<SeekNotificationType>(
-    SeekNotificationType.none,
-  );
-
-  /// Rate of seeking on double tap
-  final _seekRate = ValueNotifier<int>(0);
-
-  /// Whether direction for seeking is forward.
-  final _isForwardSeek = ValueNotifier<bool>(true);
-
-  /// Notifier for showing double tap seek indicator
-  late final AnimationController _showDoubleTapSeekIndicator;
-  late final Animation<double> _showDoubleTapSeekAnimation;
-
-  /// Notifier for showing unlock button
-  late final AnimationController _showUnlockButton;
-  late final Animation<double> _showUnlockButtonAnimation;
-
   /// Whether it was playing
   bool wasPlaying = false;
-
-  /// Duration when slide seeking on progress or long press
-  Duration _slideSeekDuration = Duration.zero;
-
-  bool get _showingSlideFrame {
-    return _seekIndicatorNotifier.value.isSlideFrame;
-  }
 
   late Animation<double> _slideFrameAnimation;
   @override
   void initState() {
     super.initState();
-
-    _controlsVisibilityController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 225),
-      reverseDuration: const Duration(milliseconds: 100),
-    );
-
-    _controlsAnimation = CurvedAnimation(
-      parent: _controlsVisibilityController,
-      curve: Curves.easeIn,
-    );
-
-    _seekIndicatorController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 175),
-    );
-
-    _seekIndicatorAnimation = CurvedAnimation(
-      parent: _seekIndicatorController,
-      curve: Curves.easeIn,
-    );
-
-    _seekDurationIndicatorController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 175),
-    );
-
-    _seekDurationIndicatorAnimation = CurvedAnimation(
-      parent: _seekDurationIndicatorController,
-      curve: Curves.easeIn,
-    );
-
     _slideFrameController = AnimationController(
       vsync: this,
       value: 0,
@@ -201,66 +110,15 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
       parent: _slideFrameController,
       curve: Curves.easeInToLinear,
     );
-
-    _bufferController = AnimationController(
-      vsync: this,
-      value: 1,
-      duration: const Duration(milliseconds: 225),
-      reverseDuration: const Duration(milliseconds: 100),
-    );
-
-    _progressController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 225),
-      reverseDuration: const Duration(milliseconds: 100),
-    );
-
-    _progressAnimation = CurvedAnimation(
-      parent: _progressController,
-      curve: Curves.easeInCubic,
-      reverseCurve: Curves.easeOutCubic,
-    );
-
-    _bufferAnimation = ColorTween(
-      begin: Colors.white38,
-      end: Colors.transparent,
-    ).animate(_bufferController);
-
-    _showDoubleTapSeekIndicator = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 225),
-    );
-
-    _showDoubleTapSeekAnimation = CurvedAnimation(
-      parent: _showDoubleTapSeekIndicator,
-      curve: Curves.easeInCubic,
-      reverseCurve: Curves.easeOutCubic,
-    );
-
-    _showUnlockButton = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 250),
-    );
-    _showUnlockButtonAnimation = CurvedAnimation(
-      parent: _showUnlockButton,
-      curve: Curves.easeInCubic,
-      reverseCurve: Curves.easeOutCubic,
-    );
   }
 
   StreamSubscription<PlayerSignal>? _playerSignalSubscription;
   Timer? _showUnlockTimer;
 
   @override
-  void didUpdateWidget(covariant PlayerOverlayControls oldWidget) {
-    if (context.orientation.isLandscape && _controlsHidden) {
-      _showPlaybackProgress.value = 0;
-    }
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
   void didChangeDependencies() {
+    viewController = context.provide<PlayerViewController>();
+
     Future.microtask(() {
       final playerRepo = ref.read(playerRepositoryProvider);
       _playerSignalSubscription ??= playerRepo.playerSignalStream.listen(
@@ -271,87 +129,7 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   }
 
   void _onPlayerSignalEvent(signal) async {
-    final hasEnded = ref.read(playerNotifierProvider).ended;
-    final isPlaying = ref.read(playerNotifierProvider).playing;
-    final isExpanded = ref.read(playerViewStateProvider).isExpanded;
-
-    if (signal == PlayerSignal.lockScreen) {
-      _preventCommonControlGestures = true;
-      ref
-          .read(playerRepositoryProvider)
-          .sendPlayerSignal([PlayerSignal.hideControls]);
-    } else if (signal == PlayerSignal.unlockScreen) {
-      _preventCommonControlGestures = false;
-      _showUnlockButton.reverse(from: 0);
-      _showUnlockTimer?.cancel();
-    } else if (signal == PlayerSignal.showUnlock) {
-      _showUnlockButton.forward();
-      _showUnlockTimer?.cancel();
-      _showUnlockTimer = Timer(const Duration(seconds: 3), () {
-        _showUnlockButton.reverse();
-      });
-    } else if (signal == PlayerSignal.showControls) {
-      if (mounted && context.orientation.isLandscape || isExpanded) {
-        _showPlaybackProgress.value = 1;
-      }
-
-      _controlsHidden = false;
-      _controlsVisibilityController.forward();
-      _bufferController.reverse();
-
-      _progressController.forward();
-
-      // Cancels existing timer
-      _controlHideTimer?.cancel();
-
-      // Auto hide only when video is playing
-      _controlHideTimer = Timer(const Duration(seconds: 3), () async {
-        if (isPlaying) {
-          _controlsHidden = true;
-          // Note: Hide progress indicator first before hiding main controls
-          _progressController.reverse();
-
-          // Reversing before sending signal, animates the reverse on
-          // auto hide
-          await _controlsVisibilityController.reverse();
-          // Hides PlaybackProgress
-          if (mounted && context.orientation.isLandscape || isExpanded) {
-            _showPlaybackProgress.value = 0;
-          }
-
-          ref
-              .read(playerRepositoryProvider)
-              .sendPlayerSignal([PlayerSignal.hideControls]);
-        }
-      });
-    } else if (signal == PlayerSignal.hideControls) {
-      _controlsHidden = true;
-      _controlHideTimer?.cancel();
-      _bufferController.forward();
-
-      // Note: Hide progress indicator first before hiding main controls
-      _progressController.reverse();
-      // Reverse opacity without animation
-      // NOTE: from: 0 messes up ColorTween for the progress indicator
-      // _controlsVisibilityController is used for progress color indicator
-      await _controlsVisibilityController.reverse(
-        from: hasEnded || !isPlaying ? null : 0,
-      );
-
-      // Hides PlaybackProgress while in landscape mode, when controls are
-      // hidden
-      if (mounted && context.orientation.isLandscape || isExpanded) {
-        _showPlaybackProgress.value = 0;
-      }
-    } else if (signal == PlayerSignal.hidePlaybackProgress) {
-      _showPlaybackProgress.value = 0;
-    } else if (signal == PlayerSignal.showPlaybackProgress) {
-      _showPlaybackProgress.value = 1;
-    } else if (signal == PlayerSignal.minimize) {
-      _preventCommonControlGestures = true;
-    } else if (signal == PlayerSignal.maximize) {
-      _preventCommonControlGestures = false;
-    } else if (signal == PlayerSignal.autoplay) {
+    if (signal == PlayerSignal.autoplay) {
       _controlMessageTimer?.cancel(); // Cancels previous timer
 
       final value = ref.read(preferencesProvider).autoplay ? 'on' : 'off';
@@ -372,15 +150,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _controlMessageTimer?.cancel();
     _latestControlMessage.dispose();
     _playerSignalSubscription?.cancel();
-    _showUnlockButton.dispose();
     _showUnlockTimer?.cancel();
-    _controlHideTimer?.cancel();
-    _controlsVisibilityController.dispose();
-    _seekIndicatorNotifier.dispose();
-    _showDoubleTapSeekIndicator.dispose();
-    _seekDurationIndicatorController.dispose();
     _slideFrameController.dispose();
-    _bufferController.dispose();
 
     super.dispose();
   }
@@ -390,293 +161,145 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        ValueListenableBuilder(
-          valueListenable: _isForwardSeek,
+        NotifierSelector(
+          notifier: viewController,
+          selector: (state) => state.seekState,
           builder: (
             BuildContext context,
-            bool isForwardSeek,
-            Widget? childWidget,
+            PlayerSeekState seekState,
+            Widget? _,
           ) {
-            return AnimatedVisibility(
-              animation: _showDoubleTapSeekAnimation,
-              alignment: _isForwardSeek.value
-                  ? Alignment.centerRight
-                  : Alignment.centerLeft,
-              child: ClipPath(
-                clipper: SeekIndicatorClipper(forward: isForwardSeek),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  width: MediaQuery.sizeOf(context).width / 2,
-                  decoration: const BoxDecoration(color: Colors.black12),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (isForwardSeek)
-                        const Icon(Icons.fast_forward)
-                      else
-                        const Icon(Icons.fast_rewind),
-                      const SizedBox(height: 8),
-                      ValueListenableBuilder(
-                        valueListenable: _seekRate,
-                        builder: (context, value, __) {
-                          return Text(
-                            '${isForwardSeek ? '' : '-'}$value seconds',
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return _DoubleTapSeekIndicator(seekState: seekState);
           },
         ),
-        Stack(
-          children: [
-            AnimatedVisibility(
-              animation: _slideFrameAnimation,
+        AnimatedVisibility(
+          animation: _slideFrameAnimation,
+          child: const ColoredBox(
+            color: Colors.black54,
+            child: SizedBox.expand(),
+          ),
+        ),
+        GestureDetector(
+          onLongPressEnd: _onLongPressEnd,
+          onDoubleTapDown: _onDoubleTapDown,
+          onLongPressStart: _onLongPressStart,
+          onLongPressMoveUpdate: _onLongPressMoveUpdate,
+          child: Container(
+            color: Colors.transparent,
+            height: double.infinity,
+            width: double.infinity,
+            child: AnimatedVisibility(
+              animation: viewController.controlsAnimation,
               child: const ColoredBox(
                 color: Colors.black54,
                 child: SizedBox.expand(),
               ),
             ),
-            GestureDetector(
-              onLongPressEnd: _onLongPressEnd,
-              onDoubleTapDown: _onDoubleTapDown,
-              onLongPressStart: _onLongPressStart,
-              onLongPressMoveUpdate: _onLongPressMoveUpdate,
-              child: Container(
-                color: Colors.transparent,
-                height: double.infinity,
-                width: double.infinity,
-                child: AnimatedVisibility(
-                  animation: _controlsAnimation,
-                  alignment: Alignment.center,
-                  child: const ColoredBox(
-                    color: Colors.black54,
-                    child: SizedBox.expand(),
+          ),
+        ),
+        AnimatedVisibility(
+          animation: viewController.controlsAnimation,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Align(
+                    alignment: Alignment.topCenter,
+                    child: _TopControlV2(),
                   ),
-                ),
+                  NotifierSelector(
+                    notifier: viewController,
+                    selector: (state) => state.controlMessage,
+                    builder: (
+                      BuildContext context,
+                      String? value,
+                      Widget? _,
+                    ) {
+                      return AnimatedValuedVisibility(
+                        visible: value != null,
+                        alignment: Alignment.center,
+                        child: Text(
+                          _latestControlMessage.value,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
-            ),
-            AnimatedVisibility(
-              alignment: Alignment.topCenter,
-              animation: _seekIndicatorAnimation,
-              child: SeekIndicator(
-                valueListenable: _seekIndicatorNotifier,
-              ),
-            ),
-            AnimatedVisibility(
-              animation: _controlsAnimation,
-              alignment: Alignment.topCenter,
-              child: const _TopControlV2(),
-            ),
-            AnimatedVisibility(
-              animation: _controlsAnimation,
-              alignment: Alignment.center,
-              child: const _MiddleControl(),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: AnimatedVisibility(
-                    animation: _slideFrameAnimation,
-                    child: _SlideFramePlayButton(
-                      onClose: _onEndAnySlideSeek,
+              const Center(child: _MiddleControl()),
+              // Shows loading indicator, regardless if controls are shown/hidden
+              const Center(child: PlayerLoadingIndicator()),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: AnimatedVisibility(
+                      animation: _slideFrameAnimation,
+                      child: const _SlideFramePlayButton(),
                     ),
                   ),
-                ),
-                AnimatedVisibility(
-                  animation: _controlsAnimation,
-                  child: const _OverlayDurationOrientation(),
-                ),
-                AnimatedVisibility(
-                  animation: _seekDurationIndicatorAnimation,
-                  alignment: Alignment.center,
-                  child: const _OverlaySeekDuration(),
-                ),
-                _OverlayProgress(
-                  bufferAnimation: _bufferAnimation,
-                  progressAnimation: _progressAnimation,
-                  hideControlAnimation: _controlsAnimation,
-                  showPlaybackProgress: _showPlaybackProgress,
-                  onTap: _onPlaybackProgressTap,
-                  onVerticalDrag: _onPlaybackVerticalDrag,
-                  onVerticalDragStart: _onPlaybackVerticalDragStart,
-                  onVerticalDragEnd: _onPlaybackVerticalDragEnd,
-                  onHorizontalDragStart: _onPlaybackProgressDragStart,
-                  onChangePosition: _onPlaybackProgressPositionChanged,
-                  onHorizontalDragEnd: _onPlaybackProgressDragEnd,
-                ),
-                PlayerSeekSlideFrame(
-                  frameHeight: kSlideFrameHeight,
-                  sizeAnimation: _slideFrameAnimation,
-                ),
-                _OverlayVideoSuggestions(animation: _controlsAnimation),
-              ],
-            ),
-            AnimatedVisibility(
-              animation: _controlMessageController,
-              child: ListenableBuilder(
-                listenable: _latestControlMessage,
-                builder: (BuildContext context, Widget? _) {
-                  return AnimatedVisibility(
-                    animation: _controlsAnimation,
-                    alignment: const Alignment(0, -.48),
-                    child: Text(
-                      _latestControlMessage.value,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  );
-                },
+                  const _OverlayDurationOrientation(),
+                  const _OverlayProgress(),
+                  PlayerSeekSlideFrame(
+                    frameHeight: kSlideFrameHeight,
+                    sizeAnimation: _slideFrameAnimation,
+                  ),
+                  const _OverlayVideoSuggestions(),
+                ],
               ),
-            ),
-            AnimatedVisibility(
-              animation: _showUnlockButtonAnimation,
+            ],
+          ),
+        ),
+        NotifierSelector(
+          notifier: viewController,
+          selector: (state) => state.seekState.type,
+          builder: (
+            BuildContext context,
+            SeekType seekType,
+            Widget? _,
+          ) {
+            return SeekIndicator(type: seekType);
+          },
+        ),
+        NotifierSelector(
+          notifier: viewController,
+          selector: (state) => state.seekState.duration,
+          builder: (
+            BuildContext context,
+            Duration duration,
+            Widget? _,
+          ) {
+            return AnimatedValuedVisibility(
+              visible: duration != Duration.zero,
+              alignment: Alignment.bottomCenter,
+              child: const _OverlaySeekDuration(),
+            );
+          },
+        ),
+        NotifierSelector(
+          notifier: viewController,
+          selector: (state) => state.isControlsLocked && state.showUnlock,
+          builder: (BuildContext context, bool show, Widget? _) {
+            return AnimatedValuedVisibility(
+              visible: show,
               alignment: const Alignment(0, .7),
               child: const PlayerUnlock(),
-            ),
-            // Shows loading indicator, regardless if controls are shown/hidden
-            const Center(child: PlayerLoadingIndicator()),
-          ],
+            );
+          },
         ),
       ],
     );
   }
 
-  void _showProgressIndicator() {
-    _progressController.value = 1;
-  }
-
-  Timer? _seekRateTimer;
-
-  void _resetSeekRate() {
-    _seekRateTimer = Timer(const Duration(milliseconds: 200), () async {
-      await _showDoubleTapSeekIndicator.reverse();
-      _seekRate.value = 0;
-    });
-  }
-
-  Future<void> _showForwardSeek() async {
-    // Hide controls
-    _controlsVisibilityController.reverse(from: 0);
-
-    // Set forward direction of seek
-    _isForwardSeek.value = true;
-
-    // Set seek rate
-    _seekRateTimer?.cancel();
-    final seekRate = ref.read(preferencesProvider).doubleTapSeek;
-    _seekRate.value += seekRate;
-
-    // Seek video by seek rate
-    ref.read(playerRepositoryProvider).seek(Duration(seconds: seekRate));
-
-    // Show seek rate widget
-    await _showDoubleTapSeekIndicator.forward();
-
-    // Reset seek rate and hide widget
-    _resetSeekRate();
-  }
-
-  Future<void> _showReverseSeek() async {
-    // Hide controls
-    _controlsVisibilityController.reverse(from: 0);
-
-    // Set reverse direction of seek
-    _isForwardSeek.value = false;
-
-    // Set seek rate
-    _seekRateTimer?.cancel();
-    final seekRate = ref.read(preferencesProvider).doubleTapSeek;
-    _seekRate.value += seekRate;
-
-    // Seek video by seek rate
-    ref
-        .read(playerRepositoryProvider)
-        .seek(Duration(seconds: seekRate), reverse: true);
-
-    // Show seek rate widget
-    await _showDoubleTapSeekIndicator.forward();
-
-    // Reset seek rate and hide widget
-    _resetSeekRate();
-  }
-
-  // Method to show the 2x speed indicator and update video speed
-  void _show2xSpeed() {
-    _seekIndicatorNotifier.value = SeekNotificationType.speedUp2X;
-    _seekIndicatorController.forward();
-    _controlsVisibilityController.reverse(from: 0);
-    ref.read(playerRepositoryProvider).setSpeed(); // Update video speed
-  }
-
-  /// Hide the 2x speed indicator and reset video speed to normal (1x)
-  void _hide2xSpeed() {
-    _seekIndicatorController.reverse();
-    // Reset video speed to normal (1x)
-    ref.read(playerRepositoryProvider).setSpeed(PlayerSpeed.normal);
-  }
-
-  /// Shows  sliding seek indicator and initiate necessary actions
-  void _showSlideSeek() {
-    _seekIndicatorNotifier.value = SeekNotificationType.slideLeftOrRight;
-    _seekIndicatorController.forward();
-    _controlsVisibilityController.reverse(from: 0);
-    _showProgressIndicator();
-  }
-
-  /// Hides the sliding seek indicator and perform related cleanup actions
-  void _hideSlideSeek() {
-    _seekIndicatorController.reverse();
-
-    // If a sliding seek duration is set, perform seek operation to that duration
-    // Release updating from video
-    ref.read(playerRepositoryProvider).updatePosition(
-          _slideSeekDuration,
-          lockProgress: false,
-        );
-    ref.read(playerRepositoryProvider).seekTo(_slideSeekDuration);
-
-    // Reset sliding seek-related values and indicators
-    _seekDurationIndicatorController.reverse();
-
-    // Reset duration variables for slide seeking
-    _lastDuration = null;
-    _upperboundSlideDuration = null;
-    _lowerboundSlideDuration = null;
-
-    // If controls are not hidden, manage control visibility and progress indicator
-    if (!_controlsHidden) {
-      if (!ref.read(playerNotifierProvider).playing) {
-        _controlsVisibilityController.forward();
-      } else {
-        _controlsHidden = true;
-      }
-    }
-  }
-
-  void _hideSlideFrameSeek() {
-    _slideFrameController.reverse();
-    _seekIndicatorNotifier.value = SeekNotificationType.none;
-  }
-
-  void _onEndAnySlideSeek() {
-    _hideSlideSeek();
-    _hideSlideFrameSeek();
-    _seekIndicatorNotifier.value = SeekNotificationType.none;
-    SlideSeekEndPlayerNotification().dispatch(context);
-  }
-
   void _onDoubleTapDown(TapDownDetails details) {
-    if (_preventCommonControlGestures) return;
-    final isLoading = ref.read(playerNotifierProvider).loading;
-    if (isLoading) return;
+    if (viewController.isControlsLocked) return;
 
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isForward = details.localPosition.dx > (screenWidth / 2);
@@ -684,28 +307,15 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
 
     if (isForward) {
       ForwardSeekPlayerNotification().dispatch(context);
-      _showForwardSeek();
     } else if (isRewind) {
       RewindSeekPlayerNotification().dispatch(context);
-      _showReverseSeek();
     }
   }
 
-  void _showReleaseIndicator() {
-    _seekIndicatorNotifier.value = SeekNotificationType.release;
-    _seekIndicatorController.forward();
-    _releaseTimer?.cancel();
-    _releaseTimer = Timer(const Duration(seconds: 2), () {
-      _seekIndicatorController.reverse();
-    });
-  }
-
   void _onLongPressStart(LongPressStartDetails details) {
-    if (_preventCommonControlGestures) return;
+    if (viewController.isControlsLocked) return;
 
     _longPressYStartPosition = details.localPosition.dy;
-    _slideSeekDuration =
-        ref.read(playerRepositoryProvider).currentVideoPosition;
 
     _startedOnLongPress = true;
 
@@ -715,10 +325,8 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     if (isLoading) return;
     if (isPlaying) {
       Forward2xSpeedStartPlayerNotification().dispatch(context);
-      _show2xSpeed();
     } else {
       SlideSeekStartPlayerNotification().dispatch(context);
-      _showSlideSeek();
     }
   }
 
@@ -728,70 +336,61 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
     _longPressYStartPosition = 0;
     _startedOnLongPress = false;
 
-    final isPlaying = ref.read(playerNotifierProvider).playing;
-    final hasEnded = ref.read(playerNotifierProvider).ended;
-    final isLoading = ref.read(playerNotifierProvider).loading;
-
-    if (isLoading) return;
+    final isPlaying = viewController.playerState.playing;
+    final hasEnded = viewController.playerState.ended;
 
     if (isPlaying && !hasEnded) {
       Forward2xSpeedEndPlayerNotification().dispatch(context);
-      _hide2xSpeed();
     } else {
       // Whether to keep slide frame
-      if (_showingSlideFrame && _slideFrameController.value > 0.7) {
+      if (_slideFrameController.value > 0.7) {
         _slideFrameController.forward();
       } else {
-        _onEndAnySlideSeek();
+        _slideFrameController.reverse();
+        SlideSeekEndPlayerNotification().dispatch(context);
       }
     }
   }
 
   void _onLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
-    if (_preventCommonControlGestures) return;
+    if (viewController.isControlsLocked) return;
 
     final isLoading = ref.read(playerNotifierProvider).loading;
     if (isLoading) return;
-
-    if (_seekIndicatorNotifier.value.isSlideSeeking) {
-      SlideSeekUpdatePlayerNotification().dispatch(context);
-      // TODO(Josh4500): Use real data
+    final PlayerSeekState seekState = viewController.seekState;
+    if (seekState.type.isSlideSeeking) {
       const fullDuration = Duration(seconds: 60);
       final totalMilliseconds = fullDuration.inMilliseconds;
-      final lastPosition =
-          ref.read(playerRepositoryProvider).currentVideoPosition;
 
       final localY = details.localPosition.dy;
       final screenWidth = MediaQuery.sizeOf(context).width;
 
-      if (_showingSlideFrame == false) {
+      if (seekState.type.isSlideFrame == false) {
         final bound = Duration(microseconds: (totalMilliseconds * 0.1).floor());
-
-        // Set initial values
-        _lastDuration ??= lastPosition;
-        _upperboundSlideDuration ??= lastPosition + bound;
-        _lowerboundSlideDuration ??= lastPosition - bound;
 
         final localDeltaX = details.localOffsetFromOrigin.dx;
         final value = ((localDeltaX / screenWidth) * totalMilliseconds).floor();
 
-        _slideSeekDuration += Duration(microseconds: value);
-
-        _slideSeekDuration = _slideSeekDuration.clamp(
+        final nextDuration =
+            (seekState.duration + Duration(microseconds: value)).clamp(
           Duration.zero,
           fullDuration,
         );
 
-        _checkOutOfBound(lastPosition, _slideSeekDuration);
-
-        _seekDurationIndicatorController.forward();
-
+        SlideSeekUpdatePlayerNotification(
+          duration: nextDuration,
+          showRelease: _checkOutOfBound(
+            nextDuration,
+            seekState.startDuration + bound,
+            seekState.startDuration - bound,
+          ),
+        ).dispatch(context);
         // Updates and locks progress from video
-        ref.read(playerRepositoryProvider).updatePosition(_slideSeekDuration);
+        // TODO ref.read(playerRepositoryProvider).updatePosition(_slideSeekDuration);
       }
 
       if (_longPressYStartPosition - localY >= kMaxVerticalDrag ||
-          _showingSlideFrame) {
+          seekState.type.isSlideFrame) {
         _updateSlideFrameController(
           (_longPressYStartPosition - localY) / kSlideFrameHeight,
         );
@@ -800,144 +399,93 @@ class _PlayerOverlayControlsState extends ConsumerState<PlayerOverlayControls>
   }
 
   void _updateSlideFrameController(double value) {
-    if (!_seekIndicatorNotifier.value.isSlideSeeking) {
+    // TODO
+    // if (!_seekIndicatorNotifier.value.isSlideSeeking) {
+    //   HapticFeedback.selectionClick();
+    // }
+    // _seekIndicatorNotifier.value = value < kMaxVerticalDrag / kSlideFrameHeight
+    //     ? SeekType.slideLeftOrRight
+    //     : SeekType.slideFrame;
+    // _seekIndicatorController.forward();
+    // _slideFrameController.value = value;
+  }
+}
+
+bool _checkOutOfBound(
+    Duration nextDuration, Duration upperBound, Duration lowerBound) {
+  // Send a vibration feedback when going in or out of lower and upper bound
+  if (nextDuration > upperBound) {
+    if (nextDuration < upperBound) {
       HapticFeedback.selectionClick();
+      return true;
     }
-    _seekIndicatorNotifier.value = value < kMaxVerticalDrag / kSlideFrameHeight
-        ? SeekNotificationType.slideLeftOrRight
-        : SeekNotificationType.slideFrame;
-    _seekIndicatorController.forward();
-    _slideFrameController.value = value;
-  }
-
-  void _checkOutOfBound(Duration lastPosition, Duration newDuration) {
-    // Send a vibration
-    if (newDuration > _upperboundSlideDuration!) {
-      if (_lastDuration! < _upperboundSlideDuration!) {
-        HapticFeedback.selectionClick();
-        _showReleaseIndicator();
-        _lastDuration = newDuration;
-      }
-    } else if (newDuration < _upperboundSlideDuration!) {
-      if (_lastDuration! > _upperboundSlideDuration!) {
-        HapticFeedback.selectionClick();
-        _showReleaseIndicator();
-        _lastDuration = lastPosition;
-      }
-    }
-
-    if (newDuration < _lowerboundSlideDuration!) {
-      if (_lastDuration! > _lowerboundSlideDuration!) {
-        HapticFeedback.selectionClick();
-        _showReleaseIndicator();
-        _lastDuration = newDuration;
-      }
-    } else if (newDuration > _lowerboundSlideDuration!) {
-      if (_lastDuration! < _lowerboundSlideDuration!) {
-        HapticFeedback.selectionClick();
-        _showReleaseIndicator();
-        _lastDuration = lastPosition;
-      }
+  } else if (nextDuration < upperBound) {
+    if (nextDuration > upperBound) {
+      HapticFeedback.selectionClick();
+      return true;
     }
   }
 
-  /// When PlaybackProgress is tapped to change the position of currently playing
-  /// video.
-  void _onPlaybackProgressTap(Duration position) {
-    if (_preventCommonControlGestures) return;
+  return false;
+}
 
-    if (_progressController.value > 0) {
-      ref.read(playerRepositoryProvider).seekTo(position);
-    } else {
-      ref
-          .read(playerRepositoryProvider)
-          .sendPlayerSignal([PlayerSignal.showControls]);
+class _DoubleTapSeekIndicator extends StatefulWidget {
+  const _DoubleTapSeekIndicator({required this.seekState});
+  final PlayerSeekState seekState;
+
+  @override
+  State<_DoubleTapSeekIndicator> createState() =>
+      _DoubleTapSeekIndicatorState();
+}
+
+class _DoubleTapSeekIndicatorState extends State<_DoubleTapSeekIndicator> {
+  SeekType _lastType = SeekType.none;
+  int _lastRate = 0;
+
+  @override
+  void didUpdateWidget(covariant _DoubleTapSeekIndicator oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.seekState.type != widget.seekState.type &&
+        widget.seekState.type.isDoubleTap) {
+      _lastType = widget.seekState.type;
+    }
+    if (widget.seekState.rate > 0) {
+      _lastRate = widget.seekState.rate;
     }
   }
 
-  void _onPlaybackProgressDragStart(Duration position) {
-    if (_preventCommonControlGestures) return;
-
-    wasPlaying = ref.read(playerNotifierProvider).playing;
-    if (wasPlaying) ref.read(playerRepositoryProvider).pauseVideo();
-
-    _seekDurationIndicatorController.forward();
-    _slideSeekDuration = position;
-
-    SlideSeekStartPlayerNotification().dispatch(context);
-    _showSlideSeek();
-    // Updates and locks progress from video
-    ref.read(playerRepositoryProvider).updatePosition(position);
-  }
-
-  void _onPlaybackProgressDragEnd() {
-    if (_preventCommonControlGestures) return;
-
-    ref.read(playerRepositoryProvider).seekTo(_slideSeekDuration);
-    if (_showingSlideFrame == false && _slideFrameController.value < 0.7) {
-      // Updates the progress for the last time and unlocks getting progress from
-      // video
-      ref.read(playerRepositoryProvider).updatePosition(
-            _slideSeekDuration,
-            lockProgress: false, // Releases lock on video progress
+  @override
+  Widget build(BuildContext context) {
+    final isForward = widget.seekState.type == SeekType.doubleTapRight ||
+        _lastType == SeekType.doubleTapRight;
+    return AnimatedValuedVisibility(
+      visible: widget.seekState.type.isDoubleTap,
+      duration: const Duration(milliseconds: 300),
+      alignment: isForward ? Alignment.centerRight : Alignment.centerLeft,
+      child: LayoutBuilder(
+        builder: (
+          BuildContext context,
+          BoxConstraints constraints,
+        ) {
+          return ClipPath(
+            clipper: SeekIndicatorClipper(forward: isForward),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              width: constraints.maxWidth / 2,
+              decoration: const BoxDecoration(color: Colors.black12),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(isForward ? Icons.fast_forward : Icons.fast_rewind),
+                  const SizedBox(height: 8),
+                  Text('${isForward ? '' : '-'}$_lastRate seconds'),
+                ],
+              ),
+            ),
           );
-
-      _seekIndicatorController.reverse();
-      _hideSlideSeek();
-      SlideSeekEndPlayerNotification().dispatch(context);
-    }
-
-    if (wasPlaying) ref.read(playerRepositoryProvider).playVideo();
-    wasPlaying = false;
-  }
-
-  void _onPlaybackVerticalDrag(double yOffset) {
-    if (_preventCommonControlGestures) return;
-
-    if (yOffset > 0 && yOffset <= kSlideFrameHeight) {
-      _updateSlideFrameController(yOffset.abs() / kSlideFrameHeight);
-    }
-  }
-
-  void _onPlaybackVerticalDragEnd() {
-    if (_preventCommonControlGestures) return;
-
-    // Whether to keep slide frame
-    if (_showingSlideFrame && _slideFrameController.value > 0.7) {
-      _slideFrameController.forward();
-    } else {
-      _onEndAnySlideSeek();
-    }
-  }
-
-  void _onPlaybackVerticalDragStart() {
-    if (_preventCommonControlGestures) return;
-
-    _showSlideSeek();
-    SlideSeekStartPlayerNotification().dispatch(context);
-  }
-
-  /// Callback for when Video position is changed from the PlaybackProgress indicator
-  void _onPlaybackProgressPositionChanged(Duration position) {
-    if (_preventCommonControlGestures) return;
-
-    final lastPosition =
-        ref.read(playerRepositoryProvider).currentVideoPosition;
-    final totalMicroseconds =
-        ref.read(playerRepositoryProvider).currentVideoDuration.inMicroseconds;
-    final bound = Duration(microseconds: (totalMicroseconds * 0.1).floor());
-
-    // Set initial values
-    _lastDuration ??= lastPosition;
-    _upperboundSlideDuration ??= lastPosition + bound;
-    _lowerboundSlideDuration ??= lastPosition - bound;
-
-    // Send vibration feedback when going in or out of lower and upper bound
-    _checkOutOfBound(lastPosition, position);
-
-    _slideSeekDuration = position;
-    // Updates and locks progress from video
-    ref.read(playerRepositoryProvider).updatePosition(position);
+        },
+      ),
+    );
   }
 }
 
@@ -966,103 +514,160 @@ class _OverlaySeekDuration extends ConsumerWidget {
   }
 }
 
-class _OverlayProgress extends ConsumerWidget {
-  const _OverlayProgress({
-    required this.showPlaybackProgress,
-    required this.progressAnimation,
-    required this.bufferAnimation,
-    this.onTap,
-    this.onHorizontalDragStart,
-    this.onHorizontalDragEnd,
-    this.onVerticalDrag,
-    this.onChangePosition,
-    required this.hideControlAnimation,
-    this.onVerticalDragStart,
-    this.onVerticalDragEnd,
-  });
-
-  final ValueChanged<Duration>? onTap;
-  final ValueChanged<Duration>? onHorizontalDragStart;
-  final VoidCallback? onHorizontalDragEnd;
-  final VoidCallback? onVerticalDragEnd;
-  final VoidCallback? onVerticalDragStart;
-  final ValueChanged<Duration>? onChangePosition;
-  final ValueChanged<double>? onVerticalDrag;
-
-  final ValueNotifier<double> showPlaybackProgress;
-  final Animation<double> hideControlAnimation;
-  final Animation<double> progressAnimation;
-  final Animation<Color?> bufferAnimation;
+class _OverlayProgress extends StatefulWidget {
+  const _OverlayProgress();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final playerRepo = ref.read(playerRepositoryProvider);
-    final isExpanded = ref.watch(
-      playerViewStateProvider.select((state) => state.isExpanded),
-    );
+  State<_OverlayProgress> createState() => _OverlayProgressState();
+}
+
+class _OverlayProgressState extends State<_OverlayProgress> {
+  late PlayerViewController viewController;
+  bool wasPlaying = false;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    viewController = context.provide<PlayerViewController>();
+  }
+
+  /// When PlaybackProgress is tapped to change the position of currently playing
+  /// video.
+  void _onTap(Duration position) {
+    if (viewController.isControlsLocked) return;
+    viewController.seekTo(position);
+  }
+
+  void _onDragStart(Duration position) {
+    if (viewController.isControlsLocked) return;
+    wasPlaying = viewController.playerState.playing;
+    if (wasPlaying) {
+      viewController.pauseVideo();
+    }
+    SlideSeekStartPlayerNotification().dispatch(context);
+  }
+
+  void _onDragEnd() {
+    if (viewController.isControlsLocked) return;
+
+    // TODO Close SlideFrame
+
+    SlideSeekEndPlayerNotification().dispatch(context);
+    if (wasPlaying) viewController.playVideo();
+    wasPlaying = false;
+  }
+
+  void _onVerticalDrag(double yOffset) {
+    if (viewController.isControlsLocked) return;
+
+    if (yOffset > 0 && yOffset <= kSlideFrameHeight) {
+      // TODO _updateSlideFrameController(yOffset.abs() / kSlideFrameHeight);
+    }
+  }
+
+  void _onVerticalDragEnd() {
+    if (viewController.isControlsLocked) return;
+
+    // Whether to keep slide frame
+    // TODO
+    // if (_showingSlideFrame && _slideFrameController.value > 0.7) {
+    //   // TODO _slideFrameController.forward();
+    // } else {
+    //   _onEndAnySlideSeek();
+    // }
+  }
+
+  void _onVerticalDragStart() {
+    if (viewController.isControlsLocked) return;
+    SlideSeekStartPlayerNotification(lockProgress: true).dispatch(context);
+  }
+
+  /// Callback for when Video position is changed from the PlaybackProgress indicator
+  void _onChangePosition(Duration position) {
+    if (viewController.isControlsLocked) return;
+    final startDuration = viewController.seekState.startDuration;
+    final totalMicroseconds = viewController.videoDuration.inMicroseconds;
+    final bound = Duration(microseconds: (totalMicroseconds * 0.1).floor());
+    // Updates and locks progress from video
+    SlideSeekUpdatePlayerNotification(
+      duration: position,
+      showRelease: _checkOutOfBound(
+        position,
+        startDuration + bound,
+        startDuration - bound,
+      ),
+    ).dispatch(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.bottomLeft,
-      child: CustomOrientationBuilder(
-        onLandscape: (BuildContext context, Widget? childWidget) {
-          return AnimatedVisibility(
-            animation: hideControlAnimation,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: childWidget,
+      child: NotifierSelector(
+        notifier: viewController,
+        selector: (state) => (
+          state.isControlsVisible && state.showPlaybackProgress,
+          state.boxProp.isExpanded
+        ),
+        builder: (BuildContext context, (bool, bool) value, Widget? _) {
+          return CustomOrientationBuilder(
+            onLandscape: (BuildContext context, Widget? childWidget) {
+              return AnimatedValuedVisibility(
+                visible: value.$1,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: childWidget,
+                ),
+              );
+            },
+            onPortrait: (BuildContext context, Widget? progressWidget) {
+              return Row(
+                children: [
+                  AnimatedValuedVisibility(
+                    visible: value.$1 && value.$2,
+                    child: const PlayPauseRestartControl(
+                      useControlButton: false,
+                    ),
+                  ),
+                  Expanded(
+                    child: AnimatedValuedVisibility(
+                      visible: value.$1 && value.$2,
+                      child: progressWidget,
+                    ),
+                  ),
+                  AnimatedValuedVisibility(
+                    visible: value.$1 && value.$2,
+                    child: Row(
+                      children: [
+                        SizedBox(width: 12.w),
+                        const PlayerDurationControl(
+                          full: false,
+                          reversed: true,
+                        ),
+                        SizedBox(width: 12.w),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+            child: PlaybackProgress(
+              animation: viewController.controlsAnimation,
+              alignment: value.$2 ? Alignment.center : Alignment.bottomCenter,
+              progress: viewController.videoProgressStream,
+              // TODO(Josh4500): Revisit this code
+              start: viewController.videoProgress ?? Progress.zero,
+              // TODO(Josh4500): Get ready value
+              end: const Duration(minutes: 1),
+              onTap: _onTap,
+              onDragStart: _onDragStart,
+              onChangePosition: _onChangePosition,
+              onDragEnd: _onDragEnd,
+              onVerticalDrag: _onVerticalDrag,
+              onVerticalDragStart: _onVerticalDragStart,
+              onVerticalDragEnd: _onVerticalDragEnd,
             ),
           );
         },
-        onPortrait: (BuildContext context, Widget? progressWidget) {
-          return Row(
-            children: [
-              if (isExpanded)
-                AnimatedVisibility(
-                  animation: hideControlAnimation,
-                  child: const PlayPauseRestartControl(
-                    useControlButton: false,
-                  ),
-                ),
-              Expanded(
-                child: AnimatedVisibility(
-                  animation: isExpanded
-                      ? hideControlAnimation
-                      : Animation.fromValueListenable(
-                          showPlaybackProgress,
-                        ),
-                  child: progressWidget,
-                ),
-              ),
-              if (isExpanded)
-                AnimatedVisibility(
-                  animation: hideControlAnimation,
-                  child: Row(
-                    children: [
-                      SizedBox(width: 12.w),
-                      const PlayerDurationControl(full: false, reversed: true),
-                      SizedBox(width: 12.w),
-                    ],
-                  ),
-                ),
-            ],
-          );
-        },
-        child: PlaybackProgress(
-          alignment: isExpanded ? Alignment.center : Alignment.bottomCenter,
-          progress: playerRepo.videoProgressStream,
-          // TODO(Josh4500): Revisit this code
-          start: playerRepo.currentVideoProgress ?? Progress.zero,
-          // TODO(Josh4500): Get ready value
-          end: const Duration(minutes: 1),
-          animation: progressAnimation,
-          bufferAnimation: bufferAnimation,
-          onTap: onTap,
-          onDragStart: onHorizontalDragStart,
-          onChangePosition: onChangePosition,
-          onDragEnd: onHorizontalDragEnd,
-          onVerticalDrag: onVerticalDrag,
-          onVerticalDragStart: onVerticalDragStart,
-          onVerticalDragEnd: onVerticalDragEnd,
-        ),
       ),
     );
   }
@@ -1129,11 +734,14 @@ class _MiddleControl extends StatelessWidget {
   }
 }
 
-class _SlideFramePlayButton extends ConsumerWidget {
-  const _SlideFramePlayButton({required this.onClose});
-  final VoidCallback onClose;
+class _SlideFramePlayButton extends StatelessWidget {
+  const _SlideFramePlayButton();
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    void onClose() {
+      SlideSeekEndPlayerNotification().dispatch(context);
+    }
+
     return Column(
       children: [
         Align(
@@ -1148,10 +756,9 @@ class _SlideFramePlayButton extends ConsumerWidget {
         ),
         Expanded(
           child: GestureDetector(
-            onTap: () {
-              onClose();
-              ref.read(playerRepositoryProvider).playVideo();
-            },
+            onTap: onClose,
+            // TODO ref.read(playerRepositoryProvider).playVideo();
+
             child: Container(
               constraints: BoxConstraints.tightFor(
                 width: 54.w,
@@ -1177,50 +784,49 @@ class _SlideFramePlayButton extends ConsumerWidget {
 }
 
 class _OverlayVideoSuggestions extends StatelessWidget {
-  const _OverlayVideoSuggestions({required this.animation});
-
-  final Animation<double> animation;
+  const _OverlayVideoSuggestions();
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
+    final viewController = context.provide<PlayerViewController>();
+
+    return NotifierSelector(
+      notifier: viewController,
+      selector: (state) {
+        return (state.boxProp.isExpanded || state.isFullscreen) &&
+            state.isControlsVisible;
+      },
       builder: (
         BuildContext context,
-        WidgetRef ref,
-        Widget? childWidget,
+        bool visible,
+        Widget? _,
       ) {
-        final isExpanded = ref.watch(
-          playerViewStateProvider.select((state) => state.isExpanded),
-        );
         final isLandscape = context.orientation.isLandscape;
-        if (isExpanded || isLandscape) {
-          return AnimatedVisibility(
-            animation: animation,
-            child: Row(
-              children: [
-                if (isLandscape) ...[
-                  Row(
-                    children: [
-                      const PlayPauseRestartControl(useControlButton: false),
-                      SizedBox(width: 8.w),
-                      const PlayerDurationControl(full: false, reversed: true),
-                    ],
-                  ),
-                  const Spacer(),
-                ],
-                const PlayerMoreVideos(),
-                if (context.orientation.isPortrait) ...[
-                  const Spacer(),
-                  const RotatedBox(
-                    quarterTurns: 2,
-                    child: PlayerMinimize(),
-                  ),
-                ],
+        return AnimatedValuedVisibility(
+          visible: visible,
+          child: Row(
+            children: [
+              if (isLandscape) ...[
+                Row(
+                  children: [
+                    const PlayPauseRestartControl(useControlButton: false),
+                    SizedBox(width: 8.w),
+                    const PlayerDurationControl(full: false, reversed: true),
+                  ],
+                ),
+                const Spacer(),
               ],
-            ),
-          );
-        }
-        return const SizedBox();
+              const PlayerMoreVideos(),
+              if (context.orientation.isPortrait) ...[
+                const Spacer(),
+                const RotatedBox(
+                  quarterTurns: 2,
+                  child: PlayerMinimize(),
+                ),
+              ],
+            ],
+          ),
+        );
       },
     );
   }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_clone/core/enums/auth_state.dart';
-import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 import 'package:youtube_clone/presentation/router.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 
@@ -10,7 +8,14 @@ import '../account_avatar.dart';
 import '../builders/auth_state_builder.dart';
 import '../connection_snackbar.dart';
 
-class HomeNavigatorBar extends ConsumerStatefulWidget {
+enum HomeTab {
+  feed,
+  short,
+  subscription,
+  library,
+}
+
+class HomeNavigatorBar extends StatefulWidget {
   const HomeNavigatorBar({
     super.key,
     this.height = 100,
@@ -24,14 +29,16 @@ class HomeNavigatorBar extends ConsumerStatefulWidget {
   final ValueChanged<int> onChangeIndex;
 
   @override
-  ConsumerState<HomeNavigatorBar> createState() => _HomeNavigatorBarState();
+  State<HomeNavigatorBar> createState() => HomeNavigatorBarState();
 }
 
-class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
+class HomeNavigatorBarState extends State<HomeNavigatorBar>
     with TickerProviderStateMixin {
+  bool _lockNavBarPos = false;
   late final AnimationController _navBarSizeController;
   late final Animation<double> _navBarSizeAnimation;
 
+  // TODO Slide
   late final AnimationController _navBarSlideController;
   late final Animation<Offset> _navBarSlideAnimation;
 
@@ -70,6 +77,26 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
     );
   }
 
+  void lockNavBarPosition() {
+    _lockNavBarPos = true;
+  }
+
+  void unlockNavBarPosition() {
+    _lockNavBarPos = false;
+  }
+
+  void updateNavBarPosition(double value) {
+    if (_lockNavBarPos == false) {
+      _navBarSizeController.value = value;
+    }
+
+    // if (navBarHidden) {
+    //   _navBarSlideController.forward();
+    // } else {
+    //   _navBarSlideController.reverse();
+    // }
+  }
+
   @override
   void dispose() {
     _navBarSizeController.dispose();
@@ -79,18 +106,6 @@ class _HomeNavigatorBarState extends ConsumerState<HomeNavigatorBar>
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(
-      homeRepositoryProvider,
-      (_, next) {
-        _navBarSizeController.value = next.navBarPos;
-        if (next.navBarHidden) {
-          _navBarSlideController.forward();
-        } else {
-          _navBarSlideController.reverse();
-        }
-      },
-    );
-
     // TODO(josh): Needs perfection compare to native
     return Theme(
       data: widget.selectedIndex == 1 ? AppTheme.dark : Theme.of(context),

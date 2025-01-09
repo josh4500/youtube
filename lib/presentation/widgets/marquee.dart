@@ -104,12 +104,13 @@ class _MarqueeState extends State<Marquee> {
 
   @override
   void didChangeDependencies() {
-    _calculateTextSize();
     super.didChangeDependencies();
+    _calculateTextSize();
   }
 
   @override
   void didUpdateWidget(Marquee oldWidget) {
+    super.didUpdateWidget(oldWidget);
     _enabled = widget.enabled;
     if (!oldWidget.enabled && state == MarqueeState.animating) {
       state = MarqueeState.notAnimating;
@@ -118,8 +119,6 @@ class _MarqueeState extends State<Marquee> {
     if (oldWidget.text != widget.text || oldWidget.style != widget.style) {
       _calculateTextSize();
     }
-
-    super.didUpdateWidget(oldWidget);
   }
 
   void _gradientChangeCallback() {
@@ -175,20 +174,23 @@ class _MarqueeState extends State<Marquee> {
   @override
   Widget build(BuildContext context) {
     final TextStyle style = widget.style ?? DefaultTextStyle.of(context).style;
-    final textSpan = TextSpan(
-      text: widget.text,
-      children: <InlineSpan>[
-        WidgetSpan(child: SizedBox(width: widget.spacing)),
-        TextSpan(text: widget.text),
-      ],
-      style: style,
-    );
+
     final double height =
         (style.fontSize ?? kDefaultFontSize) + widget.padding.vertical;
     return SizedBox(
       height: height,
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
+          final textSpan = TextSpan(
+            text: widget.text,
+            children: textLayoutSize.width > constraints.maxWidth
+                ? <InlineSpan>[
+                    WidgetSpan(child: SizedBox(width: widget.spacing)),
+                    TextSpan(text: widget.text),
+                  ]
+                : null,
+            style: style,
+          );
           final child = _MarqueeBuilder(
             text: textSpan,
             animate: _animate,
@@ -196,6 +198,7 @@ class _MarqueeState extends State<Marquee> {
             constraints: constraints,
             padding: widget.padding,
           );
+
           if (textLayoutSize.width > constraints.maxWidth) {
             return ListenableBuilder(
               listenable: _gradient,

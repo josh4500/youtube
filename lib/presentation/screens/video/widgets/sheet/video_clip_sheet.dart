@@ -36,14 +36,10 @@ class VideoClipSheet extends StatefulWidget {
   const VideoClipSheet({
     super.key,
     this.controller,
-    required this.onPressClose,
     this.draggableController,
-    required this.initialHeight,
   });
 
   final ScrollController? controller;
-  final VoidCallback onPressClose;
-  final double initialHeight;
   final DraggableScrollableController? draggableController;
 
   @override
@@ -53,17 +49,6 @@ class VideoClipSheet extends StatefulWidget {
 class _VideoClipSheetState extends State<VideoClipSheet> {
   final textFocusNode = FocusNode();
   final textEditingController = TextEditingController();
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.draggableController?.animateTo(
-        widget.initialHeight,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInCubic,
-      );
-    });
-  }
 
   @override
   void dispose() {
@@ -115,7 +100,6 @@ class _VideoClipSheetState extends State<VideoClipSheet> {
                               textEditingController.clear();
 
                               context.pop();
-                              widget.onPressClose();
                             },
                             title: 'Discard clip',
                             alignment: Alignment.center,

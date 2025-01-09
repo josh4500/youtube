@@ -26,75 +26,48 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-enum SeekNotificationType {
-  none,
-  speedUp2X,
-  pullUp,
-  slideLeftOrRight,
-  slideFrame,
-  release;
-
-  bool get isSlideSeeking {
-    return this == slideLeftOrRight || this == slideFrame || this == release;
-  }
-
-  bool get isSlideFrame => this == slideFrame;
-  bool get isNone => this == none;
-}
+import '../../player_view_controller.dart';
 
 class SeekIndicator extends StatelessWidget {
-  const SeekIndicator({
-    super.key,
-    required this.valueListenable,
-  });
-  final ValueListenable<SeekNotificationType> valueListenable;
+  const SeekIndicator({super.key, required this.type});
+  final SeekType type;
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<SeekNotificationType>(
-      valueListenable: valueListenable,
-      builder: (
-        BuildContext context,
-        SeekNotificationType type,
-        Widget? childWidget,
-      ) {
-        if (type.isNone || type.isSlideFrame) {
-          return const SizedBox();
-        }
-        return Container(
-          margin: const EdgeInsets.all(12),
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.black54,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (type == SeekNotificationType.speedUp2X) ...[
-                const Text('2X'),
-                const SizedBox(width: 4),
-                const Icon(Icons.fast_forward),
-              ] else if (type == SeekNotificationType.pullUp) ...[
-                const Icon(Icons.expand_less),
-                const SizedBox(width: 4),
-                const Text('Pull up for precise seeking'),
-              ] else if (type == SeekNotificationType.slideLeftOrRight) ...[
-                const Icon(Icons.linear_scale),
-                const SizedBox(width: 4),
-                const Text('Slide left or right to seek'),
-              ] else if (type == SeekNotificationType.release)
-                const Text('Release to cancel')
-              else
-                const SizedBox(width: 80),
-            ],
-          ),
-        );
-      },
+    if (type.isNone || type.isSlideFrame || type.isDoubleTap) {
+      return const SizedBox();
+    }
+    return Container(
+      margin: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.black54,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (type == SeekType.speedUp2X) ...[
+            const Text('2X'),
+            const SizedBox(width: 4),
+            const Icon(Icons.fast_forward),
+          ] else if (type == SeekType.pullUp) ...[
+            const Icon(Icons.expand_less),
+            const SizedBox(width: 4),
+            const Text('Pull up for precise seeking'),
+          ] else if (type == SeekType.slideLeftOrRight) ...[
+            const Icon(Icons.linear_scale),
+            const SizedBox(width: 4),
+            const Text('Slide left or right to seek'),
+          ] else if (type == SeekType.release)
+            const Text('Release to cancel')
+          else
+            const SizedBox(width: 80),
+        ],
+      ),
     );
   }
 }

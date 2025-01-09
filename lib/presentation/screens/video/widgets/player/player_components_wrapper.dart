@@ -59,7 +59,7 @@ class PlayerComponentsWrapper extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             child,
-            const PlayerOverlayControls(),
+            const Positioned.fill(child: PlayerOverlayControls()),
           ],
         ),
       ),

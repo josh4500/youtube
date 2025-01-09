@@ -33,6 +33,8 @@ import 'package:youtube_clone/presentation/screens/accounts/widgets/popup/show_y
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
+import '../create/widgets/filter_selector.dart';
+
 class YourClipsScreen extends StatefulWidget {
   const YourClipsScreen({super.key});
 
@@ -71,6 +73,7 @@ class _YourClipsScreenState extends State<YourClipsScreen>
 
   @override
   Widget build(BuildContext context) {
+    return const EditView();
     return Scaffold(
       appBar: AppBar(
         title: AnimatedBuilder(
@@ -153,6 +156,189 @@ class _YourClipsScreenState extends State<YourClipsScreen>
           ],
         ),
       ),
+    );
+  }
+}
+
+const double kFilterBoxHeight = 88;
+const double kVerticalActionMargin = 12;
+const double kTopPadding = (kVerticalActionMargin * 2) + 28 + (8 * 2);
+
+class EditView extends StatefulWidget {
+  const EditView({super.key});
+
+  @override
+  State<EditView> createState() => _EditViewState();
+}
+
+class _EditViewState extends State<EditView>
+    with SingleTickerProviderStateMixin {
+  final FocusNode focusNode = FocusNode();
+  late final AnimationController controller = AnimationController(
+    vsync: this,
+    duration: Durations.short2,
+  );
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    controller.dispose();
+    super.dispose();
+  }
+
+  void _onDragUpdate(DragUpdateDetails details) {
+    if (!focusNode.hasFocus) {
+      controller.value -= details.primaryDelta! / kFilterBoxHeight;
+    }
+  }
+
+  void _onDragEnd(DragEndDetails details) {
+    if (controller.value < .5) {
+      controller.reverse();
+    } else {
+      controller.forward();
+    }
+    focusNode.unfocus();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      child: GestureDetector(
+        onVerticalDragUpdate: _onDragUpdate,
+        onVerticalDragEnd: _onDragEnd,
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                SizeTransition(
+                  sizeFactor: controller.view,
+                  child: const SizedBox(height: kTopPadding),
+                ),
+                Expanded(
+                  child: AspectRatio(
+                    aspectRatio: 9 / 16,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: CustomNetworkImage(
+                            'https://picsum.photos/900/400',
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizeTransition(
+                  sizeFactor: controller.view,
+                  axisAlignment: -1,
+                  child: const FilterSelector(),
+                ),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: kVerticalActionMargin,
+                horizontal: 4,
+              ),
+              child: Row(
+                children: [
+                  CustomActionButton(Icons.close),
+                  Spacer(),
+                  CustomActionButton(Icons.crop_rotate_rounded),
+                  CustomActionButton(Icons.sticky_note_2),
+                  CustomActionButton(Icons.sort_by_alpha),
+                  CustomActionButton(Icons.edit),
+                ],
+              ),
+            ),
+            FadeTransition(
+              opacity: ReverseAnimation(controller.view),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Icon(Icons.keyboard_arrow_up_sharp),
+                  const SizedBox(height: 4),
+                  const Text('Filter'),
+                  const SizedBox(height: 4),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 12,
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey,
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.account_circle),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: TextField(
+                                  focusNode: focusNode,
+                                  decoration: const InputDecoration.collapsed(
+                                    hintText: 'Add a caption...',
+                                    hintStyle: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.numbers),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Majid'),
+                            IconButton(
+                              onPressed: () {},
+                              color: Colors.green,
+                              visualDensity: VisualDensity.compact,
+                              icon: const Icon(Icons.send),
+                            ),
+                          ],
+                        ),
+                        Builder(
+                          builder: (BuildContext context) {
+                            return SizedBox(
+                              height: MediaQuery.viewInsetsOf(context).bottom,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CustomActionButton extends StatelessWidget {
+  const CustomActionButton(this.iconData, {super.key});
+  final IconData iconData;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.all(8),
+      child: Icon(iconData),
     );
   }
 }

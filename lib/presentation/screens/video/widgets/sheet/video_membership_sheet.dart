@@ -35,14 +35,10 @@ class VideoMembershipSheet extends StatefulWidget {
   const VideoMembershipSheet({
     super.key,
     this.controller,
-    required this.onPressClose,
     this.draggableController,
-    required this.initialHeight,
   });
 
   final ScrollController? controller;
-  final VoidCallback onPressClose;
-  final double initialHeight;
   final DraggableScrollableController? draggableController;
 
   @override
@@ -51,17 +47,6 @@ class VideoMembershipSheet extends StatefulWidget {
 
 class _VideoMembershipSheetState extends State<VideoMembershipSheet> {
   final showMore = ValueNotifier(false);
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.draggableController?.animateTo(
-        widget.initialHeight,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInCubic,
-      );
-    });
-  }
 
   @override
   void dispose() {
@@ -74,7 +59,6 @@ class _VideoMembershipSheetState extends State<VideoMembershipSheet> {
     return PageDraggableSheet(
       title: 'Membership',
       controller: widget.controller ?? ScrollController(),
-      onClose: widget.onPressClose,
       draggableController: widget.draggableController,
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(12),

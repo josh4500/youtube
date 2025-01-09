@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:youtube_clone/presentation/models.dart';
-import 'package:youtube_clone/presentation/screens/create/provider/index_notifier.dart';
+import 'package:youtube_clone/presentation/providers.dart';
 import 'package:youtube_clone/presentation/themes.dart';
 import 'package:youtube_clone/presentation/widgets.dart';
 
@@ -47,7 +47,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
   }
 
   @override
-  void onIndexChanged(int newIndex) {
+  void didTabIndexChanged(int newIndex) {
     if (newIndex != CreateTab.post.index) {
       postTextFocusNode.unfocus();
     }

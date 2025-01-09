@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_clone/presentation/provider/repository/home_repository_provider.dart';
 import 'package:youtube_clone/presentation/router.dart';
+import 'package:youtube_clone/presentation/screens.dart' show HomeMessenger;
 import 'package:youtube_clone/presentation/themes.dart';
 
 import '../../constants.dart';
@@ -158,7 +158,7 @@ class HomeDrawerItem extends ConsumerWidget {
     return TappableArea(
       onTap: () {
         if (onTap != null) {
-          ref.read(homeRepositoryProvider).closeDrawer();
+          HomeMessenger.closeDrawer(context);
           onTap?.call();
         }
       },

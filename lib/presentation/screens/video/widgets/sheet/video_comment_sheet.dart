@@ -37,16 +37,10 @@ class VideoCommentsSheet extends StatefulWidget {
   const VideoCommentsSheet({
     super.key,
     this.controller,
-    required this.replyController,
-    required this.onPressClose,
-    required this.initialHeight,
     this.draggableController,
     this.dragDismissible = true,
   });
   final ScrollController? controller;
-  final PageDraggableOverlayChildController replyController;
-  final VoidCallback onPressClose;
-  final double initialHeight;
   final bool dragDismissible;
   final DraggableScrollableController? draggableController;
 
@@ -56,24 +50,14 @@ class VideoCommentsSheet extends StatefulWidget {
 
 class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
   final indexNotifier = ValueNotifier(0);
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.draggableController?.animateTo(
-        widget.initialHeight,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInCubic,
-      );
-    });
-  }
-
+  final replyController = PageDraggableOverlayChildController(
+    title: 'Replies',
+  );
   @override
   Widget build(BuildContext context) {
     return PageDraggableSheet(
       title: 'Comments',
       controller: widget.controller ?? ScrollController(),
-      onClose: widget.onPressClose,
       dragDismissible: widget.dragDismissible,
       showDragIndicator: widget.dragDismissible,
       draggableController: widget.draggableController,
@@ -195,14 +179,14 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
                     ),
                   ),
                   CommentTile(
-                    openReply: widget.replyController.open,
+                    openReply: replyController.open,
                   ),
                   const Divider(thickness: 6, height: 0),
                 ],
               );
             }
             return CommentTile(
-              openReply: widget.replyController.open,
+              openReply: replyController.open,
               pinned: index == 1,
               byCreator: index == 1,
               creatorLikes: index == 1,
@@ -214,10 +198,10 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
         );
       },
       bottom: ListenableBuilder(
-        listenable: widget.replyController,
+        listenable: replyController,
         builder: (context, _) {
           return Visibility(
-            visible: !widget.replyController.isOpened,
+            visible: !replyController.isOpened,
             child: const CommentTextFieldPlaceholder(),
           );
         },
@@ -225,7 +209,7 @@ class _VideoCommentsSheetState extends State<VideoCommentsSheet> {
       baseHeight: 1 - kAvgVideoViewPortHeight,
       overlayChildren: [
         PageDraggableOverlayChild(
-          controller: widget.replyController,
+          controller: replyController,
           builder: (context, controller, physics) {
             return ListView.builder(
               controller: controller,
