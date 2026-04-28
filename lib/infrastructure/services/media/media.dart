@@ -52,7 +52,7 @@ class MediaAlbum extends AssetPathEntity {
 }
 
 class MediaFile extends AssetEntity {
-  const MediaFile({
+  MediaFile({
     required super.id,
     required super.typeInt,
     required super.width,
